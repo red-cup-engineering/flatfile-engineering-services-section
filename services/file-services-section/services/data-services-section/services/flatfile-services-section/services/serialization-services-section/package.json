@@ -1,0 +1,7 @@
+{
+  "name": "@red-cup-engineering/serialization-services-section",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Proof-path section for decoded and encoded flatfile serializations."
+}
