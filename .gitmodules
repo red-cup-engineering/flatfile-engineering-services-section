@@ -6,3 +6,7 @@
 	path = services/file-services-section/services/filesystem-custody-services-section/lib/legacy
 	url = https://github.com/red-cup-engineering/filesystem-custody-services-section-legacy.git
 	branch = main
+[submodule "services/serialized-data-services-section"]
+	path = services/serialized-data-services-section
+	url = https://github.com/red-cup-engineering/serialized-data-services-section.git
+	branch = main
