@@ -1,8 +1,11 @@
 {
   "name": "@red-cup-engineering/html-file-codec-service",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": false,
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/html/index.d.mts",
