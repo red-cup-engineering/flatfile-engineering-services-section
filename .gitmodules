@@ -10,3 +10,7 @@
 	path = services/serialized-data-services-section
 	url = https://github.com/red-cup-engineering/serialized-data-services-section.git
 	branch = main
+[submodule "services/file-services-section/services/read-file-service"]
+	path = services/file-services-section/services/read-file-service
+	url = https://github.com/red-cup-engineering/read-file-service.git
+	branch = main
