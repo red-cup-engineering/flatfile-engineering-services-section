@@ -14,3 +14,6 @@
 	path = services/file-services-section/services/read-file-service
 	url = https://github.com/red-cup-engineering/read-file-service.git
 	branch = main
+[submodule "services/file-services-section/services/write-file-service"]
+	path = services/file-services-section/services/write-file-service
+	url = https://github.com/red-cup-engineering/write-file-service.git
