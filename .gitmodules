@@ -2,3 +2,7 @@
 	path = services/text-services-section
 	url = https://github.com/red-cup-engineering/text-services-section.git
 	branch = main
+[submodule "filesystem-custody-services-section-legacy"]
+	path = services/file-services-section/services/filesystem-custody-services-section/lib/legacy
+	url = https://github.com/red-cup-engineering/filesystem-custody-services-section-legacy.git
+	branch = main
