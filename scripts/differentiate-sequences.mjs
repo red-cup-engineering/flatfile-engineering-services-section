@@ -1,4 +1,4 @@
-import { canonical } from "@red-cup-engineering/json-file-codec-service";
+import { canonical } from "./canonical-json.mjs";
 
 /**
  * Differentiate two ordered JSON-value sequences using a longest common subsequence.

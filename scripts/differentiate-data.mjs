@@ -1,4 +1,4 @@
-import { canonical } from "@red-cup-engineering/json-file-codec-service";
+import { canonical } from "./canonical-json.mjs";
 
 function same(left, right) { return canonical(left) === canonical(right); }
 function pathOf(path, key) { return path === "" ? key : `${path}.${key}`; }
