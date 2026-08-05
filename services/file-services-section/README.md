@@ -1,10 +1,10 @@
-# File services section
+# File services
 
-This section owns operations whose admitted carrier is read or written through a
-file proof path. The canonical filepath is constitutive of the resource's
-identity: every earned segment is a generating or restriction morphism, and
-root-to-leaf traversal composes the proof without an external index.
+Focused command-line services include:
 
-Its data services child progressively restricts this broad boundary. Every file
-actuator is owned at the deepest path whose restrictions it proves; the path is
-the actuator's operational type and the canonical route to its implementation.
+- `services/read-file-service/scripts/read-file.mjs`
+- `services/write-file-service/scripts/write-file.mjs`
+- `services/data-services-section/services/file-observation-services-section/services/searching-file-content-service/scripts/search-file-content.mjs`
+- `services/data-services-section/services/file-projection-services-section/services/replacing-file-content-service/scripts/replace-file-content.mjs`
+- `services/filepath-services-section/services/searching-filepath-service/scripts/search-file-path.mjs`
+- `services/filepath-services-section/services/relocating-directory-service/scripts/relocate-directory.mjs`
