@@ -17,9 +17,3 @@
 [submodule "services/file-services-section/services/write-file-service"]
 	path = services/file-services-section/services/write-file-service
 	url = https://github.com/red-cup-engineering/write-file-service.git
-[submodule "services/differentiate-data-service"]
-	path = services/differentiate-data-service
-	url = https://github.com/red-cup-engineering/differentiate-data-service.git
-[submodule "services/differentiate-sequences-service"]
-	path = services/differentiate-sequences-service
-	url = https://github.com/red-cup-engineering/differentiate-sequences-service.git
