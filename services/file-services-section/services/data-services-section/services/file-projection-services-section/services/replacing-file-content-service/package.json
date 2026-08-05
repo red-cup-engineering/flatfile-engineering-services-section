@@ -1,0 +1,19 @@
+{
+  "name": "@red-cup-engineering/replacing-file-content-service",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Replaces a literal string in one text file using an atomic write.",
+  "bin": {
+    "replace-file-content": "./scripts/replace-file-content.mjs"
+  },
+  "exports": "./scripts/replace-file-content.mjs",
+  "scripts": {
+    "check": "node --check scripts/replace-file-content.mjs",
+    "test": "node --test test/*.test.mjs",
+    "verify": "npm run check && npm test"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
