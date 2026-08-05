@@ -17,3 +17,7 @@
 [submodule "services/file-services-section/services/write-file-service"]
 	path = services/file-services-section/services/write-file-service
 	url = https://github.com/red-cup-engineering/write-file-service.git
+[submodule "services/data-services"]
+	path = services/data-services
+	url = https://github.com/red-cup-engineering/data-services.git
+	branch = main

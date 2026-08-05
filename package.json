@@ -1,0 +1,13 @@
+{
+  "name": "@red-cup-engineering/data-services-section",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "differentiate-data": "./bin/differentiate-data.mjs",
+    "differentiate-sequences": "./bin/differentiate-sequences.mjs"
+  },
+  "dependencies": {
+    "@red-cup-engineering/data-services": "0.1.0"
+  }
+}
