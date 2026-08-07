@@ -5,6 +5,6 @@ compare-and-swap writes, records immutable receipts in an append-only outbox,
 and exposes no Git operation. A version-control service may settle an accepted
 receipt later; it may never infer a change from ambient worktree dirt.
 
-The provider is intentionally placed under file services. The historical
-`block-device-io-coordinator` remains a compatibility subject while its
-block-device-specific parts are separated under hardware storage custody.
+The provider is intentionally placed under file services. The retired
+`block-device-io-coordinator` is preserved in the version-control legacy
+catalog and is not part of this service's runtime boundary.
