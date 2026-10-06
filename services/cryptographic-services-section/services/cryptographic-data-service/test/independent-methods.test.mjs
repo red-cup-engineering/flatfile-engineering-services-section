@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {sha256} from '@red-cup-engineering/cryptographic-data-service/hash';
+import {sign,verify,recover,getPublicKey} from '@red-cup-engineering/cryptographic-data-service/secp256k1';
+import {sealWithPassphrase,openWithPassphrase} from '@red-cup-engineering/cryptographic-data-service/seal';
+const secret=Buffer.alloc(32,2),digest=sha256(Buffer.from('disposable admission fixture'));
+const {signature,recovery}=sign(digest,secret),pub=getPublicKey(secret);
+assert.equal(verify(digest,signature,pub),true);
+assert.deepEqual(recover(digest,signature,recovery),pub);
+assert.equal(verify(sha256(Buffer.from('different request')),signature,pub),false);
+const envelope=sealWithPassphrase('disposable payload','fixture passphrase');
+assert.equal(openWithPassphrase(envelope,'fixture passphrase'),'disposable payload');
+assert.throws(()=>openWithPassphrase(envelope,'wrong passphrase'));
