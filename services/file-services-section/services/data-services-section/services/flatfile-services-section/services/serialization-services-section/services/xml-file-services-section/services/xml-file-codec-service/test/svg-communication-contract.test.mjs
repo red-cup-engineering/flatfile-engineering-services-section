@@ -31,7 +31,7 @@ function fixture() {
         group: "source", label: "Source <value> & receiver", title: "Source <title>",
         href: "https://example.invalid/source?revision=1&view=svg",
         data: { "source-revision": "test-revision-1", "source-url": "urn:test:source" },
-        charge, box: fromBox,
+        charge, box: fromBox, focus: true,
       },
       {
         e: "urn:test:receiver", group: "receiver", label: "Receiver", charge, box: toBox,
@@ -58,6 +58,7 @@ test("interactive projection preserves escaped semantic coordinates and source r
   assert.ok(svg.includes(`data-from="${escapeXmlAttr(input.edges[0].from)}"`));
   assert.ok(svg.includes('data-to="urn:test:receiver"'));
   assert.ok(svg.includes('data-kind="states"'));
+  assert.ok(svg.includes('data-focus="true"'));
   assert.ok(svg.includes('data-source-revision="test-revision-1"'));
   assert.ok(svg.includes('data-source-url="urn:test:source"'));
   assert.ok(svg.includes(escapeXmlText(input.nodes[0].label)));
@@ -72,15 +73,16 @@ test("interactive projection emits the codec's charge attributes without remappi
   }
 });
 
-test("current static profile suppresses links and extension fields but retains core coordinates", () => {
-  // This characterizes v0.1.2, not RFC 7996 conformance or complete semantic preservation.
+test("static profile suppresses all data attributes and links while preserving visible content", () => {
+  // Profile-gating regression test, not complete RFC 7996 conformance.
   const input = fixture();
   const svg = projectSvg(input, { profile: rfc7996Profile });
   assert.doesNotMatch(svg, /<a[\s>]/);
-  assert.doesNotMatch(svg, /data-source-revision=/);
-  assert.doesNotMatch(svg, /data-positive=/);
-  assert.ok(svg.includes(`data-e="${escapeXmlAttr(input.nodes[0].e)}"`));
-  assert.ok(svg.includes('data-to="urn:test:receiver"'));
+  assert.doesNotMatch(svg, /\sdata-[A-Za-z0-9_.:-]+=/);
+  assert.ok(svg.includes('class="source"'));
+  assert.ok(svg.includes(escapeXmlText(input.nodes[0].label)));
+  assert.ok(svg.includes(escapeXmlText(input.nodes[0].title)));
+  assert.match(svg, /<path[^>]+marker-end=/);
 });
 
 test("SVG and radial projectors expose writing and recognition, not a lossless decoder", () => {
@@ -99,4 +101,26 @@ test("documented radial package subpath produces deterministic recognizable outp
   assert.equal(content, projectRadial(input));
   assert.equal(radialProjector.recognize({ path: "radial.svg", content }), true);
   assert.ok(content.includes('data-codec="radial"'));
+});
+
+// The two permission flags are independent; names do not define behavior.
+test("custom no-data profile can preserve node and edge anchors", () => {
+  const input = fixture();
+  input.edges[0].href = "https://example.invalid/relation";
+  const profile = { ...svgInteractiveProfile, name: "linked-no-data", permitsDataAttributes: false };
+  const svg = projectSvg(input, { profile });
+  assert.doesNotMatch(svg, /\sdata-[A-Za-z0-9_.:-]+=/);
+  assert.ok(svg.includes(`href="${escapeXmlAttr(input.nodes[0].href)}"`));
+  assert.ok(svg.includes('href="https://example.invalid/relation"'));
+});
+
+test("custom data-enabled profile can suppress anchors while preserving coordinates", () => {
+  const input = fixture();
+  input.edges[0].href = "https://example.invalid/relation";
+  const profile = { ...svgInteractiveProfile, name: "data-without-links", permitsAnchors: false };
+  const svg = projectSvg(input, { profile });
+  assert.doesNotMatch(svg, /<a[\s>]/);
+  assert.ok(svg.includes(`data-e="${escapeXmlAttr(input.nodes[0].e)}"`));
+  assert.ok(svg.includes(`data-from="${escapeXmlAttr(input.edges[0].from)}"`));
+  assert.ok(svg.includes('data-source-revision="test-revision-1"'));
 });

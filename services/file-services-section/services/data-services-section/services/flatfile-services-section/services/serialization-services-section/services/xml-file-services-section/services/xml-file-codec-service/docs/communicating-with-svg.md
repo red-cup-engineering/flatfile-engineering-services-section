@@ -32,9 +32,9 @@ Use ordinary extension keys such as `source-url` and `source-revision` in `node.
 
 `svgInteractiveProfile` retains extension and charge attributes and permits links. Use only with a receiver allowed to accept the supplied links and data.
 
-The currently named `rfc7996Profile` suppresses anchors, custom node data, and charge attributes, while retaining core node/edge data attributes. Its colored defaults and font list also remain. Its lint checks four regex patterns; it is not complete RFC 7996 validation and even non-SVG text can pass it. Do not describe output as RFC-conformant, fully static-safe, or lossless on that basis. The normative RFC 7996 compact schema and its monochrome/font constraints need a distinct owner-accepted conformance implementation and tests before such a claim. Source: https://www.rfc-editor.org/rfc/rfc7996.html
+The currently named `rfc7996Profile` sets `permitsDataAttributes: false`: all node and edge `data-*` attributes are suppressed, including source coordinates, focus metadata, extension fields, and charge attributes. It also suppresses anchors. Its colored defaults and font list also remain. Its lint checks four regex patterns; it is not complete RFC 7996 validation and even non-SVG text can pass it. Do not describe output as RFC-conformant, fully static-safe, or lossless on that basis. The normative RFC 7996 compact schema and its monochrome/font constraints need a distinct owner-accepted conformance implementation and tests before such a claim. Source: https://www.rfc-editor.org/rfc/rfc7996.html
 
-Because the static profile discards charge and extension fields, it cannot replace the interactive profile when those fields are the communication. Retain the original semantic carrier; do not silently drop it to satisfy a display profile.
+Because the static profile discards source coordinates, charge, and extension fields, it cannot replace the interactive profile when those fields are the communication. Retain the original semantic carrier; do not silently drop it to satisfy a display profile.
 
 ## Keep Koios' deterministic fingerprint separate
 
@@ -48,4 +48,4 @@ Use `test/svg-communication-contract.test.mjs` to characterize deterministic byt
 
 Before using SVG for an actor exchange, choose the required profile and verify that the real receiver interprets its intended source identity, relation coordinates, and charge. Keep source records available when the chosen display profile drops fields. Extend this existing codec and its owning contracts if the receiver requires a lossless decoder or a standards-conformant static projection.
 
-Source baseline: `@red-cup-engineering/xml-file-codec-service` 0.1.2 at Computer Data Services commit `d94eb5c6a842dbf5a55c72604259a5fe3010e258`, inspected 2026-10-06. This guide describes that implementation; installed and published versions may differ.
+Source baseline: `@red-cup-engineering/xml-file-codec-service` 0.1.2 at Computer Data Services commit `d94eb5c6a842dbf5a55c72604259a5fe3010e258`, inspected 2026-10-06. This guide includes the profile-gating correction in this change; installed and published versions may differ.
