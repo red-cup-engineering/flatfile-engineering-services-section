@@ -360,11 +360,12 @@ const EXTENDS = "svg-extends";
 type AttrBag = Record<string, string | number | null | undefined>;
 
 function nodeDataAttributes(node: PlacedCell, profile: Profile): AttrBag {
-  const attrs: AttrBag = { class: node.group, "data-e": node.e };
+  const attrs: AttrBag = { class: node.group };
+  if (!profile.permitsDataAttributes) return attrs;
+  attrs["data-e"] = node.e;
   if (node.a !== undefined) attrs["data-a"] = node.a;
   if (node.v !== undefined) attrs["data-v"] = node.v;
   if (node.focus) attrs["data-focus"] = "true";
-  if (!profile.permitsDataAttributes) return attrs;
   for (const [key, value] of Object.entries(node.data ?? {})) attrs[`data-${key}`] = value;
   Object.assign(attrs, chargeAttributes(node.charge));
   return attrs;
@@ -386,9 +387,13 @@ function renderNode(node: PlacedCell, registry: ShapeMorphismRegistry, profile: 
 
 function renderEdge(edge: PlacedEdge, registry: ShapeMorphismRegistry, profile: Profile, edgeColor: string): XmlNode {
   const morphism = registry.edge(edge.kind ?? "");
-  const dataAttrs: AttrBag = { "data-from": edge.from, "data-to": edge.to };
-  if (edge.kind !== undefined) dataAttrs["data-kind"] = edge.kind;
-  if (profile.permitsDataAttributes) Object.assign(dataAttrs, chargeAttributes(edge.charge));
+  const dataAttrs: AttrBag = {};
+  if (profile.permitsDataAttributes) {
+    dataAttrs["data-from"] = edge.from;
+    dataAttrs["data-to"] = edge.to;
+    if (edge.kind !== undefined) dataAttrs["data-kind"] = edge.kind;
+    Object.assign(dataAttrs, chargeAttributes(edge.charge));
+  }
   const path = edgePath(
     edge.fromBox,
     edge.toBox,

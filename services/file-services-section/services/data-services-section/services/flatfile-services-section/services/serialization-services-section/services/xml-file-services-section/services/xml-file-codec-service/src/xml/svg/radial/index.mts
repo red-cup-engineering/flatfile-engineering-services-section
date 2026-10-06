@@ -1,5 +1,5 @@
 /**
- * codecs/text/xml/svg/radial - the radial codec: charged relational data ⇄ a
+ * codecs/text/xml/svg/radial - the radial codec: charged relational data → a
  * deterministic concentric-ring SVG.
  *
  * A carrier holds a FINITE element-set that varies with the settling ordinal, so
@@ -213,8 +213,11 @@ function renderRing(ring: RadialRing, palette: ChargePalette, cx: number, cy: nu
  *
  * @example
  * ```js
- * import { charge, chargeValue } from "@red-cup-engineering/relating";
- * import { projectRadial, radialProjector } from "@red-cup-engineering/relating";
+ * import {
+ *   affirmedCharge,
+ *   projectRadial,
+ *   radialProjector,
+ * } from "@red-cup-engineering/xml-file-codec-service/svg/radial";
  *
  * const svg = projectRadial({
  *   rings: [{
@@ -224,7 +227,7 @@ function renderRing(ring: RadialRing, palette: ChargePalette, cx: number, cy: nu
  *       a: "canonicalizes",
  *       v: "bytes",
  *       orbit: "diagonal",
- *       charge: charge(chargeValue("potential")),
+ *       charge: affirmedCharge(),
  *     }],
  *   }],
  * });
