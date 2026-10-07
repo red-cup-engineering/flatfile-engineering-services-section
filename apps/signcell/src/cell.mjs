@@ -30,7 +30,7 @@
  * except to encode them.
  */
 import { coincidenceKey, coincides, semanticBytes, semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
-import { isReading, knowledgeJoinReading, readingAs, readingOfSides, readingSchema, record, sidesOfReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { isReading, knowledgeJoinReading, readingAs, readingOfSides, readingSchema, record, sidesOfReading } from "@red-cup-engineering/computer-data-services-section/four";
 
 const present = (value, role) => {
   if (value === undefined) throw new TypeError(`signcell: ${role} must be present`);

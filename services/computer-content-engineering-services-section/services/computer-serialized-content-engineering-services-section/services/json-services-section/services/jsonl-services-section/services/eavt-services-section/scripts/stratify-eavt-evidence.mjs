@@ -3,7 +3,7 @@ import { foldEavtEvidence } from "./fold-eavt-evidence.mjs";
 import { saturateEavtTrace } from "./saturate-eavt-trace.mjs";
 import { identifyContentAddressedRow } from "./identify-content-addressed-row.mjs";
 import { closeStateView } from "@red-cup-engineering/eavt/ledger/state-fold";
-import { costlierRegime } from "@red-cup-engineering/computer-data-engineering-services-section/closure-regime";
+import { costlierRegime } from "@red-cup-engineering/computer-data-services-section/closure-regime";
 import { closeOrdinalProcess, closureProcess, closureReadout, stabilizingSup } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/closure";
 import { readFileSync } from "node:fs";
 export const inputSchema = Object.freeze({

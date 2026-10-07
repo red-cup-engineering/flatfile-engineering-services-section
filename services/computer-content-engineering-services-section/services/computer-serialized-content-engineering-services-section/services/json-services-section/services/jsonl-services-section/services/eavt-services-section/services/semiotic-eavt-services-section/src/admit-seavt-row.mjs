@@ -5,8 +5,8 @@ import { eavtRow } from "@red-cup-engineering/eavt/admit-row";
 import {
   inferTy,
   isClosed,
-} from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
-import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
+} from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/typing";
+import { jsonToTerm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec";
 export const inputSchema = {
   type: "object",
   properties: {

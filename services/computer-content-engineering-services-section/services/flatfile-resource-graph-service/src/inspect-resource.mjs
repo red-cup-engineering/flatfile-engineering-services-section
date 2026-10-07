@@ -1,5 +1,5 @@
 import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
-import { admit, defineType } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
+import { admit, defineType } from "@red-cup-engineering/computer-data-services-section/type-system";
 import { composeProviders, queryRelations, serializeComposition } from "./provider/compositor.mjs";
 import { defineProvider, validateProviderOutcome } from "./provider/provider.mjs";
 

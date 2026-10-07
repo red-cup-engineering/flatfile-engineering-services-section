@@ -1,4 +1,4 @@
-import { admit, defineType } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
+import { admit, defineType } from "@red-cup-engineering/computer-data-services-section/type-system";
 
 function established(result) {
   if (result.ok) return result.value;

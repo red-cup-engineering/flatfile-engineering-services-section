@@ -20,7 +20,7 @@ import { recordConfiguredSemanticRecord } from "@red-cup-engineering/semiotic-ea
 import { inventorySemanticRecordRetirement } from "@red-cup-engineering/semiotic-eavt-services-section/inventory-semantic-record-retirement";
 import { replaySemanticRecordRetirement } from "@red-cup-engineering/semiotic-eavt-services-section/replay-semantic-record-retirement";
 import { readSeavtEntries } from "@red-cup-engineering/semiotic-eavt-services-section/read-seavt-entries";
-import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
+import { jsonToTerm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec";
 
 test("appends direct-SEN records and returns only the requested category", (t) => {
   const root = mkdtempSync(join(tmpdir(), "semantic-record-journal-"));

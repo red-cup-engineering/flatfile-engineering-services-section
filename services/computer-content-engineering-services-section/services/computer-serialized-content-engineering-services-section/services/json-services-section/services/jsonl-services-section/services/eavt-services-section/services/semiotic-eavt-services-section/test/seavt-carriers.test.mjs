@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { validateSchemaInstance } from "@red-cup-engineering/json-schema-services-section/validate-schema-instance";
-import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
+import { jsonToTerm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec";
 import { bindJsonTemplate } from "@red-cup-engineering/semiotic-eavt-services-section/bind-json-template";
 
 test("SEAVT commands execute their declared JSON carriers and preserve recorded content", async (t) => {

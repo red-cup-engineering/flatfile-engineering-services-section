@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { Mark, MarkType } from "../src/mark.mjs";
-import { instantiate, specializeType } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
+import { instantiate, specializeType } from "@red-cup-engineering/computer-data-services-section/type-system";
 test("Marks preserve opaque payloads and share a specializable admission contract", () => {
     const payload = { evidence: [true, false] };
     const value = new Mark(payload);

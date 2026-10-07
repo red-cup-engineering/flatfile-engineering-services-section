@@ -7,7 +7,7 @@ import {
   identifyValueSemanticContent,
 } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
 import { isNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { inferTy } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
+import { inferTy } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/typing";
 import { seavtRow } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
 
 const RDF_JSON = "http://www.w3.org/1999/02/22-rdf-syntax-ns#JSON";

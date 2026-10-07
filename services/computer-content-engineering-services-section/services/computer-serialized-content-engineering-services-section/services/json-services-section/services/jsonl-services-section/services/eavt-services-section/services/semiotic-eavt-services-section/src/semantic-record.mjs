@@ -8,9 +8,9 @@ import {
   EMPTY_WITNESS_ROOT,
   identifyJsonSemanticContent,
 } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
-import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
-import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { readingFamilies, readingOfSides, sidesOfReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec";
+import { tm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation";
+import { readingFamilies, readingOfSides, sidesOfReading } from "@red-cup-engineering/computer-data-services-section/four";
 import { seavtRow } from "./admit-seavt-row.mjs";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 import { journalWitness, parseJournalWitness } from "./journal/event.mjs";

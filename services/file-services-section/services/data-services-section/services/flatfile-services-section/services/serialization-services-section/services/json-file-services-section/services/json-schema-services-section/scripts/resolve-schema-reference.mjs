@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import * as json from "../../../src/index.mjs";
-import { freezeJson } from "../../../src/index.mjs";
+import * as json from "@red-cup-engineering/json-services-section";
+import { freezeJson } from "@red-cup-engineering/json-services-section";
 import { resolveSchemaPointer } from "./resolve-schema-pointer.mjs";
 
 import contract from "../schemas/resolve-schema-reference.json" with { type: "json" };

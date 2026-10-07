@@ -13,7 +13,7 @@
 // the operation, so this is where its verb contract now lives.
 
 import * as lagoonWorld from "../src/lagoon-world.mjs";
-import { REFUSAL_SCHEMA } from "@red-cup-engineering/computer-data-engineering-services-section/operation-refusal-schema";
+import { REFUSAL_SCHEMA } from "@red-cup-engineering/computer-data-services-section/operation-refusal-schema";
 
 const ROW_SCHEMA = {
   type: "object",

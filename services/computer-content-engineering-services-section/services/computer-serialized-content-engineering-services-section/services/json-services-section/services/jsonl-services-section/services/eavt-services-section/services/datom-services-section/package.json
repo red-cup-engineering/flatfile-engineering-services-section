@@ -26,8 +26,7 @@
     "./admit-rdf-datom-jsonl": "./scripts/admit-rdf-datom-jsonl.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*"
+    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*"
   },
   "files": [
     "src",

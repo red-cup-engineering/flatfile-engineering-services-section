@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { validateSchemaInstance } from "../../../../json-schema-services-section/scripts/validate-schema-instance.mjs";
+import { validateSchemaInstance } from "@red-cup-engineering/json-schema-services-section/validate-schema-instance";
 import * as normalize from "../scripts/normalize-row.mjs";
 import * as state from "../scripts/latest-state.mjs";
 import * as window from "../scripts/situation-window.mjs";

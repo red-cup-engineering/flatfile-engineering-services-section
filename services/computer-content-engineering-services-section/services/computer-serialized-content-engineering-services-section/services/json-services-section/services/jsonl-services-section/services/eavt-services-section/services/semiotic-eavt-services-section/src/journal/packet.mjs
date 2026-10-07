@@ -7,7 +7,7 @@ import {
   JSON_RESOURCE_ENVELOPE,
   canonicalizeJson,
 } from "@red-cup-engineering/json-services-section";
-import { sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
+import { sha256Hex } from "@red-cup-engineering/cryptographic-data-service/integrity";
 
 const REFERENCE_KIND = "metroplat.journal.packet-reference";
 const MEDIA_TYPE = "application/json";

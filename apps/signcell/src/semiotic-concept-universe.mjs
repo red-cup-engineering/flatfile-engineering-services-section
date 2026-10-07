@@ -1,4 +1,4 @@
-import { defineSchemaType } from "@red-cup-engineering/computer-data-engineering-services-section/type-system/schema-type";
+import { defineSchemaType } from "@red-cup-engineering/computer-data-services-section/type-system/schema-type";
 import { createTypedMark } from "./typed-mark.mjs";
 
 const freeze = (value) => Object.freeze(value);

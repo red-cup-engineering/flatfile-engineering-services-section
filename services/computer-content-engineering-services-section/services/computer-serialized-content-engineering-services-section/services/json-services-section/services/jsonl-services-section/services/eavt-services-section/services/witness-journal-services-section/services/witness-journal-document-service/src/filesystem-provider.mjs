@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { createImmutableContentCustody } from "@red-cup-engineering/immutable-content-custody-service";
 
 import { startWitnessJournalDocumentHttpProvider } from "./http-provider.mjs";
-import { sha256Base64Url } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
+import { sha256Base64Url } from "@red-cup-engineering/cryptographic-data-service/integrity";
 
 const PROFILE = "org.red-cup-engineering.filesystem-witness-journal-document.v1";
 const CUSTODY_PROFILE = "org.red-cup-engineering.filesystem-immutable-content.v1";
