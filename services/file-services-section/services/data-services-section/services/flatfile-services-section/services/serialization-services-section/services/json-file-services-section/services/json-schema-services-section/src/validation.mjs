@@ -346,7 +346,10 @@ function resolveUri(base, reference) {
     }
 }
 function unescapePointer(segment) {
-    return decodeURIComponent(segment).replace(/~1/gu, "/").replace(/~0/gu, "~");
+    const decoded = decodeURIComponent(segment);
+    if (/~(?:[^01]|$)/u.test(decoded))
+        throw new TypeError("invalid JSON Pointer escape");
+    return decoded.replace(/~1/gu, "/").replace(/~0/gu, "~");
 }
 class SchemaGraph {
     documents = new Map();
@@ -433,9 +436,9 @@ class SchemaGraph {
         for (const segment of fragment.slice(1).split("/")) {
             const key = unescapePointer(segment);
             if (Array.isArray(current))
-                current = current[Number(key)];
+                current = /^(?:0|[1-9][0-9]*)$/u.test(key) && Object.hasOwn(current, key) ? current[key] : undefined;
             else if (isObject(current))
-                current = current[key];
+                current = Object.hasOwn(current, key) ? current[key] : undefined;
             else
                 current = undefined;
             if (current === undefined)
@@ -736,7 +739,7 @@ class Evaluator {
         const required = schema["required"];
         if (Array.isArray(required)) {
             for (const name of required)
-                if (typeof name === "string" && value[name] === undefined)
+                if (typeof name === "string" && (!Object.hasOwn(value, name) || value[name] === undefined))
                     issues.push(issue("instance", path, "required", `must have required property '${name}'`));
         }
         const minProperties = schema["minProperties"];
@@ -750,11 +753,11 @@ class Evaluator {
         const dependentRequired = schema[dependencyKeyword];
         if (isObject(dependentRequired)) {
             for (const [name, dependents] of Object.entries(dependentRequired)) {
-                if (value[name] === undefined)
+                if (!Object.hasOwn(value, name) || value[name] === undefined)
                     continue;
                 if (Array.isArray(dependents)) {
                     for (const dependent of dependents)
-                        if (typeof dependent === "string" && value[dependent] === undefined)
+                        if (typeof dependent === "string" && (!Object.hasOwn(value, dependent) || value[dependent] === undefined))
                             issues.push(issue("instance", path, dependencyKeyword, `must have property ${dependent} when property ${name} is present`));
                 }
                 else if (isSchema(dependents)) {
@@ -767,7 +770,7 @@ class Evaluator {
         const dependentSchemas = schema["dependentSchemas"];
         if (isObject(dependentSchemas)) {
             for (const [name, dependent] of Object.entries(dependentSchemas)) {
-                if (value[name] === undefined || !isSchema(dependent))
+                if (!Object.hasOwn(value, name) || value[name] === undefined || !isSchema(dependent))
                     continue;
                 const collected = annotations();
                 if (sub(dependent, value, path, issues, collected))
