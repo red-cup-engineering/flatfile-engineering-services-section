@@ -1,0 +1,25 @@
+{
+  "name": "@red-cup-engineering/cbor-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "exports": "./src/cbor.mjs",
+  "files": [
+    "src",
+    "apps",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {
+    "@red-cup-engineering/uri-services-section": "workspace:*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "pack:dry-run": "npm pack --dry-run --ignore-scripts"
+  },
+  "engines": {
+    "node": ">=24.2.0"
+  }
+}

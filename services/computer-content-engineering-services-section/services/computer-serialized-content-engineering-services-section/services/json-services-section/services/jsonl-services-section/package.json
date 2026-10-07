@@ -1,0 +1,31 @@
+{
+  "name": "@red-cup-engineering/jsonl-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./nonblank-lines": "./scripts/nonblank-lines.mjs",
+    "./parse-jsonl": "./scripts/parse-jsonl.mjs",
+    "./serialize-jsonl": "./scripts/serialize-jsonl.mjs",
+    "./read-jsonl": "./scripts/read-jsonl.mjs",
+    "./write-jsonl": "./scripts/write-jsonl.mjs",
+    "./append-jsonl": "./scripts/append-jsonl.mjs",
+    "./project-jsonl": "./scripts/project-jsonl.mjs",
+    "./is-jsonl-text": "./scripts/is-jsonl-text.mjs",
+    "./jsonl-projector": "./scripts/jsonl-projector.mjs",
+    "./commit-jsonl-records": "./scripts/commit-jsonl-records.mjs",
+    "./verify-jsonl-commitment": "./scripts/verify-jsonl-commitment.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "files": [
+    "src",
+    "scripts",
+    "schemas",
+    "README.md"
+  ],
+  "dependencies": {
+    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.561.group/computer-data/json-value.schema.json",
+  "title": "JSON value",
+  "description": "The recursive JSON data carrier. Runtime admission additionally requires finite numbers, dense arrays, plain records, and absence of cycles. RFC 8785 encoding additionally rejects lone Unicode surrogates.",
+  "oneOf": [
+    {
+      "type": "null"
+    },
+    {
+      "type": "boolean"
+    },
+    {
+      "type": "number"
+    },
+    {
+      "type": "string"
+    },
+    {
+      "type": "array",
+      "items": {
+        "$ref": "#"
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#"
+      }
+    }
+  ]
+}
