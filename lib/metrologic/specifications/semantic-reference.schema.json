@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.561.group/computer/semantic-reference.schema.json",
+  "title": "Semantic cell reference",
+  "description": "The typed content address used at every semantic relation position.",
+  "type": "object",
+  "required": ["id", "type"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^ni:" },
+    "type": { "type": "string", "minLength": 1 }
+  },
+  "x-codegen": { "exportName": "semanticReferenceSchema", "typeName": "SemanticReference", "runtimeName": "semanticReferenceType" }
+}

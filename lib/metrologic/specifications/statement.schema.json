@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.561.group/computer/statement.schema.json",
+  "title": "Statement",
+  "description": "The portable four-place assertion (subject, predicate, object, witness). EAVT is its durable row representation; neither suppresses contradictory witnessed assertions.",
+  "type": "object",
+  "required": [
+    "subject",
+    "predicate",
+    "object",
+    "witness"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "subject": {
+      "type": "object"
+    },
+    "predicate": {
+      "type": "string",
+      "minLength": 1
+    },
+    "object": {
+      "type": "object"
+    },
+    "witness": {
+      "$ref": "evidence.schema.json"
+    }
+  },
+  "x-codegen": {
+    "exportName": "statementSchema",
+    "typeName": "Statement",
+    "runtimeName": "statementType"
+  }
+}
