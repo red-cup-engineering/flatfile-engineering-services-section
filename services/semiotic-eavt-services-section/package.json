@@ -2,7 +2,7 @@
   "name": "@red-cup-engineering/semiotic-eavt-services-section",
   "version": "0.1.0",
   "type": "module",
-  "description": "Semiotic EAVT (SEAVT): semantic records over EAVT rows whose coordinates are typed SEN terms — admission, identity, query, append/read, retirement inventory and replay, and the journal store.",
+  "description": "Semiotic EAVT (SEAVT): semantic records over EAVT rows whose coordinates are typed SEN terms \u2014 admission, identity, query, append/read, retirement inventory and replay, and the journal store.",
   "keywords": [
     "semiotic-eavt",
     "eavt",
