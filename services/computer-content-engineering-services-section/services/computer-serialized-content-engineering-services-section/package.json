@@ -5,7 +5,8 @@
   "description": "Groups codecs that map admitted computer content to and from serial byte or text forms.",
   "dependencies": {
     "@red-cup-engineering/eavt": "workspace:*",
-    "@red-cup-engineering/json-services-section": "workspace:*"
+    "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/uri-services-section": "workspace:*"
   },
   "exports": {
     "./services/http-data-services-section/src/content-type": "./services/http-data-services-section/src/content-type.mjs",
@@ -31,6 +32,11 @@
     "./project-web-feed": "./src/project-web-feed.mjs"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs services/http-data-services-section/test/*.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/red-cup-engineering/computer-data-services-section.git",
+    "directory": "services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section"
   }
 }
