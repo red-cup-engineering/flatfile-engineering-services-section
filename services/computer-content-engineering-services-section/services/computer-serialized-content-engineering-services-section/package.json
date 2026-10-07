@@ -1,0 +1,36 @@
+{
+  "name": "@red-cup-engineering/computer-data-serialization-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Groups codecs that map admitted computer content to and from serial byte or text forms.",
+  "dependencies": {
+    "@red-cup-engineering/eavt": "workspace:*",
+    "@red-cup-engineering/json-services-section": "workspace:*"
+  },
+  "exports": {
+    "./services/http-data-services-section/src/content-type": "./services/http-data-services-section/src/content-type.mjs",
+    "./services/http-data-services-section/src/media-type": "./services/http-data-services-section/src/media-type.mjs",
+    "./services/http-data-services-section/src/byte-range": "./services/http-data-services-section/src/byte-range.mjs",
+    "./services/http-data-services-section/src/date": "./services/http-data-services-section/src/date.mjs",
+    "./services/http-data-services-section/src/content-coding": "./services/http-data-services-section/src/content-coding.mjs",
+    "./services/http-data-services-section/src/header-value": "./services/http-data-services-section/src/header-value.mjs",
+    "./services/http-data-services-section/src/signed-cookie": "./services/http-data-services-section/src/signed-cookie.mjs",
+    "./services/http-data-services-section/src/cache-control": "./services/http-data-services-section/src/cache-control.mjs",
+    "./services/http-data-services-section/src/server-sent-event": "./services/http-data-services-section/src/server-sent-event.mjs",
+    "./services/http-data-services-section/src/cookie": "./services/http-data-services-section/src/cookie.mjs",
+    "./services/http-data-services-section/src/batchexecute": "./services/http-data-services-section/src/batchexecute.mjs",
+    "./services/http-data-services-section/src/preferences": "./services/http-data-services-section/src/preferences.mjs",
+    "./services/http-data-services-section/src/multipart-form-data": "./services/http-data-services-section/src/multipart-form-data.mjs",
+    "./microformats": "./src/microformats.mjs",
+    "./pagination-html": "./src/pagination-html.mjs",
+    "./services/http-data-services-section/src/link": "./services/http-data-services-section/src/link.mjs",
+    "./services/http-data-services-section/src/bearer-authentication": "./services/http-data-services-section/src/bearer-authentication.mjs",
+    "./base58": "./src/base58.mjs",
+    "./read-bcp-14-requirements": "./scripts/read-bcp-14-requirements.mjs",
+    "./web-feed": "./src/web-feed.mjs",
+    "./project-web-feed": "./src/project-web-feed.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}
