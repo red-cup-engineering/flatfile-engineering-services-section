@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "root": {
+      "type": "string"
+    },
+    "feed": {
+      "type": "string"
+    },
+    "at": {}
+  },
+  "required": ["root", "feed", "at"],
+  "additionalProperties": false
+}

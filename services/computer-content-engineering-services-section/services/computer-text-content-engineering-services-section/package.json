@@ -1,0 +1,22 @@
+{
+  "name": "@red-cup-engineering/computer-text-content-engineering-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "General transformations and operation dispatch for text content.",
+  "exports": {
+    "./computer-text-engine": "./src/computer-text-engine.mjs",
+    "./admit-nonempty-single-line-text": "./src/admit-nonempty-single-line-text.mjs",
+    "./parse-comma-separated-text-list": "./src/parse-comma-separated-text-list.mjs",
+    "./read-flag-token-values": "./src/read-flag-token-values.mjs",
+    "./normalize-linefeeds": "./src/normalize-linefeeds.mjs",
+    "./slugify-text": "./src/slugify-text.mjs",
+    "./text": "./src/text.mjs",
+    "./subtitles": "./src/subtitles.mjs"
+  },
+  "dependencies": {
+    "@red-cup-engineering/json-services-section": "workspace:*"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

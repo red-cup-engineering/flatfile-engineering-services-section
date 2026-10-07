@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "null"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "recordPath": {
+          "type": "string"
+        },
+        "logPath": {
+          "type": "string"
+        }
+      },
+      "required": ["recordPath", "logPath"],
+      "additionalProperties": false
+    }
+  ]
+}

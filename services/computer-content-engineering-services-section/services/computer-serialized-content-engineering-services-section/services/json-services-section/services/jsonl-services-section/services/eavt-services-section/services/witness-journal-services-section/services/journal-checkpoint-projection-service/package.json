@@ -1,0 +1,33 @@
+{
+  "name": "@red-cup-engineering/journal-checkpoint-projection-service",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Admits supplied journal-state witnesses as checkpoints and projects checkpoint replay deltas without acquiring files or journals.",
+  "exports": {
+    ".": "./src/checkpoint-events.mjs",
+    "./checkpoint-snapshot": "./src/checkpoint-snapshot.mjs"
+  },
+  "bin": {
+    "admit-journal-checkpoint": "./scripts/admit-journal-checkpoint.mjs",
+    "project-journal-checkpoints": "./scripts/project-journal-checkpoints.mjs",
+    "project-checkpoint-replay": "./scripts/project-checkpoint-replay.mjs"
+  },
+  "files": [
+    "README.md",
+    "src",
+    "scripts"
+  ],
+  "scripts": {
+    "check": "node --check src/*.mjs scripts/*.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "sideEffects": false,
+  "dependencies": {
+    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/uri-services-section": "workspace:*"
+  }
+}
