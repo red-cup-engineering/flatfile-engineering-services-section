@@ -24,8 +24,8 @@
  * This module stays purely representation-facing — how a type scopes to a
  * resource — not the process loop users run.
  */
-import { isClosureRegimeName, regimeDecidable } from "@red-cup-engineering/computer-data-engineering-services-section/closure-regime";
-import { knowledgeLeqReading, readingOfSides, sidesOfReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { isClosureRegimeName, regimeDecidable } from "@red-cup-engineering/computer-data-services-section/closure-regime";
+import { knowledgeLeqReading, readingOfSides, sidesOfReading } from "@red-cup-engineering/computer-data-services-section/four";
 
 /** The FOUR point (knowledge family) each corner names, by ⟨addressability, assertivity⟩ sides. */
 export const CORNER_READING = Object.freeze({
