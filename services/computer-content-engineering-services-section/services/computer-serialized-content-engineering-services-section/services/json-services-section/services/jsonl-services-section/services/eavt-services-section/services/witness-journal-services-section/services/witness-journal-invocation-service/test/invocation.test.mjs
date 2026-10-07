@@ -38,7 +38,8 @@ test("invocationEntry cellizes one invocation to one EAVT row: e=caller, a={verb
 });
 
 test("feedNameFor is a pure, date-derived, namespace-scoped feed name", () => {
-  assert.equal(feedNameFor("@red-cup-engineering/agentic-organization-engine", "2026-07-31T00:00:00.000Z"), "2026-07-31-red-cup-engineering-organizing-log");
+  assert.equal(feedNameFor("@red-cup-engineering/agentic-organization-engine", "2026-07-31T00:00:00.000Z"), "2026-07-31-red-cup-engineering-agentic-organization-engine-log");
+  assert.equal(feedNameFor("@red-cup-engineering/organizing", "2026-07-31T00:00:00.000Z"), "2026-07-31-red-cup-engineering-organizing-log");
   assert.equal(feedNameFor("plain", "not-a-date"), "0000-00-00-plain-log");
 });
 
