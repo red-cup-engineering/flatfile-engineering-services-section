@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.561.group/computer/semantic-cell.schema.json",
+  "title": "Semantic cell",
+  "description": "An immutable, content-addressed value admitted by a named data type. Its address is derived from kind, declared type, and content.",
+  "type": "object",
+  "required": ["kind", "id", "type", "content"],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "const": "sign.cell" },
+    "id": { "type": "string", "pattern": "^ni:" },
+    "type": { "type": "string", "minLength": 1 },
+    "content": true
+  },
+  "x-codegen": { "exportName": "semanticCellSchema", "typeName": "SemanticCell", "runtimeName": "semanticCellType" }
+}

@@ -1,0 +1,15 @@
+{
+  "subject": "claim-set:march-28",
+  "claims": [
+    { "subject": "claim-set:march-28", "predicate": "has-standing", "object": "neither" },
+    { "subject": "claim-set:march-28", "predicate": "has-standing", "object": "for" },
+    { "subject": "claim-set:march-28", "predicate": "has-standing", "object": "against" },
+    { "subject": "claim-set:march-28", "predicate": "has-standing", "object": "both" }
+  ],
+  "evidence": [
+    { "claim": 1, "side": "positive", "by": "alice", "witness": "source:for" },
+    { "claim": 2, "side": "negative", "by": "bob", "witness": "source:against" },
+    { "claim": 3, "side": "positive", "by": "alice", "witness": "source:both-for" },
+    { "claim": 3, "side": "negative", "by": "bob", "witness": "source:both-against" }
+  ]
+}
