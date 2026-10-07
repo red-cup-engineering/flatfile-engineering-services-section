@@ -1,0 +1,9 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["traces"]
+  },
+  "output": {
+    "type": "object"
+  }
+}

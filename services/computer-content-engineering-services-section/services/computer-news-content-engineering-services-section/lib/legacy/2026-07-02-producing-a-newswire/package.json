@@ -1,0 +1,41 @@
+{
+  "name": "@emsenn/producing-a-newswire",
+  "version": "0.0.0",
+  "license": "UNLICENSED",
+  "type": "module",
+  "description": "Producing a newswire: project upstream producing outputs such as divinations into canonical claim-state bundles for organizing newswires and content mills.",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "check": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "rebuild": "npm run clean && npm run build",
+    "verify": "npm run check && npm run build"
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {
+    "@emsenn/divining": "0.0.1",
+    "@emsenn/producing-content": "0.0.1",
+    "@emsenn/relating": "0.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1",
+    "typescript": "5.9.3"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false
+}

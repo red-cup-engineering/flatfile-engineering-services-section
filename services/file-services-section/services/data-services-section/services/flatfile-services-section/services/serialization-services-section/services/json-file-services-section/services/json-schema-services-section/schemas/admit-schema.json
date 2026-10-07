@@ -1,0 +1,22 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["schema"],
+    "properties": {
+      "schema": {
+        "type": "object"
+      },
+      "id": {
+        "type": "string",
+        "minLength": 1
+      },
+      "allowUnknownAnnotations": {
+        "type": "boolean"
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "required": ["schema", "identity"]
+  }
+}

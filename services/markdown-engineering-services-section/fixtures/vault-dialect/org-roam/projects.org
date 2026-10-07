@@ -1,0 +1,4 @@
+#+TITLE: Projects
+#+FILETAGS: :work:projects:
+
+Active projects, linked back to the [[file:index.org][Index]].

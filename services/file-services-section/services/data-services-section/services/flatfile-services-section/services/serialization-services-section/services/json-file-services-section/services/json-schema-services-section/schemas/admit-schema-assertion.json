@@ -1,0 +1,16 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["assertion"],
+    "properties": {
+      "assertion": {
+        "type": "object",
+        "required": ["e", "a", "v", "t"]
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "required": ["e", "a", "v", "t"]
+  }
+}

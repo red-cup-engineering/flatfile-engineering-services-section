@@ -1,0 +1,5 @@
+#+TITLE: Dangling Reference
+#+FILETAGS: :test:
+
+Links to a file that was never created, to exercise the unresolved-link warning:
+[[file:missing.org][Missing]].

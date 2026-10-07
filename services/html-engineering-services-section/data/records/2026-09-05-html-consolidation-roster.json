@@ -1,0 +1,139 @@
+{
+  "recordedAt": "2026-09-05",
+  "objectKind": "html-engineering-services-section.html-consolidation-roster",
+  "founderOrder": "html-engineering-services-section. bam. one place to do all html stuff, once.",
+  "measuredWith": [
+    "mcp__jsnode-server__jsnode_duplication (scope: html, and per-leaf-package scopes)",
+    "mcp__jsnode-server__jsnode_search (html render, html escape, markdown to html, html document assembly)",
+    "mcp__jsnode-server__jsnode_section (query: html)",
+    "mcp__jsnode-server__jsnode_package (dependents check for the three renamed/removed section wrapper packages)"
+  ],
+  "theOnePlace": {
+    "before": "computer-data-serialization-services-section/services/html-services-section",
+    "after": "computer-data-serialization-services-section/services/html-engineering-services-section",
+    "packageRename": {
+      "from": "@red-cup-engineering/html-services-section@0.1.0",
+      "to": "@red-cup-engineering/html-engineering-services-section@0.1.0",
+      "dependents": [],
+      "disposition": "clean rename, first publish under new name; old package name remains published on the registry (zero consumers, not unpublished per house no-blind-unpublish law)"
+    }
+  },
+  "rows": [
+    {
+      "function": "html-document-render-service (carrierObstruction, renderFiberObstruction, htmlText, unmark, isRef, escapeText, escapeAttr, ...)",
+      "package": "@red-cup-engineering/html-document-render-service",
+      "consumers": ["@red-cup-engineering/html-structural-projection-service", "@red-cup-engineering/metroplat"],
+      "bytesInPackage": "src/index.mts, ~11 tests",
+      "move": "git mv with parent section (html-services-section -> html-engineering-services-section); package name/version unchanged, zero consumer impact",
+      "gate": "npm test 11/11 pass post-move"
+    },
+    {
+      "function": "html-structural-projection-service (document-nodes, string-rendering, scan, shp-profile, escapeText, escapeAttr, unmark, isRef, htmlText -- exact-duplicate fingerprints shared with html-document-render-service)",
+      "package": "@red-cup-engineering/html-structural-projection-service",
+      "consumers": ["@red-cup-engineering/metroplat", "@red-cup-engineering/render-markdown-inline-html-nodes-service", "@red-cup-engineering/spotcomp", "@red-cup-engineering/web-theming-service"],
+      "bytesInPackage": "src/html/*.mts, ~9 tests",
+      "move": "git mv with parent section; package name/version unchanged, zero consumer impact",
+      "gate": "npm test 9/9 pass post-move",
+      "finding": "depends on html-document-render-service pinned at 0.0.3; published latest is 0.0.4 -- lagging pin, not a law violation (0.0.3 is a real published version), left unchanged as out of this lot's named scope"
+    },
+    {
+      "function": "renderMarkdownInlineHtml (linkSpan, bounded, escape -- exact-duplicate fingerprints shared with render-markdown-inline-html-nodes-service and render-markdown-block-html-service)",
+      "package": "@red-cup-engineering/render-markdown-inline-html-service",
+      "consumers": ["@causeway-services/equivo-service", "@lenticule-science/l-space", "@red-cup-engineering/education-platform-service", "@red-cup-engineering/markdown-services-section", "@red-cup-engineering/render-markdown-block-html-service"],
+      "bytesInPackage": "scripts/render-markdown-inline-html.mjs, no local test suite",
+      "move": "git mv from markdown-inline-html-services-section/services/ into html-engineering-services-section/services/",
+      "lawViolationFixed": "dependencies on admit-markdown-link-target-service and read-markdown-features-service were file: relative paths in local source (never actually published that way -- published 0.1.2 already carried exact pins 0.1.0/0.1.0); reverted local source to match: admit-markdown-link-target-service 0.1.0, read-markdown-features-service 0.1.0",
+      "gate": "fresh install 0 non-canonical resolved URLs; node --check pass; smoke call verified against fresh-installed node_modules"
+    },
+    {
+      "function": "renderMarkdownInlineHtmlNodes (bounded, linkSpan -- exact-duplicate fingerprints shared with render-markdown-inline-html-service)",
+      "package": "@red-cup-engineering/render-markdown-inline-html-nodes-service",
+      "consumers": ["@red-cup-engineering/markdown-services-section"],
+      "bytesInPackage": "scripts/render-markdown-inline-html-nodes.mjs, no local test suite",
+      "move": "git mv from markdown-inline-html-services-section/services/ into html-engineering-services-section/services/",
+      "lawViolationFound": "dependency on html-structural-projection-service was pinned at 0.1.5, a version that was NEVER PUBLISHED (registry has 0.1.4, 0.1.6, 0.1.7, 0.1.8 -- a pins-ahead-of-registry defect, blocked fresh install outright)",
+      "fix": "repinned to 0.1.8 (latest published, same ./document-nodes export surface as 0.1.4); this changed published-vs-source content, so republished",
+      "publish": {"fromVersion": "0.1.1", "toVersion": "0.1.2", "tarballDiffClassification": "corrective", "receiptId": "ni:///sha-256;pnLIYqkAZI5wKtYNX0g3JDIY58umld2af5jOpArr0Vg"},
+      "gate": "fresh install 0 non-canonical resolved URLs after fix; node --check pass; smoke call verified against the published 0.1.2 tarball fresh-installed from the canonical registry"
+    },
+    {
+      "function": "renderMarkdownBlockHtml (escape -- exact-duplicate fingerprint shared with render-markdown-inline-html-service)",
+      "package": "@red-cup-engineering/render-markdown-block-html-service",
+      "consumers": ["@causeway-services/tidepool.561.group", "@lenticule-science/l-space", "@red-cup-engineering/geode", "@red-cup-engineering/markdown-services-section"],
+      "bytesInPackage": "scripts/render-markdown-block-html.mjs, no local test suite",
+      "actualPriorLocation": "markdown-rendering-services-section/services/render-markdown-block-html-service (NOT markdown-inline-html-services-section/services/ as the founder's mental model of the family had it; the family's three members were split across two sibling markdown sections on disk)",
+      "move": "git mv from markdown-rendering-services-section/services/ into html-engineering-services-section/services/",
+      "lawViolationFixed": "dependency on render-markdown-inline-html-service was a file: relative path in local source, pointing at the OLD markdown-inline-html-services-section location (would have broken outright post-move); the currently-published render-markdown-block-html-service@0.1.2 tarball already carries the exact pin 0.1.2 -- local source had regressed to file: without ever publishing that regression. Fixed to exact pin 0.1.2, matching what is already live.",
+      "gate": "fresh install 0 non-canonical resolved URLs; node --check pass; smoke call verified against fresh-installed node_modules"
+    }
+  ],
+  "removed": [
+    {
+      "path": "markdown-services-section/services/markdown-inline-html-services-section",
+      "reason": "emptied by the two git mv above; removal authority explicitly granted",
+      "action": "rm -rf (plain filesystem removal, not git rm -- git authority granted for this lot covers git mv only)"
+    },
+    {
+      "path": "web-interface-services-section/services/html-rendering-services-section",
+      "reason": "zero services, zero consumers by package name (jsnode_package dependents: []); pure boilerplate README+package.json never populated; removal authority explicitly granted",
+      "action": "rm -rf"
+    }
+  ],
+  "leftInPlaceNotRemoved": [
+    {
+      "path": "markdown-services-section/services/markdown-rendering-services-section",
+      "reason": "emptied by the render-markdown-block-html-service move (only package.json remains), but removal authority was granted for markdown-inline-html-services-section and html-rendering-services-section ONLY, not this directory -- left in place as a finding for the receiver to decide (custody rule: a finding about another section's material is recorded, never fixed en passant)"
+    }
+  ],
+  "leafConsumerDispositions": [
+    {
+      "package": "@red-cup-engineering/newsletter-issue-production-services-section",
+      "capability": "renderPasteHtml / escapeHtml -- a bounded, hand-restricted Markdown-subset-to-HTML renderer (only h2/h3/p/blockquote/a/strong/em, Substack-paste-safe)",
+      "duplicationScan": "jsnode_duplication scope=newsletter-issue-production found 2 candidates, both internal exact duplicates within the package itself (compose-issue.mjs vs newsletter-issue.mjs) -- zero cross-package fingerprint match against html-document-render-service or render-markdown-block-html-service",
+      "disposition": "genuinely different operation -- left in place. A restricted-vocabulary paste-safe fragment renderer is not the same contract as full HTML-document assembly or general Markdown-to-HTML; no migration performed."
+    },
+    {
+      "package": "@red-cup-engineering/digital-goods-storefront-services-section",
+      "capability": "renderCatalogHtml / renderOfferingHtml / esc() -- full standalone HTML document assembly via template literals with an inline escape function",
+      "duplicationScan": "jsnode_duplication scope=digital-goods-storefront found 6 candidates, all internal exact duplicates within the package itself -- zero cross-package fingerprint match against html-document-render-service",
+      "disposition": "genuinely different operation -- left in place. Document assembly here is flat template-literal string-building (view-model -> <!doctype html> string), not the carrier-node-tree render model html-document-render-service owns; the shapes do not converge at the AST level per the duplication tool, so no migration performed. Its esc() (escapes &<>\"') is semantically close to html-document-render-service's escapeText+escapeAttr combined, but is not migrated this lot since the document-assembly contracts differ and jsnode found no structural match -- named here for a future dedicated escape-primitive consolidation, not performed now."
+    },
+    {
+      "package": "@red-cup-engineering/replay-spectacle",
+      "capability": "escapeHtml (src/escape-html.mjs) -- escapes values interpolated into TUFTE's explicitly-trusted tile.html fragment",
+      "duplicationScan": "jsnode_duplication scope=replay-spectacle found 2 candidates, both internal exact duplicates within the package's own adapters -- zero cross-package fingerprint match against html-document-render-service",
+      "disposition": "left in place, out of scope by founder's own instruction (\"Do not widen into TUFTE or VICTOR internals this lot\"). replay-spectacle is explicitly TUFTE's adapter (\"Domain-neutral rendering lives in TUFTE; this package is the adapter\"); its escaper is a small trust-boundary helper for TUFTE's tile.html contract, not general HTML document assembly. Recorded as a consumer to measure next, per instruction."
+    },
+    {
+      "package": "@red-cup-engineering/convert-html-to-markdown-service",
+      "capability": "HTML-to-Markdown conversion (the reverse direction of Markdown-to-HTML)",
+      "disposition": "out of the founder's named scope (not listed among the pieces to consolidate); a different capability direction living in markdown-conversion-services-section, consumed only by markdown-services-section. Left in place, named here for future measurement."
+    }
+  ],
+  "bytesRemoved": {
+    "markdown-inline-html-services-section": "1 package.json (30 bytes) after its 2 nested service dirs were relocated, not deleted",
+    "html-rendering-services-section": "README.md (~230 bytes) + package.json (~220 bytes), genuinely deleted (zero content, zero consumers)"
+  },
+  "publishes": [
+    {
+      "package": "@red-cup-engineering/render-markdown-inline-html-nodes-service",
+      "fromVersion": "0.1.1",
+      "toVersion": "0.1.2",
+      "reason": "fixed broken dependency pin (html-structural-projection-service 0.1.5 -> 0.1.8) blocking fresh install",
+      "receiptId": "ni:///sha-256;pnLIYqkAZI5wKtYNX0g3JDIY58umld2af5jOpArr0Vg"
+    },
+    {
+      "package": "@red-cup-engineering/html-engineering-services-section",
+      "fromVersion": null,
+      "toVersion": "0.1.0",
+      "reason": "first publish under the renamed section package; added files:[\"README.md\"] to keep the wrapper tarball clean (default packlist was bundling nested sub-services' dist/ and node_modules/)",
+      "receiptId": "ni:///sha-256;EISSTpTptam65VIlZKq6eaXLyzp0MduiAReGfKmkdzA"
+    }
+  ],
+  "noRepublishNeeded": [
+    "@red-cup-engineering/html-document-render-service (moved only, name/version/content unchanged)",
+    "@red-cup-engineering/html-structural-projection-service (moved only, name/version/content unchanged)",
+    "@red-cup-engineering/render-markdown-inline-html-service (file: fix restores exact parity with already-published 0.1.2 -- zero diff)",
+    "@red-cup-engineering/render-markdown-block-html-service (file: fix restores exact parity with already-published 0.1.2 -- zero diff)"
+  ]
+}

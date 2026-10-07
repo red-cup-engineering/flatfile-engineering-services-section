@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "glossary/terms/timestamp",
+  "title": "timestamp",
+  "description": "An EAVT timestamp: a row's t (transaction/witness) — identifies when, or under what provenance, a row was asserted. EAVT does not fix its shape beyond requiring a total order (fold compares t values with <, >, ===, e.g. to find the latest tombstone): a monotonic integer counter and an RFC 3339 string are both in use across consumers.",
+  "anyOf": [
+    { "type": "integer" },
+    { "type": "number" },
+    { "type": "string" }
+  ]
+}
