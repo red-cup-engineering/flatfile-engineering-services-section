@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readInput } from "node:fs";
-import { requireJsonValue } from "../../../../../../../src/index.mjs";
+import { requireJsonValue } from "@red-cup-engineering/json-services-section";
 export { default as inputSchema } from "../schemas/admit-datom-fact.input.schema.json" with { type: "json" };
 export { default as outputSchema } from "../schemas/admit-datom-fact.output.schema.json" with { type: "json" };
 export function assertObjectDatom(value) {

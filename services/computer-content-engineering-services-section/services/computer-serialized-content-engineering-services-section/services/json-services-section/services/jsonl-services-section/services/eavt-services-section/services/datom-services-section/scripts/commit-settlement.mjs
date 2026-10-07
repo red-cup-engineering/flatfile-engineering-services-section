@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 import { readFileSync as readInput } from "node:fs";
-import { writeEavtEntries } from "../../../scripts/write-eavt-entries.mjs";
+import { writeEavtEntries } from "@red-cup-engineering/eavt/write-eavt-entries";
 import { mkdirSync, appendFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { recordPathFor } from "./resolve-record-path.mjs";
 import { serialize } from "./serialize-datoms.mjs";
-import { normalizeEavtRow } from "../../../scripts/normalize-row.mjs";
-import { journalPath } from "../../../scripts/journal-path.mjs";
+import { normalizeEavtRow } from "@red-cup-engineering/eavt/normalize-row";
+import { journalPath } from "@red-cup-engineering/eavt/journal-path";
 export { default as inputSchema } from "../schemas/commit-settlement.input.schema.json" with { type: "json" };
 export { default as outputSchema } from "../schemas/commit-settlement.output.schema.json" with { type: "json" };
 export function commitSettledRecord({ root, feed, datoms, kept, at }) {

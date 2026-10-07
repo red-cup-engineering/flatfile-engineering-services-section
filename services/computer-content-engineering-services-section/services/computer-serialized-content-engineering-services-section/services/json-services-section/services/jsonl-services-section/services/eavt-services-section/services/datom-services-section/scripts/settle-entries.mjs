@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readInput } from "node:fs";
-import { normalizeEavtRow } from "../../../scripts/normalize-row.mjs";
+import { normalizeEavtRow } from "@red-cup-engineering/eavt/normalize-row";
 import { settledDatom } from "./settle-row.mjs";
 export { default as inputSchema } from "../schemas/settle-entries.input.schema.json" with { type: "json" };
 export { default as outputSchema } from "../schemas/settle-entries.output.schema.json" with { type: "json" };

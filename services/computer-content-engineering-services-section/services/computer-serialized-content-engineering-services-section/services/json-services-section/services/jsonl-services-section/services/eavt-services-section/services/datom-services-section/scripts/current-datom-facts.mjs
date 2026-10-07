@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readInput } from "node:fs";
-import { canonicalJson } from "../../../../../../../src/index.mjs";
+import { canonicalJson } from "@red-cup-engineering/json-services-section";
 import { assertObjectDatom } from "./admit-datom-fact.mjs";
 export { default as inputSchema } from "../schemas/current-datom-facts.input.schema.json" with { type: "json" };
 export { default as outputSchema } from "../schemas/current-datom-facts.output.schema.json" with { type: "json" };
