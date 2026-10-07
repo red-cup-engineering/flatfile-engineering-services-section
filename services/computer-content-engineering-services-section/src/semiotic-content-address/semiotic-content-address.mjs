@@ -13,7 +13,7 @@
  */
 import { decodeCanonical, encodeCanonical } from "@red-cup-engineering/cbor-services-section";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { sha256Bytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-sha256";
+import { sha256Bytes } from "@red-cup-engineering/cryptographic-data-service/portable-sha256";
 
 /**
  * Transform one semiotic JSON carrier into its canonical representation.
