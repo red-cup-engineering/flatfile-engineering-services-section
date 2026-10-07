@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import * as json from "../../../src/index.mjs";
-import { freezeJson } from "../../../src/index.mjs";
+import * as json from "@red-cup-engineering/json-services-section";
+import { freezeJson } from "@red-cup-engineering/json-services-section";
 import { admitSchemaAssertion } from "./admit-schema-assertion.mjs";
 
 import contract from "../schemas/serialize-schema-assertions.json" with { type: "json" };

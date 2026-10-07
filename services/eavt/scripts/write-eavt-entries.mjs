@@ -33,7 +33,7 @@ export const outputSchema = {
 };
 import { readFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { canonicalJson } from "../../../../../scripts/canonical-json.mjs";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 import { normalizeEavtRow } from "./normalize-row.mjs";
 import { writeFileTextSync } from "@red-cup-engineering/file-services/write-file";
 /** Atomically replace one EAVT JSONL journal with normalized rows. */

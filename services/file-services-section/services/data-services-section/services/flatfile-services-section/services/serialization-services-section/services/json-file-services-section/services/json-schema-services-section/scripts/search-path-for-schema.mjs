@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readInput } from "node:fs";
-import * as json from "../../../src/index.mjs";
+import * as json from "@red-cup-engineering/json-services-section";
 import { lstat, readFile, readdir, realpath, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { admitSchema } from "./admit-schema.mjs";

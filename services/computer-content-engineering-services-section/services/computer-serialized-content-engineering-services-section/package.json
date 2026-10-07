@@ -5,7 +5,8 @@
   "description": "Groups codecs that map admitted computer content to and from serial byte or text forms.",
   "dependencies": {
     "@red-cup-engineering/eavt": "workspace:*",
-    "@red-cup-engineering/json-services-section": "workspace:*"
+    "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/uri-services-section": "workspace:*"
   },
   "exports": {
     "./services/http-data-services-section/src/content-type": "./services/http-data-services-section/src/content-type.mjs",

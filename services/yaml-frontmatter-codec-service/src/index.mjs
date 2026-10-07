@@ -11,7 +11,7 @@
  * for conforming texts (canonical serialization may normalize quoting and drop
  * comments; it never loses an entry).
  */
-import { isObjectRecord, requireJsonValue } from "../../../../json-services-section/src/index.mjs";
+import { isObjectRecord, requireJsonValue } from "@red-cup-engineering/json-services-section";
 import {
   DATE_PATTERN,
   FLOAT_PATTERN,

@@ -34,7 +34,7 @@ export const outputSchema = {
 };
 import { readFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { canonicalJson } from "../../../../../scripts/canonical-json.mjs";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 import { journalPath } from "./journal-path.mjs";
 import { normalizeEavtRow } from "./normalize-row.mjs";
 import { readEavtEntries } from "./read-eavt-entries.mjs";

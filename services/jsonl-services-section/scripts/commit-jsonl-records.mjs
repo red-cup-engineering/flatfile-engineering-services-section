@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
 import { readFileSync as readInput } from "node:fs";
-import { canonicalJson } from "../../../scripts/canonical-json.mjs";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 
 /** The one currently admitted sequence-commitment profile.
  *

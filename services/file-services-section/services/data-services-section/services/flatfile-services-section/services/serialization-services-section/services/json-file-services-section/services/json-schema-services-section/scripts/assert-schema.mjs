@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import * as json from "../../../src/index.mjs";
-import { freezeJson } from "../../../src/index.mjs";
+import * as json from "@red-cup-engineering/json-services-section";
+import { freezeJson } from "@red-cup-engineering/json-services-section";
 import { DRAFT_2020_12, supported, known } from "../src/schema-vocabulary.mjs";
 import { schemaChildren } from "./schema-children.mjs";
 

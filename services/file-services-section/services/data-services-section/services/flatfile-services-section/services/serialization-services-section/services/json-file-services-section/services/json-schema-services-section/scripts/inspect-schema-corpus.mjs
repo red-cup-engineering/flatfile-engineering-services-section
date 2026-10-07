@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import * as json from "../../../src/index.mjs";
+import * as json from "@red-cup-engineering/json-services-section";
 import { assertSchema } from "./assert-schema.mjs";
 import { resolveSchemaReference } from "./resolve-schema-reference.mjs";
 import { schemaChildren } from "./schema-children.mjs";

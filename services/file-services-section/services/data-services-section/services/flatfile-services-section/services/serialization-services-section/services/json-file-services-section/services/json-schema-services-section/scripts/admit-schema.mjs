@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import * as json from "../../../src/index.mjs";
-import { freezeJson } from "../../../src/index.mjs";
+import * as json from "@red-cup-engineering/json-services-section";
+import { freezeJson } from "@red-cup-engineering/json-services-section";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { DRAFT_2020_12 } from "../src/schema-vocabulary.mjs";
 import { assertSchema } from "./assert-schema.mjs";

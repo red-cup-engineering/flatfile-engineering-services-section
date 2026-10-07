@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readInput } from "node:fs";
-import { canonicalJson } from "../../../scripts/canonical-json.mjs";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 import contracts from "../schemas/operations.json" with { type: "json" };
 export const inputSchema = contracts.serializeLines.input;
 export const outputSchema = contracts.serializeLines.output;

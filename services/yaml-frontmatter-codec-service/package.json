@@ -12,5 +12,7 @@
     "check": "node --check src/index.mjs && node --check src/yaml-subset.mjs",
     "test": "node --test test/*.test.mjs"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@red-cup-engineering/json-services-section": "workspace:*"
+  }
 }

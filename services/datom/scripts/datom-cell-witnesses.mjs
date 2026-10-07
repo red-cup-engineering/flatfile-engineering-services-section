@@ -3,7 +3,7 @@ import { readFileSync as readInput } from "node:fs";
 import {
   canonicalJson,
   requireJsonValue,
-} from "../../../../../../../src/index.mjs";
+} from "@red-cup-engineering/json-services-section";
 export { default as inputSchema } from "../schemas/datom-cell-witnesses.input.schema.json" with { type: "json" };
 export { default as outputSchema } from "../schemas/datom-cell-witnesses.output.schema.json" with { type: "json" };
 export function objectDatomWitnesses({ section, cell }) {
