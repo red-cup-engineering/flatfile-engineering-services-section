@@ -80,29 +80,29 @@ export function validateSchemaInstance(input) {
         } catch (error) {
           add(at, "$ref", `value is not a Draft 2020-12 schema: ${error.message}`);
         }
-        return;
+      } else {
+        const resolved = resolveSchemaReference({
+          reference: node.$ref,
+          base,
+          schemas: [base, ...schemas],
+        });
+        if (!resolved.found) {
+          add(at, "$ref", `unresolved or external reference ${node.$ref}`);
+          return;
+        }
+        const identity = `${resolved.base ?? ""}\0${node.$ref}\0${at}`;
+        if (!stack.has(identity)) {
+          const next = new Set(stack);
+          next.add(identity);
+          evaluate(
+            value,
+            resolved.schema,
+            at,
+            resolved.schema.$id ? resolved.schema : base,
+            next,
+          );
+        }
       }
-      const resolved = resolveSchemaReference({
-        reference: node.$ref,
-        base,
-        schemas: [base, ...schemas],
-      });
-      if (!resolved.found) {
-        add(at, "$ref", `unresolved or external reference ${node.$ref}`);
-        return;
-      }
-      const identity = `${resolved.base ?? ""}\0${node.$ref}\0${at}`;
-      if (stack.has(identity)) return;
-      const next = new Set(stack);
-      next.add(identity);
-      evaluate(
-        value,
-        resolved.schema,
-        at,
-        resolved.schema.$id ? resolved.schema : base,
-        next,
-      );
-      return;
     }
     if (node.type !== undefined) {
       const types = Array.isArray(node.type) ? node.type : [node.type];
@@ -122,9 +122,10 @@ export function validateSchemaInstance(input) {
     )
       add(at, "enum", "value is not enumerated");
     if (typeof value === "string") {
-      if (Number.isInteger(node.minLength) && value.length < node.minLength)
+      const length = [...value].length;
+      if (Number.isInteger(node.minLength) && length < node.minLength)
         add(at, "minLength", "string is shorter than minimum");
-      if (Number.isInteger(node.maxLength) && value.length > node.maxLength)
+      if (Number.isInteger(node.maxLength) && length > node.maxLength)
         add(at, "maxLength", "string is longer than maximum");
       if (
         typeof node.pattern === "string" &&
