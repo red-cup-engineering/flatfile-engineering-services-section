@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { parseCookieHeader, parseSetCookie, serializeSetCookie } from "../src/cookie.mjs";
+test("parses Cookie and round-trips Set-Cookie", ()=>{
+    assert.deepEqual(parseCookieHeader("a=one; b=two"), {
+        a: "one",
+        b: "two"
+    });
+    const parsed = parseSetCookie(serializeSetCookie("sid", "abc", {
+        httpOnly: true,
+        sameSite: "Lax"
+    }));
+    assert.equal(parsed?.name, "sid");
+    assert.equal(parsed?.httpOnly, true);
+});
