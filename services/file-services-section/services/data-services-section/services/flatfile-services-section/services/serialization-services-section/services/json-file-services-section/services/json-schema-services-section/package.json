@@ -14,7 +14,9 @@
     "./search-path-for-schema": "./services/search-path-for-schema/src/search-path-for-schema.mjs",
     "./census": "./dist/census.mjs",
     "./validation": "./src/validation.mjs",
-    "./contracts": "./src/contracts.mjs"
+    "./contracts": "./src/contracts.mjs",
+    "./validate-schema-instance": "./scripts/validate-schema-instance.mjs",
+    "./resolve-schema-pointer": "./scripts/resolve-schema-pointer.mjs"
   },
   "bin": {
     "json-schema-census": "./scripts/json-schema-census.mjs",
@@ -30,7 +32,18 @@
     "services/search-path-for-schema/src/search-path-for-schema.mjs",
     "services/writing-a-schema/src/write-a-schema.js",
     "src/validation.mjs",
-    "src/contracts.mjs"
+    "src/contracts.mjs",
+    "scripts/assert-schema.mjs",
+    "scripts/resolve-schema-pointer.mjs",
+    "scripts/resolve-schema-reference.mjs",
+    "scripts/schema-children.mjs",
+    "scripts/validate-schema-instance.mjs",
+    "schemas/assert-schema.json",
+    "schemas/resolve-schema-pointer.json",
+    "schemas/resolve-schema-reference.json",
+    "schemas/schema-children.json",
+    "schemas/validate-schema-instance.json",
+    "src/schema-vocabulary.mjs"
   ],
   "dependencies": {
     "@red-cup-engineering/json-file-codec-service": "0.1.3",

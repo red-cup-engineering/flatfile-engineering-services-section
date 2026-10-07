@@ -1,0 +1,17 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["schema"],
+    "properties": {
+      "schema": {
+        "type": ["object", "boolean"]
+      },
+      "allowUnknownAnnotations": {
+        "type": "boolean"
+      }
+    }
+  },
+  "output": {
+    "type": ["object", "boolean"]
+  }
+}
