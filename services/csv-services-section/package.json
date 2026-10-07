@@ -1,0 +1,19 @@
+{
+  "name": "@red-cup-engineering/csv-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Comma-separated values (RFC 4180): the one codec for CSV text to rows and records and back.",
+  "exports": {
+    "./csv-codec": "./scripts/csv-codec.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "README.md",
+    "package.json",
+    "scripts"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "sideEffects": false
+}
