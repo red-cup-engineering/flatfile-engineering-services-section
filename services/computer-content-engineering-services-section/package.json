@@ -1,0 +1,36 @@
+{
+  "name": "@red-cup-engineering/computer-content-engineering-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Content: data carriers with locator-independent identity and custody, their typed-resource classification and catalog, and descriptions.",
+  "dependencies": {
+    "@red-cup-engineering/cbor-services-section": "workspace:*",
+    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/javascript-node-services-section": "workspace:*",
+    "@red-cup-engineering/json-schema-services-section": "workspace:*",
+    "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/uri-services-section": "workspace:*"
+  },
+  "exports": {
+    "./semiotic-content-address": "./src/semiotic-content-address/semiotic-content-address.mjs",
+    "./semantic-content-identity": "./src/semiotic-content-address/semantic-content-identity.mjs",
+    "./description": "./src/description.mjs",
+    "./typed-resource-classification": "./src/typed-resource-classification.mjs",
+    "./catalog": "./src/catalog.mjs",
+    "./recognition": "./src/recognition.mjs",
+    "./language-cone": "./src/language-cone.mjs",
+    "./resource-term": "./src/resource-term.mjs",
+    "./receipt-sen": "./src/receipt-sen.mjs",
+    "./signed-export-receipt": "./src/signed-export-receipt.mjs",
+    "./signed-content-claim": "./src/signed-content-claim.mjs",
+    "./package.json": "./package.json",
+    "./json-projector": "./src/json-projector.mjs",
+    "./text-projector": "./src/text-projector.mjs",
+    "./jupyter/codec": "./src/jupyter/codec.mjs",
+    "./jupyter/schema": "./src/jupyter/schema.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}
