@@ -1,0 +1,22 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["document", "pointer"],
+    "properties": {
+      "document": {},
+      "pointer": {
+        "type": "string"
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "required": ["found"],
+    "properties": {
+      "found": {
+        "type": "boolean"
+      },
+      "value": {}
+    }
+  }
+}

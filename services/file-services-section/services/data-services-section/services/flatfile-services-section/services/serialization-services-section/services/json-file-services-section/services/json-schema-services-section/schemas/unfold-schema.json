@@ -1,0 +1,9 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["schema", "time"]
+  },
+  "output": {
+    "type": "object"
+  }
+}

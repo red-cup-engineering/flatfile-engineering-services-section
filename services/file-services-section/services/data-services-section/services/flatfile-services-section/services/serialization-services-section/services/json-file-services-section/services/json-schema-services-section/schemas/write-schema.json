@@ -1,0 +1,25 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["pool", "schema"],
+    "properties": {
+      "pool": {
+        "type": "string",
+        "minLength": 1
+      },
+      "schema": {
+        "type": "object"
+      },
+      "amend": {
+        "type": "boolean"
+      },
+      "dryRun": {
+        "type": "boolean"
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "required": ["ok", "dryRun", "path", "schema"]
+  }
+}

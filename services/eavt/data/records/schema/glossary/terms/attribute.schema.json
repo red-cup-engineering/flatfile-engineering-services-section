@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "glossary/terms/attribute",
+  "title": "attribute",
+  "description": "An EAVT attribute: a row's a (predicate) — a non-empty string naming the relation the row asserts between its entity and its value, conventionally a gerund (e.g. \"named\", \"located-in\").",
+  "type": "string",
+  "minLength": 1
+}

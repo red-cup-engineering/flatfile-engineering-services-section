@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { chmod, link, mkdir, open, rename, stat, unlink } from "node:fs/promises";
+import { chmod, link, mkdir, open, rename, stat, unlink, writeFile } from "node:fs/promises";
 import { chmodSync, closeSync, fsyncSync, linkSync, mkdirSync, openSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname } from "node:path";
 
@@ -31,16 +31,12 @@ async function writeAtomically(path, data, encoding, { flag, mode } = {}) {
       if (error?.code !== "ENOENT") throw error;
     }
   }
-  const finalMode = mode ?? existingMode;
   await mkdir(directory, { recursive: true });
   try {
-    // Set permissions at creation, before any bytes become visible. Keep the
-    // descriptor for syncing, since the requested mode may prohibit reopening.
-    const handle = await open(temporary, "wx", finalMode ?? undefined);
-    try {
-      await handle.writeFile(data, encoding ? { encoding } : {});
-      await handle.sync();
-    } finally { await handle.close(); }
+    await writeFile(temporary, data, { ...(encoding ? { encoding } : {}), flag: "wx" });
+    const handle = await open(temporary, "r+");
+    try { await handle.sync(); } finally { await handle.close(); }
+    const finalMode = mode ?? existingMode;
     if (finalMode !== null) await chmod(temporary, finalMode);
     if (flag === "wx") { await link(temporary, path); await unlink(temporary); }
     else await rename(temporary, path);
@@ -62,14 +58,12 @@ function writeAtomicallySync(path, data, encoding, { flag, mode } = {}) {
       if (error?.code !== "ENOENT") throw error;
     }
   }
-  const finalMode = mode ?? existingMode;
   mkdirSync(directory, { recursive: true });
   try {
-    const descriptor = openSync(temporary, "wx", finalMode ?? undefined);
-    try {
-      writeFileSync(descriptor, data, encoding ? { encoding } : {});
-      fsyncSync(descriptor);
-    } finally { closeSync(descriptor); }
+    writeFileSync(temporary, data, { ...(encoding ? { encoding } : {}), flag: "wx" });
+    const descriptor = openSync(temporary, "r+");
+    try { fsyncSync(descriptor); } finally { closeSync(descriptor); }
+    const finalMode = mode ?? existingMode;
     if (finalMode !== null) chmodSync(temporary, finalMode);
     if (flag === "wx") { linkSync(temporary, path); unlinkSync(temporary); }
     else renameSync(temporary, path);

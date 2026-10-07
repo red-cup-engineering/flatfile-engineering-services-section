@@ -1,0 +1,5 @@
+#+TITLE: Index
+#+FILETAGS: :home:
+#+DATE: [2026-01-05]
+
+The vault's entry point. See [[file:projects.org][Projects]] and [[file:reading.org][Reading]].

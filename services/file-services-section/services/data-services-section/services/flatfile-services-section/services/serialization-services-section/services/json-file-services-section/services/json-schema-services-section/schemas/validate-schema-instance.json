@@ -1,0 +1,27 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["schema", "instance"],
+    "properties": {
+      "schema": {
+        "type": ["object", "boolean"]
+      },
+      "instance": {},
+      "schemas": {
+        "type": "array"
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "required": ["ok", "errors"],
+    "properties": {
+      "ok": {
+        "type": "boolean"
+      },
+      "errors": {
+        "type": "array"
+      }
+    }
+  }
+}
