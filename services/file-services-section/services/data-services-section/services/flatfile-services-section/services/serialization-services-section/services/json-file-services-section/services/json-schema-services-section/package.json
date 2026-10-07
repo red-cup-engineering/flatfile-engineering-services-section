@@ -82,7 +82,9 @@
     "@red-cup-engineering/file-services": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/relating": "workspace:*",
-    "@red-cup-engineering/uri-services-section": "workspace:*"
+    "@red-cup-engineering/uri-services-section": "workspace:*",
+    "@red-cup-engineering/json-file-codec-service": "workspace:*",
+    "@red-cup-engineering/semantic-content-identify-service": "workspace:*"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs"
