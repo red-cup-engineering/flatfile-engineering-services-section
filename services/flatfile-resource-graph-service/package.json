@@ -1,0 +1,68 @@
+{
+  "name": "@red-cup-engineering/flatfile-resource-graph-service",
+  "version": "0.1.0",
+  "description": "EAVT resource-graph engine over markdown vaults, systemd units, Linux processes and package.json workspaces, with closure rules for cycles, orphans, broken links and stubs.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "dependencies": {
+    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-filepath-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-networking-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-system-engine": "workspace:*",
+    "@red-cup-engineering/eavt": "workspace:*",
+    "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/markdown-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/metrologic": "workspace:*",
+    "@red-cup-engineering/uri-services-section": "workspace:*",
+    "@red-cup-engineering/witness-journal-document-service": "workspace:*",
+    "@red-cup-engineering/semiotic-eavt-services-section": "workspace:*"
+  },
+  "exports": {
+    "./inspection": "./src/inspect-resource.mjs",
+    "./provider": "./src/provider/provider.mjs",
+    "./compositor": "./src/provider/compositor.mjs",
+    "./attribute-projection": "./src/provider/attribute-projection.mjs",
+    "./convention": "./src/convention.mjs",
+    "./closure/rules/compose-rules": "./src/closure/rules/compose-rules.mjs",
+    "./kernel/cells": "./src/kernel/cells.mjs",
+    "./kernel/discharge": "./src/kernel/discharge.mjs",
+    "./kernel/identity": "./src/kernel/identity.mjs",
+    "./kernel/record-store": "./src/kernel/record-store.mjs",
+    "./kernel/record-types": "./src/kernel/record-types.mjs",
+    "./kernel/replay": "./src/kernel/replay.mjs",
+    "./kernel/settlement": "./src/kernel/settlement.mjs",
+    "./kernel/store": "./src/kernel/store.mjs",
+    "./kernel/witness": "./src/kernel/witness.mjs",
+    "./cli/verbs": "./src/cli/verbs.mjs",
+    "./lagoon-world": "./src/lagoon-world.mjs",
+    "./flatfile-world-verbs": "./scripts/flatfile-world-verbs.mjs",
+    "./render/registry": "./src/render/registry.mjs",
+    "./adapters/activity-pulse": "./src/adapters/activity-pulse.mjs",
+    "./adapters/host-health": "./src/adapters/host-health.mjs",
+    "./adapters/linux-processes": "./src/adapters/linux-processes.mjs",
+    "./adapters/markdown-directory": "./src/adapters/markdown-directory.mjs",
+    "./adapters/systemd-inventory": "./src/adapters/systemd-inventory.mjs",
+    "./operator/edit": "./src/operator/edit.mjs",
+    "./operator/kind": "./src/operator/kind.mjs",
+    "./substrate/flatfile": "./src/substrate/flatfile.mjs",
+    "./substrate/link-kind": "./src/substrate/link-kind.mjs",
+    "./substrate/markdown-links": "./src/substrate/markdown-links.mjs",
+    "./substrate/predication": "./src/substrate/predication.mjs",
+    "./substrate/store": "./src/substrate/store.mjs",
+    "./substrate/read-flatfiles": "./src/substrate/read-flatfiles.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src/",
+    "scripts/",
+    "test/"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "sideEffects": false
+}

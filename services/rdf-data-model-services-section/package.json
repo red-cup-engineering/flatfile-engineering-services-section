@@ -1,0 +1,27 @@
+{
+  "name": "@red-cup-engineering/rdf-data-model-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Holds RDF triplet terms and named graphs together with their serialization, canonicalization, query, and ontology-projection services.",
+  "exports": {
+    "./sparql-over-eavt": "./scripts/sparql-over-eavt.mjs",
+    "./n-quads": "./scripts/n-quads.mjs",
+    "./rdf-canonicalization": "./scripts/rdf-canonicalization.mjs",
+    "./rdf-named-graph": "./scripts/rdf-named-graph.mjs",
+    "./rdf-terms": "./scripts/rdf-terms.mjs",
+    "./json-ld": "./scripts/json-ld.mjs",
+    "./schema-org": "./scripts/schema-org.mjs",
+    "./activitystreams": "./scripts/activitystreams.mjs",
+    "./reading-rdf": "./scripts/reading-rdf.mjs"
+  },
+  "dependencies": {
+    "@red-cup-engineering/articles-services-section": "workspace:*",
+    "@red-cup-engineering/eavt": "workspace:*",
+    "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/turtle-services-section": "workspace:*",
+    "rdf-canonize": "5.0.0"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

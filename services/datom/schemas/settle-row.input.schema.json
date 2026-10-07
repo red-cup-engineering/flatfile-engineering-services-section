@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "row": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["e", "a", "v", "t"],
+          "properties": {
+            "e": {},
+            "a": {},
+            "v": {},
+            "t": {}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4
+        }
+      ]
+    },
+    "reading": {}
+  },
+  "required": ["row", "reading"],
+  "additionalProperties": false
+}
