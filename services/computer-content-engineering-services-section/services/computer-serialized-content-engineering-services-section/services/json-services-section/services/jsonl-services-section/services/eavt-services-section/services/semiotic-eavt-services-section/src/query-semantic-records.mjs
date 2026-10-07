@@ -66,7 +66,7 @@ function semanticRecordOf(statement) {
   const [e, a, v, t] = row;
   return Object.freeze({ id: termToJson(e), category: termToJson(a), recordedAt: t,
     record: termToJson(v), told: TOLD[charge], event: statement.id,
-    origin: statement.observation.seat, causes: statement.core.causes });
+    origin: statement.observation.seat, causes: statement.observation.causes });
 }
 
 /** Records of one kind and category admitted into the journal as witnesses. */
