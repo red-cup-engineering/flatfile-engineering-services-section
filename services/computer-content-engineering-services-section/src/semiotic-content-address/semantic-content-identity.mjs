@@ -73,7 +73,7 @@ function immutableCopy(value) {
     finished.push(target);
     for (const [key, member] of Object.entries(source)) {
       const copy = copyOf(member);
-      target[key] = copy;
+      Object.defineProperty(target, key, { value: copy, enumerable: true, writable: true, configurable: true });
       if (copy !== member) pending.push([member, copy]);
     }
   }
