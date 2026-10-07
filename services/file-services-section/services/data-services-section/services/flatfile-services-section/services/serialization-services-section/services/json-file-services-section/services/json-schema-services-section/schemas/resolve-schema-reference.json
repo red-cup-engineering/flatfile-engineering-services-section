@@ -1,0 +1,21 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["base", "reference"],
+    "properties": {
+      "base": {
+        "type": "object"
+      },
+      "reference": {
+        "type": "string"
+      },
+      "schemas": {
+        "type": "array"
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "required": ["found"]
+  }
+}

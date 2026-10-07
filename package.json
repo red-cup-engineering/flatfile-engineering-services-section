@@ -8,6 +8,23 @@
     "differentiate-sequences": "./bin/differentiate-sequences.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/data-services": "0.1.0"
+    "@red-cup-engineering/data-services": "0.1.0",
+    "@red-cup-engineering/cbor-services-section": "workspace:*",
+    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/json-schema-services-section": "workspace:*"
+  },
+  "exports": {
+    "./closure-regime": "./src/closure-regime.mjs",
+    "./four": "./src/four.mjs",
+    "./semiotic-expression-notation/json-codec": "./src/semiotic-expression-notation/json-codec.mjs",
+    "./semiotic-expression-notation/typing": "./src/semiotic-expression-notation/typing.mjs",
+    "./semiotic-expression-notation": "./src/semiotic-expression-notation/notation.mjs",
+    "./type-system": "./src/type-system/type-system.mjs",
+    "./type-system/schema-type": "./src/type-system/schema-type.mjs",
+    "./type-system/relations": "./src/type-system/relations.mjs",
+    "./operation-refusal-schema": "./src/operation-refusal-schema.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs test/type-system/*.test.mjs"
   }
 }
