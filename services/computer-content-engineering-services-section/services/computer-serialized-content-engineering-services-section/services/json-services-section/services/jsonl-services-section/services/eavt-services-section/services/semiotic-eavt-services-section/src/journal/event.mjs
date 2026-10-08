@@ -227,8 +227,17 @@ export function parseJournalWitness(value) {
     throw new TypeError("journal witness must be an object");
   }
   const candidate = record;
-  if (candidate.kind !== "metroplat.journal.witness") throw new TypeError("unsupported journal witness kind");
+  // The observation and its address are the complete durable material. Earlier
+  // writers stored the derived witness fields too; both carriers retain the
+  // same verified witness, without silently accepting a truncated full record.
+  const compact = Object.keys(candidate).length === 2
+    && Object.hasOwn(candidate, "id") && Object.hasOwn(candidate, "observation");
+  if (!compact && candidate.kind !== "metroplat.journal.witness") throw new TypeError("unsupported journal witness kind");
   const expected = journalWitness(candidate.observation);
+  if (compact) {
+    if (candidate.id !== expected.id) throw new TypeError("journal witness does not match its exact observation and causal source material");
+    return expected;
+  }
   if (
     candidate.id !== expected.id
     || candidate.bytes !== expected.bytes
@@ -277,6 +286,25 @@ function deepFreeze(value) {
  * a record changed since then never reaches here.
  */
 export function verifiedJournalWitness(record) {
+  // A verified prefix already proves these exact observation bytes. Typed
+  // projections need only the observation, so derive the full addressed body
+  // when a consumer actually requests it, once per returned witness.
+  if (Object.keys(record).length === 2 && Object.hasOwn(record, "id") && Object.hasOwn(record, "observation")) {
+    const observation = record.observation, referenced = observation.referencedArtifacts ?? [];
+    const material = Object.freeze({ id: record.id, observation: deepFreeze({
+      ...observation, causes: sortedUnique(observation.causes),
+      ...(referenced.length === 0 ? {} : { referencedArtifacts: sortedUnique(referenced) }),
+    }) });
+    let complete;
+    const derive = () => complete ??= parseJournalWitness(material);
+    return Object.freeze({
+      kind: "metroplat.journal.witness", id: material.id,
+      get bytes() { return derive().bytes; },
+      get core() { return derive().core; },
+      observation: material.observation,
+      get sources() { return derive().sources; },
+    });
+  }
   const observation = record.observation;
   const referenced = observation.referencedArtifacts ?? [];
   return Object.freeze({

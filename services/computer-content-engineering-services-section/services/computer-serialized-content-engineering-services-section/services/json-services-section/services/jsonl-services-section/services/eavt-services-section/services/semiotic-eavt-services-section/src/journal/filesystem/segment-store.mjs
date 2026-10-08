@@ -3,8 +3,10 @@
  *
  * The journal's compact store: the log plate as append-only canonical JSONL.
  *
- * Each feed's admitted witnesses are one line each, in the RFC 8785 canonical JSON of the whole
- * witness, in `<feed>.jsonl.witnesses` beside the feed's logical handle. A journal root keeps its
+ * Each feed's admitted witnesses are one line each, in RFC 8785 canonical JSON:
+ * `{id, observation}`, in `<feed>.jsonl.witnesses` beside the feed's logical handle.
+ * Derived fields are reconstructed and address-verified; full records remain readable.
+ * A journal root keeps its
  * causal-admission state in four append-only JSONL indexes under `index/causal-admission/v2/`:
  *
  * - `admitted.jsonl`: `{id, log}`, one line per witness admitted into a feed;
@@ -926,7 +928,7 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
 }
 
 function publish(storeRoot, index, id, log, statement) {
-  appendLine(segmentPath(path.resolve(storeRoot, log)), statement);
+  appendLine(segmentPath(path.resolve(storeRoot, log)), { id: statement.id, observation: statement.observation });
   const record = { id, log };
   appendLine(indexFile(storeRoot, "admitted"), record);
   applyLine(index, "admitted", record);
