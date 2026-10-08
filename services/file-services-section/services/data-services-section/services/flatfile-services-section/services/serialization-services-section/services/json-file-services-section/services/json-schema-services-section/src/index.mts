@@ -1,3 +1,4 @@
+import { assertKeywordValues } from "../src/assert-keyword-values.mjs";
 import { createHash } from "node:crypto";
 import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/semantic-content-identify-service";
 import {
@@ -116,6 +117,7 @@ function admitSchema(node: SchemaNode, at: string, seen: Set<JsonValue>, allowUn
   if (dialect !== undefined && dialect !== DRAFT_2020_12) {
     throw new TypeError(`${at}: unsupported dialect ${JSON.stringify(dialect)}`);
   }
+  assertKeywordValues(node, at);
   const pattern = node.pattern;
   if (pattern !== undefined) {
     if (typeof pattern !== "string") throw new TypeError(`${at}/pattern must be a string`);

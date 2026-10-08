@@ -62,7 +62,9 @@
     "src/structural-type.mjs",
     "src/inhabit.mjs",
     "src/schema-registry.mjs",
-    "src/schema-assertions.mjs"
+    "src/schema-assertions.mjs",
+    "src/assert-keyword-values.mjs",
+    "src/assert-keyword-values.d.mts"
   ],
   "name": "@red-cup-engineering/json-schema-services-section",
   "private": false,
