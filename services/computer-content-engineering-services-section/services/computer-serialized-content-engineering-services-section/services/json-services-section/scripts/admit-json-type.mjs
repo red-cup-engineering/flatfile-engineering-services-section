@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+const { readFileSync } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 import { requireJsonValue } from "./require-json-value.mjs";
 import contract from "../schemas/admit-json-type.json" with { type: "json" };
 export const inputSchema = contract.input;

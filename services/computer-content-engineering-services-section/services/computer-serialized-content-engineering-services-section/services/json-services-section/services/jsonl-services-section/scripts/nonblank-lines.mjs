@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync as readInput } from "node:fs";
+const { readFileSync: readInput } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 import contracts from "../schemas/operations.json" with { type: "json" };
 export const inputSchema = contracts.nonBlankLines.input;
 export const outputSchema = contracts.nonBlankLines.output;

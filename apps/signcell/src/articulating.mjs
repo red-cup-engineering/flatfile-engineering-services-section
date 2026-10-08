@@ -6,7 +6,7 @@
  * request and of itself. A request crosses a wire as the canonical bytes of
  * `{ kind, operation, input }`.
  */
-import { decodeSemantic, semanticBytes, semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { bytesEqual, decodeSemantic, semanticBytes, semanticId, utf8Bytes } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
 import { mark } from "./mark.mjs";
 import { articulate, utterance } from "./utterance.mjs";
 
@@ -34,7 +34,7 @@ export const ARTICULATING_APEX = semanticId(ARTICULATING_APEX_BODY);
 
 function boundedInput(value) {
   if (value === null || typeof value !== "object" || Array.isArray(value)) throw new TypeError("articulate-utterance input must be an object");
-  if (Buffer.byteLength(JSON.stringify(value), "utf8") > MAX_ARTICULATING_INPUT_BYTES) throw new RangeError(`articulate-utterance input exceeds ${MAX_ARTICULATING_INPUT_BYTES} bytes`);
+  if (utf8Bytes(JSON.stringify(value)).length > MAX_ARTICULATING_INPUT_BYTES) throw new RangeError(`articulate-utterance input exceeds ${MAX_ARTICULATING_INPUT_BYTES} bytes`);
   if (value.apex !== undefined && value.apex !== ARTICULATING_APEX) throw new TypeError("articulate-utterance input is bound to a different apex");
   if (!Object.hasOwn(value, "tokenMark") || !Object.hasOwn(value, "claimMark")) throw new TypeError("articulate-utterance requires tokenMark and claimMark");
   return value;
@@ -81,9 +81,9 @@ export function encodeArticulatingRequest(input) {
 
 /** Admit canonical articulating request bytes; refuses noncanonical bytes and other operations. */
 export function decodeArticulatingRequest(bytes) {
-  const source = Buffer.from(bytes);
+  const source = Uint8Array.from(bytes);
   const request = decodeSemantic(source);
-  if (!semanticBytes(request).equals(source)) throw new TypeError("articulating request bytes are not canonical");
+  if (!bytesEqual(semanticBytes(request), source)) throw new TypeError("articulating request bytes are not canonical");
   if (request?.kind !== ARTICULATING_REQUEST_KIND || request.operation !== ARTICULATE_OPERATION) throw new TypeError(`Obsmetrologia articulating expected one ${ARTICULATE_OPERATION} ${ARTICULATING_REQUEST_KIND}`);
   boundedInput(request.input);
   return Object.freeze({ request, semanticId: semanticId(request) });

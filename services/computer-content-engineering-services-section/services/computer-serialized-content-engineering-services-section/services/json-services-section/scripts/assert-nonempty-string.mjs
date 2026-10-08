@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync as readInput } from "node:fs";
+const { readFileSync: readInput } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 export const inputSchema = Object.freeze({
   type: "object",
   required: ["value", "label"],

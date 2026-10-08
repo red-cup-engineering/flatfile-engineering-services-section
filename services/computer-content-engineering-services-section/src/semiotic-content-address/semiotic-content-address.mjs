@@ -14,6 +14,10 @@
 import { decodeCanonical, encodeCanonical } from "@red-cup-engineering/cbor-services-section";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { sha256Bytes } from "@red-cup-engineering/cryptographic-data-service/portable-sha256";
+import { bytesEqual, bytesToHex, bytesToLatin1, ownedBytes } from "@red-cup-engineering/cryptographic-data-service/portable-bytes";
+
+// The portable byte helpers every content-address consumer uses in place of Buffer methods.
+export { base64ToBytes, bytesCompare, bytesEqual, bytesToBase64, bytesToHex, bytesToLatin1, concatBytes, ownedBytes, utf8Bytes } from "@red-cup-engineering/cryptographic-data-service/portable-bytes";
 
 /**
  * Transform one semiotic JSON carrier into its canonical representation.
@@ -24,6 +28,10 @@ import { sha256Bytes } from "@red-cup-engineering/cryptographic-data-service/por
  * text-keyed objects. A key collision introduced by NFC normalization is
  * rejected, as is a cycle; a value shared at several places is admitted.
  */
+const canonicalSnapshots = new WeakSet();
+// A Buffer stays a Buffer (it is a Uint8Array); any other byte string is an owned Uint8Array.
+const copyBytes = (value) => (value.constructor === Uint8Array ? Uint8Array.from(value) : ownedBytes(value));
+
 export function canonicalizeSemioticJson(value) {
   let canonical;
   const pending = [{ source: value, place: (result) => { canonical = result; } }];
@@ -33,7 +41,9 @@ export function canonicalizeSemioticJson(value) {
     if (item.close) { open.delete(item.close); continue; }
     const { source, place } = item;
     if (typeof source === "string") { place(source.normalize("NFC")); continue; }
-    if (Buffer.isBuffer(source) || source instanceof Uint8Array || source === null || typeof source === "boolean" || typeof source === "bigint") { place(source); continue; }
+    if (source !== null && typeof source === "object" && canonicalSnapshots.has(source)) { place(source); continue; }
+    if (source instanceof Uint8Array) { place(copyBytes(source)); continue; }
+    if (source === null || typeof source === "boolean" || typeof source === "bigint") { place(source); continue; }
     if (typeof source === "number") {
       if (!Number.isFinite(source)) throw new TypeError("semiotic JSON numbers must be finite");
       place(source); continue;
@@ -71,34 +81,40 @@ export function canonicalizeSemioticJson(value) {
   return canonical;
 }
 
-/** A carrier's canonical form, frozen throughout: the value its address names, held so it cannot
- *  drift from that address. Byte strings are views, which cannot be frozen, and are left as is. */
+/** Own a canonical snapshot. Containers are frozen throughout; their byte-string members
+ * expose copies of private bytes. A root byte string is an owned, unmemoized copy. */
 export function canonicalCarrier(value) {
   const canonical = canonicalizeSemioticJson(value);
   const pending = [canonical];
   while (pending.length > 0) {
     const item = pending.pop();
-    if (item === null || typeof item !== "object" || ArrayBuffer.isView(item) || Object.isFrozen(item)) continue;
+    if (item === null || typeof item !== "object" || ArrayBuffer.isView(item) || canonicalSnapshots.has(item)) continue;
+    for (const key of Object.keys(item)) {
+      const member = item[key];
+      if (member instanceof Uint8Array) {
+        Object.defineProperty(item, key, { enumerable: true, configurable: false, get: () => copyBytes(member) });
+      } else pending.push(member);
+    }
     Object.freeze(item);
-    for (const member of Object.values(item)) pending.push(member);
+    canonicalSnapshots.add(item);
   }
   return canonical;
 }
 
-// A frozen carrier cannot change, so its bytes are encoded once and read back after: settling
-// compares the same cells pairwise, and re-encoding them on every comparison is quadratic work.
+// Only owned canonical snapshots qualify for memoization: a shallow freeze does not
+// establish immutable content. Cached bytes stay private; readers receive copies.
 const frozenBytes = new WeakMap();
 
-/** The canonical CBOR bytes of a carrier's canonical form. Callers treat the bytes as read-only. */
+/** An owned copy (a Uint8Array) of the canonical CBOR bytes of a carrier's canonical form. */
 export function semanticBytes(value) {
-  const memo = value !== null && typeof value === "object" && Object.isFrozen(value);
+  const memo = value !== null && typeof value === "object" && canonicalSnapshots.has(value);
   if (memo) {
     const cached = frozenBytes.get(value);
-    if (cached !== undefined) return cached;
+    if (cached !== undefined) return ownedBytes(cached);
   }
   const bytes = encodeCanonical(canonicalizeSemioticJson(value));
   if (memo) frozenBytes.set(value, bytes);
-  return bytes;
+  return ownedBytes(bytes);
 }
 
 /** Canonical CBOR bytes back to the canonical carrier they encode. */
@@ -136,8 +152,8 @@ export function coincides(left, right) {
     if (typeof right === "number" && !Number.isFinite(right)) semanticBytes(right);
     return left === right;
   }
-  return semanticBytes(left).equals(semanticBytes(right));
+  return bytesEqual(semanticBytes(left), semanticBytes(right));
 }
 
 /** The canonical bytes coincidence compares, as a key: carriers coincide exactly when their keys are equal. */
-export const coincidenceKey = (value) => semanticBytes(value).toString("latin1");
+export const coincidenceKey = (value) => bytesToLatin1(semanticBytes(value));

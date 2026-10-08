@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { createHash } from "node:crypto";
-import { readFileSync as readInput } from "node:fs";
+import { sha256Bytes } from "@red-cup-engineering/cryptographic-data-service/portable-sha256";
+const { readFileSync: readInput } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 
 /** The one currently admitted sequence-commitment profile.
@@ -37,7 +37,7 @@ function freeze(value) {
 }
 
 function sha256Hex(bytes) {
-  return createHash("sha256").update(bytes).digest("hex");
+  return sha256Bytes(bytes);
 }
 
 function supportedProfile(profile) {

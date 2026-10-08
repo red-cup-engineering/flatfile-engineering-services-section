@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { readFileSync as readInput } from "node:fs";
-import { appendFileSync, mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+const { readFileSync: readInput } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
+const { appendFileSync, mkdirSync } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
+const { dirname } = globalThis.process?.getBuiltinModule?.("node:path") ?? {};
 import { serializeLines } from "./serialize-jsonl.mjs";
 import contracts from "../schemas/operations.json" with { type: "json" };
 export const inputSchema = contracts.appendJsonl.input;

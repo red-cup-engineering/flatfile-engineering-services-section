@@ -9,12 +9,11 @@
  * no evaluation. Normalizing an arbitrary term is the SEN evaluator's, and its identity
  * (`identifyNormalizedSemanticContent`) is the code layer's, built on this envelope law.
  */
-import { decodeSemantic, semanticAddress, semanticId } from "./semiotic-content-address.mjs";
+import { bytesEqual, coincides, decodeSemantic, semanticAddress, semanticId } from "./semiotic-content-address.mjs";
 import { isNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { isDeepStrictEqual } from "node:util";
 import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec";
 import { checkTerm, inferTerm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/typing";
-import { encodeJsonByteCarrier } from "@red-cup-engineering/json-services-section/encode-json-byte-carrier";
+import { encodeJsonByteCarrier } from "@red-cup-engineering/json-services-section/json-byte-carrier";
 
 export const SEN_NORMALIZATION_PROFILE = "urn:rce:sen:normalize:0.1.0";
 export const IDENTITY_SETTLEMENT_PROFILE = "urn:rce:settlement:identity:0.0.1";
@@ -34,6 +33,7 @@ const V2_KEYS = Object.freeze([
   "settledBody",
   "witnessRoot",
 ]);
+const V2_SORTED_KEYS = Object.freeze([...V2_KEYS].sort());
 
 /** Explicit root for semantic material whose named settlement profile consumes
  * no evidential witnesses. This is a raw canonical-carrier commitment, not a
@@ -100,7 +100,7 @@ export function admitSemanticEnvelope(envelope, { normalForm = undefined, typeCh
     throw semanticContentRefusal("malformed-normalized-content", "normalized semantic content must be one envelope object");
   }
   const keys = Object.keys(envelope).sort();
-  if (!isDeepStrictEqual(keys, [...V2_KEYS].sort()) || envelope.kind !== V2_KIND || envelope.version !== ENVELOPE_VERSION) {
+  if (keys.length !== V2_KEYS.length || !keys.every((key, index) => key === V2_SORTED_KEYS[index]) || envelope.kind !== V2_KIND || envelope.version !== ENVELOPE_VERSION) {
     throw semanticContentRefusal("malformed-normalized-content", "normalized semantic content has unknown fields, kind, or version");
   }
   const objectKind = canonicalString(envelope.objectKind, "objectKind");
@@ -122,7 +122,7 @@ export function admitSemanticEnvelope(envelope, { normalForm = undefined, typeCh
     } catch {
       throw semanticContentRefusal("normalization-failure", "settledBody could not be checked under the declared normalization profile");
     }
-    if (!isDeepStrictEqual(normalized, envelope.settledBody)) {
+    if (!coincides(normalized, envelope.settledBody)) {
       throw semanticContentRefusal("non-normal-content", "settledBody is not normal under the declared normalization profile");
     }
   }
@@ -154,7 +154,7 @@ export function decodeSemanticEnvelope(bytes, token = undefined, options = {}) {
     throw semanticContentRefusal("malformed-normalized-content", "bytes must carry one canonical SEN normalized-content envelope");
   }
   const identified = commitSemanticEnvelope(decoded, options);
-  if (!Buffer.from(identified.bytes).equals(Buffer.from(bytes))) {
+  if (!bytesEqual(identified.bytes, bytes)) {
     throw semanticContentRefusal("normalized-content-commitment-mismatch", "bytes do not reproduce their canonical normalized-content commitment");
   }
   if (token !== undefined && token !== identified.token) {
@@ -296,7 +296,7 @@ export function admitJsonSemanticContent({ bytes, token, objectKind } = {}) {
   } catch {
     throw semanticContentRefusal("non-json-semantic-content", "settled body is not an admitted JSON term");
   }
-  if (!isDeepStrictEqual(jsonToTerm(value), identified.envelope.settledBody)) {
+  if (!coincides(jsonToTerm(value), identified.envelope.settledBody)) {
     throw semanticContentRefusal("non-json-semantic-content", "settled body is not the injective JSON-to-SEN representation");
   }
   return Object.freeze({ ...identified, value: immutableCopy(value) });

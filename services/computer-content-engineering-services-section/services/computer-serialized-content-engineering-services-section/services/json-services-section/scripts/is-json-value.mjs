@@ -87,7 +87,7 @@ export function isJsonValue(value) {
 }
 
 if (import.meta.main) {
-  const { readFileSync: readInput } = await import("node:fs");
+  const { readFileSync: readInput } = (globalThis.process?.getBuiltinModule?.("node:fs") ?? {});
 
   process.stdout.write(
     JSON.stringify(isJsonValue(JSON.parse(readInput(0, "utf8")))) + "\n",

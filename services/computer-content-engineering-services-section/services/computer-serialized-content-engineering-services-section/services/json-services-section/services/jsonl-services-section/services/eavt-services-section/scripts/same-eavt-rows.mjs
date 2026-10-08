@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+const { readFileSync } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 export const inputSchema = {
   type: "object",
   properties: {

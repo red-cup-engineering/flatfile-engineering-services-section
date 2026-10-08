@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync as readInput } from "node:fs";
+const { readFileSync: readInput } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 import {
   JSONL_JCS_SHA256_SEQUENCE_V1,
   commitJsonlRecords,

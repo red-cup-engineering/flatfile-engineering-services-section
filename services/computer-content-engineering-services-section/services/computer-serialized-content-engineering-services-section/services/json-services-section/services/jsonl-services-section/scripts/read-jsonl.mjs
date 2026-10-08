@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { readFileSync as readInput } from "node:fs";
-import { readFileSync } from "node:fs";
+const { readFileSync: readInput } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
+const { readFileSync } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 import { parseLines } from "./parse-jsonl.mjs";
 import contracts from "../schemas/operations.json" with { type: "json" };
 export const inputSchema = contracts.readJsonlAtPath.input;

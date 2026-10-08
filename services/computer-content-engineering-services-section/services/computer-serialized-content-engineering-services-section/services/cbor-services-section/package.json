@@ -12,6 +12,7 @@
     "package.json"
   ],
   "dependencies": {
+    "@red-cup-engineering/cryptographic-data-service": "workspace:*",
     "@red-cup-engineering/uri-services-section": "workspace:*"
   },
   "devDependencies": {},

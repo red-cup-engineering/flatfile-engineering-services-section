@@ -7,7 +7,7 @@ export function identify(value) {
   return encode(value);
 }
 if (import.meta.main) {
-  const { readFileSync } = await import("node:fs");
+  const { readFileSync } = (globalThis.process?.getBuiltinModule?.("node:fs") ?? {});
 
   process.stdout.write(
     JSON.stringify(identify(JSON.parse(readFileSync(0, "utf8")))) + "\n",

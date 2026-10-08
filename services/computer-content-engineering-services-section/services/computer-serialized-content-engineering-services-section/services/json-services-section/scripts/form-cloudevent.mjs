@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync as readInput } from "node:fs";
+const { readFileSync: readInput } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 import contract from "../schemas/form-cloudevent.json" with { type: "json" };
 export const inputSchema = contract.input;
 export const outputSchema = contract.output;

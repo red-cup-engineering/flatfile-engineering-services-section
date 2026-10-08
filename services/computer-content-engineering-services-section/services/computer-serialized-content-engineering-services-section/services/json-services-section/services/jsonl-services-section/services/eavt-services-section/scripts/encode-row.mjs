@@ -9,7 +9,7 @@ export function encode(value) {
   return encodeAdmitted(row(value));
 }
 if (import.meta.main) {
-  const { readFileSync } = await import("node:fs");
+  const { readFileSync } = (globalThis.process?.getBuiltinModule?.("node:fs") ?? {});
 
   process.stdout.write(
     JSON.stringify(encode(JSON.parse(readFileSync(0, "utf8")))) + "\n",

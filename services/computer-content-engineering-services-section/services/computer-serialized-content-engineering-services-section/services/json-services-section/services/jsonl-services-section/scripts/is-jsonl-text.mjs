@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+const { readFileSync } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 import { parseLines } from "./parse-jsonl.mjs";
 export const inputSchema = { type: "string" };
 export const outputSchema = { type: "boolean" };

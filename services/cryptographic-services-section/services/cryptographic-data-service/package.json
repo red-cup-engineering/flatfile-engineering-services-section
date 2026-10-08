@@ -7,6 +7,7 @@
     "./hash": "./src/hash.mjs",
     "./integrity": "./src/integrity.mjs",
     "./portable-sha256": "./src/portable-sha256.mjs",
+    "./portable-bytes": "./src/portable-bytes.mjs",
     "./secp256k1": "./src/secp256k1.mjs",
     "./keccak256": "./src/keccak256.mjs",
     "./evm": "./src/evm.mjs",

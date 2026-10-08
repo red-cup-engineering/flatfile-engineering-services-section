@@ -14,7 +14,8 @@
     "./is-jsonl-text": "./scripts/is-jsonl-text.mjs",
     "./jsonl-projector": "./scripts/jsonl-projector.mjs",
     "./commit-jsonl-records": "./scripts/commit-jsonl-records.mjs",
-    "./verify-jsonl-commitment": "./scripts/verify-jsonl-commitment.mjs"
+    "./verify-jsonl-commitment": "./scripts/verify-jsonl-commitment.mjs",
+    "./convert-jsonl": "./scripts/convert-jsonl.mjs"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs"
@@ -27,6 +28,7 @@
   ],
   "dependencies": {
     "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/cryptographic-data-service": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*"
   }
 }

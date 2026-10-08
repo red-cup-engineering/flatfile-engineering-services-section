@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync as readInput } from "node:fs";
+const { readFileSync: readInput } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 import { parseJsonValue as parse } from "@red-cup-engineering/json-services-section/parse-json-value";
 import contracts from "../schemas/operations.json" with { type: "json" };
 export const inputSchema = contracts.parseLines.input;
