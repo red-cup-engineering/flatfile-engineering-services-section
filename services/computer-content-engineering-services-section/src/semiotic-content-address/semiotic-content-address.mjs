@@ -29,10 +29,15 @@ export { base64ToBytes, bytesCompare, bytesEqual, bytesToBase64, bytesToHex, byt
  * rejected, as is a cycle; a value shared at several places is admitted.
  */
 const canonicalSnapshots = new WeakSet();
+const retainedSnapshots = new WeakSet();
 // A Buffer stays a Buffer (it is a Uint8Array); any other byte string is an owned Uint8Array.
 const copyBytes = (value) => (value.constructor === Uint8Array ? Uint8Array.from(value) : ownedBytes(value));
 
 export function canonicalizeSemioticJson(value) {
+  return copyCarrier(value, true);
+}
+
+function copyCarrier(value, normalizeText) {
   let canonical;
   const pending = [{ source: value, place: (result) => { canonical = result; } }];
   const open = new Set();
@@ -40,8 +45,8 @@ export function canonicalizeSemioticJson(value) {
     const item = pending.pop();
     if (item.close) { open.delete(item.close); continue; }
     const { source, place } = item;
-    if (typeof source === "string") { place(source.normalize("NFC")); continue; }
-    if (source !== null && typeof source === "object" && canonicalSnapshots.has(source)) { place(source); continue; }
+    if (typeof source === "string") { place(normalizeText ? source.normalize("NFC") : source); continue; }
+    if (source !== null && typeof source === "object" && (canonicalSnapshots.has(source) || (!normalizeText && retainedSnapshots.has(source)))) { place(source); continue; }
     if (source instanceof Uint8Array) { place(copyBytes(source)); continue; }
     if (source === null || typeof source === "boolean" || typeof source === "bigint") { place(source); continue; }
     if (typeof source === "number") {
@@ -58,16 +63,18 @@ export function canonicalizeSemioticJson(value) {
     }
     if (source && Object.getPrototypeOf(source) === Object.prototype) {
       open.add(source); pending.push({ close: source });
-      const result = {}; const members = [];
+      const result = {}; const members = [], normalizedKeys = new Set();
       for (const [key, member] of Object.entries(source)) {
         // A member whose value is undefined is absent, as JSON reads it.
         if (member === undefined) continue;
         const canonicalKey = key.normalize("NFC");
-        if (Object.hasOwn(result, canonicalKey)) throw new TypeError(`semiotic JSON map keys collide after NFC normalization: ${canonicalKey}`);
+        if (normalizedKeys.has(canonicalKey)) throw new TypeError(`semiotic JSON map keys collide after NFC normalization: ${canonicalKey}`);
+        normalizedKeys.add(canonicalKey);
+        const retainedKey = normalizeText ? canonicalKey : key;
         // Reserve an own data property before assigning its canonical value;
         // names such as __proto__ must not invoke an inherited setter.
-        Object.defineProperty(result, canonicalKey, { value: undefined, enumerable: true, writable: true, configurable: true });
-        members.push([canonicalKey, member]);
+        Object.defineProperty(result, retainedKey, { value: undefined, enumerable: true, writable: true, configurable: true });
+        members.push([retainedKey, member]);
       }
       place(result);
       for (let index = members.length - 1; index >= 0; index -= 1) {
@@ -84,11 +91,21 @@ export function canonicalizeSemioticJson(value) {
 /** Own a canonical snapshot. Containers are frozen throughout; their byte-string members
  * expose copies of private bytes. A root byte string is an owned, unmemoized copy. */
 export function canonicalCarrier(value) {
-  const canonical = canonicalizeSemioticJson(value);
+  return ownSnapshot(canonicalizeSemioticJson(value), canonicalSnapshots);
+}
+
+/** Own a detached carrier without changing its text representatives or map keys.
+ * Containers are frozen and byte members expose copies, as with canonicalCarrier.
+ * Identity still uses semanticBytes: a retained snapshot is not a canonical snapshot. */
+export function retainedCarrier(value) {
+  return ownSnapshot(copyCarrier(value, false), retainedSnapshots);
+}
+
+function ownSnapshot(canonical, snapshots) {
   const pending = [canonical];
   while (pending.length > 0) {
     const item = pending.pop();
-    if (item === null || typeof item !== "object" || ArrayBuffer.isView(item) || canonicalSnapshots.has(item)) continue;
+    if (item === null || typeof item !== "object" || ArrayBuffer.isView(item) || canonicalSnapshots.has(item) || retainedSnapshots.has(item)) continue;
     for (const key of Object.keys(item)) {
       const member = item[key];
       if (member instanceof Uint8Array) {
@@ -96,7 +113,7 @@ export function canonicalCarrier(value) {
       } else pending.push(member);
     }
     Object.freeze(item);
-    canonicalSnapshots.add(item);
+    snapshots.add(item);
   }
   return canonical;
 }

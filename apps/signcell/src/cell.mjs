@@ -29,7 +29,7 @@
  * Terms and witnesses are opaque semiotic JSON values; nothing here reads them
  * except to encode them.
  */
-import { bytesEqual, bytesToHex, bytesToLatin1, canonicalCarrier, coincidenceKey, coincides, semanticBytes, semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { bytesEqual, bytesToHex, bytesToLatin1, retainedCarrier, coincidenceKey, coincides, semanticBytes, semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
 import { isReading, knowledgeJoinReading, readingAs, readingOfSides, readingSchema, record, sidesOfReading } from "@red-cup-engineering/computer-data-services-section/four";
 
 const present = (value, role) => {
@@ -46,7 +46,7 @@ export { coincides, coincidenceKey };
 function side(witnesses) {
   const byBytes = new Map();
   for (const witness of witnesses) byBytes.set(bytesToHex(semanticBytes(present(witness, "witness"))), witness);
-  return canonicalCarrier([...byBytes.keys()].sort().map((key) => byBytes.get(key)));
+  return retainedCarrier([...byBytes.keys()].sort().map((key) => byBytes.get(key)));
 }
 
 /** The reading the sides alone show, in the knowledge family (Valued.presence). */
@@ -65,7 +65,7 @@ function written(value, told, denied) {
  *  A cell is a triple with one of these. */
 export const evidence = ({ for: told = [], against: denied = [], value } = {}) => {
   const [forSide, againstSide] = [side(told), side(denied)];
-  return canonicalCarrier({ for: forSide, against: againstSide, ...written(value, forSide, againstSide) });
+  return retainedCarrier({ for: forSide, against: againstSide, ...written(value, forSide, againstSide) });
 };
 
 /** A cell's evidence (or a bare pair's) as a bare evidence pair, its value kept. */
@@ -79,7 +79,7 @@ export const hasEvidence = (value) => value !== null && typeof value === "object
 const admitted = new WeakSet();
 function made(subject, predicate, object, told, denied, reading) {
   const [forSide, againstSide] = [side(told), side(denied)];
-  const value = canonicalCarrier({
+  const value = retainedCarrier({
     subject: present(subject, "subject"),
     predicate: present(predicate, "predicate"),
     object: present(object, "object"),
@@ -95,7 +95,7 @@ function made(subject, predicate, object, told, denied, reading) {
 // again, and its bytes and address, once known, are the prior cell's.
 function reEvidenced(prior, told, denied, reading) {
   const [forSide, againstSide] = [side(told), side(denied)];
-  const value = canonicalCarrier({ subject: prior.subject, predicate: prior.predicate, object: prior.object, for: forSide, against: againstSide, ...written(reading, forSide, againstSide) });
+  const value = retainedCarrier({ subject: prior.subject, predicate: prior.predicate, object: prior.object, for: forSide, against: againstSide, ...written(reading, forSide, againstSide) });
   admitted.add(value);
   if (tripleBytesOf.has(prior)) tripleBytesOf.set(value, tripleBytesOf.get(prior));
   if (addressOf.has(prior)) addressOf.set(value, addressOf.get(prior));
@@ -125,7 +125,7 @@ export const evidenced = (at, value) => admitted.has(at)
   : cell(at.subject, at.predicate, at.object, value);
 
 /** The triple a cell is addressed by. */
-export const triple = (value) => canonicalCarrier({ subject: value.subject, predicate: value.predicate, object: value.object });
+export const triple = (value) => retainedCarrier({ subject: value.subject, predicate: value.predicate, object: value.object });
 
 // Owned, admitted cells have immutable triples, so their bytes and address are computed once.
 const tripleBytesOf = new WeakMap();
