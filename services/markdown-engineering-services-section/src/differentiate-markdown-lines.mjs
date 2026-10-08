@@ -1,0 +1,4 @@
+import { differentiateSequences } from "@red-cup-engineering/json-services-section/differentiate-sequences";
+function lines(text) { const normalized = text.replace(/\r\n?/gu, "\n"); if (normalized === "") return []; const output = normalized.split("\n"); if (normalized.endsWith("\n")) output.pop(); return output; }
+/** Differentiate two Markdown texts as normalized ordered line sequences. */
+export function differentiateMarkdownLines(before, after) { if (typeof before !== "string" || typeof after !== "string") throw new TypeError("before and after must be strings"); return differentiateSequences(lines(before), lines(after)).map((change) => Object.freeze({ kind: change.kind, ...(change.beforeIndex === undefined ? {} : { beforeLine: change.beforeIndex + 1 }), ...(change.afterIndex === undefined ? {} : { afterLine: change.afterIndex + 1 }), text: change.value })); }
