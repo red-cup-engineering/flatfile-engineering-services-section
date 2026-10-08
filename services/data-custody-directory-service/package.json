@@ -1,0 +1,48 @@
+{
+  "name": "@red-cup-engineering/data-custody-directory-service",
+  "version": "0.3.0",
+  "type": "module",
+  "description": "Resolves and verifies the three lawful data/ custody directories -- logs, records, state -- a service's flatfile data may live under.",
+  "license": "Apache-2.0",
+  "keywords": [
+    "computer-data",
+    "561-group"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/bare-cedar-fog.git",
+    "directory": "services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/computer-file-engineering-services-section/services/flatfile-engineering-services-section/services/data-custody-directory-service"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/data-custody-directory.mjs"
+    },
+    "./resolve-data-custody-directory": {
+      "import": "./scripts/resolve-data-custody-directory.mjs"
+    },
+    "./check-data-custody-directory": {
+      "import": "./scripts/check-data-custody-directory.mjs"
+    },
+    "./migrate-data-custody-directory": {
+      "import": "./scripts/migrate-data-custody-directory.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "resolve-data-custody-directory": "./scripts/resolve-data-custody-directory.mjs",
+    "check-data-custody-directory": "./scripts/check-data-custody-directory.mjs",
+    "migrate-data-custody-directory": "./scripts/migrate-data-custody-directory.mjs"
+  },
+  "files": [
+    "README.md",
+    "scripts",
+    "src"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
