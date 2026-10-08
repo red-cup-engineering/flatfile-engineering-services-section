@@ -16,7 +16,9 @@
     "./validation": "./src/validation.mjs",
     "./contracts": "./src/contracts.mjs",
     "./validate-schema-instance": "./scripts/validate-schema-instance.mjs",
-    "./resolve-schema-pointer": "./scripts/resolve-schema-pointer.mjs"
+    "./resolve-schema-pointer": "./scripts/resolve-schema-pointer.mjs",
+    "./realize": "./src/realize.mjs",
+    "./structural-type": "./src/structural-type.mjs"
   },
   "bin": {
     "json-schema-census": "./scripts/json-schema-census.mjs",
@@ -43,7 +45,9 @@
     "schemas/resolve-schema-reference.json",
     "schemas/schema-children.json",
     "schemas/validate-schema-instance.json",
-    "src/schema-vocabulary.mjs"
+    "src/schema-vocabulary.mjs",
+    "src/realize.mjs",
+    "src/structural-type.mjs"
   ],
   "dependencies": {
     "@red-cup-engineering/json-file-codec-service": "0.1.3",
