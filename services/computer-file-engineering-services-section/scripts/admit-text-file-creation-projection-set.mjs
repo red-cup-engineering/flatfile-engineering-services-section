@@ -1,7 +1,7 @@
 import { freezeJson } from "@red-cup-engineering/json-services-section";
 import { parseLines, serializeLines } from "@red-cup-engineering/jsonl-services-section";
 import { admitTextFileCreationProjection } from "@red-cup-engineering/file-services/admit-text-file-creation-projection";
-import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
+import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-data-service/integrity";
 
 function refusal(code, message, path = null) {
   return freezeJson({ type: "TextFileCreationProjectionSetRefusal", version: 1, code, message, path });
