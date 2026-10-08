@@ -23,7 +23,7 @@ export const inputSchema = {
 export const outputSchema = { type: "object" };
 import { readFileSync } from "node:fs";
 import { normalizeEavtRow } from "./normalize-row.mjs";
-import { canonicalJson } from "../../../../../scripts/canonical-json.mjs";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 
 export function latestState({ entries } = {}) {
   if (!Array.isArray(entries))
