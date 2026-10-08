@@ -13,7 +13,7 @@
  */
 import { decodeCanonical, encodeCanonical } from "@red-cup-engineering/cbor-services-section";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { sha256Bytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-sha256";
+import { sha256Bytes } from "@red-cup-engineering/cryptographic-data-service/portable-sha256";
 
 /**
  * Transform one semiotic JSON carrier into its canonical representation.
@@ -54,7 +54,10 @@ export function canonicalizeSemioticJson(value) {
         if (member === undefined) continue;
         const canonicalKey = key.normalize("NFC");
         if (Object.hasOwn(result, canonicalKey)) throw new TypeError(`semiotic JSON map keys collide after NFC normalization: ${canonicalKey}`);
-        result[canonicalKey] = undefined; members.push([canonicalKey, member]);
+        // Reserve an own data property before assigning its canonical value;
+        // names such as __proto__ must not invoke an inherited setter.
+        Object.defineProperty(result, canonicalKey, { value: undefined, enumerable: true, writable: true, configurable: true });
+        members.push([canonicalKey, member]);
       }
       place(result);
       for (let index = members.length - 1; index >= 0; index -= 1) {

@@ -32,6 +32,11 @@
     "./project-web-feed": "./src/project-web-feed.mjs"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs services/http-data-services-section/test/*.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/red-cup-engineering/computer-data-services-section.git",
+    "directory": "services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section"
   }
 }

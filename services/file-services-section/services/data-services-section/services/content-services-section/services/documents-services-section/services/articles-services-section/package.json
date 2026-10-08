@@ -1,6 +1,7 @@
 {
   "name": "@red-cup-engineering/articles-services-section",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "private": true,
   "type": "module",
   "description": "Restricts document carriers to sustained prose claims with explicit disposition.",
   "x-capability-recovery": [
@@ -20,7 +21,7 @@
   },
   "dependencies": {
     "@red-cup-engineering/metrologic": "workspace:*",
-    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-data-services-section": "workspace:*",
     "@red-cup-engineering/json-schema-services-section": "workspace:*"
   }
 }

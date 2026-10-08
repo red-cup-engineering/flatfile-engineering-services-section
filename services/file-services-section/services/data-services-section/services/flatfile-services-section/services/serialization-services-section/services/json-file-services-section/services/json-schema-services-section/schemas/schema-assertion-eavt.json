@@ -1,9 +1,0 @@
-{
-  "input": {
-    "type": "object",
-    "required": ["assertion"]
-  },
-  "output": {
-    "type": "object"
-  }
-}

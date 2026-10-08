@@ -97,7 +97,7 @@ function evaluatorSchemaGraph(root, references) {
                 continue;
             }
             if (!schemaKeys.has(key)) {
-                result[key] = item;
+                Object.defineProperty(result, key, { value: item, enumerable: true, writable: true, configurable: true });
                 continue;
             }
             if (["allOf", "anyOf", "oneOf", "prefixItems"].includes(key) && Array.isArray(item)) {

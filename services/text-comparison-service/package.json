@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/text-comparison-service",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Compares text using explicit case and Unicode-folding rules while retaining source spans, and matches names against a list of named records with rarity-weighted words.",
   "exports": {

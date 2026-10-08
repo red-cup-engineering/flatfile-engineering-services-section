@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/markdown-engineering-services-section",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "type": "module",
   "description": "Markdown source reading, editing, relation projection and filesystem access in one implementation. Direct module exports share source coordinates; CLI and typed operations call those same modules.",
   "exports": {
@@ -136,21 +136,21 @@
   },
   "dependencies": {
     "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/computer-data-serialization-services-section": "workspace:*",
     "@red-cup-engineering/computer-filepath-engineering-services-section": "workspace:*",
     "@red-cup-engineering/computer-text-content-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/csl-json-services-section": "workspace:*",
     "@red-cup-engineering/file-services": "workspace:*",
     "@red-cup-engineering/html-structural-projection-service": "workspace:*",
     "@red-cup-engineering/json-schema-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/metrologic": "workspace:*",
-    "@red-cup-engineering/toml-services-section": "workspace:*",
     "@red-cup-engineering/uri-services-section": "workspace:*",
     "@red-cup-engineering/yaml-frontmatter-codec-service": "workspace:*",
-    "@red-cup-engineering/signcell": "workspace:*"
+    "@red-cup-engineering/signcell": "workspace:*",
+    "@red-cup-engineering/computer-data-services-section": "workspace:*",
+    "@red-cup-engineering/cryptographic-data-service": "workspace:*",
+    "@red-cup-engineering/toml-file-codec-service": "workspace:*"
   },
   "files": [
     "src",
@@ -165,5 +165,10 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/red-cup-engineering/computer-data-services-section.git",
+    "directory": "services/markdown-engineering-services-section"
   }
 }

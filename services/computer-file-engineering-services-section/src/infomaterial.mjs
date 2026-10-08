@@ -16,7 +16,7 @@ import { createReadStream } from "node:fs";
 import { lstat, opendir, readlink } from "node:fs/promises";
 import { basename, isAbsolute, resolve } from "node:path";
 import { decodeSemantic, semanticBytes, semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
-import { sha256 } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/hash";
+import { sha256 } from "@red-cup-engineering/cryptographic-data-service/hash";
 
 export const MATERIAL_PROFILE = "org.emsenn.infomaterial.merkle.v2";
 export const DIRECTORY_PLATE_PROFILE = "org.emsenn.infomaterial.directory-plate.v1";

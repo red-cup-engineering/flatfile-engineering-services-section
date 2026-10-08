@@ -1,6 +1,6 @@
 import { isDeepStrictEqual } from "node:util";
 import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
-import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
+import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec";
 import {
   EMPTY_WITNESS_ROOT,
   identifyJsonSemanticContent,

@@ -5,7 +5,7 @@ import { replaceMarkdownLines } from "./replace-markdown-lines.mjs";
 import { replaceMarkdownSection } from "./replace-markdown-section.mjs";
 import { replaceMarkdownText } from "./replace-markdown-text.mjs";
 import { normalizeLinefeeds } from "@red-cup-engineering/computer-text-content-engineering-services-section/normalize-linefeeds";
-import { encodeToml } from "@red-cup-engineering/toml-services-section/toml-codec";
+import { encodeToml } from "@red-cup-engineering/toml-file-codec-service";
 import { encodeYaml } from "@red-cup-engineering/yaml-frontmatter-codec-service";
 
 export const markdownEditRequestKind = "red-cup-engineering.markdown.edit-request";

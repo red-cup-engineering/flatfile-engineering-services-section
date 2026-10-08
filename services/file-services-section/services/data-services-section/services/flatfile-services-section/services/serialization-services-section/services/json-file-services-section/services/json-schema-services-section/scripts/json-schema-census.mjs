@@ -1,67 +1,16 @@
 #!/usr/bin/env node
-import { readFileSync, readdirSync, lstatSync } from "node:fs";
-import { resolve, relative } from "node:path";
-import { censusSchemaArtifacts } from "./census-schema-artifacts.mjs";
-export const inputSchema = {
-  type: "object",
-  required: ["root"],
-  properties: {
-    root: { type: "string" },
-    maxBytes: { type: "integer", minimum: 1 },
-    maxFiles: { type: "integer", minimum: 1 },
-  },
-};
-export const outputSchema = {
-  type: "object",
-  required: ["entries", "counts", "roleCounts"],
-};
-export function censusSchemaPath({
-  root,
-  maxBytes = 33554432,
-  maxFiles = 20000,
-}) {
-  if (typeof root !== "string" || !root.startsWith("/"))
-    throw new TypeError("root must be an explicit absolute path");
-  const base = resolve(root),
-    pending = [base],
-    entries = [];
-  let bytes = 0;
-  while (pending.length) {
-    const dir = pending.pop();
-    for (const name of readdirSync(dir).sort()) {
-      if (
-        [
-          ".git",
-          "node_modules",
-          ".venv",
-          ".pnpm-store",
-          ".tmp",
-          "dist",
-          "runtime-images",
-        ].includes(name)
-      )
-        continue;
-      const path = resolve(dir, name),
-        info = lstatSync(path);
-      if (info.isSymbolicLink()) continue;
-      if (info.isDirectory()) {
-        pending.push(path);
-        continue;
-      }
-      if (!/\.(?:json|[cm]?[jt]s|md|rml|txt)$/u.test(name)) continue;
-      bytes += info.size;
-      if (bytes > maxBytes || entries.length >= maxFiles)
-        throw new RangeError("schema census exceeds maxBytes or maxFiles");
-      entries.push({
-        path: relative(base, path),
-        content: readFileSync(path, "utf8"),
-      });
-    }
-  }
-  return censusSchemaArtifacts({ entries });
-}
-if (import.meta.main)
-  process.stdout.write(
-    JSON.stringify(censusSchemaPath(JSON.parse(readFileSync(0, "utf8")))) +
-      "\n",
-  );
+import { readFileSync, readdirSync, lstatSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { resolve, relative, dirname } from "node:path";
+import { canonical } from "@red-cup-engineering/json-file-codec-service";
+import { censusClassified, classifyCensusEntry } from "../src/census.mts";
+
+const value = (flag) => { const at = process.argv.indexOf(flag); return at < 0 ? undefined : process.argv[at + 1]; };
+const rootArg = value("--root"), outArg = value("--out"), verify = process.argv.includes("--verify");
+if (!rootArg || !outArg) throw new Error("usage: json-schema-census --root ABSOLUTE_PATH --out ABSOLUTE_PATH [--verify]");
+if (!rootArg.startsWith("/") || !outArg.startsWith("/")) throw new Error("root and out must be explicit absolute paths");
+const root = resolve(rootArg), out = resolve(outArg), entries = [];
+function walk(dir) { for (const name of readdirSync(dir)) { if (name === ".git" || name === "node_modules" || name === ".venv" || name === ".pnpm-store" || name === ".tmp" || name === "dist" || name === "runtime-images") continue; const path = resolve(dir, name); if (path === out) continue; let info; try { info = lstatSync(path); } catch { continue; } if (info.isSymbolicLink()) continue; if (info.isDirectory()) walk(path); else if (/\.(?:json|[cm]?[jt]s|md|rml|txt)$/.test(name)) { try { entries.push(classifyCensusEntry({ path: relative(root, path), content: readFileSync(path, "utf8") })); } catch { /* a mutable corpus may race the read; classify only observed files */ } } } }
+walk(root); const result = censusClassified(entries); const bytes = `${canonical(result)}\n`;
+if (verify && existsSync(out) && readFileSync(out, "utf8") !== bytes) throw new Error(`census artifact differs: ${out}`);
+if (!verify) { mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, bytes); }
+process.stdout.write(`${JSON.stringify({ out, counts: result.counts, roleCounts: result.roleCounts })}\n`);

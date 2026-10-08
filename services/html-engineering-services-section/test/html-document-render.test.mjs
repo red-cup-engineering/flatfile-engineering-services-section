@@ -8,7 +8,7 @@ import {
 import {
   intZero,
   intOne,
-} from "@red-cup-engineering/computer-data-engineering-services-section/number/exact-number";
+} from "@red-cup-engineering/exact-number-data-service/exact-number";
 
 // A minimal but structurally-complete settled Document fixture, in the same
 // shape the house test suite for html-structural-projection-service (the package this

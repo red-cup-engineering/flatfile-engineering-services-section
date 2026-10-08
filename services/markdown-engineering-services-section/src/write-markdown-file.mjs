@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { normalizeLinefeeds } from "@red-cup-engineering/computer-text-content-engineering-services-section/normalize-linefeeds";
 import { writeFileText } from "@red-cup-engineering/file-services/write-file";
 import { confineWritablePath, isMarkdownPath } from "@red-cup-engineering/computer-filepath-engineering-services-section/filepath";
-import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
+import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-data-service/integrity";
 
 const MODES = new Set(["create", "replace", "upsert"]);
 const REVISION = /^sha256:[a-f0-9]{64}$/u;

@@ -1,0 +1,37 @@
+{
+  "name": "@red-cup-engineering/operation-witness-admission-service",
+  "version": "0.1.4",
+  "type": "module",
+  "description": "Admits one explicit operation observation as one journal-ready EAVT witness without acquiring or mutating journal state.",
+  "exports": {
+    ".": "./src/operation-witness.mjs",
+    "./operation-ledger": "./src/operation-ledger.mjs",
+    "./hook-event-witness": "./src/hook-event-witness.mjs",
+    "./hook-budget-guard": "./src/hook-budget-guard.mjs",
+    "./trace-operation-witnesses": "./src/trace-operation-witnesses.mjs",
+    "./scripts/record-operation.mjs": "./scripts/record-operation.mjs"
+  },
+  "bin": {
+    "project-operation-ledger": "./scripts/project-operation-ledger.mjs",
+    "admit-hook-event-witness": "./scripts/admit-hook-event-witness.mjs",
+    "admit-trace-operation-witnesses": "./scripts/admit-trace-operation-witnesses.mjs",
+    "project-hook-budget-guard": "./scripts/project-hook-budget-guard.mjs"
+  },
+  "files": [
+    "src",
+    "scripts"
+  ],
+  "scripts": {
+    "check": "node --check src/*.mjs && node --check scripts/*.mjs",
+    "test": "node --test"
+  },
+  "peerDependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=24"
+  },
+  "sideEffects": false,
+  "dependencies": {
+    "@red-cup-engineering/cryptographic-data-service": "workspace:*"
+  }
+}

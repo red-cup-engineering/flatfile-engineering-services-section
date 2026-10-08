@@ -5,7 +5,7 @@ import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fenc
 import { relativeLinkPath } from "./relocate-markdown-tree.mjs";
 import { mutateMarkdownFrontmatter } from "./mutate-markdown-frontmatter.mjs";
 import { applyMarkdownLinkEdits } from "./apply-markdown-tree-relocation.mjs";
-import { sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
+import { sha256Hex } from "@red-cup-engineering/cryptographic-data-service/integrity";
 
 const EXTERNAL_TARGET = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/iu;
 const REWRITABLE_KINDS = new Set(["markdown-link", "markdown-image", "wikilink", "transclusion"]);

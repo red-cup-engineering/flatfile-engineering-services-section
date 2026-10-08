@@ -21,7 +21,7 @@ export function resolveSchemaPointer({ document, pointer }) {
   for (const raw of path.slice(1).split("/")) {
     if (/~(?:[^01]|$)/u.test(raw)) return {found:false};
     const key = raw.replaceAll("~1", "/").replaceAll("~0", "~");
-    if (Array.isArray(current) && /^(?:0|[1-9][0-9]*)$/u.test(key))
+    if (Array.isArray(current) && /^(?:0|[1-9][0-9]*)$/u.test(key) && Number(key) < current.length && Object.hasOwn(current, key))
       current = current[Number(key)];
     else if (json.isJsonRecord(current) && Object.hasOwn(current, key))
       current = current[key];

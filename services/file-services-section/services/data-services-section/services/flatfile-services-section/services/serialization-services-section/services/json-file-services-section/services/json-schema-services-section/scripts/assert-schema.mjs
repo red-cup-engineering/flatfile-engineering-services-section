@@ -2,6 +2,7 @@
 import * as json from "@red-cup-engineering/json-services-section";
 import { freezeJson } from "@red-cup-engineering/json-services-section";
 import { DRAFT_2020_12, supported, known } from "../src/schema-vocabulary.mjs";
+import { assertKeywordValues } from "../src/assert-keyword-values.mjs";
 import { schemaChildren } from "./schema-children.mjs";
 
 import contract from "../schemas/assert-schema.json" with { type: "json" };
@@ -25,6 +26,7 @@ export function assertSchema({ schema, allowUnknownAnnotations = false }) {
       throw new TypeError(
         `${at}: unsupported dialect ${JSON.stringify(node.$schema)}`,
       );
+    assertKeywordValues(node, at);
     if (node.pattern !== undefined) {
       if (typeof node.pattern !== "string")
         throw new TypeError(`${at}/pattern must be a string`);

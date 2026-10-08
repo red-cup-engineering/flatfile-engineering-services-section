@@ -1,25 +1,30 @@
-# JSON Schema
+# JSON Schema service
 
-The scripts admit the supported Draft 2020-12 vocabulary, validate JSON instances, resolve references against an explicit corpus, and preserve schemas as pointer-cell assertions. Each file in `scripts/` implements its named function with one JSON input and output. `src/index.mjs` collects exports.
+This capability cell owns deterministic JSON Schema documents, bounded local
+resolution, validation, policy inspection, and schema-assertion traces. It is
+deliberately not a JSON projector: validation is a non-monotone judgment, so
+it cannot be a `read` operation.
 
-| Effect | Script and input |
-| --- | --- |
-| Admit a schema and its identity | `admit-schema.mjs`: `{schema, id?, allowUnknownAnnotations?}` |
-| Validate an instance | `validate-schema-instance.mjs`: `{instance, schema, schemas?}` |
-| Resolve a reference | `resolve-schema-reference.mjs`: `{base, reference, schemas?}` |
-| Unfold a schema into assertions | `unfold-schema.mjs`: `{schema, time, base?}` |
-| Reconstruct a schema | `fold-schema-assertions.mjs`: `{assertions}` |
-| Inspect conflicting assertions | `cohere-schema-assertions.mjs`: `{assertions}` |
-| Inspect a corpus and its references | `inspect-schema-corpus.mjs`: `{schemas}` |
-| Read a named schema | `read-schema.mjs`: `{pool, name}` |
-| Write or amend a schema atomically | `write-schema.mjs`: `{pool, schema, amend?, dryRun?}` |
-| Discover schemas under a path | `search-path-for-schema.mjs`: path string |
-| Census artifacts within explicit limits | `json-schema-census.mjs`: `{root, maxBytes?, maxFiles?}` |
+The only admitted dialect is JSON Schema Draft 2020-12. The exported
+`SUPPORTED_VOCABULARY` is exact: known Draft 2020-12 assertion keywords outside
+that set are refused, rather than silently ignored. Resolution is deliberately
+bounded to an explicit in-memory corpus; it never reads a registry, URL, or
+working directory.
 
-Reference resolution reads only the supplied corpus. Filesystem operations require an explicit path or pool. A write checks the resulting corpus before replacing a file; refusal leaves existing data intact. Census fails when its limits are exceeded instead of returning an apparently complete truncated result.
+`read-a-schema` is the canonical process face. It discovers only a caller-
+selected or nearest upward `lib/schemas` pool, then uses the same pure semantic
+implementation exported by this package. Node-local `writing-a-schema`
+processes retain filesystem seating, filename policy, atomic retraction, and
+negative-control authority; they call this service for schema inspection and
+reading rather than carrying copied validators.
 
-```sh
-printf '%s\n' '{"instance":3,"schema":{"type":"integer"}}' | node scripts/validate-schema-instance.mjs
-```
+The recovered assertion API (`unfoldSchema`, `foldSchema`, parse/serialize,
+coherence, projection, and explicit triple/EAVT identities) preserves the
+historical pointer-cell representation without conflating it with `$id`, file,
+digest, or RMN coordinates.
 
-`apps/json-schema-cli.mjs` accepts successive validation requests as JSONL. The individual scripts accept one JSON value. Run `node --test test/*.test.mjs`.
+`json-schema-census --root ABSOLUTE_PATH --out ABSOLUTE_PATH` inventories
+implementations, consumers, packages, declarations, schema documents, tests,
+and documentation by generation. Its output is recovery evidence. An archived
+implementation receives an explicit disposition before physical retirement;
+Git history remains the legacy evidence surface.
