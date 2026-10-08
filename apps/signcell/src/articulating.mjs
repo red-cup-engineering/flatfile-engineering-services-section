@@ -66,7 +66,7 @@ export const articulateUtteranceAction = Object.freeze({
 });
 
 export const articulatingApex = Object.freeze({
-  packageName: "@red-cup-engineering/computer-data-engineering-services-section",
+  packageName: "@red-cup-engineering/computer-data-services-section",
   basePath: "/articulating",
   apex: ARTICULATING_APEX,
   actions: Object.freeze([articulateUtteranceAction]),

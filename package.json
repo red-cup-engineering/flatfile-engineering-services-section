@@ -1,8 +1,4 @@
 {
-  "name": "@red-cup-engineering/computer-data-services-section",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
   "bin": {
     "differentiate-data": "./bin/differentiate-data.mjs",
     "differentiate-sequences": "./bin/differentiate-sequences.mjs"
@@ -34,7 +30,11 @@
     "./typed-operation-message": "./src/typed-operation-message.mjs",
     "./artifact-fabrication": "./src/artifact-fabrication.mjs"
   },
+  "name": "@red-cup-engineering/computer-data-services-section",
+  "private": true,
   "scripts": {
     "test": "node --test test/*.test.mjs test/type-system/*.test.mjs"
-  }
+  },
+  "type": "module",
+  "version": "0.1.1"
 }

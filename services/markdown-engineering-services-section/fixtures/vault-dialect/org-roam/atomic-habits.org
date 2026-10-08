@@ -1,0 +1,7 @@
+#+TITLE: Atomic Habits
+#+FILETAGS: :books:habits:
+
+Notes on the book, filed back under [[file:reading.org][Reading]].
+
+An org-roam ID link, deliberately out of v1 scope and expected to be silently ignored (not a
+warning, not a door): [[id:01ARZ3NDEKTSV4RRFFQ69G5FAV][Some ID-linked node]].

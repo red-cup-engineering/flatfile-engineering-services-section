@@ -1,0 +1,20 @@
+{
+  "name": "@red-cup-engineering/text-comparison-service",
+  "version": "0.1.1",
+  "type": "module",
+  "description": "Compares text using explicit case and Unicode-folding rules while retaining source spans, and matches names against a list of named records with rarity-weighted words.",
+  "exports": {
+    ".": "./src/compare-strings.mjs",
+    "./match-names": "./src/match-names.mjs"
+  },
+  "bin": {
+    "compare-strings": "./scripts/compare-strings.mjs"
+  },
+  "scripts": {
+    "check": "node --check src/compare-strings.mjs && node --check src/match-names.mjs && node --check scripts/compare-strings.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
