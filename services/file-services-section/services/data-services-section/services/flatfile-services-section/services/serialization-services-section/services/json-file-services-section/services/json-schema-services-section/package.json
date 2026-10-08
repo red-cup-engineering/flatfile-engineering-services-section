@@ -52,7 +52,9 @@
     "src/realize.mjs",
     "src/structural-type.mjs",
     "src/inhabit.mjs",
-    "src/schema-registry.mjs"
+    "src/schema-registry.mjs",
+    "src/assert-keyword-values.mjs",
+    "src/assert-keyword-values.d.mts"
   ],
   "dependencies": {
     "@red-cup-engineering/json-file-codec-service": "0.1.3",
