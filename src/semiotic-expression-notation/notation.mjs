@@ -1,7 +1,7 @@
 /**
  * @packageDocumentation
  *
- * `@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation` is the grammar of Relation
+ * `@red-cup-engineering/computer-data-services-section/semiotic-expression-notation` is the grammar of Relation
  * Model Notation.
  *
  * Types (Ty) and terms (Tm) as frozen-array JSON s-expressions, the

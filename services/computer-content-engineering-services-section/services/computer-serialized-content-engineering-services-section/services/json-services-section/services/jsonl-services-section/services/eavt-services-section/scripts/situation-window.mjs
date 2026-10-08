@@ -32,7 +32,7 @@ export const outputSchema = {
   },
 };
 import { readFileSync } from "node:fs";
-import { canonicalJson } from "../../../../../scripts/canonical-json.mjs";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 import { normalizeEavtRow } from "./normalize-row.mjs";
 /** Select normalized EAVT rows inside an inclusive canonical-time window. */
 export function situationWindow({ entries, since, until } = {}) {

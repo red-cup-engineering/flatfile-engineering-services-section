@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
+import { sha256Hex } from "@red-cup-engineering/cryptographic-data-service/integrity";
 
 function boundedPath(rootDirectory, relativePath) {
   if (typeof rootDirectory !== "string" || rootDirectory.trim() === "") throw new TypeError("rootDirectory must be nonempty text");

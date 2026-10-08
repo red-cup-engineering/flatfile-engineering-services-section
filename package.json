@@ -11,7 +11,9 @@
     "@red-cup-engineering/data-services": "0.1.0",
     "@red-cup-engineering/cbor-services-section": "workspace:*",
     "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/json-schema-services-section": "workspace:*"
+    "@red-cup-engineering/json-schema-services-section": "workspace:*",
+    "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/uri-services-section": "workspace:*"
   },
   "exports": {
     "./closure-regime": "./src/closure-regime.mjs",
@@ -22,7 +24,15 @@
     "./type-system": "./src/type-system/type-system.mjs",
     "./type-system/schema-type": "./src/type-system/schema-type.mjs",
     "./type-system/relations": "./src/type-system/relations.mjs",
-    "./operation-refusal-schema": "./src/operation-refusal-schema.mjs"
+    "./operation-refusal-schema": "./src/operation-refusal-schema.mjs",
+    "./type-system/document": "./src/type-system/document.mjs",
+    "./tally": "./src/tally.mjs",
+    "./randomization": "./src/randomization/index.mjs",
+    "./randomization/hash-seed": "./src/randomization/hash-seed.mjs",
+    "./randomization/mulberry32": "./src/randomization/mulberry32.mjs",
+    "./randomization/stream": "./src/randomization/stream.mjs",
+    "./typed-operation-message": "./src/typed-operation-message.mjs",
+    "./artifact-fabrication": "./src/artifact-fabrication.mjs"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs test/type-system/*.test.mjs"
