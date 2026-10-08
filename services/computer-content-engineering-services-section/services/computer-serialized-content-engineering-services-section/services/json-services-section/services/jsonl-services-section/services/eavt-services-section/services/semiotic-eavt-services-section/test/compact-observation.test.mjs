@@ -14,6 +14,9 @@ test('Compact observations retain the complete addressed witness and refuse alte
   assert.deepEqual(parseJournalWitness(compact),witness);
   assert.deepEqual(verifiedJournalWitness(compact),witness);
   assert.deepEqual(parseJournalWitness(witness),witness);
+  const causal=journalWitness({...witness.observation,causes:[witness.id]});
+  const repeated={id:causal.id,observation:{...causal.observation,causes:[witness.id,witness.id]}};
+  assert.deepEqual(verifiedJournalWitness(repeated).observation,parseJournalWitness(repeated).observation);
   assert.throws(()=>parseJournalWitness({...compact,id:'ni:///sha-256;wrong'}),/does not match/);
   assert.throws(()=>verifiedJournalWitness({...compact,observation:{...compact.observation,payload:{article:'Altered'}}}).core,/does not match/);
   assert.throws(()=>parseJournalWitness({...compact,kind:'metroplat.journal.witness'}));

@@ -290,7 +290,11 @@ export function verifiedJournalWitness(record) {
   // projections need only the observation, so derive the full addressed body
   // when a consumer actually requests it, once per returned witness.
   if (Object.keys(record).length === 2 && Object.hasOwn(record, "id") && Object.hasOwn(record, "observation")) {
-    const material = Object.freeze({ id: record.id, observation: deepFreeze(record.observation) });
+    const observation = record.observation, referenced = observation.referencedArtifacts ?? [];
+    const material = Object.freeze({ id: record.id, observation: deepFreeze({
+      ...observation, causes: sortedUnique(observation.causes),
+      ...(referenced.length === 0 ? {} : { referencedArtifacts: sortedUnique(referenced) }),
+    }) });
     let complete;
     const derive = () => complete ??= parseJournalWitness(material);
     return Object.freeze({
