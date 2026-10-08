@@ -23,6 +23,7 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     },
+    "./assert-schema": "./scripts/assert-schema.mjs",
     "./census": "./dist/census.mjs",
     "./contracts": "./src/contracts.mjs",
     "./inhabit": "./src/inhabit.mjs",
