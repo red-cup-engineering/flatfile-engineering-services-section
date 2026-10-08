@@ -28,7 +28,9 @@
     "./randomization/mulberry32": "./src/randomization/mulberry32.mjs",
     "./randomization/stream": "./src/randomization/stream.mjs",
     "./typed-operation-message": "./src/typed-operation-message.mjs",
-    "./artifact-fabrication": "./src/artifact-fabrication.mjs"
+    "./artifact-fabrication": "./src/artifact-fabrication.mjs",
+    "./media/audio": "./src/media/audio.mjs",
+    "./media/raster": "./src/media/raster.mjs"
   },
   "name": "@red-cup-engineering/computer-data-services-section",
   "private": true,
