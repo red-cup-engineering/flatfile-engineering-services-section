@@ -1,5 +1,5 @@
 import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fence.mjs";
-import { decodeToml } from "@red-cup-engineering/toml-services-section/toml-codec";
+import { decodeToml } from "@red-cup-engineering/toml-file-codec-service";
 import {
   decodeYaml,
   decodeYamlWithSourceLocations,

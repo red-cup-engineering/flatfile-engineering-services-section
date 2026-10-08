@@ -1,4 +1,4 @@
-import { encodeToml } from "@red-cup-engineering/toml-services-section/toml-codec";
+import { encodeToml } from "@red-cup-engineering/toml-file-codec-service";
 import { encodeYaml } from "@red-cup-engineering/yaml-frontmatter-codec-service";
 
 /**

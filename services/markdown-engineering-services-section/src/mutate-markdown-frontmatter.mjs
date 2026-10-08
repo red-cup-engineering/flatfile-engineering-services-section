@@ -5,7 +5,7 @@ import { readMarkdownFile } from "./read-markdown-file.mjs";
 import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
 import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fence.mjs";
 import { dumpMarkdownFrontmatter } from "./dump-markdown-frontmatter.mjs";
-import { encodeToml } from "@red-cup-engineering/toml-services-section/toml-codec";
+import { encodeToml } from "@red-cup-engineering/toml-file-codec-service";
 import { mutateYamlTopLevelMapping } from "@red-cup-engineering/yaml-frontmatter-codec-service";
 
 function record(value, name) { if (value === null || typeof value !== "object" || Array.isArray(value)) throw new TypeError(`${name} must be a JSON object`); return value; }
