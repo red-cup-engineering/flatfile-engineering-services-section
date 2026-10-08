@@ -1,0 +1,45 @@
+{
+  "name": "@red-cup-engineering/csl-json-services-section",
+  "version": "0.1.1",
+  "type": "module",
+  "description": "CSL-JSON (csl-data.json, CSL 1.0.2) as the org's one bibliographic record format, seated in computer-data beside JSON Schema and CloudEvents: the item type vocabulary, name and date objects, DOI normalization, title folding, item admission, and the projections of OpenAlex, PubMed, and CrossRef records into it.",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": "./src/csl-json.mjs",
+    "./scripts/project-openalex-work-csl.mjs": "./scripts/project-openalex-work-csl.mjs",
+    "./scripts/project-pubmed-summary-csl.mjs": "./scripts/project-pubmed-summary-csl.mjs",
+    "./scripts/project-crossref-work-csl.mjs": "./scripts/project-crossref-work-csl.mjs",
+    "./csl-references": "./src/csl-references.mjs",
+    "./open-library": "./src/open-library.mjs",
+    "./record-formatting": "./src/csl-record-formatting.mjs"
+  },
+  "files": [
+    "src/",
+    "scripts/",
+    "README.md"
+  ],
+  "scripts": {
+    "check": "node --check src/*.mjs && node --check scripts/project-openalex-work-csl.mjs && node --check scripts/project-pubmed-summary-csl.mjs && node --check scripts/project-crossref-work-csl.mjs && node --check test/*.test.mjs",
+    "test": "node --test test/*.test.mjs",
+    "verify": "npm run check && npm test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@red-cup-engineering/html-structural-projection-service": "workspace:*",
+    "@red-cup-engineering/json-services-section": "workspace:*"
+  },
+  "keywords": [
+    "csl-json",
+    "csl",
+    "bibliography",
+    "citation",
+    "json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/red-cup-engineering/computer-data-services-section.git",
+    "directory": "services/csl-json-services-section"
+  }
+}
