@@ -1,4 +1,4 @@
-import { readingAs, readingOfSides, sidesOfReading } from "@red-cup-engineering/computer-data-services-section/four";
+import { readingAs, readingOfSides, sidesOfReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 /**
  * vault-note-schema/src/diataxis - Diataxis as a derived read over markdown
  * text, and its transport onto the four readings. Relocated

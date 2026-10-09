@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { defineType } from "@red-cup-engineering/computer-data-services-section/type-system";
+import { defineType } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
 import { createTypedMark, admitTypedMark, referenceOf } from "../src/typed-mark.mjs";
 import { createSignClaim, conflateClaims } from "../src/semantic-claim.mjs";
 import { knowledgeReading } from "../src/cell.mjs";

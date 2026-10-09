@@ -9,7 +9,7 @@
   ],
   "dependencies": {
     "@red-cup-engineering/articles-services-section": "workspace:*",
-    "@red-cup-engineering/computer-data-services-section": "workspace:*",
+    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/css-services-section": "workspace:*",
     "@red-cup-engineering/html-structural-projection-service": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",

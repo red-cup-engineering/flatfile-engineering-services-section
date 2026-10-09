@@ -5,7 +5,7 @@
  * `src/integrations/knowledge-vaults/schema.mts`.
  */
 import { schemaFrom } from "@red-cup-engineering/json-schema-services-section/contracts";
-import { readingFamilies } from "@red-cup-engineering/computer-data-services-section/four";
+import { readingFamilies } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const diataxisModeNameSchema = { enum: ["tutorial", "how-to", "explanation", "reference"] };
 

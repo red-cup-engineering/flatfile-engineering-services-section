@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ty, tm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation";
+import { ty, tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import {
   tyEqual, inferTy, checkTy, hasTy,
   termSize, termUses, isClosed,
-} from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/typing";
+} from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
 
 // ── 1. tyEqual — structural equality, including negative cases ─────────────
 

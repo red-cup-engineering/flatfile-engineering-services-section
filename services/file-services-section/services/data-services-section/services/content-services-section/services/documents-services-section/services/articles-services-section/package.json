@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@red-cup-engineering/metrologic": "workspace:*",
-    "@red-cup-engineering/computer-data-services-section": "workspace:*",
+    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/json-schema-services-section": "workspace:*"
   }
 }

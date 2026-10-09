@@ -1,4 +1,4 @@
-import { readingOfSides } from "@red-cup-engineering/computer-data-services-section/four";
+import { readingOfSides } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 /**
  * @packageDocumentation
  * statement - EAVT statement identity and source-row law.

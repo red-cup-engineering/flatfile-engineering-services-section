@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { tm, ty } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation";
+import { tm, ty } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { encodeCanonical } from "@red-cup-engineering/cbor-services-section";
-import { checkTy, inferTy } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/typing";
+import { checkTy, inferTy } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
 import {
   arrayTag, objectTag,
   listTerm, termList, typedListTerm, typedListItems, listTy,
@@ -10,7 +10,7 @@ import {
   objectTerm, arrayTerm, stringTerm,
   projectField, objectTy, arrayTy,
   encodeJsonTermCanonical, jsonToTerm, termToJson,
-} from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec";
+} from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
 
 test("typedListTerm: empty and structured homogeneous collections check against one list type", () => {
   const entryTy = objectTy(["locus", "charge"], { locus: ty.base(), charge: ty.base() });
