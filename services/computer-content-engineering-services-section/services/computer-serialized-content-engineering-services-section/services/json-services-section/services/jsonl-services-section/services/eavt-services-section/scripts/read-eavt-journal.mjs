@@ -29,14 +29,16 @@ export const outputSchema = {
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { journalPath } from "./journal-path.mjs";
-import { readEavtEntries } from "./read-eavt-entries.mjs";
+import { iterateEavtEntries } from "./read-eavt-entries.mjs";
 /** Read one dated EAVT journal and derive its append-order trace. */
-export function readEavtJournal({ root, feed, at } = {}) {
-  return Object.freeze(
-    readEavtEntries({ path: journalPath({ root, feed, at }) }).map(
-      (entry, index) => Object.freeze({ entry, trace: index + 1 }),
-    ),
-  );
+export function* iterateEavtJournal({ root, feed, at } = {}) {
+  let trace = 0;
+  for (const entry of iterateEavtEntries({ path: journalPath({ root, feed, at }) })) {
+    yield Object.freeze({ entry, trace: ++trace });
+  }
+}
+export function readEavtJournal(input) {
+  return Object.freeze([...iterateEavtJournal(input)]);
 }
 
 /** The dates of a root's dated cuts through an inclusive calendar frontier, in order. */
@@ -66,12 +68,14 @@ function datesThrough({ root, feed, throughDate }) {
 }
 
 /** Read a feed's dated cuts through an inclusive calendar frontier. */
-export function readEavtJournalThroughDate({ root, feed, throughDate } = {}) {
-  const rows = [];
+export function* iterateEavtJournalThroughDate({ root, feed, throughDate } = {}) {
+  let trace = 0;
   for (const date of datesThrough({ root, feed, throughDate })) {
-    for (const { entry } of readEavtJournal({ root, feed, at: date })) rows.push(Object.freeze({ entry, trace: rows.length + 1 }));
+    for (const { entry } of iterateEavtJournal({ root, feed, at: date })) yield Object.freeze({ entry, trace: ++trace });
   }
-  return Object.freeze(rows);
+}
+export function readEavtJournalThroughDate(input) {
+  return Object.freeze([...iterateEavtJournalThroughDate(input)]);
 }
 
 /** The revision of what `readEavtJournalThroughDate` reads: each dated cut's identity and extent.
