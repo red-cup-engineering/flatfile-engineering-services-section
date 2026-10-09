@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readCarrierInput } from "node:fs";
-import { readEavtJournal, readEavtJournalThroughDate } from "@red-cup-engineering/eavt/read-eavt-journal";
+import { readEavtJournal, iterateEavtJournalThroughDate } from "@red-cup-engineering/eavt/read-eavt-journal";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 export const inputSchema = {
   type: "object",
@@ -42,12 +42,13 @@ export function readSeavtEntries({ root, feed, at } = {}) {
   );
 }
 
-export function readSeavtEntriesThroughDate({ root, feed, throughDate } = {}) {
-  return Object.freeze(
-    readEavtJournalThroughDate({ root, feed, throughDate }).map(({ entry, trace }) =>
-      Object.freeze({ entry: normalizeSeavtRow(entry), trace }),
-    ),
-  );
+export function* iterateSeavtEntriesThroughDate(input) {
+  for (const { entry, trace } of iterateEavtJournalThroughDate(input)) {
+    yield Object.freeze({ entry: normalizeSeavtRow(entry), trace });
+  }
+}
+export function readSeavtEntriesThroughDate(input) {
+  return Object.freeze([...iterateSeavtEntriesThroughDate(input)]);
 }
 if (import.meta.main)
   process.stdout.write(
