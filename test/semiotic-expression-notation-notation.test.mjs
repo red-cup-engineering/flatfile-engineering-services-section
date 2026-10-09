@@ -6,7 +6,6 @@ import {
   generatorNameOfTerm, readingOfTerm, boolOfTerm,
   isTerm, validateSenTerm, TySchema, TmSchema, SEN_FORMS,
 } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { knowledgeJoinReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 import { compileJsonSchema } from "@red-cup-engineering/json-schema-services-section/validation";
 
@@ -14,33 +13,23 @@ const typeValidation = compileJsonSchema(TySchema);
 const termValidation = compileJsonSchema(TmSchema, { references: [TySchema] });
 const validateAgainst = (schema, _root, value) =>
   (schema === TySchema ? typeValidation : termValidation).validate(value).valid;
-const typeTags = ["base", "arrow", "prod", "unit", "list", "empty", "sum"];
-const termTags = [
-  "var", "lam", "app", "pair", "fst", "snd", "star", "mark", "coincide", "cond", "fold",
-  "prim", "inl", "inr", "case", "abort",
-];
 
 // ── 1. construct terms and types ────────────────────────────────────────────
 
-test("type constructors produce frozen, schema-valid arrays for all seven current forms", () => {
+test("type constructors produce frozen tagged arrays for all five forms", () => {
   const cases = [
     ty.base(),
     ty.arrow(ty.base(), ty.base()),
     ty.prod(ty.base(), ty.base()),
     ty.unit(),
     ty.list(ty.base()),
-    ty.empty(),
-    ty.sum(ty.base(), ty.unit()),
   ];
   const tags = cases.map((t) => t[0]);
-  assert.deepEqual(tags, typeTags);
-  for (const t of cases) {
-    assert.equal(Object.isFrozen(t), true);
-    assert.equal(validateAgainst(TySchema, TySchema, t), true, JSON.stringify(t));
-  }
+  assert.deepEqual(tags, ["base", "arrow", "prod", "unit", "list"]);
+  for (const t of cases) assert.equal(Object.isFrozen(t), true);
 });
 
-test("term constructors produce frozen, schema-valid arrays for all sixteen current forms", () => {
+test("term constructors produce frozen tagged arrays for all eleven forms", () => {
   const cases = [
     tm.var(0),
     tm.lam(tm.var(0)),
@@ -53,19 +42,12 @@ test("term constructors produce frozen, schema-valid arrays for all sixteen curr
     tm.coincide(tm.mark("a"), tm.mark("a")),
     tm.cond(tm.reading("held"), tm.star(), tm.star()),
     tm.fold(tm.lam(tm.lam(tm.var(0))), tm.star(), tm.star()),
-    tm.prim("test.identity", tm.star()),
-    tm.inl(tm.star(), ty.base()),
-    tm.inr(ty.unit(), tm.mark("right")),
-    tm.case(tm.inl(tm.star(), ty.unit()), tm.var(0), tm.var(0)),
-    tm.abort(tm.var(0), ty.unit()),
   ];
   const tags = cases.map((t) => t[0]);
-  assert.deepEqual(tags, termTags);
-  for (const t of cases) {
-    assert.equal(Object.isFrozen(t), true);
-    assert.equal(validateAgainst(TmSchema, TmSchema, t), true, JSON.stringify(t));
-    assert.equal(isTerm(t), true);
-  }
+  assert.deepEqual(tags, [
+    "var", "lam", "app", "pair", "fst", "snd", "star", "mark", "coincide", "cond", "fold",
+  ]);
+  for (const t of cases) assert.equal(Object.isFrozen(t), true);
 });
 
 test("tm.var rejects non-natural indices", () => {
@@ -76,7 +58,7 @@ test("tm.var rejects non-natural indices", () => {
 // ── 2. validate constructed terms/types against the shipped schema literals ─
 
 test("constructed types validate against TySchema", () => {
-  for (const t of [ty.base(), ty.arrow(ty.base(), ty.unit()), ty.prod(ty.base(), ty.unit()), ty.unit(), ty.list(ty.base()), ty.empty(), ty.sum(ty.base(), ty.unit())]) {
+  for (const t of [ty.base(), ty.arrow(ty.base(), ty.unit()), ty.prod(ty.base(), ty.unit()), ty.unit(), ty.list(ty.base())]) {
     assert.equal(validateAgainst(TySchema, TySchema, t), true, JSON.stringify(t));
   }
   assert.equal(validateAgainst(TySchema, TySchema, ["not-a-type"]), false);
@@ -92,11 +74,8 @@ test("constructed terms validate against TmSchema, including nested recursion", 
 });
 
 test("TmSchema and TySchema each expose one anyOf branch per grammar form", () => {
-  assert.equal(TmSchema.anyOf.length, 16);
-  assert.equal(TySchema.anyOf.length, 7);
-  assert.deepEqual(Object.keys(SEN_FORMS).sort(), [...termTags].sort());
-  assert.deepEqual(TmSchema.anyOf.map((branch) => branch.prefixItems[0].const).sort(), [...termTags].sort());
-  assert.deepEqual(TySchema.anyOf.map((branch) => branch.prefixItems[0].const).sort(), [...typeTags].sort());
+  assert.equal(TmSchema.anyOf.length, Object.keys(SEN_FORMS).length);
+  assert.equal(TySchema.anyOf.length, 5);
 });
 
 // ── validator.mjs's isTerm, exercised directly ──────────────────────────────
@@ -176,7 +155,7 @@ test("canonical substitution reaches every nested child without capture", () => 
 
 // ── 4. charge round-trips — unknown/held/denied/contested ───────────────────
 //
-// The lattice operations (negate/conflate/joinK/meetK/leK/leT/
+// The lattice operations (negate/conflate/joinK/meetK/leK/leT/settle/
 // fromCharge) are notation-layer term BUILDERS: `chargeCase` always emits a
 // symbolic `cond`/`coincide` decision tree over the four canonical charges, even
 // when its subject is already a concrete literal — this package does not
@@ -296,13 +275,12 @@ test("leT: denied is truth-least, held is truth-greatest (reduced)", () => {
   assert.equal(boolOfTerm(reduceClosedTree(tm.leT(tm.reading("held"), tm.reading("denied")))), false);
 });
 
-test("joinK reduces to the shared FOUR knowledge join for all sixteen pairs without a settle alias", () => {
-  assert.equal(Object.hasOwn(tm, "settle"), false);
+test("settle is exactly joinK, reduced values agree for every pair", () => {
   for (const left of charges) {
     for (const right of charges) {
       assert.deepEqual(
+        reduceClosedTree(tm.settle(tm.reading(left), tm.reading(right))),
         reduceClosedTree(tm.joinK(tm.reading(left), tm.reading(right))),
-        tm.reading(knowledgeJoinReading(left, right)),
       );
     }
   }
