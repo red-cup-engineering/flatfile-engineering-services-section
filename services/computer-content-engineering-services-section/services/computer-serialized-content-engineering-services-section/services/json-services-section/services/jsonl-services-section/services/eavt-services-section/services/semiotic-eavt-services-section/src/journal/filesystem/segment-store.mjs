@@ -26,7 +26,11 @@
  * cold would spend its first read re-verifying every segment. `index/segment-verified/v1.jsonl`
  * records, per segment, a verified byte offset and the SHA-256 of the bytes before it; a later
  * process whose segment's checkpoint digest still matches takes its witnesses as verified and
- * verifies only what follows. An in-process reading relies on the append-only writer contract;
+ * verifies only what follows. A segment larger than `segmentLimits.streamedBytes` is verified by
+ * streaming (`streamVerifySegment`): one witness in memory at a time, a checkpoint every
+ * `segmentLimits.checkpointBytes`, so a cold start's heap does not depend on the segment's size and a
+ * process killed mid-verification resumes from its last checkpoint. `segmentStatements` refuses a
+ * segment too large to hold decoded (`JOURNAL_SEGMENT_TOO_LARGE`); fold or project it. An in-process reading relies on the append-only writer contract;
  * its file identity and boundary fingerprint are a change detector, not proof against arbitrary
  * middle-of-file rewrites.
  *
@@ -485,7 +489,7 @@ function recordCheckpoint(file, offset, digest) {
   const held = rootCheckpoints(storeRoot);
   const segment = path.relative(storeRoot, file);
   const last = held.get(segment);
-  if (last !== undefined && last.offset <= offset && offset - last.offset < CHECKPOINT_STRIDE) return;
+  if (last !== undefined && last.offset <= offset && offset - last.offset < Math.min(CHECKPOINT_STRIDE, segmentLimits.checkpointBytes)) return;
   const record = { segment, offset, digest };
   try {
     fs.mkdirSync(path.dirname(checkpointFile(storeRoot)), { recursive: true });
@@ -560,6 +564,52 @@ function advanceReading(file, stat, reading, offset) {
 }
 
 /**
+ * A segment larger than this is verified by streaming (`streamVerifySegment`) before anything is
+ * decoded from it, so progress is checkpointed as it is made and a process that is killed midway
+ * resumes from the last checkpoint instead of re-verifying the whole segment on its next start.
+ */
+export const segmentLimits = {
+  /** Segments larger than this are verified by streaming. */
+  streamedBytes: 32 * 1024 * 1024,
+  /** How much verified segment a streaming verification covers between checkpoints. */
+  checkpointBytes: 32 * 1024 * 1024,
+  /** The most heap `segmentStatements` will let one segment's decoded witnesses take (estimated). */
+  materializeHeap: 256 * 1024 * 1024,
+};
+
+/**
+ * Verify a segment's witnesses one line at a time, from its last checkpoint to its last complete
+ * line, holding no witness after its line is checked, and checkpoint every `segmentLimits.checkpointBytes`.
+ * The heap it takes does not depend on the segment's size. Every complete line is verified exactly
+ * as `readSegmentFile` verifies it (a line that is not a verified witness throws), so a prefix this
+ * leaves checkpointed is one whose digest matches or whose lines were verified here: the house's
+ * guarantee, reached without ever holding the segment. Returns the offset verified through.
+ */
+function streamVerifySegment(file) {
+  if (logPathOfSegment(file) === undefined) return 0;
+  const size = fs.statSync(file).size;
+  const start = verifiedPrefix(file, size);
+  const hash = start?.hash ?? createHash("sha256");
+  let hashed = start?.offset ?? 0;
+  const tail = readTail(file, hashed, (line, { offset, length }) => {
+    const record = parseLine(line);
+    if (record === undefined || typeof record.id !== "string") throw new TypeError(`journal segment ${file} holds a line that is not a witness`);
+    parseJournalWitness(record);
+    const end = offset + length + 1;
+    if (end - hashed >= segmentLimits.checkpointBytes) {
+      hashRange(file, hash, hashed, end);
+      hashed = end;
+      recordCheckpoint(file, end, hash.copy().digest("hex"));
+    }
+  });
+  if (tail.offset > hashed) {
+    hashRange(file, hash, hashed, tail.offset);
+    recordCheckpoint(file, tail.offset, hash.copy().digest("hex"));
+  }
+  return tail.offset;
+}
+
+/**
  * Every witness line of one segment file, verified and deduplicated by id, read incrementally: a
  * process re-reads only bytes appended since it last looked, and re-reads the whole file when the
  * bytes it already read have changed. A complete line that is not a verified witness is corruption
@@ -571,6 +621,14 @@ function readSegmentFile(file) {
   if (cached !== undefined && !readingHolds(file, stat, cached)) cached = undefined;
   if (cached === undefined) {
     cached = { offset: 0, byId: new Map(), mtimeMs: 0, digest: "" };
+    if (stat.size > segmentLimits.streamedBytes && logPathOfSegment(file) !== undefined) {
+      // Verify by streaming first: the decoded reading below then takes the cheap verified path, and
+      // a segment too large to hold decoded is refused with an error rather than by exhausting the heap.
+      streamVerifySegment(file);
+      if (stat.size * SEGMENT_DECODED_FACTOR > segmentLimits.materializeHeap) {
+        throw Object.assign(new RangeError(`journal segment ${file} (${stat.size} bytes) is too large to read whole; fold or project it instead`), { code: "JOURNAL_SEGMENT_TOO_LARGE" });
+      }
+    }
     const verified = logPathOfSegment(file) === undefined ? undefined : verifiedPrefix(file, stat.size);
     if (verified !== undefined) {
       for (const line of readPrefixLines(file, verified.offset)) {
@@ -640,7 +698,7 @@ export function foldSegmentStatements(logPath, extra, visit) {
   let stat;
   try { stat = fs.statSync(file); }
   catch (error) { if (error.code !== "ENOENT") throw error; }
-  if (stat === undefined || stat.size <= 32 * 1024 * 1024 || segments.has(file)) {
+  if (stat === undefined || stat.size <= segmentLimits.streamedBytes || segments.has(file)) {
     const byId = new Map();
     for (const statement of segmentStatements(logPath)) byId.set(statement.id, statement);
     for (const statement of extra) if (!byId.has(statement.id)) byId.set(statement.id, statement);
@@ -649,6 +707,9 @@ export function foldSegmentStatements(logPath, extra, visit) {
   }
   const storeRoot = artifactStoreRoot(logPath);
   const admitted = rootIndex(storeRoot, ["admitted"]).byLog.get(path.relative(storeRoot, path.resolve(logPath)));
+  // Verified by streaming, checkpointing as it goes, so what follows decodes only verified bytes
+  // and a process killed midway does not lose the verification it had done.
+  streamVerifySegment(file);
   const verified = verifiedPrefix(file, stat.size);
   const located = new Map();
   // Indexing needs only each line's id; the witness is parsed and verified when it is folded.
@@ -731,6 +792,7 @@ export function projectSegmentStatements(logPath, project) {
   let stat;
   try { stat = fs.statSync(file); }
   catch (error) { if (error.code !== "ENOENT") throw error; }
+  if (stat !== undefined && stat.size > segmentLimits.streamedBytes && !projections.has(file)) streamVerifySegment(file);
   const kept = projections.get(file);
   let view = kept?.project === project ? kept.view : undefined;
   if (view !== undefined && (stat === undefined || !readingHolds(file, stat, view))) view = undefined;
