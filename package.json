@@ -22,6 +22,7 @@
     "./type-system/relations": "./src/type-system/relations.mjs",
     "./operation-refusal-schema": "./src/operation-refusal-schema.mjs",
     "./type-system/document": "./src/type-system/document.mjs",
+    "./type-system/thing": "./src/type-system/thing.mjs",
     "./tally": "./src/tally.mjs",
     "./randomization": "./src/randomization/index.mjs",
     "./randomization/hash-seed": "./src/randomization/hash-seed.mjs",
@@ -30,13 +31,14 @@
     "./typed-operation-message": "./src/typed-operation-message.mjs",
     "./artifact-fabrication": "./src/artifact-fabrication.mjs",
     "./media/audio": "./src/media/audio.mjs",
-    "./media/raster": "./src/media/raster.mjs"
+    "./media/raster": "./src/media/raster.mjs",
+    "./package.json": "./package.json"
   },
-  "name": "@red-cup-engineering/computer-data-services-section",
+  "name": "@red-cup-engineering/computer-data-engineering-services-section",
   "private": true,
   "scripts": {
     "test": "node --test test/*.test.mjs test/type-system/*.test.mjs"
   },
   "type": "module",
-  "version": "0.1.1"
+  "version": "0.1.2"
 }

@@ -5,8 +5,8 @@ import {
   instantiateSen,
   generatorNameOfTerm, readingOfTerm, boolOfTerm,
   isTerm, validateSenTerm, TySchema, TmSchema, SEN_FORMS,
-} from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation";
-import { knowledgeJoinReading } from "@red-cup-engineering/computer-data-services-section/four";
+} from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
+import { knowledgeJoinReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 import { compileJsonSchema } from "@red-cup-engineering/json-schema-services-section/validation";
 

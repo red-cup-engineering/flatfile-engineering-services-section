@@ -7,7 +7,7 @@ import {
   isClosureRegimeName,
   regimeCost,
   regimeDecidable,
-} from "@red-cup-engineering/computer-data-services-section/closure-regime";
+} from "@red-cup-engineering/computer-data-engineering-services-section/closure-regime";
 
 const names = ["strict", "scott", "transfinite-bounded", "aperiodic"];
 
