@@ -1,7 +1,7 @@
 /**
  * @packageDocumentation
  *
- * `@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec` is the bridge between JSON values
+ * `@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec` is the bridge between JSON values
  * and SEN terms.
  *
  * `jsonToTerm` admits a JSON value into the term layer; `termToJson`
