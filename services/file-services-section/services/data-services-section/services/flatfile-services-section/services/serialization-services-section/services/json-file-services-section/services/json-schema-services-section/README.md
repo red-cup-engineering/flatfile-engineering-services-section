@@ -28,3 +28,19 @@ implementations, consumers, packages, declarations, schema documents, tests,
 and documentation by generation. Its output is recovery evidence. An archived
 implementation receives an explicit disposition before physical retirement;
 Git history remains the legacy evidence surface.
+
+`json-schema-census --records --root ABSOLUTE_PATH [--rev REV] [--out ABSOLUTE_PATH]`
+is the data/records monitor reading of DR-33 in the specification of record
+kinds and their carriers. It reads the tracked file list (`git ls-files -s`,
+or `git ls-tree -r REV`) and the blobs through `git cat-file --batch`; it
+walks no tree and writes no registry. Per record kind (the first segment
+after `data/records/`, loose files as `(root).<extension>`) it reports files,
+bytes, declared and inferred class, derivable bytes (files that state their
+generation, or sit under a README that does), duplicate bytes by blob id, code
+files, schemas without `x-codegen`, and reader count. A kind is declared only
+by a `.schema.json` carrying `x-codegen` and `x-record-kind`, with
+`x-record-class`, `x-record-owner`, `x-record-readers` and
+`x-record-generator`; the reader count is the readers those declarations name.
+Each kind is read in FOUR on `declared`, `has-reader`, `no-derivable-bytes`,
+`no-duplicate-bytes`, `no-code` and `schema-consumed`: ⊥ (nothing told) and f
+(told against) are obstructions, ⊤ (told both) is a certificate, t closes.
