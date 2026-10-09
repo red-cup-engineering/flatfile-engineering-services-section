@@ -1,7 +1,7 @@
 // The house RFC 6920 ("Naming Things with Hashes") module: builds and
 // validates the narrow `ni:///sha-256;<base64url-digest>` content-identity URI
 // that every house content address is written in.
-import { sha256Bytes } from "@red-cup-engineering/cryptographic-data-service/portable-sha256";
+import { sha256Bytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-sha256";
 
 function base64url(bytes) {
   let text = "";

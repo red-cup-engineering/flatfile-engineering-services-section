@@ -3,7 +3,7 @@ import { readFileSync as readCarrierInput } from "node:fs";
 import { readFileSync, readdirSync } from "node:fs";
 import { join, relative, resolve, sep } from "node:path";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
-import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-data-service/integrity";
+import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 export const RETIRED_FILENAMES = Object.freeze([
   "semantic-record-content.jsonl",
   "semantic-record-seavt-claims.jsonl",

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import {sha256} from '@red-cup-engineering/cryptographic-data-service/hash';
-import {sign,verify,recover,getPublicKey} from '@red-cup-engineering/cryptographic-data-service/secp256k1';
-import {sealWithPassphrase,openWithPassphrase} from '@red-cup-engineering/cryptographic-data-service/seal';
+import {sha256} from '@red-cup-engineering/cryptographic-computer-data-engineering-services-section/hash';
+import {sign,verify,recover,getPublicKey} from '@red-cup-engineering/cryptographic-computer-data-engineering-services-section/secp256k1';
+import {sealWithPassphrase,openWithPassphrase} from '@red-cup-engineering/cryptographic-computer-data-engineering-services-section/seal';
 const secret=Buffer.alloc(32,2),digest=sha256(Buffer.from('disposable admission fixture'));
 const {signature,recovery}=sign(digest,secret),pub=getPublicKey(secret);
 assert.equal(verify(digest,signature,pub),true);
