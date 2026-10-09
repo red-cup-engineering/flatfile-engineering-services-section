@@ -12,7 +12,7 @@
  * of every stored typed mark's address.
  */
 import { canonicalCarrier, semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
-import { admit } from "@red-cup-engineering/computer-data-services-section/type-system";
+import { admit } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
 import { typedMarkType, semanticReferenceType as typedMarkReferenceType } from "./semantic-carriers.mjs";
 
 const TYPED_MARK = "sign.cell";

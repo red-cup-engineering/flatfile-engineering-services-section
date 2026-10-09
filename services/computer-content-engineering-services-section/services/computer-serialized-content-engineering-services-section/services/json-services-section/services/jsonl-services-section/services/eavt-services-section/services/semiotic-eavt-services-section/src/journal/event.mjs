@@ -17,8 +17,8 @@ import {
   isClosed,
   inferTy,
   checkTy,
-} from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/typing";
-import { tm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation";
+} from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
+import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { eavtKey } from "@red-cup-engineering/eavt/row";
 import { isCausalWitness } from "./judgment.mjs";
 import { addressWitnessCore } from "./witness.mjs";

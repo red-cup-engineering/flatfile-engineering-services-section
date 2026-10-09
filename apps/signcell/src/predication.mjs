@@ -4,7 +4,7 @@
  * (content identity of the triple), one set of moves. This module adds only what predication
  * names over those cells: entity and predicate sets, sites and the base category.
  */
-import { readingSchema } from "@red-cup-engineering/computer-data-services-section/four";
+import { readingSchema } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { MarkSchema, TokenSchema, ClaimSchema, coincides } from "./utterance.mjs";
 import { cell as signCell, cellSet as signCellSet, converse, hasEvidence, objectProjection, sameCell, specialize, subjectProjection } from "./cell.mjs";
 export const PredicateSchema = {

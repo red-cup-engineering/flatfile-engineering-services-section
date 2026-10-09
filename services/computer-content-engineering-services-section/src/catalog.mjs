@@ -1,5 +1,5 @@
 import { classify, define, restrict } from "./typed-resource-classification.mjs";
-import { isClosureRegimeName } from "@red-cup-engineering/computer-data-services-section/closure-regime";
+import { isClosureRegimeName } from "@red-cup-engineering/computer-data-engineering-services-section/closure-regime";
 import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 import { freezeJson } from "@red-cup-engineering/json-services-section";
 import { semanticId } from "./resource-term.mjs";

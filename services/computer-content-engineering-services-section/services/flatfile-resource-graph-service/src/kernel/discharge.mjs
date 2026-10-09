@@ -1,6 +1,6 @@
 import { validateRecord } from "./record-types.mjs";
 import { validateWitness } from "./witness.mjs";
-import { FOUR, four, joinKnowledgeWire } from "@red-cup-engineering/computer-data-services-section/four";
+import { FOUR, four, joinKnowledgeWire } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 // Register C (design spec S5C): institution.md's sigma_t/Delta_t double
 // settlement, hand-mirroring pymetrologic.quartet's Corner/CommutingPair

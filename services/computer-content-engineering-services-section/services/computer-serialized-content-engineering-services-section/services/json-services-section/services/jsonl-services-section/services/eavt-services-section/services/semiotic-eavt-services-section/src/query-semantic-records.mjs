@@ -8,8 +8,8 @@ import {
   EMPTY_WITNESS_ROOT,
   identifyJsonSemanticContent,
 } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
-import { termToJson } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec";
-import { tm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation";
+import { termToJson } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
+import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { readEavtEntriesSince } from "@red-cup-engineering/eavt/read-eavt-entries";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 import { journalDirectoryOf } from "./journal/store-root.mjs";

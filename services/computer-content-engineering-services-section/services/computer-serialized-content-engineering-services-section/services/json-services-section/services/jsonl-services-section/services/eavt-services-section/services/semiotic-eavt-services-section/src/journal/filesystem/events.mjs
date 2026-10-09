@@ -6,7 +6,7 @@ import path from "node:path";
 import { isArtifactRef } from "../../identity/index.mjs";
 
 import { requireJsonValue } from "@red-cup-engineering/json-services-section";
-import { tm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation";
+import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { journalWitness } from "../event.mjs";
 import { artifactStoreRoot } from "../store-root.mjs";
 import { toEavt, eavtKey, eavtRecord, parse as parseEavt } from "@red-cup-engineering/eavt/row";

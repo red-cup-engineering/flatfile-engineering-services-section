@@ -1,5 +1,5 @@
 import { schemaFrom } from "@red-cup-engineering/json-schema-services-section/contracts";
-import { readingFamilies } from "@red-cup-engineering/computer-data-services-section/four";
+import { readingFamilies } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const cloudEventsSpecVersion = "1.0";
 const cloudEventsTypeSchema = {

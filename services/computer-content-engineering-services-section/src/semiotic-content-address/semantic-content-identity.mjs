@@ -11,8 +11,8 @@
  */
 import { bytesEqual, coincides, decodeSemantic, semanticAddress, semanticId } from "./semiotic-content-address.mjs";
 import { isNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/json-codec";
-import { checkTerm, inferTerm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation/typing";
+import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
+import { checkTerm, inferTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
 import { encodeJsonByteCarrier } from "@red-cup-engineering/json-services-section/json-byte-carrier";
 
 export const SEN_NORMALIZATION_PROFILE = "urn:rce:sen:normalize:0.1.0";

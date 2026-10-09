@@ -5,8 +5,8 @@
  * meet wrote beside it; it is never a field stated beside the triple, so no claim reads `potential`
  * without a witness having told it.
  */
-import { admit } from "@red-cup-engineering/computer-data-services-section/type-system";
-import { sidesOfReading } from "@red-cup-engineering/computer-data-services-section/four";
+import { admit } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
+import { sidesOfReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { cell, merge, sameCell } from "./cell.mjs";
 import { semanticClaimType } from "./semantic-carriers.mjs";
 

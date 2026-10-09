@@ -1,7 +1,7 @@
 /** The semantic carrier schemas, in the specification shape they were first generated in; the
  *  specifications themselves are retired, so this module is their source. */
-import { readingSchema } from "@red-cup-engineering/computer-data-services-section/four";
-import { defineSchemaType } from "@red-cup-engineering/computer-data-services-section/type-system/schema-type";
+import { readingSchema } from "@red-cup-engineering/computer-data-engineering-services-section/four";
+import { defineSchemaType } from "@red-cup-engineering/computer-data-engineering-services-section/type-system/schema-type";
 export const cellSchema = Object.freeze({
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.561.group/computer/cell.schema.json",

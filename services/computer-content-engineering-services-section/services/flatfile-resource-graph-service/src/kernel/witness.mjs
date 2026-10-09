@@ -1,7 +1,7 @@
 import { isNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { isValidKind } from "../operator/kind.mjs";
 import { identityOfRecord } from "./identity.mjs";
-import { four, witnessBit } from "@red-cup-engineering/computer-data-services-section/four";
+import { four, witnessBit } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

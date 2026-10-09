@@ -1,6 +1,6 @@
-import { createRelationalField, defineRelation } from "@red-cup-engineering/computer-data-services-section/type-system/relations";
+import { createRelationalField, defineRelation } from "@red-cup-engineering/computer-data-engineering-services-section/type-system/relations";
 import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
-import { admit } from "@red-cup-engineering/computer-data-services-section/type-system";
+import { admit } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
 import { semanticGraphType } from "./semantic-carriers.mjs";
 import { admitTypedMarkCarrier, referenceOf, typedMarkReferenceType } from "./typed-mark.mjs";
 const accepted = (value) => Object.freeze({ ok: true, value });

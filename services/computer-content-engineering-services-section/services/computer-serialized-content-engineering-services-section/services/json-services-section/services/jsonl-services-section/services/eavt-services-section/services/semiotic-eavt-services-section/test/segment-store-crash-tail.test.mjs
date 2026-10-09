@@ -3,7 +3,7 @@ import { strict as assert } from "node:assert";
 import { appendFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { tm } from "@red-cup-engineering/computer-data-services-section/semiotic-expression-notation";
+import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { artifactStoreRoot } from "../src/journal/store-root.mjs";
 import { journalWitness } from "../src/journal/event.mjs";
 import {

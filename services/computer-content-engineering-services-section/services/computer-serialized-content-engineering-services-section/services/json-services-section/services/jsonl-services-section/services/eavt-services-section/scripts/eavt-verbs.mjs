@@ -21,7 +21,7 @@ import { supersedeEavtRows } from "./supersede-eavt-rows.mjs";
 import { constitute as constituteEntity } from "./constitute-entity.mjs";
 import { eavtRow } from "./admit-row.mjs";
 import { encodeCanonical, decodeCanonical, canonicalCborToNiUri } from "@red-cup-engineering/cbor-services-section";
-import { REFUSAL_SCHEMA } from "@red-cup-engineering/computer-data-services-section/operation-refusal-schema";
+import { REFUSAL_SCHEMA } from "@red-cup-engineering/computer-data-engineering-services-section/operation-refusal-schema";
 
 // A strict {e,a,v,t} row, reused by every verb whose args or return value is one.
 const ROW_SCHEMA = {

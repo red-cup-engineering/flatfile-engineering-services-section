@@ -1,4 +1,4 @@
-import { readingAs } from "@red-cup-engineering/computer-data-services-section/four";
+import { readingAs } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const DATE_LIKE = /^\d{4}-\d{2}-\d{2}(?:$|[T\s])/u;
 
