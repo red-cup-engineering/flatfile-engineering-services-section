@@ -30,7 +30,8 @@
     "./typed-operation-message": "./src/typed-operation-message.mjs",
     "./artifact-fabrication": "./src/artifact-fabrication.mjs",
     "./media/audio": "./src/media/audio.mjs",
-    "./media/raster": "./src/media/raster.mjs"
+    "./media/raster": "./src/media/raster.mjs",
+    "./x402-discovery-snapshot": "./src/x402-discovery-snapshot.mjs"
   },
   "name": "@red-cup-engineering/computer-data-services-section",
   "private": true,
