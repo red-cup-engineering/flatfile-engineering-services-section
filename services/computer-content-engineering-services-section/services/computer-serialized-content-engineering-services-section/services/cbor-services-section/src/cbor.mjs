@@ -9,7 +9,7 @@ import { decode as decodeNative } from "cbor2/decoder";
 import { Writer } from "cbor2/writer";
 import { Tag } from "cbor2/tag";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { base64ToBytes, bytesCompare, bytesEqual, bytesToBase64, ownedBytes } from "@red-cup-engineering/cryptographic-data-service/portable-bytes";
+import { base64ToBytes, bytesCompare, bytesEqual, bytesToBase64, ownedBytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-bytes";
 
 const OPTIONS = Object.freeze({ ...defaultEncodeOptions, simplifyNegativeZero: true, ignoreOriginalEncoding: true, ignoreGlobalTags: true });
 function fail(code, message) { const error = new Error(message); error.code = code; throw error; }

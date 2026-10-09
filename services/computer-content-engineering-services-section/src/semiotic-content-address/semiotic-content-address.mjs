@@ -13,11 +13,11 @@
  */
 import { decodeCanonical, encodeCanonical } from "@red-cup-engineering/cbor-services-section";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { sha256Bytes } from "@red-cup-engineering/cryptographic-data-service/portable-sha256";
-import { bytesEqual, bytesToHex, bytesToLatin1, ownedBytes } from "@red-cup-engineering/cryptographic-data-service/portable-bytes";
+import { sha256Bytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-sha256";
+import { bytesEqual, bytesToHex, bytesToLatin1, ownedBytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-bytes";
 
 // The portable byte helpers every content-address consumer uses in place of Buffer methods.
-export { base64ToBytes, bytesCompare, bytesEqual, bytesToBase64, bytesToHex, bytesToLatin1, concatBytes, ownedBytes, utf8Bytes } from "@red-cup-engineering/cryptographic-data-service/portable-bytes";
+export { base64ToBytes, bytesCompare, bytesEqual, bytesToBase64, bytesToHex, bytesToLatin1, concatBytes, ownedBytes, utf8Bytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-bytes";
 
 /**
  * Transform one semiotic JSON carrier into its canonical representation.

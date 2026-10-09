@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { sha256Bytes } from "@red-cup-engineering/cryptographic-data-service/portable-sha256";
+import { sha256Bytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-sha256";
 const { readFileSync: readInput } = globalThis.process?.getBuiltinModule?.("node:fs") ?? {};
 import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 

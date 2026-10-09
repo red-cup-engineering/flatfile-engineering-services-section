@@ -1,4 +1,4 @@
-import { sha256Hex } from "@red-cup-engineering/cryptographic-data-service/integrity";
+import { sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 
 const OPERATION_KINDS = new Set(["tool-use", "mcp-call", "command", "file-read", "file-write", "token-cost", "http-call", "record-hook-event", "note"]);
 
