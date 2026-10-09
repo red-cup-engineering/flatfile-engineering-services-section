@@ -44,7 +44,7 @@ import { isCausalWitness } from "../judgment.mjs";
 import { evaluateWitnessDependencies } from "../substrate.mjs";
 import { validateAddressedWitnessCore } from "../witness.mjs";
 import { artifactStoreRoot } from "../store-root.mjs";
-import { openSegmentReader } from "./segment-bytes.mjs";
+import { appendDurably, openSegmentReader, syncFile } from "./segment-bytes.mjs";
 
 /** The suffix of a feed's witness segment, appended to its logical `.jsonl` handle. */
 export const SEGMENT_SUFFIX = ".witnesses";
@@ -56,9 +56,20 @@ const INDEX_FILES = Object.freeze(["artifacts", "admitted", "blocked", "pending"
 export const indexDirectory = (storeRoot) => path.join(storeRoot, "index", "causal-admission", "v2");
 const indexFile = (storeRoot, name) => path.join(indexDirectory(storeRoot), `${name}.jsonl`);
 
-function appendLine(file, value) {
+/**
+ * Append one canonical JSON line as the file's writer: a crash tail is truncated first, and the line is
+ * on disk before this returns, unless `deferred` (a Set) is given, in which case the file joins it and
+ * the caller makes the set durable with `syncDeferred` before acknowledging.
+ */
+function appendLine(file, value, deferred) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.appendFileSync(file, `${canonicalJson(value)}\n`, "utf8");
+  appendDurably(file, `${canonicalJson(value)}\n`, { sync: deferred === undefined });
+  deferred?.add(file);
+}
+
+function syncDeferred(deferred) {
+  for (const file of deferred) syncFile(file);
+  deferred.clear();
 }
 
 /** Read the complete lines appended to `file` since byte `offset`: returns them and the new offset. */
@@ -478,7 +489,8 @@ function recordCheckpoint(file, offset, digest) {
   const record = { segment, offset, digest };
   try {
     fs.mkdirSync(path.dirname(checkpointFile(storeRoot)), { recursive: true });
-    fs.appendFileSync(checkpointFile(storeRoot), `${canonicalJson(record)}\n`);
+    // A checkpoint is re-derivable by verification, so it is not synced.
+    appendDurably(checkpointFile(storeRoot), `${canonicalJson(record)}\n`, { sync: false });
     held.set(segment, record);
   } catch {
     // A store this process cannot write keeps verifying in full.
@@ -792,6 +804,8 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
   const storeRoot = artifactStoreRoot(logPath);
   const index = rootIndex(storeRoot);
   const log = path.relative(storeRoot, path.resolve(logPath));
+  // Index lines written by this call, made durable once before it acknowledges.
+  const deferred = new Set();
 
   for (const artifact of artifacts) {
     let canonicalText;
@@ -801,7 +815,7 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
       throw new TypeError(`journal referenced artifact ${artifact.ref}: ${error.message}`);
     }
     if (index.artifacts.has(artifact.ref)) continue;
-    appendLine(indexFile(storeRoot, "artifacts"), { ref: artifact.ref, canonicalText });
+    appendLine(indexFile(storeRoot, "artifacts"), { ref: artifact.ref, canonicalText }, deferred);
     index.artifacts.set(artifact.ref, canonicalText);
   }
 
@@ -880,27 +894,27 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
     const state = stateOf(id);
     if (state === "blocked") continue;
     if (state === "admitted" || legacy.state?.(id) === "admitted") {
-      if (!index.admitted.get(id)?.has(itemLog)) publish(storeRoot, index, id, itemLog, statement);
+      if (!index.admitted.get(id)?.has(itemLog)) publish(storeRoot, index, id, itemLog, statement, deferred);
       continue;
     }
     const coreArtifact = artifactAt(id);
     if (coreArtifact === undefined) continue;
     const core = validateAddressedWitnessCore(coreArtifact.canonical);
     if (!isCausalWitness(core)) {
-      block(storeRoot, index, id, core);
+      block(storeRoot, index, id, core, deferred);
       enqueueDependents(id);
       continue;
     }
     const evaluation = evaluateWitnessDependencies(core.value, { artifact: artifactAt, witnessState: stateOf });
     if (evaluation.obstruction !== undefined) {
-      block(storeRoot, index, id, evaluation.obstruction);
+      block(storeRoot, index, id, evaluation.obstruction, deferred);
       enqueueDependents(id);
       continue;
     }
     if (evaluation.missing.length > 0) {
       if (!(index.pending.get(id) ?? []).some((entry) => entry.log === itemLog)) {
         const record = { id, log: itemLog, statement, missing: evaluation.missing };
-        appendLine(indexFile(storeRoot, "pending"), record);
+        appendLine(indexFile(storeRoot, "pending"), record, deferred);
         // Read back rather than applied in place: the tail read knows the line's byte range, so the
         // index holds the body on disk. A body held in memory per pending witness grew a node's heap
         // with everything that ever waited on a cause.
@@ -915,11 +929,12 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
       }
       continue;
     }
-    publish(storeRoot, index, id, itemLog, statement);
+    publish(storeRoot, index, id, itemLog, statement, deferred);
     newly.add(id);
     enqueueDependents(id);
   }
 
+  syncDeferred(deferred);
   return Object.freeze(statements.map((statement) => Object.freeze({
     statement,
     written: newly.has(statement.id),
@@ -927,17 +942,18 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
   })));
 }
 
-function publish(storeRoot, index, id, log, statement) {
+function publish(storeRoot, index, id, log, statement, deferred) {
+  // The segment line is on disk before the index line that names it exists.
   appendLine(segmentPath(path.resolve(storeRoot, log)), { id: statement.id, observation: statement.observation });
   const record = { id, log };
-  appendLine(indexFile(storeRoot, "admitted"), record);
+  appendLine(indexFile(storeRoot, "admitted"), record, deferred);
   applyLine(index, "admitted", record);
 }
 
-function block(storeRoot, index, id, obstruction) {
+function block(storeRoot, index, id, obstruction, deferred) {
   if (index.blocked.has(id)) return;
   const record = { id, obstruction: JSON.parse(JSON.stringify(obstruction ?? null)) };
-  appendLine(indexFile(storeRoot, "blocked"), record);
+  appendLine(indexFile(storeRoot, "blocked"), record, deferred);
   applyLine(index, "blocked", record);
 }
 

@@ -17,6 +17,16 @@
  * Legacy `<segment>.packed.json` descriptions remain readable. New descriptions are written last
  * and atomically, after their data is verified, so a reader sees either the plain bytes or a packing
  * that reproduces them exactly; the hole is punched only after publication.
+ *
+ * A crash during an append can leave the file extended with NUL bytes whose data never reached the
+ * disk (delayed allocation extends the size before the data lands). The bytes after the last
+ * complete line are the file's tail. A tail of only NUL bytes is crash padding: readers read the
+ * file as if it ended at the last newline, and `appendDurably`, the file's writer, truncates it
+ * before appending. A tail of text without a newline is a torn append: readers already leave it
+ * unread, and the writer truncates it before appending, so the next line is never fused to it. A NUL
+ * byte anywhere else outside the packed prefix, including a tail that mixes text and NUL, is
+ * corruption and is refused. Each recovery is reported once through `process.emitWarning` with the
+ * code `JOURNAL_TAIL_RECOVERED`.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -29,6 +39,132 @@ const FRAME_BYTES = 1 << 20;
 const LEVEL = 12;
 
 const descriptions = new Map();
+
+export const TAIL_RECOVERED = "JOURNAL_TAIL_RECOVERED";
+const TAIL_CHUNK = 64 * 1024;
+
+/**
+ * Classify the bytes after the last newline of `[boundary, size)`, where `boundary` is the end of the
+ * packed prefix (which always ends on a newline). Returns `{ end, kind }`: `end` is the offset just
+ * past the last complete line, and `kind` is "clean" (nothing follows it), "nul" (only NUL bytes
+ * follow), "torn" (text without NUL follows) or "mixed" (NUL and other bytes follow).
+ */
+function classifyTail(fd, size, boundary) {
+  if (size <= boundary) return { end: size, kind: "clean" };
+  const chunk = Buffer.alloc(TAIL_CHUNK);
+  let nul = false, other = false;
+  for (let at = size; at > boundary;) {
+    const from = Math.max(boundary, at - chunk.length);
+    const count = fs.readSync(fd, chunk, 0, at - from, from);
+    if (count !== at - from) throw new TypeError("journal file ended while its tail was classified");
+    const view = chunk.subarray(0, count);
+    const newline = view.lastIndexOf(10);
+    const after = newline >= 0 ? view.subarray(newline + 1) : view;
+    if (after.length > 0) {
+      const zeros = after.indexOf(0) >= 0;
+      if (zeros) nul = true;
+      if (!zeros || after.some((byte) => byte !== 0)) other = true;
+    }
+    if (newline >= 0) {
+      const end = from + newline + 1;
+      return { end, kind: end === size ? "clean" : classifyKind(nul, other) };
+    }
+    at = from;
+  }
+  return { end: boundary, kind: classifyKind(nul, other) };
+}
+
+function classifyKind(nul, other) {
+  if (nul && other) return "mixed";
+  return nul ? "nul" : "torn";
+}
+
+const reported = new Map();
+
+function reportTail(file, kind, detail) {
+  process.emitWarning(
+    `journal file ${file}: ${kind === "nul" ? "a run of NUL bytes left by a crash" : "a torn final line"} after its last complete line ${detail.action}`,
+    { type: "JournalTailRecovery", code: TAIL_RECOVERED, detail: JSON.stringify({ file, kind, pid: process.pid, ...detail }) },
+  );
+}
+
+/** A reader met crash padding: report it once per file and extent. */
+function reportRead(file, tail, size) {
+  const key = `${tail.end}:${size}`;
+  if (reported.get(file) === key) return;
+  reported.set(file, key);
+  reportTail(file, "nul", { action: "was read as absent", offset: tail.end, bytes: size - tail.end });
+}
+
+/** The writer recovers a tail it owns: truncates NUL padding or a torn line at the last newline. */
+function repairTail(fd, file, size, stat) {
+  const boundary = packingOf(file)?.packed ?? 0;
+  const tail = classifyTail(fd, size, boundary);
+  if (tail.kind === "clean") return;
+  if (tail.kind === "mixed") {
+    throw new TypeError(`journal file ${file} holds NUL bytes outside its packed prefix`);
+  }
+  const detail = { action: "was truncated before the next append", offset: tail.end, bytes: size - tail.end, mtime: new Date(stat.mtimeMs).toISOString() };
+  if (tail.kind === "torn") {
+    const lost = Buffer.alloc(size - tail.end);
+    fs.readSync(fd, lost, 0, lost.length, tail.end);
+    detail.sha256 = createHash("sha256").update(lost).digest("hex");
+  }
+  fs.ftruncateSync(fd, tail.end);
+  reported.delete(file);
+  reportTail(file, tail.kind, detail);
+}
+
+function syncDirectory(directory) {
+  let fd;
+  try {
+    fd = fs.openSync(directory, "r");
+    fs.fsyncSync(fd);
+  } catch (error) {
+    if (!["EISDIR", "EPERM", "EINVAL", "EACCES"].includes(error.code)) throw error;
+  } finally {
+    if (fd !== undefined) fs.closeSync(fd);
+  }
+}
+
+/**
+ * Append `text` to `file` as its writer. A crash tail (NUL padding or a torn line) is truncated
+ * first, so the new bytes always begin on a line boundary. With `sync` (the default) the bytes are on
+ * disk (fdatasync) before this returns, and a file this call created is linked durably into its
+ * directory; with `sync: false` the caller makes them durable with `syncFile`.
+ */
+export function appendDurably(file, text, { sync = true } = {}) {
+  const fd = fs.openSync(file, "a+");
+  try {
+    const stat = fs.fstatSync(fd);
+    const size = stat.size;
+    if (size > 0) {
+      const last = Buffer.alloc(1);
+      fs.readSync(fd, last, 0, 1, size - 1);
+      if (last[0] !== 10) repairTail(fd, file, size, stat);
+    }
+    const body = Buffer.from(text, "utf8");
+    for (let written = 0; written < body.length;) {
+      written += fs.writeSync(fd, body, written, body.length - written);
+    }
+    if (sync) {
+      fs.fdatasyncSync(fd);
+      if (size === 0) syncDirectory(path.dirname(file));
+    }
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+/** Make the bytes already written to `file` durable. */
+export function syncFile(file) {
+  const fd = fs.openSync(file, "r");
+  try {
+    fs.fdatasyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+}
 
 function basenameIdentity(file) {
   return createHash("sha256").update(path.basename(file), "utf8").digest("hex");
@@ -169,6 +305,16 @@ export function openSegmentReader(file) {
     if (count > 0 && buffer.subarray(offset, offset + count).includes(0)) {
       if (repack() && position < packing.packed) {
         return readOnce(buffer, offset, length, position);
+      }
+      // Crash padding: NUL bytes that run from the last complete line to the end of the file are read as absent.
+      const size = fs.fstatSync(fd).size;
+      const tail = classifyTail(fd, size, packing?.packed ?? 0);
+      if (tail.kind === "nul") {
+        const usable = Math.max(0, Math.min(count, tail.end - position));
+        if (!buffer.subarray(offset, offset + usable).includes(0)) {
+          reportRead(file, tail, size);
+          return usable;
+        }
       }
       throw new TypeError(`journal file ${file} holds NUL bytes outside its packed prefix`);
     }
