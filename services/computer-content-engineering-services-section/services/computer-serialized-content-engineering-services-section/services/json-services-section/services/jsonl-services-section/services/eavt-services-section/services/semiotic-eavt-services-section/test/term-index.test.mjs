@@ -90,3 +90,34 @@ test("a revision past the journal's string bound splits across records, and a la
   assert.deepEqual(again.search("fog123").map((hit) => hit.key), ["small-123"]);
   assert.deepEqual(again.search("cedar", { limit: 300 }).map((hit) => hit.key), index.search("cedar", { limit: 300 }).map((hit) => hit.key));
 });
+
+test("match answers the FTS5 query subset: words, prefixes, phrases, AND, OR, NOT, parentheses", () => {
+  const texts = new Map([
+    ["a", "cedar fog over the harbor"],
+    ["b", "fog cedar harbor lights"],
+    ["c", "salt marsh and cedar"],
+    ["d", "x402 payments over ActivityPub"],
+  ]);
+  const index = createTermIndex();
+  index.revise(({ put }) => { for (const [key, text] of texts) put(key, "r1", text); });
+  const keys = (expression, options) => index.match(expression, { textOf: (key) => texts.get(key), ...options }).map((hit) => hit.key).sort();
+  assert.deepEqual(keys("cedar fog"), ["a", "b"], "juxtaposed words all match");
+  assert.deepEqual(keys("cedar AND fog"), ["a", "b"]);
+  assert.deepEqual(keys('"cedar fog"'), ["a"], "a phrase is matched word for word against the text");
+  assert.deepEqual(index.match('"cedar fog"').map((hit) => hit.key).sort(), ["a", "b"], "without the text a phrase asks only for its words");
+  assert.deepEqual(keys("marsh OR lights"), ["b", "c"]);
+  assert.deepEqual(keys("cedar NOT fog"), ["c"]);
+  assert.deepEqual(keys("cedar NOT (fog OR salt)"), []);
+  assert.deepEqual(keys("(salt OR harbor) AND cedar NOT lights"), ["a", "c"], "NOT binds tighter than AND, AND tighter than OR");
+  assert.deepEqual(keys("har*"), ["a", "b"]);
+  assert.deepEqual(keys("activity*"), ["d"]);
+  assert.deepEqual(keys('"x402 payments"'), ["d"]);
+  assert.deepEqual(keys("absent OR x402"), ["d"]);
+  assert.deepEqual(keys("   "), []);
+  // A word a query asks for twice scores like FTS5's: the rarer word outweighs the common one.
+  const [best] = index.match("cedar OR marsh");
+  assert.equal(best.key, "c");
+  for (const unsupported of ["title:cedar", "NEAR(cedar fog)", "^cedar", "+cedar"]) assert.throws(() => index.match(unsupported), /unsupported FTS5/u, unsupported);
+  assert.throws(() => index.match("(cedar"), /parenthesis/u);
+  assert.throws(() => index.match("cedar)"), /parenthesis/u);
+});
