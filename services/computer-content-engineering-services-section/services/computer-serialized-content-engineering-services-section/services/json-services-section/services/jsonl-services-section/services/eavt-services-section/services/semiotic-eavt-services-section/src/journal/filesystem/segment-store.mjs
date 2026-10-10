@@ -6,21 +6,19 @@
  * Each feed's admitted witnesses are one line each, in RFC 8785 canonical JSON:
  * `{id, observation}`, in `<feed>.jsonl.witnesses` beside the feed's logical handle.
  * Derived fields are reconstructed and address-verified; full records remain readable.
- * A journal root keeps its
- * causal-admission state in four append-only JSONL indexes under `index/causal-admission/v2/`:
  *
- * - `admitted.jsonl`: `{id, log}`, one line per witness admitted into a feed;
- * - `blocked.jsonl`: `{id, obstruction}`, witnesses admission refused for good;
- * - `pending.jsonl`: `{id, log, statement, missing}`, witnesses received before what they depend on;
- * - `artifacts.jsonl`: `{ref, canonicalText}`, artifacts an observation references beyond its own
- *   sources.
+ * Where everything lives is computed from an address, never looked up. A feed's address is its proof
+ * path (`<YYYY>/<MM>/<DD>/<date>-admit-<subject>.jsonl`). A witness's admission facts live in the
+ * bucket its NI address names (`ni-path-v1`, see "the located index" below), and a feed's ledger
+ * `<feed>.jsonl.admitted` records how far its segment had grown at each admission. No table from
+ * witness id to feed is held in memory or on disk: a process's memory does not grow with the store.
  *
  * Admission is the same causal law as before (`evaluateWitnessDependencies`); only where its facts
- * are kept changed. Segments are the source: the admitted index is rebuilt from them when absent,
- * readers deduplicate by witness id (two writers may race to the same line), and a process keeps
- * each index in memory, reading only the bytes appended since it last looked. A witness reaches its
- * segment before the index records it, so a segment never holds less than the index says was
- * admitted into it; a read that finds less has found loss, and throws rather than forget.
+ * are kept changed. Segments are the source: the index is rebuilt from them when absent, readers
+ * deduplicate by witness id (two writers may race to the same line), and every question reads the
+ * bucket it names afresh (from where this process left it), so a fact another process wrote is seen.
+ * A witness reaches its segment before its ledger and bucket record it, so a segment never holds less
+ * than its ledger says; a read that finds less has found loss, and throws rather than forget.
  *
  * Verifying a witness re-derives its content addresses, milliseconds each, so a process that starts
  * cold would spend its first read re-verifying every segment. `index/segment-verified/v1.jsonl`
