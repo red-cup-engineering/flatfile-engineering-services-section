@@ -35,6 +35,7 @@
     "./record-configured-semantic-record": "./src/record-configured-semantic-record.mjs",
     "./record-semantic-record": "./src/record-semantic-record.mjs",
     "./replay-semantic-record-retirement": "./src/replay-semantic-record-retirement.mjs",
+    "./term-index": "./src/term-index.mjs",
     "./field-index": "./src/field-index.mjs",
     "./read-semantic-records-since": "./src/read-semantic-records-since.mjs",
     "./identity": "./src/identity/index.mjs",
