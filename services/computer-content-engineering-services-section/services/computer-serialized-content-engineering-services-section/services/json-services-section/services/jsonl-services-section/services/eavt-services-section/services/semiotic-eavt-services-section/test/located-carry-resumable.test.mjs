@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { closeSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync, writeSync } from "node:fs";
+import { appendFileSync, closeSync, mkdirSync, mkdtempSync, openSync, readFileSync, rmSync, writeFileSync, writeSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -137,4 +137,32 @@ test("a line longer than the budget is carried by a step of its own, to that lin
   assert.equal(marker(storeRoot).carried.artifacts, Buffer.byteLength(long) + 1, "the step stops at the long line's end");
   assert.equal(carryLocatedIndex(storeRoot), "located");
   assert.equal(locatedIndex(storeRoot).isAdmitted(address(9)), true);
+});
+
+test("a v2 file ending in a partial line is carried through to it, and the line is carried once it is whole", async (t) => {
+  smallSteps(t);
+  const storeRoot = v2Root(t, 3_000);
+  const file = join(indexDirectory(storeRoot), "admitted.jsonl");
+  const line = `{"id":"${address("late")}","log":"${relative}"}`;
+  // A writer stopped mid-append: the file ends in the first half of a line.
+  appendFileSync(file, line.slice(0, 20));
+  // The full carry ends (it does not loop on bytes it cannot carry), and the root reads located.
+  assert.equal(carryLocatedIndex(storeRoot), "located");
+  assert.equal(locatedIndexState(storeRoot).state, "located");
+  assert.equal(marker(storeRoot).through.admitted, readFileSync(file).length);
+  clearSegmentIndexes();
+  assert.equal(locatedIndex(storeRoot).isAdmitted(address(2_999)), true);
+  assert.equal(locatedIndex(storeRoot).isAdmitted(address("late")), false);
+  // The writer finishes the line: the root carries again from that line, answering it in the meantime.
+  appendFileSync(file, `${line.slice(20)}\n`);
+  assert.equal(locatedIndexState(storeRoot).state, "carrying");
+  assert.equal(locatedIndex(storeRoot).isAdmitted(address("late")), true);
+  const deadline = Date.now() + 20_000;
+  while (locatedIndexState(storeRoot).state !== "located" && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(locatedIndexState(storeRoot).state, "located");
+  assert.equal(marker(storeRoot).through, undefined);
+  const carriedOnce = readFileSync(locatedBucketFile(storeRoot, "admitted", address("late")), "utf8").split(address("late")).length - 1;
+  assert.equal(carriedOnce, 1);
+  clearSegmentIndexes();
+  assert.equal(locatedIndex(storeRoot).isAdmitted(address("late")), true);
 });

@@ -313,7 +313,8 @@ export const carryLimits = { chunkBytes: 8 * 1024 * 1024 };
 function readBoundedTail(file, offset, budget, visit, { progressed = false } = {}) {
   let size;
   try { size = fs.statSync(file).size; } catch (error) { if (error.code === "ENOENT") return { offset: 0, size: -1 }; throw error; }
-  if (size <= offset || budget <= 0) return { offset, size };
+  if (size <= offset) return { offset, size, atEnd: true };
+  if (budget <= 0) return { offset, size, atEnd: false };
   const read = (length, lines = Infinity) => {
     const iterator = segmentLines(file, offset, length);
     let next, position = offset, taken = 0;
@@ -327,14 +328,17 @@ function readBoundedTail(file, offset, budget, visit, { progressed = false } = {
       return next?.done ? next.value : position;
     } finally { iterator.return(); }
   };
-  let length = Math.min(size - offset, budget), end = read(length);
+  let length = Math.min(size - offset, budget), end = read(length), lines = Infinity;
   // A line longer than the whole budget is still carried, but only by a step that has carried nothing else,
   // and only as far as that line's end: the window doubles until it holds one whole line.
   while (!progressed && end === offset && length < size - offset) {
     length = Math.min(size - offset, length * 2);
-    end = read(length, 1);
+    end = read(length, lines = 1);
   }
-  return { offset: end, size };
+  // At its end when every whole line was read: what follows `end` then is a final line still being written
+  // (or left by a writer that stopped mid-append), which belongs to whichever read sees it complete.
+  const atEnd = end === size || (length === size - offset && (lines === Infinity || end === offset));
+  return { offset: end, size, atEnd };
 }
 
 /** Carry at most `budget` bytes of the v2 index lines after `offsets` into buckets and ledgers. Returns the new
@@ -344,6 +348,7 @@ function carryV2Lines(storeRoot, offsets, budget = Infinity) {
   const writer = carryWriter();
   const next = { ...offsets };
   const feeds = new Set();
+  const through = {};
   let left = budget, done = true;
   for (const name of V2_NAMES) {
     const from = offsets[name] ?? 0;
@@ -369,8 +374,9 @@ function carryV2Lines(storeRoot, offsets, budget = Infinity) {
       }
     }, { progressed: left < budget });
     next[name] = tail.offset;
+    if (tail.atEnd && tail.offset < tail.size) through[name] = tail.size;
     left -= tail.offset - from;
-    if (tail.size >= 0 && tail.offset < tail.size) { done = false; break; }
+    if (tail.size >= 0 && !tail.atEnd) { done = false; break; }
   }
   // Each carried feed's ledger records what its segment holds now; a missing segment records a byte
   // it lacks, so its next read fails closed as the v2 index made it.
@@ -380,7 +386,7 @@ function carryV2Lines(storeRoot, offsets, budget = Infinity) {
     writer.line(ledgerPath(path.resolve(storeRoot, log)), { carried: "v2", end: Math.max(size, 1) });
   }
   writer.close();
-  return { offsets: next, done };
+  return { offsets: next, done, through };
 }
 
 function rebuildFromSegments(storeRoot) {
@@ -398,16 +404,17 @@ const v2Sizes = (storeRoot) => Object.fromEntries(V2_NAMES.map((name) => {
   try { return [name, fs.statSync(v2File(storeRoot, name)).size]; } catch { return [name, -1]; }
 }));
 const hasV2 = (sizes) => V2_NAMES.some((name) => sizes[name] >= 0);
-/** A marker written by an earlier carry is complete unless it says otherwise and covers every v2 byte. */
+/** A marker written by an earlier carry is complete unless it says otherwise and covers every v2 byte, or every
+ *  byte but a partial final line the file still ends in. */
 const carriedThrough = (marker, sizes) => marker !== undefined && marker.complete !== false
-  && V2_NAMES.every((name) => sizes[name] <= (marker.carried?.[name] ?? -1));
+  && V2_NAMES.every((name) => sizes[name] <= (marker.carried?.[name] ?? -1) || marker.through?.[name] === sizes[name]);
 
 /**
  * One step of carrying a root's earlier layouts into its located index: at most `budget` bytes of v2 lines
  * (or, for a root with no index at all, a rebuild from its segments). The marker records where the step
  * stopped (`complete: false` until the last byte), so a carry interrupted at any point resumes from its last
  * step instead of from the start. A step another process holds is left to it; a lock older than ten minutes is
- * taken over. Returns "located" when nothing is left, "progress", or "held".
+ * taken over. Returns "located" when nothing is left, "progress", "stalled" (nothing could be carried yet), or "held".
  */
 function carryStep(storeRoot, budget) {
   const sizes = v2Sizes(storeRoot);
@@ -428,9 +435,13 @@ function carryStep(storeRoot, budget) {
       writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: {} });
       return "located";
     }
-    const { offsets, done } = carryV2Lines(storeRoot, current?.carried ?? {}, budget);
-    writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: offsets, ...(done ? {} : { complete: false }) });
-    return done ? "located" : "progress";
+    const { offsets, done, through } = carryV2Lines(storeRoot, current?.carried ?? {}, budget);
+    // `through` names a file carried to a partial final line, at the size it had: the root is located until
+    // that file grows, and the next carry starts at that line.
+    writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: offsets, ...(Object.keys(through).length ? { through } : {}), ...(done ? {} : { complete: false }) });
+    if (done) return "located";
+    // A step that moved no offset (nothing it can carry yet) is not progress: the caller waits instead of spinning.
+    return V2_NAMES.every((name) => (offsets[name] ?? 0) === (current?.carried?.[name] ?? 0)) ? "stalled" : "progress";
   } finally {
     fs.closeSync(handle);
     fs.rmSync(lock, { force: true });
@@ -444,6 +455,7 @@ export function carryLocatedIndex(storeRoot, { steps = Infinity } = {}) {
     // A bounded number of steps leaves the carry where it stopped, as an interrupted process would.
     if (taken >= steps) return "progress";
     const step = carryStep(storeRoot, carryLimits.chunkBytes);
+    if (step === "stalled") return "progress";
     if (step !== "progress") {
       if (step === "located") { carried.set(storeRoot, { sizes: v2Sizes(storeRoot), located: true, marked: true }); remainders.delete(storeRoot); }
       return step;
@@ -508,7 +520,7 @@ function scheduleCarry(storeRoot) {
       return;
     }
     // Each step yields the event loop; a carry another process holds is looked at again shortly.
-    const delay = next === "failed" ? Math.min(60_000, 1000 * 2 ** (failures - 1)) : next === "held" ? 1000 : 0;
+    const delay = next === "failed" ? Math.min(60_000, 1000 * 2 ** (failures - 1)) : next === "held" || next === "stalled" ? 1000 : 0;
     setTimeout(step, delay).unref();
   };
   setTimeout(step, 0).unref();
