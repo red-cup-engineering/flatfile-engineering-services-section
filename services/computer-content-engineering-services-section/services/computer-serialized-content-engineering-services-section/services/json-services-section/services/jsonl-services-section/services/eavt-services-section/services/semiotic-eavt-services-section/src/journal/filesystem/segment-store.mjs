@@ -310,24 +310,30 @@ export const carryLimits = { chunkBytes: 8 * 1024 * 1024 };
 
 /** The v2 lines after `offset`, up to about `budget` bytes and ending at a line boundary (a line longer than the
  *  budget is read whole, so every step makes progress). */
-function readBoundedTail(file, offset, budget, visit) {
+function readBoundedTail(file, offset, budget, visit, { progressed = false } = {}) {
   let size;
   try { size = fs.statSync(file).size; } catch (error) { if (error.code === "ENOENT") return { offset: 0, size: -1 }; throw error; }
-  if (size <= offset) return { offset, size };
-  const read = (length) => {
+  if (size <= offset || budget <= 0) return { offset, size };
+  const read = (length, lines = Infinity) => {
     const iterator = segmentLines(file, offset, length);
-    let next, position = offset;
+    let next, position = offset, taken = 0;
     try {
-      while (!(next = iterator.next()).done) {
+      while (taken < lines && !(next = iterator.next()).done) {
         const bytes = Buffer.byteLength(next.value, "utf8");
         visit(next.value, { file, offset: position, length: bytes });
         position += bytes + 1;
+        taken += 1;
       }
-      return next.value;
+      return next?.done ? next.value : position;
     } finally { iterator.return(); }
   };
-  let end = read(Math.min(size - offset, budget));
-  if (end === offset && size - offset > budget) end = read(size - offset);
+  let length = Math.min(size - offset, budget), end = read(length);
+  // A line longer than the whole budget is still carried, but only by a step that has carried nothing else,
+  // and only as far as that line's end: the window doubles until it holds one whole line.
+  while (!progressed && end === offset && length < size - offset) {
+    length = Math.min(size - offset, length * 2);
+    end = read(length, 1);
+  }
   return { offset: end, size };
 }
 
@@ -341,6 +347,13 @@ function carryV2Lines(storeRoot, offsets, budget = Infinity) {
   let left = budget, done = true;
   for (const name of V2_NAMES) {
     const from = offsets[name] ?? 0;
+    // A spent budget ends the step; a file it did not reach is carried by the next step.
+    if (left <= 0) {
+      let size = -1;
+      try { size = fs.statSync(v2File(storeRoot, name)).size; } catch (error) { if (error.code !== "ENOENT") throw error; }
+      if (size > from) { done = false; break; }
+      continue;
+    }
     const tail = readBoundedTail(v2File(storeRoot, name), from, left, (line) => {
       const record = parseLine(line);
       if (record === undefined) return;
@@ -354,7 +367,7 @@ function carryV2Lines(storeRoot, offsets, budget = Infinity) {
       } else if (name === "artifacts" && typeof record.ref === "string" && typeof record.canonicalText === "string") {
         writer.line(locatedBucketFile(storeRoot, "artifacts", record.ref), { ref: record.ref, canonicalText: record.canonicalText });
       }
-    });
+    }, { progressed: left < budget });
     next[name] = tail.offset;
     left -= tail.offset - from;
     if (tail.size >= 0 && tail.offset < tail.size) { done = false; break; }
@@ -443,6 +456,7 @@ export function carryLocatedIndex(storeRoot, { steps = Infinity } = {}) {
 // from where they stopped when a v2 writer appends. The carry itself runs in steps off the question path.
 const remainders = new Map();
 const scheduled = new Set();
+const carryErrors = new Map();
 
 function v2Facts(storeRoot, remainder) {
   for (const name of V2_NAMES) {
@@ -477,9 +491,16 @@ function v2Facts(storeRoot, remainder) {
 function scheduleCarry(storeRoot) {
   if (scheduled.has(storeRoot)) return;
   scheduled.add(storeRoot);
+  let failures = 0;
   const step = () => {
     let next;
-    try { next = carryStep(storeRoot, carryLimits.chunkBytes); } catch { next = "held"; }
+    try { next = carryStep(storeRoot, carryLimits.chunkBytes); carryErrors.delete(storeRoot); failures = 0; }
+    catch (error) {
+      // A failed step is recorded for readiness to report, and retried later and later (to a minute).
+      next = "failed";
+      failures += 1;
+      carryErrors.set(storeRoot, Object.freeze({ message: error instanceof Error ? error.message : String(error), at: new Date().toISOString(), failures }));
+    }
     if (next === "located") {
       scheduled.delete(storeRoot);
       carried.set(storeRoot, { sizes: v2Sizes(storeRoot), located: true, marked: true });
@@ -487,7 +508,8 @@ function scheduleCarry(storeRoot) {
       return;
     }
     // Each step yields the event loop; a carry another process holds is looked at again shortly.
-    setTimeout(step, next === "held" ? 1000 : 0).unref();
+    const delay = next === "failed" ? Math.min(60_000, 1000 * 2 ** (failures - 1)) : next === "held" ? 1000 : 0;
+    setTimeout(step, delay).unref();
   };
   setTimeout(step, 0).unref();
 }
@@ -524,7 +546,8 @@ export function locatedIndexState(storeRoot) {
   const sizes = v2Sizes(storeRoot), marker = readMarker(storeRoot);
   if (carriedThrough(marker, sizes)) return Object.freeze({ state: "located" });
   if (marker === undefined && !hasV2(sizes)) return Object.freeze({ state: segmentFilesUnder(storeRoot).length === 0 ? "located" : "carrying" });
-  return Object.freeze({ state: "carrying", carried: Object.freeze({ ...(marker?.carried ?? {}) }), sizes: Object.freeze(sizes) });
+  const error = carryErrors.get(storeRoot);
+  return Object.freeze({ state: "carrying", carried: Object.freeze({ ...(marker?.carried ?? {}) }), sizes: Object.freeze(sizes), ...(error ? { error } : {}) });
 }
 
 /** Store roots below `root`: directories holding a v2 causal-admission index (day directories hold witness
@@ -642,6 +665,7 @@ function segmentFilesUnder(storeRoot) {
 export function clearSegmentIndexes() {
   carried.clear();
   remainders.clear();
+  carryErrors.clear();
   bucketCache.clear();
   dayListings.clear();
   segments.clear();

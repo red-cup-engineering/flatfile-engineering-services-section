@@ -99,3 +99,42 @@ test("a host prepares every v2 store below its state root at boot", async (t) =>
   while (locatedIndexState(storeRoot).state !== "located" && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 20));
   assert.equal(locatedIndexState(storeRoot).state, "located");
 });
+
+test("one step carries no more than its budget across every v2 file", (t) => {
+  smallSteps(t);
+  const storeRoot = v2Root(t, 100);
+  const budget = carryLimits.chunkBytes;
+  // The admitted file is smaller than one budget, so the step reaches the blocked file with what is left, and
+  // that leftover is shorter than the blocked file's first line: the step must stop, not read the file whole.
+  const first = `{"id":"${address("b-long")}","obstruction":"${"x".repeat(budget - 1024)}"}`;
+  const fd = openSync(join(indexDirectory(storeRoot), "blocked.jsonl"), "w");
+  writeSync(fd, `${first}\n`);
+  for (let n = 0; n < 50_000; n += 1) writeSync(fd, `{"id":"${address(`b${n}`)}","obstruction":null}\n`);
+  closeSync(fd);
+  assert.equal(carryLocatedIndex(storeRoot, { steps: 1 }), "progress");
+  const one = marker(storeRoot);
+  const total = Object.values(one.carried).reduce((sum, offset) => sum + offset, 0);
+  assert.ok(total <= budget, `one step carried ${total} bytes with a ${budget}-byte budget`);
+  assert.ok(one.carried.admitted > 0);
+  assert.equal(one.carried.blocked ?? 0, 0, "the blocked file waits for the next step");
+  assert.equal(one.complete, false);
+  // The next step starts on it with a whole budget, and carries no more than that.
+  assert.equal(carryLocatedIndex(storeRoot, { steps: 1 }), "progress");
+  const two = marker(storeRoot);
+  assert.ok(two.carried.blocked > Buffer.byteLength(first) && two.carried.blocked <= budget);
+  assert.equal(carryLocatedIndex(storeRoot), "located");
+  clearSegmentIndexes();
+  assert.equal(locatedIndex(storeRoot).isBlocked(address("b49999")), true);
+});
+
+test("a line longer than the budget is carried by a step of its own, to that line's end only", (t) => {
+  smallSteps(t);
+  const storeRoot = v2Root(t, 10);
+  const budget = carryLimits.chunkBytes;
+  const long = `{"ref":"r","canonicalText":"${"y".repeat(3 * budget)}"}`;
+  writeFileSync(join(indexDirectory(storeRoot), "artifacts.jsonl"), `${long}\n${"{\"ref\":\"s\",\"canonicalText\":\"z\"}\n".repeat(20_000)}`);
+  assert.equal(carryLocatedIndex(storeRoot, { steps: 1 }), "progress");
+  assert.equal(marker(storeRoot).carried.artifacts, Buffer.byteLength(long) + 1, "the step stops at the long line's end");
+  assert.equal(carryLocatedIndex(storeRoot), "located");
+  assert.equal(locatedIndex(storeRoot).isAdmitted(address(9)), true);
+});
