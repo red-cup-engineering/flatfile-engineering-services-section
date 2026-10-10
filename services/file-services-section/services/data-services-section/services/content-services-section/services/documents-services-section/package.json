@@ -1,7 +1,6 @@
 {
   "name": "@red-cup-engineering/documents-services-section",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "description": "Restricts content carriers to decoded documents with exact attributable and assay evidence.",
   "x-capability-recovery": [
