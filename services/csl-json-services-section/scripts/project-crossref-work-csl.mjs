@@ -17,6 +17,8 @@ import {
   stripUndefinedCslFields,
   toCslType,
 } from "../src/csl-json.mjs";
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 /** CrossRef's own type words, in CrossRef's sense, as CSL 1.0.2 types. */
 export const CROSSREF_TYPE_ALIASES = Object.freeze({
@@ -69,7 +71,7 @@ function main() {
   process.stdout.write(`${JSON.stringify(crossrefWorkToCsl(message), null, 2)}\n`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   try {
     main();
   } catch (error) {

@@ -2,6 +2,7 @@
 import { lstat, mkdir, rename } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { realpathSync } from "node:fs";
 
 export async function relocateDirectory({ source, destination, apply = false } = {}) {
   if (typeof source !== "string" || source.length === 0) throw new TypeError("source is required");
@@ -49,7 +50,7 @@ async function main() {
   process.stdout.write(`${JSON.stringify(await relocateDirectory(options))}\n`);
 }
 
-if (resolve(fileURLToPath(import.meta.url)) === resolve(process.argv[1] ?? "")) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   main().catch((error) => {
     process.stderr.write(`${error.message}\n`);
     process.exitCode = 1;

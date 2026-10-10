@@ -4,6 +4,8 @@ import { readMarkdownFile } from "./read-markdown-file.mjs";
 import { projectMarkdownFeatures } from "./read-markdown-features.mjs";
 import { readMarkdownSource } from "./read-markdown-structure.mjs";
 import { deriveMarkdownVaultGraph } from "./derive-markdown-vault-graph.mjs";
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 /**
  * Read every admitted Markdown document beneath a root and derive its link graph.
@@ -36,7 +38,7 @@ export function reportBrokenMarkdownLinks(graph) {
   return graph.edges.filter((edge) => edge.status === "dangling" || edge.status === "ambiguous");
 }
 
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   const [root, region = ""] = process.argv.slice(2);
   if (!root) {
     process.stderr.write("usage: scan-markdown-tree-links.mjs <root> [region]\n");
