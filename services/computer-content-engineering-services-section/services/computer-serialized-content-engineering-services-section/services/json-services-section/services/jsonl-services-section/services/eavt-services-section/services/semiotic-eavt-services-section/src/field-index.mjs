@@ -1,16 +1,16 @@
 import { createHash } from "node:crypto";
-import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, readSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { basename, join, relative, resolve } from "node:path";
+import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, readSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { canonicalJson } from "@red-cup-engineering/json-services-section";
 import { parseJournalWitness } from "./journal/event.mjs";
-import { segmentAdmittedLogs, segmentPath } from "./journal/filesystem/segment-store.mjs";
+import { segmentPath } from "./journal/filesystem/segment-store.mjs";
+import { kindFeedsGrew, tailKindFeeds } from "./journal/filesystem/feed-tail.mjs";
 import { withDirectoryLock } from "./journal/filesystem/directory-lock.mjs";
 import { journalDirectoryOf } from "./journal/store-root.mjs";
 import { semanticRecordOf } from "./query-semantic-records.mjs";
 
 const LAYOUT = 1;
 const SHARDS = 256;
-const READ_CHUNK = 1024 * 1024;
 
 /**
  * A field path: dot-separated names, `[*]` after a name for each member of an array
@@ -58,28 +58,6 @@ function readBytes(file, offset, length) {
   } finally { closeSync(descriptor); }
 }
 
-/** Each complete line of `file` from `offset`, with its byte offset and length; a final line without its newline is left for later. */
-function* linesFrom(file, offset, end) {
-  const descriptor = openSync(file, "r");
-  try {
-    let position = offset, carry = Buffer.alloc(0);
-    while (position < end) {
-      const buffer = Buffer.alloc(Math.min(READ_CHUNK, end - position));
-      const bytes = readSync(descriptor, buffer, 0, buffer.length, position);
-      if (bytes === 0) break;
-      position += bytes;
-      let data = carry.length ? Buffer.concat([carry, buffer.subarray(0, bytes)]) : buffer.subarray(0, bytes);
-      let start = 0, newline;
-      const base = position - data.length;
-      while ((newline = data.indexOf(0x0a, start)) >= 0) {
-        yield { line: data.subarray(start, newline).toString("utf8"), offset: base + start, length: newline - start, next: base + newline + 1 };
-        start = newline + 1;
-      }
-      carry = Buffer.from(data.subarray(start));
-    }
-  } finally { closeSync(descriptor); }
-}
-
 /**
  * Bounded point reads by key over one category of a semantic record journal.
  *
@@ -106,17 +84,13 @@ export function createFieldIndex({ root, objectKind, category, fields } = {}) {
   const directory = join(store, "index", "field", "v1", encodeURIComponent(objectKind), encodeURIComponent(category), createHash("sha256").update(declaration).digest("hex").slice(0, 16));
   const cursorFile = join(directory, "cursor.json");
   const shardFile = (field, shard) => join(directory, encodeURIComponent(field), `${shard}.jsonl`);
-  const feedSuffix = `-admit-${objectKind}.jsonl`;
-  const feeds = () => segmentAdmittedLogs(store).filter((log) => basename(log).endsWith(feedSuffix));
-
   const readCursor = () => {
     try {
       const cursor = JSON.parse(readFileSync(cursorFile, "utf8"));
       return cursor.layout === LAYOUT && cursor.declaration === declaration ? cursor : null;
     } catch (error) { if (error.code === "ENOENT" || error instanceof SyntaxError) return null; throw error; }
   };
-  const sizeOf = (log) => { try { return statSync(segmentPath(log)).size; } catch (error) { if (error.code === "ENOENT") return 0; throw error; } };
-  const stale = (cursor) => cursor === null || feeds().some((log) => sizeOf(log) !== (cursor.feeds[relative(store, log)] ?? 0));
+  const stale = (cursor) => cursor === null || kindFeedsGrew(store, objectKind, cursor.feeds);
 
   function catchUp() {
     withDirectoryLock(directory, () => {
@@ -126,33 +100,28 @@ export function createFieldIndex({ root, objectKind, category, fields } = {}) {
         cursor = { layout: LAYOUT, declaration, feeds: {} };
       };
       if (cursor === null) rebuild();
-      if (feeds().some((log) => sizeOf(log) < (cursor.feeds[relative(store, log)] ?? 0))) rebuild();
       const pending = new Map();
-      for (const log of feeds()) {
-        const rel = relative(store, log), from = cursor.feeds[rel] ?? 0, size = sizeOf(log);
-        if (size === from) continue;
-        let reached = from;
-        for (const { line, offset, length, next } of linesFrom(segmentPath(log), from, size)) {
-          reached = next;
-          let witness;
-          try { witness = JSON.parse(line); } catch { continue; }
-          if (typeof witness?.id !== "string" || witness.observation === undefined) continue;
-          // Keys are read from the line as written; every read verifies the witness it decodes.
-          let projected;
-          try { projected = semanticRecordOf({ id: witness.id, observation: witness.observation }); } catch { continue; }
-          if (projected === undefined || projected.category !== category) continue;
-          for (const [field, read] of readers) {
-            for (const value of read(projected.record)) {
-              const key = keyOf(value);
-              if (key === undefined) continue;
-              const file = shardFile(field, shardOf(field, key));
-              if (!pending.has(file)) pending.set(file, []);
-              pending.get(file).push(JSON.stringify([key, witness.id, rel, offset, length]));
-            }
+      const visit = ({ line, offset, length, feed }) => {
+        let witness;
+        try { witness = JSON.parse(line); } catch { return; }
+        if (typeof witness?.id !== "string" || witness.observation === undefined) return;
+        // Keys are read from the line as written; every read verifies the witness it decodes.
+        let projected;
+        try { projected = semanticRecordOf({ id: witness.id, observation: witness.observation }); } catch { return; }
+        if (projected === undefined || projected.category !== category) return;
+        for (const [field, read] of readers) {
+          for (const value of read(projected.record)) {
+            const key = keyOf(value);
+            if (key === undefined) continue;
+            const file = shardFile(field, shardOf(field, key));
+            if (!pending.has(file)) pending.set(file, []);
+            pending.get(file).push(JSON.stringify([key, witness.id, feed, offset, length]));
           }
         }
-        cursor.feeds[rel] = reached;
-      }
+      };
+      let read = tailKindFeeds({ store, objectKind, positions: cursor.feeds, visit });
+      if (read.reset) { rebuild(); pending.clear(); read = tailKindFeeds({ store, objectKind, positions: cursor.feeds, visit }); }
+      cursor.feeds = read.positions;
       for (const [file, lines] of pending) {
         mkdirSync(join(file, ".."), { recursive: true });
         appendFileSync(file, `${lines.join("\n")}\n`);
