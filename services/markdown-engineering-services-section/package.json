@@ -98,6 +98,9 @@
     "./vault/diataxis-coverage-schema": "./src/vault/diataxis-coverage-schema.mjs",
     "./vault/directory-listing": "./src/vault/directory-listing.mjs"
   },
+  "sqlAdmissionPaths": [
+    "src/vault/import-sql-full-text-index.mjs"
+  ],
   "bin": {
     "admit-markdown-date-path": "./scripts/markdown-services.mjs",
     "admit-markdown-link-target": "./scripts/markdown-services.mjs",
