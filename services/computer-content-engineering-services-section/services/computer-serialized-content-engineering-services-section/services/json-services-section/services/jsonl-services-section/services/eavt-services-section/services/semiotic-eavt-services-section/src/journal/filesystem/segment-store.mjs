@@ -413,7 +413,7 @@ function rebuildFromSegments(storeRoot, after, budget = Infinity) {
     if (left < budget && size > left) break;
     const logPath = logPathOfSegment(segment);
     const log = path.relative(storeRoot, logPath);
-    for (const statement of readSegmentFile(segment).statements) writer.line(locatedBucketFile(storeRoot, "admitted", statement.id), { id: statement.id, log });
+    for (const statement of readSegmentFile(segment, { keep: false }).statements) writer.line(locatedBucketFile(storeRoot, "admitted", statement.id), { id: statement.id, log });
     writer.line(ledgerPath(logPath), { end: size, rebuilt: true });
     left -= size;
     through = list[at];
@@ -428,7 +428,7 @@ function segmentFacts(storeRoot, remainder, after) {
   for (let at = rebuildIndex(list, after); at < list.length; at += 1) {
     const segment = path.join(storeRoot, list[at]);
     let statements;
-    try { ({ statements } = readSegmentFile(segment)); } catch (error) { if (error.code === "ENOENT") continue; throw error; }
+    try { ({ statements } = readSegmentFile(segment, { keep: false })); } catch (error) { if (error.code === "ENOENT") continue; throw error; }
     const log = path.relative(storeRoot, logPathOfSegment(segment));
     for (const statement of statements) {
       const held = remainder.admitted.get(statement.id);
@@ -991,7 +991,7 @@ function streamVerifySegment(file) {
  * bytes it already read have changed. A complete line that is not a verified witness is corruption
  * and throws; only a torn final line (a crash mid-append) is left unread.
  */
-function readSegmentFile(file) {
+function readSegmentFile(file, { keep = true } = {}) {
   const stat = fs.statSync(file);
   let cached = segments.get(file);
   if (cached !== undefined && !readingHolds(file, stat, cached)) cached = undefined;
@@ -1029,7 +1029,9 @@ function readSegmentFile(file) {
   }
   // Decoded feeds are disposable. Retaining an arbitrary number of complete
   // historical telemetry feeds made a node's heap grow with its entire archive.
-  segments.keep(file, cached, cached.offset * SEGMENT_DECODED_FACTOR);
+  // A walk over every segment (a rebuild, or a rebuild's remainder) reads each once and holds none, even when
+  // the segment cache is unbounded: the walk would otherwise pin the whole archive decoded.
+  if (keep) segments.keep(file, cached, cached.offset * SEGMENT_DECODED_FACTOR);
   return Object.freeze({ statements: Object.freeze([...cached.byId.values()]) });
 }
 
