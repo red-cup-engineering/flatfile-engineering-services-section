@@ -19,7 +19,7 @@ import {
   checkTy,
 } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { eavtKey } from "@red-cup-engineering/eavt/row";
+import { eavtAddress } from "@red-cup-engineering/eavt/row";
 import { isCausalWitness } from "./judgment.mjs";
 import { addressWitnessCore } from "./witness.mjs";
 
@@ -356,7 +356,7 @@ function buildUniqueRecord(commandValue, optionsValue) {
     kind: "metroplat.journal.observation",
     seat: options.seat,
     claim: tm.mark(UNIQUE_ADMISSION),
-    address: tm.mark(eavtKey(payload)),
+    address: tm.mark(eavtAddress(payload)),
     time: options.admittedAt,
     causes: command.causes,
     payload,

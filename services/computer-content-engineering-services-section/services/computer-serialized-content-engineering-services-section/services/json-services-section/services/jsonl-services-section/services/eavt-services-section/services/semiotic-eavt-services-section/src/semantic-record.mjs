@@ -15,7 +15,7 @@ import { seavtRow } from "./admit-seavt-row.mjs";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 import { journalWitness, parseJournalWitness } from "./journal/event.mjs";
 import { addressArtifact, isArtifactRef, verifyArtifact } from "./identity/index.mjs";
-import { eavtKey, toEavt } from "@red-cup-engineering/eavt/row";
+import { eavtAddress, toEavt } from "@red-cup-engineering/eavt/row";
 
 const EXPECTED_ENVELOPE = Object.freeze({
   maxSourceBytes: 1048576,
@@ -148,7 +148,7 @@ function witnessForRow(row, origin, causes, claim) {
   return journalWitness({
     kind: "metroplat.journal.observation",
     payload,
-    address: tm.mark(eavtKey(payload)),
+    address: tm.mark(eavtAddress(payload)),
     time: String(row.t),
     seat: origin,
     causes,
@@ -302,7 +302,7 @@ function modernResult(witness, objectKind, category, charge) {
   }
   const payload = toEavt(row);
   if (!equalJson(payload, observation.payload, "modern payload normalization")) invalid("modern payload normalization");
-  if (!equalJson(observation.address, tm.mark(eavtKey(payload)), "modern row address")) invalid("modern row address");
+  if (!equalJson(observation.address, tm.mark(eavtAddress(payload)), "modern row address")) invalid("modern row address");
   if (observation.time !== String(row.t)) invalid("modern row time");
   const origin = scalar(observation.seat, "modern origin");
   const causes = references(observation.causes, "modern causes");

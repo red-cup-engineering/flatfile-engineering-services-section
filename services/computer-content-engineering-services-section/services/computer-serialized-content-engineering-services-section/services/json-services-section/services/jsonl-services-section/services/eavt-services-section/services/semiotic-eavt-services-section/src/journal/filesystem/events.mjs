@@ -9,7 +9,7 @@ import { requireJsonValue } from "@red-cup-engineering/json-services-section";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { journalWitness } from "../event.mjs";
 import { artifactStoreRoot } from "../store-root.mjs";
-import { toEavt, eavtKey, eavtRecord, parse as parseEavt } from "@red-cup-engineering/eavt/row";
+import { toEavt, eavtAddress, eavtRecord, parse as parseEavt } from "@red-cup-engineering/eavt/row";
 
 const CAUSAL_ADMISSION_INDEX_VERSION = 1;
 
@@ -126,7 +126,7 @@ export function eventForRow(row, seat, options = {}) {
     kind: "metroplat.journal.observation",
     seat,
     claim: options.claim ?? tm.mark("metroplat.eavt.row"),
-    address: tm.mark(eavtKey(row)),
+    address: tm.mark(eavtAddress(row)),
     time: String(t),
     causes: Object.freeze([...(options.causes ?? [])].sort()),
     payload: row,
