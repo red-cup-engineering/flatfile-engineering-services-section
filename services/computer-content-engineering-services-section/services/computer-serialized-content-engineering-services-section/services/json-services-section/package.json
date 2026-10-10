@@ -37,7 +37,9 @@
     "./json-resource": "./scripts/json-resource.mjs",
     "./resolve-json-pointer": "./scripts/resolve-json-pointer.mjs",
     "./cloudevent-identity": "./scripts/cloudevent-identity.mjs",
-    "./cloudevent-schema": "./scripts/cloudevent-schema.mjs"
+    "./cloudevent-schema": "./scripts/cloudevent-schema.mjs",
+    "./json-transformations": "./scripts/json-transformations.mjs",
+    "./json-patch": "./scripts/json-patch.mjs"
   },
   "files": [
     "src",
@@ -47,10 +49,10 @@
     "schemas"
   ],
   "dependencies": {
-    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/json-schema-services-section": "workspace:*",
-    "@red-cup-engineering/metrologic": "workspace:*",
-    "@red-cup-engineering/signcell": "workspace:*"
+    "@red-cup-engineering/computer-data-engineering-services-section": "0.1.0",
+    "@red-cup-engineering/json-schema-services-section": "0.3.0",
+    "@red-cup-engineering/metrologic": "0.3.0",
+    "@red-cup-engineering/signcell": "0.1.0"
   },
   "devDependencies": {},
   "scripts": {

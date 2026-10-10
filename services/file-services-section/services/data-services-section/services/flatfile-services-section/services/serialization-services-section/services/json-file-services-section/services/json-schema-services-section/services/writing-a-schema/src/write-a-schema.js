@@ -5,7 +5,7 @@
  * @closure-kind process
  * @description Writes a JSON Schema into the schema pool from data, refusing one that is unsatisfiable, self-contradictory, or names references that do not resolve; and with --check, validates every seated schema. Use when adding a record type, changing a type's contract, or proving the pool still says what it claims. A schema is a record like any other, so it is written by a script and checked by a machine rather than typed and hoped over.
  *
- * @precondition the data is valid JSON and declares $schema, $id and type
+ * @precondition the data is valid JSON and declares $id and type; $schema, when absent, is the one admitted dialect (Draft 2020-12)
  * @precondition $id agrees with the filename, so a schema resolves by the name it is filed under
  * @precondition every required key is declarable, so the schema is satisfiable by some document
  * @precondition every $ref resolves, to a local $def or to a sibling schema's $id in the pool
@@ -40,16 +40,16 @@
  *
  * ## The validator
  *
- * The canonical JSON Schema service owns schema semantics. This node-local
- * writer owns only pool discovery, filename seating, atomic write/retraction,
+ * The canonical JSON Schema service owns schema semantics: admission is
+ * `admitSchema`, the authoring invariants are `inspectSchemaCorpus` over the
+ * pool, and the judgment of an instance is the one validator of `src/index.mts`.
+ * This node-local writer owns only filename seating, atomic write/retraction,
  * and the negative control against the schema after it has been seated.
  *
- * It implements the subset this pool actually uses — type, required, properties,
- * additionalProperties, enum, const, pattern, minLength, minItems, minProperties,
- * uniqueItems, items, propertyNames, $ref, $defs, oneOf — and **refuses a schema
- * using a keyword it does not implement**, rather than ignoring it. Silently
- * ignoring an unimplemented keyword is how a schema comes to report itself
- * enforced while enforcing nothing.
+ * The bounded vocabulary **refuses a schema using a keyword it does not
+ * implement**, rather than ignoring it. Silently ignoring an unimplemented
+ * keyword is how a schema comes to report itself enforced while enforcing
+ * nothing.
  *
  * ## Run it
  *
@@ -65,7 +65,9 @@
  * before refusing — a bare invocation run from above the pool, such as the
  * repository root, still finds the pool this script is seated beside.
  *
- * Input is JSON. Output is JSON.
+ * Input is JSON. Output is JSON. The same operation is importable:
+ * `writeSchema({ pool, schema, amend, dryRun })` and `checkSchemaPool({ pool })`
+ * return their results and throw their refusals instead of printing and exiting.
  *
  * ## When NOT to use
  *
@@ -75,232 +77,94 @@
  *   kind of thing exists; making one is a decision, and this only performs it.
  */
 
-import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { inspectSchema } from "@red-cup-engineering/json-schema-services-section";
+import { admitSchema } from "../../../scripts/admit-schema.mjs";
+import { inspectSchemaCorpus } from "../../../scripts/inspect-schema-corpus.mjs";
+import { inspectSchemaPool } from "../../../scripts/inspect-schema-pool.mjs";
+import { discoverSchemaPool, readSchemaPool } from "../../../scripts/read-schema-pool.mjs";
+import { schemaCorpus, validateInstance } from "../../../dist/index.mjs";
 
-// ── resolution ─────────────────────────────────────────────────────────────
-// Walk from the asking point UP, testing <D>/<shape> at each D. Nearest wins,
-// neighbours or upward, never downward: resolving downward lets one venture's
-// private answer capture a question asked outside it.
-//
-// No repo root, and no `git rev-parse`. A node may be a submodule, so the
-// enclosing git toplevel is some other tree's root and says nothing about where
-// THIS unit's glossary is. Asking up by shape is well-defined only because every
-// unit carries the same subdirectory vocabulary.
-function findUp(from, shape) {
-  let d = resolve(from);
-  for (;;) {
-    const at = join(d, shape);
-    if (existsSync(at)) return at;
-    const up = dirname(d);
-    if (up === d) return null; // no unit above the asking point carries it
-    d = up;
-  }
-}
+import contract from "../../../schemas/write-schema.json" with { type: "json" };
+export const inputSchema = contract.input;
+export const outputSchema = contract.output;
 
-// A skill is one file: it CALLS its siblings as subprocesses rather than
-// importing them, because project-a-skill copies a skill as a single file and an
-// imported sibling would not travel with it. So a sibling must be FOUND, and two
-// shapes answer — the flat pool a skill's source lives in, and a node it was
-// projected into, where the harness wants a directory per skill.
-function findSkill(flatName, from) {
-  const beside = join(dirname(fileURLToPath(import.meta.url)), flatName);
-  if (existsSync(beside)) return beside; // the flat source pool
-  const pooled = findUp(from, join("lib/management/skills", flatName));
-  if (pooled) return pooled;
-  let d = resolve(from);
-  for (;;) {
-    const projected = join(d, ".claude/skills");
-    if (existsSync(projected)) {
-      for (const entry of readdirSync(projected)) {
-        const at = join(projected, entry, "scripts", flatName);
-        if (existsSync(at)) return at;
-      }
-    }
-    const up = dirname(d);
-    if (up === d) return null;
-    d = up;
-  }
-}
+const line = ({ pointer, keyword, message }) => `${pointer || "$"}: ${keyword}: ${message}`;
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const FROM = argValue("--from") ?? process.cwd();
-const CHECK = process.argv.includes("--check");
-const AMEND = process.argv.includes("--amend");
-const DRY_RUN = process.argv.includes("--dry-run");
-// FROM (explicit --from, or its cwd default) walks first; only where that
-// finds no pool does the walk retry from this script's own file location — a
-// fallback, never a preference, so nothing that resolves today changes what
-// it resolves to.
-const POOL = argValue("--pool") ?? findUp(FROM, "lib/schemas") ?? findUp(HERE, "lib/schemas");
-
-// Which keywords are implemented is READING-A-SCHEMA's fact, not this script's.
-// A copy here would drift from it the first time the validator grows a keyword —
-// and did, within the hour: this list refused allOf/if/then while the validator
-// implemented them. One fact, one home.
-
-function argValue(flag) {
-  const i = process.argv.indexOf(flag);
-  return i !== -1 ? process.argv[i + 1] : undefined;
-}
-
-function out(value, code = 0) {
-  process.stdout.write(JSON.stringify(value, null, 2) + "\n");
-  process.exit(code);
-}
-
-const die = (message) => out({ ok: false, error: message }, 1);
-
-// ⊥ — no unit at or above the asking point carries a schema pool. An absence,
-// not an empty pool: seating a class into a pool that does not exist would
-// create the unit's schema pool as a side effect of writing one class into it.
-if (!POOL) {
-  die(`⊥ no schema pool at or above ${FROM} — nothing carries lib/schemas. Pass --pool to name one, or --from to ask from somewhere else.`);
-}
-
-/** The invariants a schema must hold to be a contract rather than a decoration. */
-function schemaErrors(schema, poolIds) {
-  try {
-    const inspected = inspectSchema(schema, poolIds);
-    const errs = inspected.errors.map(({ pointer, keyword, message }) => `${pointer || "$"}: ${keyword}: ${message}`);
-    if (schema.type !== undefined && typeof schema.type !== "string") errs.push("$: type must be a single string in this pool");
-    return errs;
-  } catch (error) {
-    return [`$: schema inspection failed: ${error instanceof Error ? error.message : String(error)}`];
-  }
-}
-
-function readPool() {
-  const schemas = new Map();
-  const broken = new Map();
-  if (!existsSync(POOL)) return { schemas, broken };
-  for (const entry of readdirSync(POOL)) {
-    if (!entry.endsWith(".schema.json")) continue;
-    const path = join(POOL, entry);
-    try {
-      schemas.set(entry, { path, schema: JSON.parse(readFileSync(path, "utf8")) });
-    } catch (e) {
-      broken.set(entry, e.message);
-    }
-  }
-  return { schemas, broken };
-}
-
-function fileNameFor(id) {
-  // emsenn/schema/office -> office.schema.json
-  return `${id.split("/").pop()}.schema.json`;
-}
-
-function check() {
-  const { schemas, broken } = readPool();
-  const poolIds = new Set([...schemas.values()].map((s) => s.schema.$id).filter(Boolean));
-  const report = { ok: true, checked: schemas.size, schemas: [] };
-
-  for (const [entry, { schema }] of schemas) {
-    const errs = schemaErrors(schema, poolIds);
-    if (schema.$id && fileNameFor(schema.$id) !== entry) {
-      errs.push(`$: $id '${schema.$id}' would file as ${fileNameFor(schema.$id)}, but it is filed as ${entry}`);
-    }
-    if (errs.length) {
-      report.ok = false;
-      report.schemas.push({ file: entry, errors: errs });
-    }
-  }
-
-  if (broken.size) {
-    report.ok = false;
-    report.broken = Object.fromEntries(broken);
-  }
-  if (schemas.size === 0) {
-    report.ok = false;
-    report.error = "the pool holds no schemas — an empty sweep is a broken sweep, not a clean one";
-  }
-
-  out(report, report.ok ? 0 : 1);
-}
-
-function write() {
-  const input = readFileSync(0, "utf8").trim();
-  if (!input) die("no data on stdin — a schema is written from data, never typed into a file");
-  let schema;
-  try {
-    schema = JSON.parse(input);
-  } catch (e) {
-    die(`stdin is not JSON: ${e.message}`);
-  }
-
-  if (typeof schema.$id !== "string" || !schema.$id) die("$: no $id — a schema with no address cannot be referenced");
-
-  const { schemas, broken } = readPool();
-  if (broken.size) die(`the pool holds unparseable schemas (${[...broken.keys()].join(", ")}) — nothing is written against a broken pool`);
-
-  const entry = fileNameFor(schema.$id);
-  const path = join(POOL, entry);
+/**
+ * Seat one schema into the pool, or refuse and leave the pool as it was. A new schema is refused if its
+ * file exists (use `amend`), an amendment if its file does not; a schema that is unusable as a contract,
+ * that would leave a sibling broken, or that admits the empty object is never left seated.
+ */
+export function writeSchema({ pool, schema: input, amend = false, dryRun = false }) {
+  const schema = admitSchema({ schema: input, allowUnknownAnnotations: true }).schema;
+  const stem = schema.$id
+    .split("/")
+    .at(-1)
+    .replace(/\.schema\.json$|\.json$/u, "");
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(stem))
+    throw new TypeError("schema id needs a filename-safe final segment");
+  const entry = `${stem}.schema.json`;
+  const { records } = readSchemaPool({ pool });
+  const path = join(resolve(pool), entry);
   const exists = existsSync(path);
-  if (exists && !AMEND) die(`${entry} already exists — refused, never overwritten; use --amend`);
-  if (!exists && AMEND) die(`${entry} seats nowhere — amend edits what exists`);
+  if (exists && !amend) throw new TypeError(`${entry} already exists — refused, never overwritten; use amend`);
+  if (!exists && amend) throw new TypeError(`${entry} seats nowhere — amend edits what exists`);
 
-  const poolIds = new Set([...schemas.values()].map((s) => s.schema.$id).filter(Boolean));
-  poolIds.add(schema.$id);
+  const siblings = records.filter((record) => record.path !== path).map((record) => record.schema);
+  const { errors } = inspectSchemaCorpus({ schemas: [...siblings, schema] });
+  const own = errors.filter((error) => error.schema === schema.$id);
+  if (own.length) throw new TypeError(`${entry} is not a usable contract: ${own.map(line).join("; ")}`);
+  if (errors.length) throw new TypeError(`writing ${entry} would leave siblings broken: ${JSON.stringify(errors)}`);
 
-  const errs = schemaErrors(schema, poolIds);
-  if (errs.length) die(`${entry} is not a usable contract: ${errs.join("; ")}`);
-
-  // Amending must not break a sibling that refs this one.
-  const orphaned = [];
-  for (const [other, { schema: sibling }] of schemas) {
-    if (other === entry) continue;
-    const siblingErrs = schemaErrors(sibling, poolIds);
-    if (siblingErrs.length) orphaned.push({ file: other, errors: siblingErrs });
-  }
-  if (orphaned.length) die(`writing ${entry} would leave siblings broken: ${JSON.stringify(orphaned)}`);
-
-  const text = `${JSON.stringify(schema, null, 2)}\n`;
-  if (DRY_RUN) out({ ok: true, dryRun: true, would: { write: relative(FROM, path) } });
+  if (dryRun) return { ok: true, dryRun: true, path, schema: schema.$id };
 
   // Retraction, not repair. Every check below runs against the schema AS SEATED,
   // because that is the only state anything else will ever read it in — and a
   // schema that fails one is withdrawn whole rather than left half-seated for
   // the next reader to trust.
+  const text = `${JSON.stringify(schema, null, 2)}\n`;
   const prior = exists ? readFileSync(path, "utf8") : null;
   const retract = () => (prior === null ? unlinkSync(path) : writeFileSync(path, prior));
-
   writeFileSync(path, text);
-
-  const back = readFileSync(path, "utf8");
-  if (back !== text) {
-    retract();
-    die(`${entry} was written but does not read back byte-identical; withdrawn`);
-  }
-
-  // The negative control: a term must be able to REFUSE something, or it judges
-  // nothing. Run the seated schema against `{}` through reading-a-schema — the
-  // one validator — because a schema whose emptiness passes is the silent-green
-  // failure that makes a check worse than no check. This is why the validator is
-  // called and never copied: a private copy would answer for a contract other
-  // than the one the pool enforces.
-  const reader = fileURLToPath(import.meta.resolve("@red-cup-engineering/json-schema-services-section/read-a-schema"));
-  if (!reader) {
-    retract();
-    die("⊥ cannot find reading-a-schema — the one validator. Nothing is seated on an unproved contract; withdrawn");
-  }
-  const probe = spawnSync(process.execPath, [reader, schema.$id, "--pool", POOL], { input: "{}", encoding: "utf8" });
-  let verdict = null;
   try {
-    verdict = JSON.parse(probe.stdout);
-  } catch {
+    if (readFileSync(path, "utf8") !== text)
+      throw new TypeError(`${entry} was written but does not read back byte-identical; withdrawn`);
+    // The negative control: a term must be able to REFUSE something, or it judges
+    // nothing. Run the seated schema against `{}` through the one validator, because
+    // a schema whose emptiness passes is the silent-green failure that makes a check
+    // worse than no check.
+    let verdict;
+    try {
+      const seated = readSchemaPool({ pool }).records;
+      const target = seated.find((record) => record.path === path);
+      verdict = validateInstance({}, target.schema, schemaCorpus(seated.map((record) => record.schema)));
+    } catch (error) {
+      throw new TypeError(`⊥ cannot judge the seated ${entry}: ${error instanceof Error ? error.message : String(error)}; withdrawn`);
+    }
+    if (verdict.ok)
+      throw new TypeError(`${entry} admits the empty object — this term refuses nothing and can judge nothing; withdrawn`);
+  } catch (error) {
     retract();
-    die(`⊥ reading-a-schema returned nothing parseable probing ${entry}: ${(probe.stderr || probe.stdout || "").trim()}; withdrawn`);
+    throw error;
   }
-  if (verdict?.ok === true) {
-    retract();
-    die(`${entry} admits the empty object — this term refuses nothing and can judge nothing; withdrawn`);
-  }
+  return { ok: true, dryRun: false, path, schema: schema.$id };
+}
 
-  out({ ok: true, [AMEND ? "amended" : "seated"]: { $id: schema.$id, path: relative(FROM, path) } });
+/** Validate the whole pool and report by file: what could not be read, what each schema fails, and an empty pool as broken. */
+export function checkSchemaPool({ pool }) {
+  const inspected = inspectSchemaPool({ pool });
+  const report = { ok: inspected.ok, checked: inspected.checked, schemas: [] };
+  const files = new Map(), broken = {};
+  for (const error of inspected.errors) {
+    if (error.keyword === "pool") report.error = error.message;
+    else if (error.keyword === "file") broken[basename(error.path)] = error.message;
+    else files.set(basename(error.path), [...(files.get(basename(error.path)) ?? []), line(error)]);
+  }
+  for (const [file, errors] of files) report.schemas.push({ file, errors });
+  if (Object.keys(broken).length) report.broken = broken;
+  return report;
 }
 
 function printUsage() {
@@ -317,6 +181,53 @@ function printUsage() {
   );
 }
 
-if (process.argv.includes("--help")) printUsage();
-else if (CHECK) check();
-else write();
+function main(args) {
+  const argValue = (flag) => {
+    const i = args.indexOf(flag);
+    return i !== -1 ? args[i + 1] : undefined;
+  };
+  const out = (value, code = 0) => {
+    process.stdout.write(JSON.stringify(value, null, 2) + "\n");
+    process.exit(code);
+  };
+  const die = (message) => out({ ok: false, error: message }, 1);
+
+  if (args.includes("--help")) return printUsage();
+  const FROM = argValue("--from") ?? process.cwd();
+  // FROM (explicit --from, or its cwd default) walks first; only where that finds no pool does the
+  // walk retry from this script's own file location — a fallback, never a preference.
+  const POOL = argValue("--pool") ?? discoverSchemaPool({ from: FROM, near: dirname(fileURLToPath(import.meta.url)) });
+
+  // ⊥ — no unit at or above the asking point carries a schema pool. An absence,
+  // not an empty pool: seating a class into a pool that does not exist would
+  // create the unit's schema pool as a side effect of writing one class into it.
+  if (!POOL || !existsSync(POOL))
+    die(`⊥ no schema pool at or above ${FROM} — nothing carries lib/schemas. Pass --pool to name one, or --from to ask from somewhere else.`);
+
+  if (args.includes("--check")) {
+    const report = checkSchemaPool({ pool: POOL });
+    out(report, report.ok ? 0 : 1);
+  }
+
+  const input = readFileSync(0, "utf8").trim();
+  if (!input) die("no data on stdin — a schema is written from data, never typed into a file");
+  let schema;
+  try {
+    schema = JSON.parse(input);
+  } catch (e) {
+    die(`stdin is not JSON: ${e.message}`);
+  }
+  if (typeof schema?.$id !== "string" || !schema.$id) die("$: no $id — a schema with no address cannot be referenced");
+
+  const amend = args.includes("--amend");
+  let result;
+  try {
+    result = writeSchema({ pool: POOL, schema, amend, dryRun: args.includes("--dry-run") });
+  } catch (error) {
+    die(error instanceof Error ? error.message : String(error));
+  }
+  if (result.dryRun) out({ ok: true, dryRun: true, would: { write: relative(FROM, result.path) } });
+  out({ ok: true, [amend ? "amended" : "seated"]: { $id: result.schema, path: relative(FROM, result.path) } });
+}
+
+if (import.meta.main) main(process.argv.slice(2));

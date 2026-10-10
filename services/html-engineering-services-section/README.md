@@ -1,30 +1,7 @@
-# html-engineering-services-section
+# HTML engineering
 
-This is the one section for all HTML: rendering documents and fragments,
-escaping, structural projection, Markdown-to-HTML, and HTML validity. It is
-seated in computer-data serialization beside `xml-services-section` and
-`json-services-section`; per that sibling's own README, "Vocabulary
-refinements such as HTML and SVG must restrict this codec rather than owning
-competing escaping or AST writers" — this section is that restriction, not a
-competing HTML implementation.
+HTML has its own native parsing and document carrier beside XML and JSON. HTML error recovery, implied elements, foreign namespaces, template fragments and character-reference contexts cannot be implemented by treating HTML as XML. SVG remains XML. Shared lexical escaping retains text and quoted-attribute values through receiving.
 
-It owns five services:
+The section exports document/carrier rendering, article/page composition, metadata, templates and static pages through the actual package subpaths. Semantic Hypertext Packet projection and receiving live in `services/html-structural-projection-service`: typed coordinates, both evidence sides, ordered frontiers and packet commitments remain distinct from HTML syntax. Markdown rendering composes the actual Markdown supplier; the section does not claim nonexistent service directories. Filesystem custody remains with file services.
 
-- `services/html-document-render-service` renders a data carrier and
-  resolved CSS as a complete HTML document string.
-- `services/html-structural-projection-service` provides Semantic Hypertext
-  Packet (SHP) projection, scanning, linting, escaping, and structural HTML
-  construction.
-- `services/render-markdown-inline-html-service` renders Markdown inline
-  spans (emphasis, links, code) to an HTML string.
-- `services/render-markdown-inline-html-nodes-service` renders Markdown
-  inline spans to structural HTML carrier nodes (the typed counterpart of
-  the string renderer above), composing
-  `html-structural-projection-service`.
-- `services/render-markdown-block-html-service` renders a full Markdown
-  document to block-level HTML, composing
-  `render-markdown-inline-html-service` for inline spans.
-
-Neither `html-document-render-service` nor `html-structural-projection-service`
-owns filesystem custody. Reading and writing files remain separate file-service
-operations.
+Native HTML document reading, character references and six bounded transformations are exported by the structural-projection package's `./scan`, `./lexical` and `./transformations` subpaths. Existing SHP and Webmention consumers use the same reader. Parsed start-tag rows preserve original UTF-16 positions and authored order while excluding inert bodies and inferred nodes; native tree correction may discard source tags. See that package's README for callable contracts, resource bounds and qualified fixture evidence.

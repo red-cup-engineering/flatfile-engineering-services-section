@@ -4,13 +4,13 @@
   "type": "module",
   "description": "Content: data carriers with locator-independent identity and custody, their typed-resource classification and catalog, and descriptions.",
   "dependencies": {
-    "@red-cup-engineering/cbor-services-section": "workspace:*",
-    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/javascript-node-services-section": "workspace:*",
-    "@red-cup-engineering/json-schema-services-section": "workspace:*",
-    "@red-cup-engineering/json-services-section": "workspace:*",
-    "@red-cup-engineering/uri-services-section": "workspace:*"
+    "@red-cup-engineering/cbor-services-section": "0.1.0",
+    "@red-cup-engineering/computer-data-engineering-services-section": "0.1.0",
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.0",
+    "@red-cup-engineering/javascript-node-services-section": "0.3.0",
+    "@red-cup-engineering/json-schema-services-section": "0.3.0",
+    "@red-cup-engineering/json-services-section": "1.0.0",
+    "@red-cup-engineering/uri-services-section": "0.1.0"
   },
   "exports": {
     "./semiotic-content-address": "./src/semiotic-content-address/semiotic-content-address.mjs",

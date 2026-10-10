@@ -12,7 +12,7 @@ export const DEFAULT_MARKDOWN_VAULT_EXCLUDES = Object.freeze([".git", "node_modu
  */
 export async function observeMarkdownVaultDirectory({
   root, region = "", excludes = DEFAULT_MARKDOWN_VAULT_EXCLUDES,
-  limit = 200, maxScan = 20_000, admitPath = () => true,
+  limit = 200, maxScan = 20_000,
 } = {}) {
   if (!Number.isInteger(limit) || limit < 0) throw new TypeError("limit must be a nonnegative integer");
   if (!Number.isInteger(maxScan) || maxScan < 0) throw new TypeError("maxScan must be a nonnegative integer");
@@ -22,8 +22,7 @@ export async function observeMarkdownVaultDirectory({
     schemaVersion: 1, extensions: ["md", "markdown"], excludedDirectoryNames: excludes,
     vaults: [{ id: "source", region: ".", fallback: true }],
   } });
-  const eligible=enumeration.paths.filter(path=>admitPath(relativeRegion ? `${relativeRegion}/${path}` : path));
-  const candidates = eligible.slice(0, maxScan);
+  const candidates = enumeration.paths.slice(0, maxScan);
   const admitted = [], diagnostics = [];
   let excluded = 0;
   for (let offset = 0; offset < candidates.length; offset += 64) {
@@ -48,7 +47,7 @@ export async function observeMarkdownVaultDirectory({
     excludes: Object.freeze([...excludes]), paths: Object.freeze(admitted.slice(0, limit)),
     symlinkPolicy: "exclude", diagnostics: Object.freeze(diagnostics),
     enumerated: enumeration.paths.length, scanned: candidates.length, excluded,
-    available: admitted.length, truncated: eligible.length > maxScan || admitted.length > limit,
+    available: admitted.length, truncated: enumeration.paths.length > maxScan || admitted.length > limit,
   });
 }
 

@@ -5,7 +5,12 @@ import { makeNiUri, verifyNiUri } from "@red-cup-engineering/uri-services-sectio
 import { keyIdOf, privateSigningKey, publicSigningKey, signCanonicalBody, verifyCanonicalBody } from "./canonical-signature.mjs";
 
 const KIND = "computer-content.signed-content-claim";
-const DOMAIN = "computer-content.signed-content-claim.v1\n";
+// The kind before the 2026-10-04 rename (SignCell, SignChain, SignGraph and SignCraft are apps of their
+// layers' sections): claims signed under it are carried and verify under their own domain.
+const DOMAINS = Object.freeze({
+  [KIND]: "computer-content.signed-content-claim.v1\n",
+  "signstuff.signed-content-claim": "signstuff.signed-content-claim.v1\n",
+});
 const named = (value) => typeof value === "string" && value.length > 0 && value.trim() === value;
 const shape = (value, names) => value && typeof value === "object" && !Array.isArray(value)
   && Object.keys(value).length === names.length && names.every((name) => Object.hasOwn(value, name));
@@ -18,13 +23,13 @@ export function signContentClaim({ bytes, mediaType, purpose, issuer, issuedAt, 
   const body = Object.freeze({ kind: KIND, version: 1, purpose, issuer, issuedAt,
     content: Object.freeze({ uri: makeNiUri(bytes), bytes: bytes.byteLength, mediaType }) });
   return Object.freeze({ ...body, signature: Object.freeze({ algorithm: "Ed25519", keyId: keyIdOf(createPublicKey(key)),
-    value: signCanonicalBody(DOMAIN, body, key) }) });
+    value: signCanonicalBody(DOMAINS[KIND], body, key) }) });
 }
 
 export function verifyContentClaim({ bytes, claim, publicKey, expectedIssuer, expectedPurpose, expectedMediaType }) {
   try {
     if (!(bytes instanceof Uint8Array) || !shape(claim, ["kind", "version", "purpose", "issuer", "issuedAt", "content", "signature"])
-      || claim.kind !== KIND || claim.version !== 1 || ![expectedIssuer, expectedPurpose, expectedMediaType].every(named)
+      || !Object.hasOwn(DOMAINS, claim.kind) || claim.version !== 1 || ![expectedIssuer, expectedPurpose, expectedMediaType].every(named)
       || claim.issuer !== expectedIssuer || claim.purpose !== expectedPurpose
       || !named(claim.issuedAt) || !Number.isFinite(Date.parse(claim.issuedAt))
       || !shape(claim.content, ["uri", "bytes", "mediaType"]) || claim.content.mediaType !== expectedMediaType
@@ -34,7 +39,7 @@ export function verifyContentClaim({ bytes, claim, publicKey, expectedIssuer, ex
     const key = publicSigningKey(publicKey);
     if (keyIdOf(key) !== claim.signature.keyId) return refuse("untrusted signer");
     const { signature, ...body } = claim;
-    if (!verifyCanonicalBody(DOMAIN, body, signature.value, key)) return refuse("invalid signature");
+    if (!verifyCanonicalBody(DOMAINS[claim.kind], body, signature.value, key)) return refuse("invalid signature");
     return Object.freeze({ ok: true, issuer: claim.issuer, content: claim.content.uri, keyId: claim.signature.keyId });
   } catch {
     return refuse("malformed content claim or key");

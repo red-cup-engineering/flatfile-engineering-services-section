@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
-import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical";
 import { readAllFeedsEntries } from "./read-all-feeds-entries.mjs";
 import { readEavtState } from "./read-eavt-state.mjs";
 export const inputSchema = {

@@ -20,12 +20,7 @@ import {
 } from "@red-cup-engineering/css-services-section/css-style-resolution";
 import { canonical } from "@red-cup-engineering/json-services-section";
 
-/* ── escape (local copy) ────────────────────────────────────────────────────
- * html-structural-projection-service keeps the canonical escaping/SHP-value surface;
- * this package cannot depend back on it (it re-exports this package's
- * symbols), so it carries its own minimal copy for the values a carrier node
- * can hold. Splitting escaping into its own package is a later job.
- */
+import { escapeHtmlTextValue as escapeXmlText, escapeHtmlAttributeValue as escapeXmlAttr } from "@red-cup-engineering/html-structural-projection-service/lexical";
 
 const REF_PREFIX = "shp-ref:";
 
@@ -47,19 +42,8 @@ function htmlText(value) {
 }
 
 /** Escape a value for HTML text content (`&`, `<`, `>`). */
-function escapeText(value) {
-  return htmlText(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-/** Escape a value for a quoted HTML attribute (text escaping plus `"` and `'`). */
-function escapeAttr(value) {
-  return escapeText(value)
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+function escapeText(value) { return escapeXmlText(htmlText(value)); }
+function escapeAttr(value) { return escapeXmlAttr(htmlText(value)); }
 
 /* ── carrier ────────────────────────────────────────────────────────────── */
 

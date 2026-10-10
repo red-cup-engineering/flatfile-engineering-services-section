@@ -38,12 +38,18 @@ export function validateSchemaInstance(input) {
     errors.push(violation(pointer, keyword, message));
   const pointer = (at, key) =>
     `${at}/${String(key).replaceAll("~", "~0").replaceAll("/", "~1")}`;
+  // A calendar date must survive a round trip: "2023-02-30" is shaped like a date and is not one.
+  const calendar = (text) => {
+    const stamp = new Date(`${text}T00:00:00.000Z`);
+    return Number.isFinite(stamp.valueOf()) && stamp.toISOString().slice(0, 10) === text;
+  };
   const date = (value, withTime) =>
     typeof value === "string" &&
     (withTime
       ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u
       : /^\d{4}-\d{2}-\d{2}$/u
     ).test(value) &&
+    calendar(value.slice(0, 10)) &&
     !Number.isNaN(Date.parse(value));
   const same = (left, right) =>
     json.canonicalJson(left) === json.canonicalJson(right);

@@ -26,7 +26,7 @@ const code = /\.(?:[cm]?[jt]s)$/u;
 const documentation = /\.(?:md|rml|txt)$/u;
 const archivedPath = /(?:^|\/)(?:legacy|_archive|archive|retired-carriers|content\/assets\/legacy)(?:\/|$)/u;
 const schemaWords = /(?:JSON Schema|json-schema|read-a-schema|write-a-schema|\.schema\.json|\$schema|SchemaAssertion|schemaCorpus)/iu;
-const implementationWords = /(?:export\s+function\s+(?:validateInstance|createSchema|schemaCorpus|resolveJsonPointer|resolvePointer|projectSchemaAssertions|cohereSchemaAssertions|unfoldSchema|foldSchema|schemaRegistry)|function\s+(?:validate|schemaErrors)\s*\([^)]*schema|classifyCensusEntry\s*\()/u;
+const implementationWords = /(?:export\s+function\s+(?:validateInstance|createSchema|schemaCorpus|resolveJsonPointer|resolvePointer|projectSchemaAssertions|cohereSchemaAssertions|unfoldSchema|foldSchema|schemaRegistry|validateSchemaInstance|admitSchema|resolveSchemaReference|censusSchemaArtifacts|transformSchemaAssertions)|function\s+(?:validate|schemaErrors)\s*\([^)]*schema|classifyCensusEntry\s*\()/u;
 
 function generation(path: string): string {
   const dated = /content\/assets\/legacy\/([^/]+)/u.exec(path)?.[1];

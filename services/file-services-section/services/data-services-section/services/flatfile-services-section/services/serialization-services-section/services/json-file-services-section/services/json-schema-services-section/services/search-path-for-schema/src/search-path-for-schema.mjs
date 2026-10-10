@@ -2,6 +2,10 @@ import { lstat, readFile, readdir, realpath, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { createSchema, unfoldSchema } from "../../../dist/index.mjs";
 
+import contract from "../../../schemas/search-path-for-schema.json" with { type: "json" };
+export const inputSchema = contract.input;
+export const outputSchema = contract.output;
+
 const EXCLUDED = Object.freeze(new Set([".git", "node_modules", "dist", "data", "out", "cache"]));
 
 async function candidatePaths(root) {

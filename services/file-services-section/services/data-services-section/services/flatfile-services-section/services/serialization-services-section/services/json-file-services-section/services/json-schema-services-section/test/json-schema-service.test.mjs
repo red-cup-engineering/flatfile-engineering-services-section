@@ -7,6 +7,13 @@ import {
   schemaAssertionEavtId, schemaAssertionId,
 } from "../src/index.mts";
 import { census, censusClassified, classifyCensusEntry } from "../src/census.mts";
+import { admitSchema } from "../scripts/admit-schema.mjs";
+import { censusSchemaArtifacts } from "../scripts/census-schema-artifacts.mjs";
+import { resolveSchemaPointer } from "../scripts/resolve-schema-pointer.mjs";
+import { validateSchemaInstance } from "../scripts/validate-schema-instance.mjs";
+import { cohereSchemaAssertions as cohereOperation } from "../scripts/cohere-schema-assertions.mjs";
+import { foldSchemaAssertions as foldOperation } from "../scripts/fold-schema-assertions.mjs";
+import { unfoldSchema as unfoldOperation } from "../scripts/unfold-schema.mjs";
 
 const make = (body, id = "example/schema") => createSchema({ $id: id, ...body }).schema;
 test("fixed dialect, canonical identity, receipt and immutability", () => {
@@ -68,4 +75,95 @@ test("census classifies generations without promotion", () => {
   assert.equal(result.roleCounts.documentation, 1);
   assert.deepEqual(censusClassified([{ path: "live/read-a-schema.js", content: "function validate(value, schema) {}" }].map(classifyCensusEntry)), census([{ path: "live/read-a-schema.js", content: "function validate(value, schema) {}" }]));
   assert.deepEqual(result.entries.filter((entry) => entry.legacyDisposition !== null).map((entry) => entry.legacyDisposition), ["retain-as-evidence", "supersede-with-explicit-migration"]);
+});
+
+// The request/response operations of scripts/ are faces of the same implementations the positional API above exercises.
+test("schema pointer assertions round-trip and preserve contradictions", () => {
+  const schema = admitSchema({
+    schema: {
+      $id: "example/schema",
+      type: "object",
+      properties: { name: { type: "string" } },
+    },
+  }).schema;
+  const assertions = unfoldOperation({ schema, time: "t1" }).assertions;
+  assert.deepEqual(foldOperation({ assertions }).schema, schema);
+  assert.deepEqual(unfoldOperation({ schema, time: "t1" }).assertions, unfoldSchema(schema, { t: "t1" }));
+  assert.equal(
+    cohereOperation({
+      assertions: [...assertions, { e: "#", a: "type", v: "array", t: "t2" }],
+    }).schema,
+    null,
+  );
+});
+
+test("validation resolves only the explicit corpus and reports the refusing keyword", () => {
+  const name = admitSchema({
+    schema: { $id: "name", type: "string", minLength: 2 },
+  }).schema;
+  const person = admitSchema({
+    schema: {
+      $id: "person",
+      type: "object",
+      required: ["name", "tags"],
+      properties: {
+        name: { $ref: "name" },
+        tags: { type: "array", uniqueItems: true, contains: { const: "held" } },
+      },
+      additionalProperties: false,
+    },
+  }).schema;
+  assert.equal(
+    validateSchemaInstance({
+      instance: { name: "Ada", tags: ["held"] },
+      schema: person,
+      schemas: [name],
+    }).ok,
+    true,
+  );
+  const refusal = validateSchemaInstance({
+    instance: { name: "A", tags: ["lost", "lost"], extra: true },
+    schema: person,
+    schemas: [name],
+  });
+  assert.equal(refusal.ok, false);
+  assert.deepEqual(
+    new Set(refusal.errors.map((error) => error.keyword)),
+    new Set(["minLength", "uniqueItems", "contains", "additionalProperties"]),
+  );
+  assert.equal(
+    validateSchemaInstance({
+      instance: { name: "Ada", tags: ["held"] },
+      schema: person,
+    }).ok,
+    false,
+  );
+});
+
+test("pointer lookup and census keep their authority in caller-provided carriers", () => {
+  assert.deepEqual(
+    resolveSchemaPointer({
+      document: { "a/b": ["held"] },
+      pointer: "#/a~1b/0",
+    }),
+    { found: true, value: "held" },
+  );
+  assert.deepEqual(
+    censusSchemaArtifacts({
+      entries: [
+        { path: "live/a.schema.json", content: "{}" },
+        {
+          path: "legacy/validator.mjs",
+          content: "export function validateSchemaInstance() {}",
+        },
+      ],
+    }).counts,
+    {
+      "schema-document": 1,
+      "schema-implementation": 0,
+      "legacy-schema-document": 0,
+      "legacy-implementation": 1,
+      other: 0,
+    },
+  );
 });

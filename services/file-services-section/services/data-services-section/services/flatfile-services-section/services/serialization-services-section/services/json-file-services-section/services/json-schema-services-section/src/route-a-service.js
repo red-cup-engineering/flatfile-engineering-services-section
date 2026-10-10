@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const service = process.argv[2];
 const routes = Object.freeze({
-  "reading-a-schema": join(root, "bin/read-a-schema.mjs"),
+  "reading-a-schema": join(root, "scripts/read-a-schema.mjs"),
   "writing-a-schema": join(root, "services/writing-a-schema/src/write-a-schema.js"),
   "search-path-for-schema": join(root, "services/search-path-for-schema/scripts/search-path-for-schema.mjs"),
 });
