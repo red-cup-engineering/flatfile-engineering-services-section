@@ -187,3 +187,88 @@ export function admitArtifactFabricationRealizationReceipt(specification, candid
     return freeze({ type: "ArtifactFabricationRealizationReceipt", version: 1, artifactId: specification.artifact.id, specificationDigest: specification.specificationDigest, realizations, acceptances, traceability: specification.traceability });
   } catch (error) { return refusal(error, "ArtifactFabricationRealizationReceiptRefusal"); }
 }
+
+/*
+ * The language-neutral work order of an operation (fabrication line stage 2; the code-fabrication
+ * specification of 2026-09-04: a code work order is the meaning-closure, "identity, requirements,
+ * prohibitions, laws, standards, input and output schemas, examples, traceability", and MUST NOT
+ * carry source or tests). An operation closure states what each operation is, what it takes and
+ * returns (JSON Schema), admitted examples as plain data, and exact dependencies named with their
+ * ecosystem. It names no file, export, module system or language: those belong to a binding, so one
+ * order is fabricated in any language the line has a binding for and its examples hold in every one.
+ */
+
+const ECOSYSTEM_VERSION = { npm: /^[0-9]+\.[0-9]+\.[0-9]+$/u, pypi: /^[0-9]+(?:\.[0-9]+)*$/u, racket: /^[0-9]+(?:\.[0-9]+)*$/u, guix: /^[0-9A-Za-z.+-]+$/u };
+const schemaValue = (value, path) => { if (typeof value !== "boolean" && !(record(value) && json(value))) refuse("INVALID_SCHEMA", `${path} must be a JSON Schema (object or boolean)`, path); return value; };
+
+/** Admits a language-neutral operation closure, or returns its refusal. */
+export function admitOperationMeaningClosure(candidate) {
+  try {
+    exact(candidate, ["type", "version", "operations", "examples", "dependencies"], "candidate");
+    if (candidate.type !== "OperationMeaningClosureCandidate" || candidate.version !== 1) refuse("INVALID_CANDIDATE", "candidate must be OperationMeaningClosureCandidate@1", "candidate");
+    if (!Array.isArray(candidate.operations) || candidate.operations.length === 0) refuse("MISSING_OPERATIONS", "operations must name at least one operation", "operations");
+    const names = new Set();
+    const operations = candidate.operations.map((item, index) => {
+      const path = `operations[${index}]`; exact(item, ["name", "description", "inputSchema", "outputSchema"], path);
+      const name = id(item.name, `${path}.name`); if (names.has(name)) refuse("DUPLICATE_OPERATION", `operations repeat ${name}`, path); names.add(name);
+      return { name, description: text(item.description, `${path}.description`), inputSchema: schemaValue(item.inputSchema, `${path}.inputSchema`), outputSchema: schemaValue(item.outputSchema, `${path}.outputSchema`) };
+    });
+    if (!Array.isArray(candidate.examples) || candidate.examples.length === 0) refuse("MISSING_EXAMPLES", "examples must admit at least one example", "examples");
+    const exampleNames = new Set(); const exemplified = new Set();
+    const examples = candidate.examples.map((item, index) => {
+      const path = `examples[${index}]`; exact(item, ["name", "operation", "input", "output"], path);
+      const name = id(item.name, `${path}.name`); if (exampleNames.has(name)) refuse("DUPLICATE_EXAMPLE", `examples repeat ${name}`, path); exampleNames.add(name);
+      if (!names.has(item.operation)) refuse("UNKNOWN_OPERATION", `${path} names an unknown operation`, path); exemplified.add(item.operation);
+      if (!json(item.input) || !json(item.output)) refuse("INVALID_EXAMPLE", `${path} input and output must be JSON data`, path);
+      return { name, operation: item.operation, input: item.input, output: item.output };
+    });
+    const unexemplified = operations.find(({ name }) => !exemplified.has(name)); if (unexemplified) refuse("UNEXEMPLIFIED_OPERATION", `operation ${unexemplified.name} has no admitted example`, "examples");
+    if (!Array.isArray(candidate.dependencies)) refuse("INVALID_DEPENDENCIES", "dependencies must be an array", "dependencies");
+    const seen = new Set();
+    const dependencies = candidate.dependencies.map((item, index) => {
+      const path = `dependencies[${index}]`; exact(item, ["ecosystem", "name", "version"], path);
+      const pattern = ECOSYSTEM_VERSION[item.ecosystem]; if (!pattern) refuse("UNKNOWN_ECOSYSTEM", `${path}.ecosystem must be one of ${Object.keys(ECOSYSTEM_VERSION).join(", ")}`, path);
+      const name = text(item.name, `${path}.name`); if (typeof item.version !== "string" || !pattern.test(item.version)) refuse("INEXACT_DEPENDENCY", `${path}.version must be an exact ${item.ecosystem} version`, path);
+      const key = `${item.ecosystem}:${name}`; if (seen.has(key)) refuse("DUPLICATE_DEPENDENCY", `dependencies repeat ${key}`, path); seen.add(key);
+      return { ecosystem: item.ecosystem, name, version: item.version };
+    }).sort((a, b) => `${a.ecosystem}:${a.name}`.localeCompare(`${b.ecosystem}:${b.name}`));
+    const admitted = { type: "OperationMeaningClosure", version: 1, operations, examples, dependencies };
+    admitted.closureDigest = semanticId(admitted);
+    return freeze(admitted);
+  } catch (error) { return refusal(error, "OperationMeaningClosureRefusal"); }
+}
+
+const words = (name) => name.split("-");
+const camel = (name) => words(name).map((word, index) => (index === 0 ? word : word[0].toUpperCase() + word.slice(1))).join("");
+const snake = (name) => words(name).join("_");
+
+/** How each language the line binds names an operation's home and symbol, and which ecosystem it resolves dependencies in. */
+export const OPERATION_LANGUAGE_BINDINGS = freeze({
+  "javascript-node": { ecosystem: "npm", entry: (name) => ({ module: `src/${name}.mjs`, symbol: camel(name) }) },
+  racket: { ecosystem: "racket", entry: (name) => ({ module: `${name}.rkt`, symbol: name }) },
+  guile: { ecosystem: "guix", entry: (name, unit) => ({ module: `(${unit} ${name})`, symbol: name }) },
+  python: { ecosystem: "pypi", entry: (name, unit) => ({ module: `src/${snake(unit)}/${snake(name)}.py`, symbol: snake(name) }) },
+});
+
+/**
+ * Bind an admitted operation closure to one language: each operation gains its module and symbol by
+ * that language's convention, and only dependencies of that language's ecosystem are carried. A
+ * dependency of another ecosystem cannot be resolved there, so binding refuses rather than drops it.
+ * `unit` is the package or library name a module-qualified language nests under. The examples and
+ * schemas are carried unchanged: the same order is assayed by the same data in every binding.
+ */
+export function bindOperationMeaningClosure(closure, language, { unit } = {}) {
+  try {
+    if (!record(closure) || closure.type !== "OperationMeaningClosure" || closure.version !== 1 || typeof closure.closureDigest !== "string") refuse("INVALID_CLOSURE", "closure must be an admitted OperationMeaningClosure@1", "closure");
+    const binding = OPERATION_LANGUAGE_BINDINGS[language]; if (!binding) refuse("UNKNOWN_LANGUAGE", `language must be one of ${Object.keys(OPERATION_LANGUAGE_BINDINGS).join(", ")}`, "language");
+    if (["guile", "python"].includes(language)) id(unit, "unit");
+    const foreign = closure.dependencies.find((item) => item.ecosystem !== binding.ecosystem);
+    if (foreign) refuse("FOREIGN_DEPENDENCY", `${foreign.ecosystem}:${foreign.name} cannot be resolved by a ${language} binding`, "dependencies");
+    return freeze({
+      type: "BoundOperationMeaningClosure", version: 1, language, closureDigest: closure.closureDigest,
+      operations: closure.operations.map((operation) => ({ ...operation, ...binding.entry(operation.name, unit) })),
+      examples: closure.examples,
+      dependencies: Object.fromEntries(closure.dependencies.map(({ name, version }) => [name, version])),
+    });
+  } catch (error) { return refusal(error, "BoundOperationMeaningClosureRefusal"); }
+}
