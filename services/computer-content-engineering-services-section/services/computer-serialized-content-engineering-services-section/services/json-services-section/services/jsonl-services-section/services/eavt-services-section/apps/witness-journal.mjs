@@ -11,7 +11,7 @@ import { journalPath } from "../scripts/journal-path.mjs";
 import { readEavtEntries } from "../scripts/read-eavt-entries.mjs";
 import { writeEavtEntries } from "../scripts/write-eavt-entries.mjs";
 import { readEavtJournal } from "../scripts/read-eavt-journal.mjs";
-import { readJsonlAtPath } from "../../../src/index.mjs";
+import { readJsonlAtPath } from "@red-cup-engineering/jsonl-services-section";
 import { latestState } from "../scripts/latest-state.mjs";
 import { situationWindow } from "../scripts/situation-window.mjs";
 import { readEavtState } from "../scripts/read-eavt-state.mjs";
