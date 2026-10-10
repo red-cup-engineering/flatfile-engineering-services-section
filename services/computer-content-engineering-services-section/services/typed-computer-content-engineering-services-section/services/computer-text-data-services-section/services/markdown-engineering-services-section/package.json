@@ -156,7 +156,7 @@
     "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/toml-file-codec-service": "workspace:*",
-    "@red-cup-engineering/toml-services-section": "0.1.0"
+    "@red-cup-engineering/toml-services-section": "workspace:*"
   },
   "files": [
     "src",

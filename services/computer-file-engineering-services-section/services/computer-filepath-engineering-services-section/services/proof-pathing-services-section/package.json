@@ -19,7 +19,7 @@
     "verify": "npm run check && npm test"
   },
   "dependencies": {
-    "@red-cup-engineering/proof-path-structuration-service": "0.1.0",
+    "@red-cup-engineering/proof-path-structuration-service": "workspace:*",
     "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
     "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*"
   }

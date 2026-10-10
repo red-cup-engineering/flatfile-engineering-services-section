@@ -402,10 +402,10 @@
   ],
   "sideEffects": false,
   "dependencies": {
-    "@red-cup-engineering/computer-content-engineering-services-section": "0.1.0",
+    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
     "@red-cup-engineering/eavt-services-section": "workspace:*",
-    "@red-cup-engineering/json-services-section": "1.0.0",
-    "@red-cup-engineering/computer-data-engineering-services-section": "0.1.0",
+    "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/exact-number-data-service": "workspace:*"
   },
   "scripts": {
