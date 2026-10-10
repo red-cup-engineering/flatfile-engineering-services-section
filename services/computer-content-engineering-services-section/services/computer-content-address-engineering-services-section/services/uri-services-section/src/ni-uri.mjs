@@ -2,6 +2,7 @@
 // validates the narrow `ni:///sha-256;<base64url-digest>` content-identity URI
 // that every house content address is written in.
 import { sha256Bytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-sha256";
+import { decodeJsonByteCarrier } from "@red-cup-engineering/json-services-section/json-byte-carrier";
 
 function base64url(bytes) {
   let text = "";
@@ -91,7 +92,10 @@ export function makeNiUriService(request) {
   if (request.algorithm !== undefined && request.algorithm !== "sha-256") {
     throw new TypeError(`unsupported ni URI algorithm ${JSON.stringify(request.algorithm)}; only sha-256 is available`);
   }
-  const bytes = hasBytes ? Buffer.from(request.bytesBase64, "base64") : Buffer.from(request.text, "utf8");
+  if (hasText && !request.text.isWellFormed()) throw new TypeError("text must be well-formed Unicode");
+  const bytes = hasBytes
+    ? Uint8Array.from(decodeJsonByteCarrier({carrier:{mediaType:"application/octet-stream",contentBase64:request.bytesBase64}}).bytes)
+    : new TextEncoder().encode(request.text);
   return { uri: makeNiUri(bytes) };
 }
 

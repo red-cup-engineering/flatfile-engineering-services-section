@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.561.group/computer/csl-projection.schema.json",
+  "title": "CSL projection",
+  "description": "How one source record's JSON becomes a CSL-JSON item: each key is a CSL variable and each value a rule that reads the source record. A source's projection is data, so a new bibliographic source needs a projection, not a script.",
+  "type": "object",
+  "propertyNames": { "type": "string", "minLength": 1 },
+  "additionalProperties": { "$ref": "#/$defs/rule" },
+  "$defs": {
+    "path": {
+      "description": "A dot path into the source record. A segment ending in [] maps the rest of the path over an array, so the rule reads an array.",
+      "type": "string",
+      "minLength": 1
+    },
+    "rule": {
+      "anyOf": [
+        { "$ref": "#/$defs/path" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "path": { "$ref": "#/$defs/path" },
+            "value": { "description": "A constant, for a variable every record of the source shares." },
+            "template": { "description": "A string with {path} holes; it yields nothing when any hole reads nothing.", "type": "string", "minLength": 1 },
+            "first": { "description": "The first rule that yields a value.", "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/rule" } },
+            "as": {
+              "description": "The CSL value kind the read value becomes.",
+              "enum": ["text", "title", "names", "date", "year", "doi", "type", "join"]
+            },
+            "family": { "description": "names: the key of a name record's family name.", "type": "string" },
+            "given": { "description": "names: the key of a name record's given name.", "type": "string" },
+            "literal": { "description": "names: the key of a name record's literal name.", "type": "string" },
+            "initials": { "description": "names: display strings read as \"Family AB\", family then initials.", "type": "boolean" },
+            "split": { "description": "names, type: the separator a single display string is split on.", "type": "string" },
+            "aliases": {
+              "description": "type: the source's own type words, lowercased, as CSL types.",
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            },
+            "prefer": { "description": "type: CSL types chosen first when any of the source's words alias to them.", "type": "array", "items": { "type": "string" } },
+            "separator": { "description": "join: the separator between the unique values.", "type": "string" }
+          }
+        }
+      ]
+    }
+  }
+}

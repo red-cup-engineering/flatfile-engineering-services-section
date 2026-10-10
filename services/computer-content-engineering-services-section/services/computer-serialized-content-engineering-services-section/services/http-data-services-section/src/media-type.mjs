@@ -1,3 +1,4 @@
+import { mimeTypeEssence } from "../../../src/mime-type.mjs";
 const EXT_TYPES = {
     mmd: "text/vnd.mermaid", mermaid: "text/vnd.mermaid",
     puml: "text/x-plantuml", plantuml: "text/x-plantuml",
@@ -55,10 +56,10 @@ export function extensionType(path, table = EXT_TYPES) {
 }
 /** The first extension the table gives a media type (parameters ignored), or "bin". */
 export function typeExtension(type, table = EXT_TYPES) {
-    const essence = type.split(";")[0].trim().toLowerCase();
+    const essence = mimeTypeEssence(type);
     return Object.keys(table).find((extension)=>table[extension] === essence) ?? "bin";
 }
 export function isCompressible(type) {
-    const t = type.split(";")[0]?.trim().toLowerCase() ?? "";
+    const t = mimeTypeEssence(type) ?? "";
     return t.startsWith("text/") || t.endsWith("+json") || t.endsWith("+xml") || t === "application/json" || t === "application/jsonl" || t === "application/xml" || t === "application/javascript" || t === "text/javascript" || t === "image/svg+xml" || t === "application/atom+xml" || t === "application/rss+xml" || t === "text/turtle" || t === "application/n-quads" || t === "application/wasm";
 }

@@ -55,6 +55,13 @@ date builder. They are gone; this is the one.
   schema.org citation projection, house-record/CSL projection, and citekey
   minting. Markdown and bibliography consume these functions rather than
   carrying renderers or a second CSL adapter.
+- `src/csl-projection.mjs` — `projectCslItem(record, projection)`: any
+  source record to a CSL-JSON item by a *CSL projection*, data admitted
+  against `src/csl-projection.schema.json` that names, per CSL variable, the
+  path it is read from and the CSL value kind it becomes (text, title, names,
+  date, year, doi, type with the source's own alias table, or a joined list),
+  with constants, `{path}` templates and first-of fallbacks. A new
+  bibliographic source is a projection, not a script.
 - `scripts/project-openalex-work-csl.mjs`,
   `scripts/project-pubmed-summary-csl.mjs`,
   `scripts/project-crossref-work-csl.mjs` — one bibliographic source's
