@@ -11,7 +11,7 @@
     "@red-cup-engineering/semantic-content-identify-service": "0.2.2",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/eavt": "workspace:*",
+    "@red-cup-engineering/eavt-services-section": "workspace:*",
     "@red-cup-engineering/uri-services-section": "0.1.0",
     "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.0"
   },

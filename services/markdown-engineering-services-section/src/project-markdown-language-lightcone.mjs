@@ -15,7 +15,7 @@
  *
  */
 import { confineExistingPath } from "@red-cup-engineering/computer-filepath-engineering-services-section/filepath";
-import { readFileText } from "@red-cup-engineering/file-services/read-file";
+import { readFileText } from "@red-cup-engineering/computer-file-engineering-services-section/read-file";
 import { resolve } from "node:path";
 import { readFlagValue, readRepeatedFlagValues } from "@red-cup-engineering/computer-text-content-engineering-services-section/read-flag-token-values";
 import {

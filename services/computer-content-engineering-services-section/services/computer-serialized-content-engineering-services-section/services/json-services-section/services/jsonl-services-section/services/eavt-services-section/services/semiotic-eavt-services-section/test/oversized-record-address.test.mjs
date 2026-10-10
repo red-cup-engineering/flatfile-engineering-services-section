@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { EAVT_ADDRESS_KEY_BYTES, eavtAddress, eavtId, eavtKey } from "@red-cup-engineering/eavt/row";
+import { EAVT_ADDRESS_KEY_BYTES, eavtAddress, eavtId, eavtKey } from "@red-cup-engineering/eavt-services-section/row";
 import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
 import { createSemanticRecordJournal } from "../src/record-semantic-record.mjs";
 import { journalWitness, parseJournalWitness } from "../src/journal/event.mjs";

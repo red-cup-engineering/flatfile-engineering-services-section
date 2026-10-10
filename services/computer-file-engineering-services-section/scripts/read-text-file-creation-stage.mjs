@@ -8,9 +8,9 @@
 // jsnode-package-services-section inlines for its own freshly minted stage directories.
 import { lstat, readdir } from "node:fs/promises";
 import path from "node:path";
-import { readFileText } from "@red-cup-engineering/file-services/read-file";
+import { readFileText } from "@red-cup-engineering/computer-file-engineering-services-section/read-file";
 import { serializeLines } from "@red-cup-engineering/jsonl-services-section";
-import { admitTextFileCreationProjectionSet } from "@red-cup-engineering/file-services/admit-text-file-creation-projection-set";
+import { admitTextFileCreationProjectionSet } from "@red-cup-engineering/computer-file-engineering-services-section/admit-text-file-creation-projection-set";
 import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 
 class StageReadRefusal extends Error {

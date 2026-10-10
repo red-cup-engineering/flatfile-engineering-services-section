@@ -25,6 +25,6 @@
     "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/eavt": "workspace:*"
+    "@red-cup-engineering/eavt-services-section": "workspace:*"
   }
 }

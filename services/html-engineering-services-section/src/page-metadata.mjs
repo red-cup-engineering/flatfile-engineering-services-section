@@ -5,7 +5,7 @@
  * JSON-LD from the RDF section's schema-org). Every page renderer that writes
  * `og:` or `twitter:` tags writes them through `socialMetaTags`.
  */
-import { ArticleSchema } from "@red-cup-engineering/articles-services-section/article";
+import { ArticleSchema } from "@red-cup-engineering/computer-article-engineering-services-section/article";
 import { escapeAttr } from "@red-cup-engineering/html-structural-projection-service";
 import {
   articleToArticleJsonLd,
@@ -15,7 +15,7 @@ import {
   renderJsonLdScript,
   websiteContextToWebSiteJsonLd,
 
-} from "@red-cup-engineering/rdf-data-model-services-section/schema-org";
+} from "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section/schema-org";
 
 function firstNonEmpty(...values) {
   for (const value of values) {

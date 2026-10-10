@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readCarrierInput } from "node:fs";
-import { readEavtJournal, iterateEavtJournalThroughDate } from "@red-cup-engineering/eavt/read-eavt-journal";
+import { readEavtJournal, iterateEavtJournalThroughDate } from "@red-cup-engineering/eavt-services-section/read-eavt-journal";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 export const inputSchema = {
   type: "object",

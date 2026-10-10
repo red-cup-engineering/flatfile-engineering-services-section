@@ -1,5 +1,5 @@
 {
-  "name": "@red-cup-engineering/datom",
+  "name": "@red-cup-engineering/datom-services-section",
   "version": "0.1.0",
   "type": "module",
   "exports": {
@@ -28,7 +28,7 @@
   "dependencies": {
     "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
     "@red-cup-engineering/jsonl-services-section": "workspace:*",
-    "@red-cup-engineering/eavt": "workspace:*",
+    "@red-cup-engineering/eavt-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*"
   },

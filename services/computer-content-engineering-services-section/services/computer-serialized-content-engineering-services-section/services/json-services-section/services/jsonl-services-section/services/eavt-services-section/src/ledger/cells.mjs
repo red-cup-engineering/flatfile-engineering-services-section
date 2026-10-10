@@ -1,4 +1,4 @@
-import { eavtRecord } from "@red-cup-engineering/eavt/row";
+import { eavtRecord } from "@red-cup-engineering/eavt-services-section/row";
 // holography/projecting/cells — the grain-of-change EAVT cell DSL.
 //
 // A witness is an EAVT `[entity, attribute, value, time]`: at `time`, the cell

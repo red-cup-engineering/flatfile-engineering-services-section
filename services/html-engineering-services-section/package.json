@@ -8,13 +8,13 @@
     "README.md"
   ],
   "dependencies": {
-    "@red-cup-engineering/articles-services-section": "workspace:*",
+    "@red-cup-engineering/computer-article-engineering-services-section": "workspace:*",
     "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/css-services-section": "workspace:*",
     "@red-cup-engineering/html-structural-projection-service": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/markdown-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/rdf-data-model-services-section": "workspace:*"
+    "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section": "workspace:*"
   },
   "exports": {
     "./html-document-render": "./src/html-document-render.mjs",

@@ -4,7 +4,7 @@ import { canonicalize } from "./identity.mjs";
 import { getRecord } from "./record-store.mjs";
 import { TIER_B_RECORD_TYPES, validateRecord } from "./record-types.mjs";
 import { validateWitness } from "./witness.mjs";
-import { readEavtJournal } from "@red-cup-engineering/eavt/read-eavt-journal";
+import { readEavtJournal } from "@red-cup-engineering/eavt-services-section/read-eavt-journal";
 import { FOUR, four, joinKnowledgeWire } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 // Deterministic replay: fold the append-only event log into in-memory

@@ -1,4 +1,4 @@
-import { writeFileText } from "@red-cup-engineering/file-services/write-file";
+import { writeFileText } from "@red-cup-engineering/computer-file-engineering-services-section/write-file";
 
 export async function writeTextFile({ path, text } = {}) {
   if (typeof path !== "string" || path.length === 0) throw new TypeError("path must be a nonempty string");

@@ -15,7 +15,7 @@ import { seavtRow } from "./admit-seavt-row.mjs";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 import { journalWitness, parseJournalWitness } from "./journal/event.mjs";
 import { addressArtifact, isArtifactRef, verifyArtifact } from "./identity/index.mjs";
-import { eavtAddress, toEavt } from "@red-cup-engineering/eavt/row";
+import { eavtAddress, toEavt } from "@red-cup-engineering/eavt-services-section/row";
 
 const EXPECTED_ENVELOPE = Object.freeze({
   maxSourceBytes: 1048576,

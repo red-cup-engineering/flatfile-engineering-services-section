@@ -21,7 +21,7 @@
  *
  * `projectStateView` remains the designated lens on that settlement.
  */
-import { canonicalStatementValue } from "@red-cup-engineering/eavt/statement";
+import { canonicalStatementValue } from "@red-cup-engineering/eavt-services-section/statement";
 import { mark } from "@red-cup-engineering/signcell/utterance";
 import { closeOrdinalProcess, closureProcess, closureReadout, stabilizingSup } from "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/closure";
 

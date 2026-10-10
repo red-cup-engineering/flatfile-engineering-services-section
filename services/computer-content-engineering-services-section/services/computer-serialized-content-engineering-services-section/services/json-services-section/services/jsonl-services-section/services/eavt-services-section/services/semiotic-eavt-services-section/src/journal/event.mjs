@@ -19,7 +19,7 @@ import {
   checkTy,
 } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { eavtAddress } from "@red-cup-engineering/eavt/row";
+import { eavtAddress } from "@red-cup-engineering/eavt-services-section/row";
 import { isCausalWitness } from "./judgment.mjs";
 import { addressWitnessCore } from "./witness.mjs";
 

@@ -1,6 +1,6 @@
 # Serialization package source receiving
 
-This restores the authentic `@red-cup-engineering/computer-data-serialization-services-section`
+This restores the authentic `@red-cup-engineering/computer-serialized-content-engineering-services-section`
 package, version `0.1.0`, within the existing Computer Data content hierarchy:
 `services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section`.
 It is distinct from the `@red-cup-engineering/serialized-data-services-section`

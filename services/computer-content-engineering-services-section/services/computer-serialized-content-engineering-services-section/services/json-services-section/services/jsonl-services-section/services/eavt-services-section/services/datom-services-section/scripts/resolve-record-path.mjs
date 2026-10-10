@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readInput } from "node:fs";
-import { journalPath } from "@red-cup-engineering/eavt/journal-path";
+import { journalPath } from "@red-cup-engineering/eavt-services-section/journal-path";
 export { default as inputSchema } from "../schemas/resolve-record-path.input.schema.json" with { type: "json" };
 export { default as outputSchema } from "../schemas/resolve-record-path.output.schema.json" with { type: "json" };
 export function recordPathFor({ root, feed, at }) {

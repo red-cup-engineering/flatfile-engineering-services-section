@@ -9,8 +9,8 @@ import { closeSync, openSync, readFileSync, readSync, statSync, writeFileSync } 
 import { verifyContentFile } from "./file-content-custody.mjs";
 import { relative, resolve, sep } from "node:path";
 import { walkPosixPathsSync } from "@red-cup-engineering/computer-filepath-engineering-services-section/walk-posix-paths";
-import { writeFileBytesSync } from "@red-cup-engineering/file-services/write-file";
-import { extensionType } from "@red-cup-engineering/computer-data-serialization-services-section/services/http-data-services-section/src/media-type";
+import { writeFileBytesSync } from "@red-cup-engineering/computer-file-engineering-services-section/write-file";
+import { extensionType } from "@red-cup-engineering/computer-serialized-content-engineering-services-section/services/http-data-services-section/src/media-type";
 
 const missing = (error) => error?.code === "ENOENT";
 

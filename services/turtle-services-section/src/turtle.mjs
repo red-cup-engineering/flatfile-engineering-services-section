@@ -12,7 +12,7 @@
  * `parseTurtle` back to itself; `parseTurtle` rejects any line outside that
  * exact grammar rather than guessing at a richer one.
  */
-import { assertTriple } from "@red-cup-engineering/eavt/triple";
+import { assertTriple } from "@red-cup-engineering/eavt-services-section/triple";
 
 /** Write an IRI as a Turtle IRIREF `<...>`. */
 export function iriRef(iri) {

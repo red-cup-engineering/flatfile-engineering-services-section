@@ -1,6 +1,6 @@
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
-import {writeFileTextSync} from '@red-cup-engineering/file-services/write-file';
+import {writeFileTextSync} from '@red-cup-engineering/computer-file-engineering-services-section/write-file';
 import {immutableContentKey} from './immutable-content-custody.mjs';
 const KIND='content-reference.frontier.v1';
 const address=id=>{if(id!==null)immutableContentKey(id);return id;};

@@ -3,14 +3,14 @@ import { readFileSync as readCarrierInput } from "node:fs";
 import { readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { canonicalJson } from "@red-cup-engineering/json-services-section";
-import { dataArtifactAddress } from "@red-cup-engineering/eavt/data-artifact-address";
+import { dataArtifactAddress } from "@red-cup-engineering/eavt-services-section/data-artifact-address";
 import {
   EMPTY_WITNESS_ROOT,
   identifyJsonSemanticContent,
 } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
 import { termToJson } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { readEavtEntriesSince } from "@red-cup-engineering/eavt/read-eavt-entries";
+import { readEavtEntriesSince } from "@red-cup-engineering/eavt-services-section/read-eavt-entries";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 import { journalDirectoryOf } from "./journal/store-root.mjs";
 import { cacheBudgetFromEnvironment, projectSegmentStatements, readingCache } from "./journal/filesystem/segment-store.mjs";

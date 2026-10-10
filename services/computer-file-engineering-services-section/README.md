@@ -1,6 +1,6 @@
 # Computer file engineering services section
 
-`@red-cup-engineering/file-services` is the canonical physical-file operation
+`@red-cup-engineering/computer-file-engineering-services-section` is the canonical physical-file operation
 package: it reads bytes or UTF-8 text, atomically writes bytes or UTF-8 text,
 and searches explicit file carriers. Its commands are `read-file`, `write-file`,
 `search-file`, and `search-files`.

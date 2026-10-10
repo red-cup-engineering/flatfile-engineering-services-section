@@ -6,8 +6,8 @@
  *
  * @packageDocumentation
  */
-import { articleContract } from "@red-cup-engineering/articles-services-section/article";
-import { pageContract } from "@red-cup-engineering/articles-services-section/page";
+import { articleContract } from "@red-cup-engineering/computer-article-engineering-services-section/article";
+import { pageContract } from "@red-cup-engineering/computer-article-engineering-services-section/page";
 
 export const SCHEMA_ORG_CONTEXT = "https://schema.org";
 export const ARTICLE_TYPE = "Article";

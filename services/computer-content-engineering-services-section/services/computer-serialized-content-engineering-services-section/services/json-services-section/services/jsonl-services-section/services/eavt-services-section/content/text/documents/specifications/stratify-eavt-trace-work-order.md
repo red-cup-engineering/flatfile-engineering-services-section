@@ -1,14 +1,14 @@
 # stratify-eavt-trace
 ## Requirements
-- `derives-three-levels`: The operation returns `{entity, asserted, saturated, settled, closure}` for `request.subject` over `request.rows`: Level 0 `asserted` (the subject's raw deduped rows), Level 1 `saturated` (the subject's retraction-closed rows), Level 2 `settled` (`@red-cup-engineering/eavt`'s own settled-fiber shape), plus `closure` (the fold-pass counts and derived regime).
+- `derives-three-levels`: The operation returns `{entity, asserted, saturated, settled, closure}` for `request.subject` over `request.rows`: Level 0 `asserted` (the subject's raw deduped rows), Level 1 `saturated` (the subject's retraction-closed rows), Level 2 `settled` (`@red-cup-engineering/eavt-services-section`'s own settled-fiber shape), plus `closure` (the fold-pass counts and derived regime).
 - `canonical-composition-order`: The operation composes σ then Δ (`settled = transfer(saturate(rows))`) — two separate passes, never one lumped fold — reproducing `fold`/`settle`'s own output for the subject exactly.
-- `composes-eavt-stratify`: The operation delegates the whole three-level derivation to `@red-cup-engineering/eavt`'s own `stratify` export; it never re-derives saturation, transfer, or closure classification itself.
+- `composes-eavt-stratify`: The operation delegates the whole three-level derivation to `@red-cup-engineering/eavt-services-section`'s own `stratify` export; it never re-derives saturation, transfer, or closure classification itself.
 - `pure-operation`: The operation performs no filesystem or network access; it reads only the `subject`, `rows`, and optional `retract`/`converse` fields of its request.
 ## Prohibitions
 - `missing-fields-refusal`: The operation must refuse (throw `TypeError`) a request whose `subject` is not a non-empty string, or whose `rows` is not an array.
-- `no-second-stratification`: The operation must not compute saturation, transfer, or a closure ordinal/regime itself, nor call any stratification export other than `@red-cup-engineering/eavt`'s own `stratify`.
+- `no-second-stratification`: The operation must not compute saturation, transfer, or a closure ordinal/regime itself, nor call any stratification export other than `@red-cup-engineering/eavt-services-section`'s own `stratify`.
 ## Laws
-- `primitives-exist-once` | 561 Group working discipline | 2026-08-30 | CLAUDE.md | Applies to this operation's own stratification step. | The three-level derived reading (asserted/saturated/settled) lives once, in `@red-cup-engineering/eavt`; this operation composes that export by exact pin rather than reimplementing it.
+- `primitives-exist-once` | 561 Group working discipline | 2026-08-30 | CLAUDE.md | Applies to this operation's own stratification step. | The three-level derived reading (asserted/saturated/settled) lives once, in `@red-cup-engineering/eavt-services-section`; this operation composes that export by exact pin rather than reimplementing it.
 - `braided-tower-stratification` | 561 Group org layering, EAVT custody | 2026-08-30, 2026-04-04, 2026-04-06 | .claude/rules/org-layering.md | Applies to this whole operation source file. | A row's stratum is a derived reading of the trace, never a stored field; Level 0 asserted / Level 1 saturated = Fix(σ) / Level 2 settled = Fix(σ) ∩ Fix(Δ) are distinct strata never stored indistinguishably — this operation is the one export exposing all three at once.
 - `fabricate-do-not-hand-write` | 561 Group working discipline, dispatch-agents skill | 2026-09-04 | .claude/skills/dispatch-agents/SKILL.md | Applies to this whole operation source file. | The operation is born through the jsnode fabrication line from this work order, never hand-written.
 ## Standards
@@ -17,15 +17,15 @@
 none
 ## Package
 ```json
-{"packageName":"@red-cup-engineering/stratify-eavt-trace-service","packageVersion":"0.1.0","license":"MIT","dependencies":{"@red-cup-engineering/eavt":"0.8.0"},"devDependencies":{}}
+{"packageName":"@red-cup-engineering/stratify-eavt-trace-service","packageVersion":"0.1.0","license":"MIT","dependencies":{"@red-cup-engineering/eavt-services-section":"0.8.0"},"devDependencies":{}}
 ```
 ## Operation
 ```mjs path=scripts/stratify-eavt-trace.mjs
 #!/usr/bin/env node
-import { stratify } from "@red-cup-engineering/eavt";
+import { stratify } from "@red-cup-engineering/eavt-services-section";
 
 /**
- * Derives the braided-tower three-level reading of one subject over an {e,a,v,t} trace, composing @red-cup-engineering/eavt's own stratify for the whole Level 0/1/2 derivation.
+ * Derives the braided-tower three-level reading of one subject over an {e,a,v,t} trace, composing @red-cup-engineering/eavt-services-section's own stratify for the whole Level 0/1/2 derivation.
  * @param {object} request A record with `subject` (the entity to stratify), `rows` (an {e,a,v,t} row array, any order, the whole trace, not pre-filtered), and optional `retract` (passed to saturation) and `converse` (passed to transfer) exactly as eavt's own fold/settle accept them.
  * @returns {object} `{entity, asserted, saturated, settled, closure}` — asserted (Level 0), saturated (Level 1), settled (Level 2, eavt's own fold shape), and closure (the fold-pass counts, their max, and the derived regime name).
  * @throws {TypeError} When subject is not a non-empty string, rows is not an array, or a row is non-conformant.
@@ -42,7 +42,7 @@ export function stratifyEavtTrace(request) {
 if (import.meta.main) {
   if (process.argv.includes("--help")) {
     process.stdout.write(
-      "stratifyEavtTrace — Derives the braided-tower three-level reading of one subject over an {e,a,v,t} trace, composing @red-cup-engineering/eavt's own stratify for the whole Level 0/1/2 derivation.\n",
+      "stratifyEavtTrace — Derives the braided-tower three-level reading of one subject over an {e,a,v,t} trace, composing @red-cup-engineering/eavt-services-section's own stratify for the whole Level 0/1/2 derivation.\n",
     );
   } else {
     let text = "";

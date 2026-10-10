@@ -13,7 +13,7 @@
  */
 import { iriRef, isIriTerm, predicateNamespace, subjectIri, vocabularyNamespace } from "@red-cup-engineering/turtle-services-section/turtle";
 
-import { assertTriple } from "@red-cup-engineering/eavt/triple";
+import { assertTriple } from "@red-cup-engineering/eavt-services-section/triple";
 
 export { iriRef };
 

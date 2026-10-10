@@ -10,7 +10,7 @@ import { createReadStream, createWriteStream } from "node:fs";
 import { mkdir, mkdtemp, rename, rm, stat } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { once } from "node:events";
-import { nquadLine } from "@red-cup-engineering/rdf-data-model-services-section/n-quads";
+import { nquadLine } from "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section/n-quads";
 
 const NI = /^ni:\/\/\/sha-256;[A-Za-z0-9_-]{43}$/u;
 const XSD_INTEGER = "http://www.w3.org/2001/XMLSchema#integer";

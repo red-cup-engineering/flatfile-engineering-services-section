@@ -1,6 +1,6 @@
 import { canonical } from "@red-cup-engineering/json-services-section";
-import { serializeNQuads } from "@red-cup-engineering/rdf-data-model-services-section/n-quads";
-import { canonicalizeNQuads } from "@red-cup-engineering/rdf-data-model-services-section/rdf-canonicalization";
+import { serializeNQuads } from "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section/n-quads";
+import { canonicalizeNQuads } from "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section/rdf-canonicalization";
 import {
   EMPTY_WITNESS_ROOT,
   identifyBytesSemanticContent,

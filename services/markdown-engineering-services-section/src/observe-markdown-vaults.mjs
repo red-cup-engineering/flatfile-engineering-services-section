@@ -14,7 +14,7 @@
  */
 import { confineExistingPath, confinePath } from "@red-cup-engineering/computer-filepath-engineering-services-section/filepath";
 import { spawnSync } from "node:child_process";
-import { readFileText } from "@red-cup-engineering/file-services/read-file";
+import { readFileText } from "@red-cup-engineering/computer-file-engineering-services-section/read-file";
 import { resolve } from "node:path";
 import { readFlagValue } from "@red-cup-engineering/computer-text-content-engineering-services-section/read-flag-token-values";
 

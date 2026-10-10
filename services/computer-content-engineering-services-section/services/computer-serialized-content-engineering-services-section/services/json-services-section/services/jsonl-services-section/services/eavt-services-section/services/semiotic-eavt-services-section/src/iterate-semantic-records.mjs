@@ -12,7 +12,7 @@
  */
 import { statSync } from "node:fs";
 import { resolve } from "node:path";
-import { dataArtifactAddress } from "@red-cup-engineering/eavt/data-artifact-address";
+import { dataArtifactAddress } from "@red-cup-engineering/eavt-services-section/data-artifact-address";
 
 import { journalDirectoryOf } from "./journal/store-root.mjs";
 import { projectSegmentStatements, segmentPath } from "./journal/filesystem/segment-store.mjs";

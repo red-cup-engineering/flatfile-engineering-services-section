@@ -6,7 +6,7 @@
  */
 
 import { htmlElement, htmlFragment } from "@red-cup-engineering/html-structural-projection-service/document-nodes";
-import { pageToWebPageJsonLd, renderJsonLdScript } from "@red-cup-engineering/rdf-data-model-services-section/schema-org";
+import { pageToWebPageJsonLd, renderJsonLdScript } from "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section/schema-org";
 import { renderMarkdownBlockHtml } from "@red-cup-engineering/markdown-engineering-services-section/render-markdown-block-html";
 import { renderStaticWebsiteHtmlPresentation, staticWebsiteBodyAttributes } from "./static-page.mjs";
 

@@ -11,7 +11,7 @@ import { headingSlug } from '@red-cup-engineering/computer-text-content-engineer
 import { parseCitationItems, formatCitationLabel, formatReferenceEntry } from '@red-cup-engineering/csl-json-services-section/record-formatting';
 import { readMarkdownFrontmatter } from './read-markdown-frontmatter.mjs';
 import { niUriContentType, niUriName, niWellKnownPath } from '@red-cup-engineering/uri-services-section/ni-uri';
-import { extensionType } from '@red-cup-engineering/computer-data-serialization-services-section/services/http-data-services-section/src/media-type';
+import { extensionType } from '@red-cup-engineering/computer-serialized-content-engineering-services-section/services/http-data-services-section/src/media-type';
 
 // ---------- front matter ----------
 

@@ -19,7 +19,7 @@ import {
   readingDescriptorSchema,
 } from "./reading-schema.mjs";
 import { canonical } from "@red-cup-engineering/json-services-section";
-import { eavtRecord } from "@red-cup-engineering/eavt/row";
+import { eavtRecord } from "@red-cup-engineering/eavt-services-section/row";
 export {
   coherenceReportCarrier,
   coherenceReportSchema,

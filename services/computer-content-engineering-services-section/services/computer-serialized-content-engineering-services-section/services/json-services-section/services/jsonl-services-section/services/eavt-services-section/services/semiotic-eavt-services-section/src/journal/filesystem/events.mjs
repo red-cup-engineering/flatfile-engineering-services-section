@@ -9,7 +9,7 @@ import { requireJsonValue } from "@red-cup-engineering/json-services-section";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { journalWitness } from "../event.mjs";
 import { artifactStoreRoot } from "../store-root.mjs";
-import { toEavt, eavtAddress, eavtRecord, parse as parseEavt } from "@red-cup-engineering/eavt/row";
+import { toEavt, eavtAddress, eavtRecord, parse as parseEavt } from "@red-cup-engineering/eavt-services-section/row";
 
 const CAUSAL_ADMISSION_INDEX_VERSION = 1;
 

@@ -18,7 +18,7 @@ import { isPathname } from "@red-cup-engineering/computer-filepath-engineering-s
  */
 import { define,                               } from "@red-cup-engineering/computer-content-engineering-services-section/typed-resource-classification";
 import { mark, utterance,                       } from "@red-cup-engineering/signcell/utterance";
-import { eavtRecord } from "@red-cup-engineering/eavt/row";
+import { eavtRecord } from "@red-cup-engineering/eavt-services-section/row";
 
 function asJsonValue(value         , context        )            {
   if (value === null || typeof value === "boolean" || typeof value === "string") return value;

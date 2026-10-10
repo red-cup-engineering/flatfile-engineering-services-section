@@ -10,7 +10,7 @@
  *  path-building from path-resolution. Derive; never restate. */
 import path from "node:path";
 
-import { artifactTier } from "@red-cup-engineering/eavt/statement";
+import { artifactTier } from "@red-cup-engineering/eavt-services-section/statement";
 
 /** The log tier's POSIX path segment under a settlement root — the directory
  *  holding the journal's content-addressed `objects/`, its causal-admission

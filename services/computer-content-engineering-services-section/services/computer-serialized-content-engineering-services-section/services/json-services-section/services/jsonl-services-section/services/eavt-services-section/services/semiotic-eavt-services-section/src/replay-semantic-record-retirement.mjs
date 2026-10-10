@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { appendSeavtEntries } from "./append-seavt-entries.mjs";
 import { inventorySemanticRecordRetirement } from "./inventory-semantic-record-retirement.mjs";
-import { writeFileBytesSync } from "@red-cup-engineering/file-services/write-file";
+import { writeFileBytesSync } from "@red-cup-engineering/computer-file-engineering-services-section/write-file";
 import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 const digest = (bytes) =>
     sha256Digest(bytes),

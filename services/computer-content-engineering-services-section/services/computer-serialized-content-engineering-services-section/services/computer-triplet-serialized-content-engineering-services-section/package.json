@@ -1,5 +1,5 @@
 {
-  "name": "@red-cup-engineering/rdf-data-model-services-section",
+  "name": "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section",
   "version": "0.1.0",
   "type": "module",
   "description": "Holds RDF triplet terms and named graphs together with their serialization, canonicalization, query, and ontology-projection services.",
@@ -15,8 +15,8 @@
     "./reading-rdf": "./scripts/reading-rdf.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/articles-services-section": "workspace:*",
-    "@red-cup-engineering/eavt": "workspace:*",
+    "@red-cup-engineering/computer-article-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/eavt-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/turtle-services-section": "workspace:*",
     "rdf-canonize": "5.0.0"

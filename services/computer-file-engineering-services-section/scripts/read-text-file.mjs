@@ -1,4 +1,4 @@
-import { readFileText } from "@red-cup-engineering/file-services/read-file";
+import { readFileText } from "@red-cup-engineering/computer-file-engineering-services-section/read-file";
 import { resolve } from "node:path";
 
 export async function readTextFile({ path } = {}) {
