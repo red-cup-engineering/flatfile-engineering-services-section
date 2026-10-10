@@ -389,16 +389,58 @@ function carryV2Lines(storeRoot, offsets, budget = Infinity) {
   return { offsets: next, done, through };
 }
 
-function rebuildFromSegments(storeRoot) {
+// The segments of a root being rebuilt, listed once per process (relative, in the order a rebuild takes them):
+// a feed created later is admitted into its buckets directly, so the list need not grow.
+const rebuildLists = new Map();
+function rebuildList(storeRoot) {
+  let list = rebuildLists.get(storeRoot);
+  if (list === undefined) rebuildLists.set(storeRoot, list = segmentFilesUnder(storeRoot).map((segment) => path.relative(storeRoot, segment)));
+  return list;
+}
+const rebuildIndex = (list, after) => { const at = after === undefined ? 0 : list.findIndex((relative) => relative > after); return at < 0 ? list.length : at; };
+
+/** One step of rebuilding a root that has no index at all from its segments: whole segments, in order, after
+ *  `after`, until `budget` bytes of them are rebuilt (a segment larger than the budget takes a step of its own).
+ *  Returns the last segment rebuilt and whether none is left. */
+function rebuildFromSegments(storeRoot, after, budget = Infinity) {
   const writer = carryWriter();
-  for (const segment of segmentFilesUnder(storeRoot)) {
+  const list = rebuildList(storeRoot);
+  let at = rebuildIndex(list, after), left = budget, through = after;
+  for (; at < list.length; at += 1) {
+    const segment = path.join(storeRoot, list[at]);
+    let size;
+    try { size = fs.statSync(segment).size; } catch (error) { if (error.code !== "ENOENT") throw error; through = list[at]; continue; }
+    if (left < budget && size > left) break;
     const logPath = logPathOfSegment(segment);
     const log = path.relative(storeRoot, logPath);
     for (const statement of readSegmentFile(segment).statements) writer.line(locatedBucketFile(storeRoot, "admitted", statement.id), { id: statement.id, log });
-    writer.line(ledgerPath(logPath), { end: fs.statSync(segment).size, rebuilt: true });
+    writer.line(ledgerPath(logPath), { end: size, rebuilt: true });
+    left -= size;
+    through = list[at];
   }
   writer.close();
+  return { through, done: at >= list.length };
 }
+
+/** The witnesses of the segments a rebuild has not reached, read into a root's remainder (read only). */
+function segmentFacts(storeRoot, remainder, after) {
+  const list = rebuildList(storeRoot);
+  for (let at = rebuildIndex(list, after); at < list.length; at += 1) {
+    const segment = path.join(storeRoot, list[at]);
+    let statements;
+    try { ({ statements } = readSegmentFile(segment)); } catch (error) { if (error.code === "ENOENT") continue; throw error; }
+    const log = path.relative(storeRoot, logPathOfSegment(segment));
+    for (const statement of statements) {
+      const held = remainder.admitted.get(statement.id);
+      if (held === undefined) remainder.admitted.set(statement.id, log);
+      else if (typeof held === "string") { if (held !== log) remainder.admitted.set(statement.id, new Set([held, log])); }
+      else held.add(log);
+    }
+  }
+}
+
+/** A root with no v2 index that is still to be rebuilt from its segments (no marker yet, or one mid-rebuild). */
+const rebuilding = (marker, sizes) => !hasV2(sizes) && (marker === undefined || marker.rebuilt !== undefined);
 
 const v2Sizes = (storeRoot) => Object.fromEntries(V2_NAMES.map((name) => {
   try { return [name, fs.statSync(v2File(storeRoot, name)).size]; } catch { return [name, -1]; }
@@ -430,10 +472,12 @@ function carryStep(storeRoot, budget) {
   try {
     const current = readMarker(storeRoot);
     if (carriedThrough(current, sizes)) return "located";
-    if (current === undefined && !hasV2(sizes)) {
-      rebuildFromSegments(storeRoot);
-      writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: {} });
-      return "located";
+    if (rebuilding(current, sizes)) {
+      // `rebuilt` names the last segment rebuilt while the rebuild is unfinished; the next step resumes after it.
+      const { through, done } = rebuildFromSegments(storeRoot, current?.rebuilt, budget);
+      writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: {}, ...(done ? {} : { rebuilt: through ?? "", complete: false }) });
+      if (done) { rebuildLists.delete(storeRoot); return "located"; }
+      return through === current?.rebuilt ? "stalled" : "progress";
     }
     const { offsets, done, through } = carryV2Lines(storeRoot, current?.carried ?? {}, budget);
     // `through` names a file carried to a partial final line, at the size it had: the root is located until
@@ -530,7 +574,7 @@ function scheduleCarry(storeRoot) {
  * Make a root's located index answer for what earlier layouts hold, without carrying on the question path:
  * a located root answers from its buckets; an unfinished carry answers from its buckets and the uncarried v2
  * remainder, while the carry continues in bounded steps. A root with no index at all is rebuilt from its
- * segments (no v2 to answer from in the meantime).
+ * segments in bounded steps the same way, answering meanwhile from the segments not yet rebuilt.
  */
 function carryV2(storeRoot) {
   const sizes = v2Sizes(storeRoot), state = carried.get(storeRoot);
@@ -541,7 +585,18 @@ function carryV2(storeRoot) {
     remainders.delete(storeRoot);
     return;
   }
-  if (marker === undefined && !hasV2(sizes)) { carryLocatedIndex(storeRoot); return; }
+  if (rebuilding(marker, sizes)) {
+    // Answered from the buckets and the segments the rebuild has not reached, read once; the rebuild runs in
+    // steps off the question path. Marked, so a writer does not mark the root located before it is rebuilt.
+    if (!remainders.has(storeRoot)) {
+      const remainder = { offsets: {}, kinds: new Map(LOCATED_KINDS.map((kind) => [kind, new Map()])), admitted: new Map(), logs: new Map() };
+      segmentFacts(storeRoot, remainder, marker?.rebuilt);
+      remainders.set(storeRoot, remainder);
+    }
+    carried.set(storeRoot, { sizes, located: false, marked: true });
+    scheduleCarry(storeRoot);
+    return;
+  }
   let remainder = remainders.get(storeRoot);
   if (remainder === undefined) {
     remainder = { offsets: { ...(marker?.carried ?? {}) }, kinds: new Map(LOCATED_KINDS.map((kind) => [kind, new Map()])), admitted: new Map(), logs: new Map() };
@@ -559,29 +614,43 @@ export function locatedIndexState(storeRoot) {
   if (carriedThrough(marker, sizes)) return Object.freeze({ state: "located" });
   if (marker === undefined && !hasV2(sizes)) return Object.freeze({ state: segmentFilesUnder(storeRoot).length === 0 ? "located" : "carrying" });
   const error = carryErrors.get(storeRoot);
-  return Object.freeze({ state: "carrying", carried: Object.freeze({ ...(marker?.carried ?? {}) }), sizes: Object.freeze(sizes), ...(error ? { error } : {}) });
+  return Object.freeze({ state: "carrying", carried: Object.freeze({ ...(marker?.carried ?? {}) }), sizes: Object.freeze(sizes),
+    ...(marker?.rebuilt !== undefined ? { rebuilt: marker.rebuilt } : {}), ...(error ? { error } : {}) });
 }
 
-/** Store roots below `root`: directories holding a v2 causal-admission index (day directories hold witness
- *  segments, never a store root; symbolic links and node_modules are not followed). */
-export function v2StoreRoots(root, depth = 8) {
+const UNWALKED = new Set(["node_modules", ".git"]);
+const journalDirectory = (directory) => path.basename(directory) === ".metroplat-journal"
+  || (path.basename(directory) === "journals" && path.basename(path.dirname(directory)) === "data");
+
+/** Journal stores below `root`: directories holding a v2 causal-admission index, and every `data/journals` and
+ *  `.metroplat-journal` directory (the roots `artifactStoreRoot` yields). A store with a v2 index is not walked
+ *  further; a journal directory without one is walked for stores below it, past its content objects, its index
+ *  and its day directories. Symbolic links, node_modules and .git are not followed. */
+export function journalStoreRoots(root, depth = 10) {
   const found = [];
   const visit = (directory, left) => {
+    const journal = journalDirectory(directory);
+    if (fs.existsSync(indexDirectory(directory))) { found.push(directory); return; }
+    if (journal) found.push(directory);
+    if (left === 0) return;
     let entries;
     try { entries = fs.readdirSync(directory, { withFileTypes: true }); } catch { return; }
-    if (fs.existsSync(indexDirectory(directory))) { found.push(directory); return; }
-    if (left === 0) return;
     for (const entry of entries) {
-      if (entry.isDirectory() && !entry.isSymbolicLink() && entry.name !== "node_modules" && !/^\d{2,4}$/u.test(entry.name)) visit(path.join(directory, entry.name), left - 1);
+      if (!entry.isDirectory() || entry.isSymbolicLink() || UNWALKED.has(entry.name) || /^\d{2,4}$/u.test(entry.name)) continue;
+      if (journal && (entry.name === "objects" || entry.name === "index")) continue;
+      visit(path.join(directory, entry.name), left - 1);
     }
   };
   visit(root, depth);
   return found.sort();
 }
 
-/** Prepare every v2 store root below `root` at boot (`prepareLocatedIndex`), returning each one's state. */
-export function prepareLocatedIndexesUnder(root, { depth = 8 } = {}) {
-  return Object.freeze(v2StoreRoots(root, depth).map((storeRoot) => Object.freeze({ storeRoot, ...prepareLocatedIndex(storeRoot) })));
+/** Store roots below `root` holding a v2 causal-admission index. */
+export const v2StoreRoots = (root, depth = 10) => journalStoreRoots(root, depth).filter((storeRoot) => fs.existsSync(indexDirectory(storeRoot)));
+
+/** Prepare every journal store below `root` at boot (`prepareLocatedIndex`), returning each one's state. */
+export function prepareLocatedIndexesUnder(root, { depth = 10 } = {}) {
+  return Object.freeze(journalStoreRoots(root, depth).map((storeRoot) => Object.freeze({ storeRoot, ...prepareLocatedIndex(storeRoot) })));
 }
 
 /** Start a root's carry in the background at boot, before any question, and return its state. A service calls
@@ -678,6 +747,7 @@ export function clearSegmentIndexes() {
   carried.clear();
   remainders.clear();
   carryErrors.clear();
+  rebuildLists.clear();
   bucketCache.clear();
   dayListings.clear();
   segments.clear();
