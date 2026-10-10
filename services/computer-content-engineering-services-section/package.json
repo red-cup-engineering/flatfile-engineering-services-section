@@ -24,13 +24,37 @@
     "./receipt-sen": "./src/receipt-sen.mjs",
     "./signed-export-receipt": "./src/signed-export-receipt.mjs",
     "./signed-content-claim": "./src/signed-content-claim.mjs",
-    "./package.json": "./package.json",
     "./json-projector": "./src/json-projector.mjs",
     "./text-projector": "./src/text-projector.mjs",
     "./jupyter/codec": "./src/jupyter/codec.mjs",
-    "./jupyter/schema": "./src/jupyter/schema.mjs"
+    "./jupyter/schema": "./src/jupyter/schema.mjs",
+    "./dataset-store": "./src/dataset-store.mjs",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs"
-  }
+  },
+  "x-capability-recovery": [
+    {
+      "capability": "typed-resource-classification",
+      "source": "@red-cup-engineering/typed-resource-catalog",
+      "owner": "./src/typed-resource-classification.mjs"
+    },
+    {
+      "capability": "canonical-relational-dataset-custody",
+      "source": "content-addressed-dataset-store-service",
+      "owner": "./src/dataset-store.mjs",
+      "provenance": "./provenance/dataset-custody-recovery.json"
+    },
+    {
+      "capability": "semantic-content-identity",
+      "source": "@red-cup-engineering/semantic-content-identify-service",
+      "owner": "./src/semiotic-content-address/semantic-content-identity.mjs"
+    },
+    {
+      "capability": "immutable-network-byte-custody",
+      "source": "@red-cup-engineering/immutable-content-custody-service",
+      "owner": "@red-cup-engineering/immutable-content-custody-service"
+    }
+  ]
 }

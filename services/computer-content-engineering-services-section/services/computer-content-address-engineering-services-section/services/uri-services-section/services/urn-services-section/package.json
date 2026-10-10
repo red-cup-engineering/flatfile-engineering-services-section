@@ -1,0 +1,14 @@
+{
+  "name": "@red-cup-engineering/urn-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Groups the firm's RFC 8141 Uniform Resource Name services: admission of a surface string into its NID/NSS/r-component/q-component/f-component parts, rendering admitted parts back into a URN string, and RFC 8141 URN-equivalence of two URNs. Generic and RFC-faithful only; carries no firm-specific naming semantics.",
+  "exports": {
+    "./urn-admission-service": "./scripts/urn-admission-service.mjs",
+    "./urn-equivalence-service": "./scripts/urn-equivalence-service.mjs",
+    "./urn-rendering-service": "./scripts/urn-rendering-service.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

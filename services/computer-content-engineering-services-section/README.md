@@ -49,3 +49,9 @@ Under addressing, URI, and NI, `immutable-content-custody-service` retains exact
 NI-addressed bytes only through an injected object-store capability. The documents subtree records
 path-relative operational receipts without turning a file path into byte
 identity. Provider output is content, not truth or governance authority.
+
+`dataset-store` (`./dataset-store`) is the canonical relational dataset custody
+recovered from the retired file-data section: a content-addressed store of
+canonical JSON datasets whose provenance is recorded in
+`provenance/dataset-custody-recovery.json`. `content-tree-reading-service`
+reads a content tree.
