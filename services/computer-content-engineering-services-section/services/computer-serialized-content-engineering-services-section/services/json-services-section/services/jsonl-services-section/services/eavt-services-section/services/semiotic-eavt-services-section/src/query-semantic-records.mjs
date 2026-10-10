@@ -13,7 +13,7 @@ import { tm } from "@red-cup-engineering/computer-data-engineering-services-sect
 import { readEavtEntriesSince } from "@red-cup-engineering/eavt/read-eavt-entries";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 import { journalDirectoryOf } from "./journal/store-root.mjs";
-import { projectSegmentStatements, readingCache } from "./journal/filesystem/segment-store.mjs";
+import { cacheBudgetFromEnvironment, projectSegmentStatements, readingCache } from "./journal/filesystem/segment-store.mjs";
 
 /** The feed every semantic record was appended to before records were journal witnesses. */
 const LEGACY_FEED = "witness-journal-seavt";
@@ -89,10 +89,10 @@ function journalRecords(root, kind, categories) {
  * than every historical row (some carry whole signed roadmaps) on every read. The
  * readings are disposable and bounded by the heap their records are estimated to
  * hold, so a long-lived process over a large or growing set of feeds keeps at most
- * `legacyReadingLimits.heap` of them; an evicted feed is parsed again on its next
- * query. Keys name one category each, so queries over overlapping category sets
+ * `legacyReadingLimits.heap` of them (SEAVT_READING_CACHE_BYTES, a byte count or `unbounded`); an
+ * evicted feed is parsed again on its next query. Keys name one category each, so queries over overlapping category sets
  * share readings instead of each holding its own copy. */
-export const legacyReadingLimits = { heap: 32 * 1024 * 1024, entries: 4096 };
+export const legacyReadingLimits = { heap: cacheBudgetFromEnvironment("SEAVT_READING_CACHE_BYTES", 32 * 1024 * 1024), entries: 4096 };
 const LEGACY_DECODED_FACTOR = 3;
 const LEGACY_RECORD_HEAP = 200;
 let legacyReadings = readingCache(legacyReadingLimits.heap, legacyReadingLimits.entries);
