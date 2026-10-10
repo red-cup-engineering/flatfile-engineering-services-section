@@ -1,6 +1,6 @@
 /** The crossings between exact numbers and the host: exact audit strings and native floating point
  *  (lossy, read only). Decimal strings are decimal-string's; host-integer lifts are exact-number's. */
-import { rationalParts, toBigInt, toNumber as rationalToNumber } from "./exact-number.mjs";
+import { rationalParts, toBigInt, toNumber as rationalToNumber } from "@red-cup-engineering/exact-number-data-service/exact-number";
 
 /** A rational read as a native floating-point value (lossy). */
 export const toNumber = rationalToNumber;

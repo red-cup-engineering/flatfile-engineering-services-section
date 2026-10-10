@@ -9,7 +9,8 @@
     "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
     "@red-cup-engineering/json-schema-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
-    "@red-cup-engineering/uri-services-section": "workspace:*"
+    "@red-cup-engineering/uri-services-section": "workspace:*",
+    "@red-cup-engineering/exact-number-data-service": "workspace:*"
   },
   "exports": {
     "./closure-regime": "./src/closure-regime.mjs",
@@ -32,13 +33,9 @@
     "./artifact-fabrication": "./src/artifact-fabrication.mjs",
     "./media/audio": "./src/media/audio.mjs",
     "./media/raster": "./src/media/raster.mjs",
-    "./number/exact-number": "./src/number/exact-number.mjs",
     "./number/exact-number-host": "./src/number/exact-number-host.mjs",
-    "./number/deterministic-math": "./src/number/deterministic-math.mjs",
     "./number/decimal-string": "./src/number/decimal-string.mjs",
     "./number/graded": "./src/number/graded.mjs",
-    "./number/quadratic": "./src/number/quadratic.mjs",
-    "./number/rational-matrix": "./src/number/rational-matrix.mjs",
     "./package.json": "./package.json"
   },
   "name": "@red-cup-engineering/computer-data-engineering-services-section",

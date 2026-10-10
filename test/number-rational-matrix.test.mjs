@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ratMatrix, ratNullity, ratRank } from "../src/number/rational-matrix.mjs";
+import { ratMatrix, ratNullity, ratRank } from "@red-cup-engineering/exact-number-data-service/rational-matrix";
 
 test("ratRank: integer, rational and carrier entries", () => {
   assert.equal(ratRank([]), 0);
