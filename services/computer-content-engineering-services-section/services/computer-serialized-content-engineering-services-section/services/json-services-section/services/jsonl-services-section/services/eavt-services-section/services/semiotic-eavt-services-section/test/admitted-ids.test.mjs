@@ -10,7 +10,7 @@ import { tm } from "@red-cup-engineering/computer-data-engineering-services-sect
 import { journalWitness } from "../src/journal/event.mjs";
 import { artifactStoreRoot } from "../src/journal/store-root.mjs";
 import {
-  clearSegmentIndexes, indexDirectory, ledgerPath, locatedAddressOf, locatedBucketFile, locatedBucketPath, locatedIndex,
+  carryLocatedIndex, clearSegmentIndexes, indexDirectory, ledgerPath, locatedAddressOf, locatedBucketFile, locatedBucketPath, locatedIndex,
   locatedIndexDirectory, segmentAdmit, segmentAdmittedLogs, segmentPath, segmentState, segmentStatements, segmentWitness,
 } from "../src/journal/filesystem/segment-store.mjs";
 
@@ -89,6 +89,8 @@ test("a v2 root is carried into buckets once, and v2 lines written later are car
     assert.deepEqual([...index.admittedLogs(first.id)], [relative]);
     assert.equal(index.isAdmitted(second.id), false, "only what v2 recorded is carried");
     assert.equal(index.isBlocked(blocked), true);
+    // The questions above were answered from the uncarried v2 lines; the carry itself writes the ledger.
+    assert.equal(carryLocatedIndex(storeRoot), "located");
     assert.ok(existsSync(ledgerPath(log)));
     appendFileSync(join(indexDirectory(storeRoot), "admitted.jsonl"), `${JSON.stringify({ id: second.id, log: relative })}\n`);
     assert.equal(segmentState(log, second.id), "admitted", "a later v2 line is carried");
@@ -122,6 +124,10 @@ function indexGrowth(count) {
     const fd = openSync(join(indexDirectory(storeRoot), "admitted.jsonl"), "w");
     for (let n = 0; n < count; n += 1) writeSync(fd, `{"id":"${address(n)}","log":"${relative}"}\n`);
     closeSync(fd);
+    clearSegmentIndexes();
+    // Measured on a located root: while a carry is unfinished, the uncarried v2 lines are held as the v2
+    // store held them, and released when the carry completes.
+    carryLocatedIndex(storeRoot);
     clearSegmentIndexes();
     gc(); gc();
     const before = process.memoryUsage();
