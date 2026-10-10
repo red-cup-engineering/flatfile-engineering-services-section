@@ -777,9 +777,11 @@ function deferredPendingEntry(id, log, sourceRefs, location) {
  * to hold, not by the bytes of the files they were read from: a decoded witness costs about twice
  * its line (a segment's cache measured 1.7x its file) and a typed projection about three times its
  * JSON, plus an id string for every witness it has seen. A reading dearer than the whole budget is
- * not kept; the next read decodes it again from the flat file.
+ * not kept; the next read decodes it again from the flat file. An unbounded budget (`Infinity`)
+ * holds every reading and evicts none, whatever `maximumEntries` says.
  */
 export function readingCache(budget, maximumEntries = 4096) {
+  if (budget === Infinity) maximumEntries = Infinity;
   const held = new Map();
   let total = 0;
   const cache = {
@@ -803,9 +805,24 @@ export function readingCache(budget, maximumEntries = 4096) {
   return cache;
 }
 
-const SEGMENT_CACHE_HEAP = 4 * 1024 * 1024;
+/**
+ * A reading-cache budget in bytes, from `environment[name]`: a non-negative integer, or `unbounded`
+ * (hold every reading, as the readers did before they were bounded); `fallback` when unset or empty.
+ * Any other value throws, naming the variable, so a misconfigured process stops at start-up.
+ */
+export function cacheBudgetFromEnvironment(name, fallback, environment = process.env) {
+  const raw = environment[name];
+  if (raw === undefined || raw.trim() === "") return fallback;
+  const value = raw.trim();
+  if (value === "unbounded") return Infinity;
+  if (!/^\d+$/u.test(value) || !Number.isSafeInteger(Number(value)))
+    throw new RangeError(`${name} must be a byte count or "unbounded", not ${JSON.stringify(raw)}`);
+  return Number(value);
+}
+
+const SEGMENT_CACHE_HEAP = cacheBudgetFromEnvironment("SEAVT_SEGMENT_CACHE_BYTES", 4 * 1024 * 1024);
 const SEGMENT_DECODED_FACTOR = 2;
-const PROJECTION_CACHE_HEAP = 6 * 1024 * 1024;
+const PROJECTION_CACHE_HEAP = cacheBudgetFromEnvironment("SEAVT_PROJECTION_CACHE_BYTES", 6 * 1024 * 1024);
 const PROJECTION_DECODED_FACTOR = 3;
 const PROJECTED_ID_HEAP = 100;
 const segments = readingCache(SEGMENT_CACHE_HEAP);
