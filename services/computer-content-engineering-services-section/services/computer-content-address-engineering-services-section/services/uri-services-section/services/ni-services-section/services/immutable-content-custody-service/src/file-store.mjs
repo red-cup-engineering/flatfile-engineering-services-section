@@ -50,7 +50,7 @@ export function createPathContent(pathOf, mediaTypeOf = extensionType) {
   });
 }
 
-export function createFileStore(root) {
+export function createFileStoreSync(root) {
   if (typeof root !== "string" || root.trim() === "") throw new TypeError("a file store needs its root directory named explicitly");
   const base = resolve(root, "objects");
   const pathOf = (key) => {
@@ -64,33 +64,47 @@ export function createFileStore(root) {
   };
   return Object.freeze({
     root: resolve(root),
-    async putCurrent(key, { body, mediaType = "application/octet-stream" }) {
+    putIfAbsent(key, { body, mediaType = "application/octet-stream" }) {
+      const path = pathOf(key);
+      try { writeFileBytesSync(path, Buffer.from(body), { flag: "wx", mode: 0o600 }); }
+      catch (error) { if (error?.code === "EEXIST") return Object.freeze({ conflict: true }); throw error; }
+      writeFileSync(path + ".media-type", mediaType + "\n", { mode: 0o600 });
+      return Object.freeze({ conflict: false });
+    },
+    putCurrent(key, { body, mediaType = "application/octet-stream" }) {
       const path = pathOf(key);
       writeFileBytesSync(path, Buffer.from(body));
       writeFileSync(`${path}.media-type`, `${mediaType}\n`);
       return Object.freeze({ conflict: false });
     },
-    async get(key) {
+    get(key) {
       const path = pathOf(key);
       let body;
       try { body = readFileSync(path); } catch (error) { if (missing(error)) return null; throw error; }
       return Object.freeze({ body, mediaType: mediaTypeOf(path) });
     },
-    async head(key) {
+    head(key) {
       const path = pathOf(key);
       let stat;
       try { stat = statSync(path); } catch (error) { if (missing(error)) return null; throw error; }
       return stat.isFile() ? Object.freeze({ size: stat.size, mediaType: mediaTypeOf(path), lastModified: stat.mtime }) : null;
     },
     /** Bytes start through end (inclusive) of one object, or null when it is absent. */
-    async read(key, range) {
+    read(key, range) {
       return readRange(pathOf(key), range);
     },
-    async list(prefix = "", continuationToken) {
+    list(prefix = "", continuationToken) {
       if (continuationToken !== undefined) throw new Error("a file store lists in one page and takes no continuation token");
       const files = walkPosixPathsSync({ root: base, missing: "empty", paths: "absolute", result: "paths", symlinks: "skip", includeFile: ({ name }) => !name.endsWith(".media-type") && !name.startsWith(".") }).files;
       const keys = files.map((path) => relative(base, path).split(sep).join("/")).filter((key) => key.startsWith(prefix)).sort();
       return Object.freeze({ keys: Object.freeze(keys), continuationToken: undefined });
     },
   });
+}
+
+/** Promise-shaped callers share exactly the synchronous byte-store implementation. */
+export function createFileStore(root) {
+  const store = createFileStoreSync(root);
+  return Object.freeze(Object.fromEntries(Object.entries(store).map(([key, value]) =>
+    [key, typeof value === "function" ? async (...args) => value(...args) : value])));
 }
