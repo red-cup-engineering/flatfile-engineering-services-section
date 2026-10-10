@@ -37,3 +37,14 @@ test("the single-stream profile refuses corruption, truncation, trailing input, 
   await assert.rejects(compressContent({ format: "gzip", carrier: { mediaType: "text/plain", contentBase64: "AB==" } }), TypeError);
   await assert.rejects(compressContent({ format: "constructor", carrier: carrier([]) }), TypeError);
 });
+
+test("one raw deflate stream or one gzip member is the whole input: whatever follows it is refused", async () => {
+  const named = Buffer.concat([Buffer.from([0x1f, 0x8b, 8, 8 | 16 | 4, 0, 0, 0, 0, 0, 3, 2, 0, 0x41, 0x42]), Buffer.from("n\0c\0"), gzipSync("abc").subarray(10)]);
+  for (const [format, valid] of [["deflate-raw", deflateRawSync(Buffer.from("abc"))], ["gzip", gzipSync("abc")], ["gzip", named]]) {
+    const decoded = await decompressContent({ format, carrier: carrier(valid) });
+    assert.equal(Buffer.from(decoded.carrier.contentBase64, "base64").toString(), "abc");
+    for (const tail of [Buffer.of(1), Buffer.of(0), valid]) {
+      await assert.rejects(decompressContent({ format, carrier: carrier(Buffer.concat([valid, tail])) }), TypeError);
+    }
+  }
+});
