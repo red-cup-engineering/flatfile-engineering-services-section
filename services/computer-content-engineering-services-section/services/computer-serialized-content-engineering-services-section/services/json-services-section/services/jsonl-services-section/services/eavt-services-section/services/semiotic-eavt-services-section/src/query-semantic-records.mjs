@@ -57,8 +57,9 @@ function datesUnder(directory) {
 }
 
 /** A semantic record is a projection of its verified witness. The query keeps
- * these typed values; repeated board/agency reads need not decode old witnesses. */
-function semanticRecordOf(statement) {
+ * these typed values; repeated board/agency reads need not decode old witnesses.
+ * Every reader of semantic records projects with this one function, so they share a reading. */
+export function semanticRecordOf(statement) {
   const row = statement.observation.payload;
   if (!Array.isArray(row) || row.length !== 4) return undefined;
   const charge = CHARGE_OF_CLAIM.get(canonicalJson(statement.observation.claim));
