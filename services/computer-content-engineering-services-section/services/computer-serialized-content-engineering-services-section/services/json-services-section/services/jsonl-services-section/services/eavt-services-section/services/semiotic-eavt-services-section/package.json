@@ -20,6 +20,7 @@
   "exports": {
     "./admit-seavt-row": "./src/admit-seavt-row.mjs",
     "./admit-semantic-record": "./src/admit-semantic-record.mjs",
+    "./admit-jsonl-once": "./src/admit-jsonl-once.mjs",
     "./command": "./src/command.mjs",
     "./append-seavt-entries": "./src/append-seavt-entries.mjs",
     "./bind-json-template": "./src/bind-json-template.mjs",
