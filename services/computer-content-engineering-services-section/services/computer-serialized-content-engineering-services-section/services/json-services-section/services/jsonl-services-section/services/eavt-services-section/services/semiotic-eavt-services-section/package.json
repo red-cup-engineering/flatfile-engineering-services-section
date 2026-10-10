@@ -39,6 +39,7 @@
     "./term-index": "./src/term-index.mjs",
     "./field-index": "./src/field-index.mjs",
     "./read-semantic-records-since": "./src/read-semantic-records-since.mjs",
+    "./iterate-semantic-records": "./src/iterate-semantic-records.mjs",
     "./identity": "./src/identity/index.mjs",
     "./identity/primitive-articulation": "./src/identity/primitive-articulation.mjs",
     "./identity/site": "./src/identity/site.mjs",

@@ -38,7 +38,7 @@ export const inputSchema = {
 export const outputSchema = { type: "array", items: { type: "object" } };
 
 /** The dated directories (YYYY/MM/DD) under one tier directory, as dates, in order. */
-function datesUnder(directory) {
+export function datesUnder(directory) {
   const dates = [];
   const list = (path, pattern) => {
     try {
