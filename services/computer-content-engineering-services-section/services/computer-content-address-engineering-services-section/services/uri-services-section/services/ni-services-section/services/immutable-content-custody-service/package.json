@@ -12,7 +12,9 @@
   ],
   "exports": {
     ".": "./src/immutable-content-custody.mjs",
-    "./file-store": "./src/file-store.mjs"
+    "./file-store": "./src/file-store.mjs",
+    "./file-content": "./src/file-content-custody.mjs",
+    "./file-reference": "./src/file-content-reference.mjs"
   },
   "files": [
     "src",
