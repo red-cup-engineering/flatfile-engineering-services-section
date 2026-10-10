@@ -17,6 +17,8 @@ import { tmpdir } from "node:os";
 import { join, resolve, dirname, basename } from "node:path";
 import { parseArgs } from "node:util";
 import { createFileContentCustody } from "../src/file-content-custody.mjs";
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 const TREE_MEDIA_TYPE = "application/gzip";
 const TREE_PROFILE = "tar-gnu-sorted-mtime0-owner0-gzip-n";
@@ -68,7 +70,7 @@ export function runCustodyFile(argv) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   try { process.stdout.write(`${JSON.stringify(runCustodyFile(process.argv.slice(2)))}\n`); }
   catch (error) { process.stderr.write(`${JSON.stringify({ kind: "immutable-content-custody-refusal", message: error?.message ?? String(error) })}\n`); process.exitCode = 1; }
 }

@@ -7,6 +7,8 @@
 // say. Append-only belongs to data formats (journals, JSONL logs) only.
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { extname, join } from "node:path";
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 const PATTERNS = Object.freeze([
   { name: "strikethrough", regex: /~~[^~\n]+~~/ },
@@ -90,7 +92,7 @@ export function checkMarkdownRevisionDiscipline(targets) {
   return violations;
 }
 
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   const targets = process.argv.slice(2);
   if (targets.length === 0) {
     process.stderr.write(
