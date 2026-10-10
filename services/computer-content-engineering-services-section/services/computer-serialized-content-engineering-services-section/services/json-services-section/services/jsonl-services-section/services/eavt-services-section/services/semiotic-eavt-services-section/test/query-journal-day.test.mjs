@@ -60,3 +60,16 @@ test("refuses a query without roots or a date", () => {
   assert.throws(() => queryJournalDay({ roots: [], date: "2026-10-10" }), TypeError);
   assert.throws(() => queryJournalDay({ roots: ["/tmp"], date: "10/10/2026" }), TypeError);
 });
+
+test("a settlement store keeps a chain: each record cites the one before it", async (t) => {
+  const { createSettlementStore } = await import("@red-cup-engineering/semiotic-eavt-services-section/record-semantic-record");
+  const root = machine(t, "desk");
+  const store = createSettlementStore({ settlementRoot: root, objectKind: "561-group.test-venue.desk.v1", actor: "enterprise:desk" });
+  const decision = store.record({ category: "decision", recordedAt: "2026-10-10T01:00:00.000Z", record: { type: "Decision", id: "d1" } });
+  const intent = store.record({ category: "order-intent", recordedAt: "2026-10-10T01:00:01.000Z", record: { type: "OrderIntent", decision: "d1" }, causes: [decision.events[0]] });
+  const fill = store.record({ category: "fill", recordedAt: "2026-10-10T01:00:02.000Z", record: { type: "Fill", amountAtomic: "51" }, causes: [intent.events[0]], origin: "machine:cold-red-gate" });
+  const day = queryJournalDay({ roots: [root], date: "2026-10-10" });
+  assert.deepEqual(day.map((entry) => [entry.category, entry.causes]), [["decision", []], ["order-intent", [decision.events[0]]], ["fill", [intent.events[0]]]]);
+  assert.equal(day[2].origin, "machine:cold-red-gate");
+  assert.deepEqual(store.records("fill"), [{ type: "Fill", amountAtomic: "51" }]);
+});
