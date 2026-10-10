@@ -181,15 +181,18 @@ export function createSemanticRecordJournal({ root, objectKind: defaultObjectKin
 /**
  * A settlement store over one journal: an actor's records, each kept under a category and
  * asserted as `actor records <record id or category>`, told for and not against unless the
- * request says otherwise, and read back by category.
+ * request says otherwise, and read back by category. A record may name the events it follows
+ * (`causes`, e.g. a fill citing its order intent) and the seat it is recorded from (`origin`).
  */
 export function createSettlementStore({ settlementRoot, objectKind, actor } = {}) {
   const journal = createSemanticRecordJournal({ root: settlementRoot, objectKind });
   return Object.freeze({
     root: journal.root,
-    record: ({ category, recordedAt, record, told = { for: true, against: false }, relation }) => journal.record({
+    record: ({ category, recordedAt, record, told = { for: true, against: false }, relation, causes, origin }) => journal.record({
       category, recordedAt, record, told,
       relation: relation ?? { subject: actor, predicate: "records", object: record?.id ?? category },
+      ...(causes === undefined ? {} : { causes }),
+      ...(origin === undefined ? {} : { origin }),
     }),
     records: (category) => journal.query({ category }).map((row) => structuredClone(row.record)),
   });
