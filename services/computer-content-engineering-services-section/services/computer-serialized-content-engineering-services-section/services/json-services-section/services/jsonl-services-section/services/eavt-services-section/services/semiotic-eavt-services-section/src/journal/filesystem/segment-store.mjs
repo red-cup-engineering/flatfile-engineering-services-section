@@ -56,9 +56,8 @@ export const segmentPath = (logPath) => `${logPath}${SEGMENT_SUFFIX}`;
 /** A feed's logical handle from its segment path, or undefined. */
 export const logPathOfSegment = (file) => (file.endsWith(`.jsonl${SEGMENT_SUFFIX}`) ? file.slice(0, -SEGMENT_SUFFIX.length) : undefined);
 
-const INDEX_FILES = Object.freeze(["artifacts", "admitted", "blocked", "pending"]);
+/** The v2 causal-admission index, read only to carry it into the located index. */
 export const indexDirectory = (storeRoot) => path.join(storeRoot, "index", "causal-admission", "v2");
-const indexFile = (storeRoot, name) => path.join(indexDirectory(storeRoot), `${name}.jsonl`);
 
 /**
  * Append one canonical JSON line as the file's writer: a crash tail is truncated first, and the line is
@@ -109,240 +108,326 @@ function parseLine(line) {
   }
 }
 
-// ── the root index: admitted, blocked and pending witnesses, and explicit artifacts ──
+// ── the located index: where an admission fact lives is computed from its address ──
+//
+// Every admission fact is a line in a bucket file whose path is computed from the address the fact
+// is about (`ni-path-v1`, semiotic-content-address-system `conformance/ni-path-v1.json`):
+//
+//   <store>/index/causal-admission/v3/<kind>/sha-256/<d0 d1>.jsonl,  d the key's NI digest
+//
+// - `admitted`: `{id, log}` per witness admitted into a feed, in the bucket of `id`;
+// - `blocked`:  `{id, obstruction}`, in the bucket of `id`;
+// - `pending`:  `{id, log, statement, missing}`, a witness received before its causes, in the bucket of `id`;
+// - `waiting`:  `{dependency, id, log}`, the reverse edge a pending witness waits on, in the bucket of `dependency`;
+// - `artifacts`: `{ref, canonicalText}`, an artifact referenced beyond a witness's own sources, in the bucket of `ref`;
+// - `sources`:  `{ref, id, log}`, a source a pending witness carries, in the bucket of `ref`.
+//
+// A key that is not an NI address is located by the NI of its UTF-8 bytes. Beside each feed, its
+// ledger `<feed>.jsonl.admitted` holds `{id, end}` per admission: the segment's size once the
+// witness's line was on disk. A reader asks one bucket or one ledger and opens nothing else; no
+// table from address to location is held in memory or on disk. A process keeps only a small cache
+// of recently read buckets (`LOCATED_CACHE_BYTES`), each re-read from where it left off when the
+// file has grown, so a fact another process wrote is seen at the next question.
+//
+// A root written by the v2 store (`index/causal-admission/v2/*.jsonl`, read whole into memory) is
+// carried into buckets once, streaming, and any lines a v2 writer appends later are carried at the
+// next question (`carryV2`). A root with neither is rebuilt from its segments.
 
-const roots = new Map();
+export const LOCATED_FORMULA = "ni-path-v1";
+export const locatedIndexDirectory = (storeRoot) => path.join(storeRoot, "index", "causal-admission", "v3");
+const LOCATED_KINDS = Object.freeze(["admitted", "blocked", "pending", "waiting", "artifacts", "sources"]);
+const ADDRESS_PREFIX = "ni:///sha-256;";
+const LOCATED_CACHE_BYTES = 4 * 1024 * 1024;
+const LOCATED_CACHE_ENTRIES = 256;
+const CARRY_BUFFER_BYTES = 4 * 1024 * 1024;
+
+/** The NI address a key is located by: its own when it is one, else the NI of its UTF-8 bytes. */
+export function locatedAddressOf(key) {
+  if (typeof key !== "string" || key.length === 0) throw new TypeError("a located key must be nonempty text");
+  if (key.length === ADDRESS_PREFIX.length + 43 && key.startsWith(ADDRESS_PREFIX)) {
+    const text = key.slice(ADDRESS_PREFIX.length);
+    if (Buffer.from(text, "base64url").toString("base64url") === text) return key;
+  }
+  return `${ADDRESS_PREFIX}${createHash("sha256").update(key, "utf8").digest("base64url")}`;
+}
+
+/** `ni-path-v1`: the bucket of a key, relative to a kind's directory (`sha-256/<d0 d1>.jsonl`). */
+export function locatedBucketPath(key) {
+  return `sha-256/${locatedAddressOf(key).slice(ADDRESS_PREFIX.length, ADDRESS_PREFIX.length + 2)}.jsonl`;
+}
+
+/** The bucket file holding a key's `kind` facts in a store. */
+export function locatedBucketFile(storeRoot, kind, key) {
+  if (!LOCATED_KINDS.includes(kind)) throw new TypeError(`unknown located index kind: ${kind}`);
+  return path.join(locatedIndexDirectory(storeRoot), kind, ...locatedBucketPath(key).split("/"));
+}
+
+/** A feed's admission ledger, beside its segment. */
+export const ledgerPath = (logPath) => `${logPath}.admitted`;
+
+const bucketCache = readingCache(LOCATED_CACHE_BYTES, LOCATED_CACHE_ENTRIES);
+
+function applyBucketLine(kind, entries, record, location) {
+  const list = (key) => { let held = entries.get(key); if (held === undefined) { held = []; entries.set(key, held); } return held; };
+  if (kind === "admitted" && typeof record.id === "string" && typeof record.log === "string") {
+    const logs = entries.get(record.id) ?? new Set();
+    logs.add(record.log);
+    entries.set(record.id, logs);
+  } else if (kind === "blocked" && typeof record.id === "string") {
+    if (!entries.has(record.id)) entries.set(record.id, record.obstruction ?? null);
+  } else if (kind === "pending" && typeof record.id === "string" && typeof record.log === "string" && record.statement) {
+    const held = list(record.id);
+    // Pending bodies stay on disk; a reader decodes one only when admission needs it.
+    if (!held.some((entry) => entry.log === record.log)) held.push(deferredPendingEntry(record.id, record.log, (record.statement.sources ?? []).map((source) => source.ref), location));
+  } else if (kind === "waiting" && typeof record.dependency === "string" && typeof record.id === "string" && typeof record.log === "string") {
+    const held = list(record.dependency);
+    if (!held.some((entry) => entry.id === record.id && entry.log === record.log)) held.push(Object.freeze({ id: record.id, log: record.log }));
+  } else if (kind === "artifacts" && typeof record.ref === "string" && typeof record.canonicalText === "string") {
+    if (!entries.has(record.ref)) entries.set(record.ref, record.canonicalText);
+  } else if (kind === "sources" && typeof record.ref === "string" && typeof record.id === "string" && typeof record.log === "string") {
+    const held = list(record.ref);
+    if (!held.some((entry) => entry.id === record.id && entry.log === record.log)) held.push(Object.freeze({ id: record.id, log: record.log }));
+  }
+}
+
+/** One bucket's facts, read from where this process last left it when the file has grown. */
+function readBucket(storeRoot, kind, key) {
+  const file = locatedBucketFile(storeRoot, kind, key);
+  let stat;
+  try { stat = fs.statSync(file); }
+  catch (error) {
+    if (error.code === "ENOENT") { bucketCache.delete(file); return EMPTY_BUCKET; }
+    throw error;
+  }
+  let held = bucketCache.get(file);
+  if (held !== undefined && (held.ino !== stat.ino || stat.size < held.offset)) held = undefined;
+  if (held === undefined) held = { offset: 0, ino: stat.ino, entries: new Map() };
+  if (stat.size > held.offset) {
+    const tail = readTail(file, held.offset, (line, location) => {
+      const record = parseLine(line);
+      if (record !== undefined) applyBucketLine(kind, held.entries, record, location);
+    });
+    held.offset = tail.offset;
+  }
+  // A decoded bucket line costs about three times its bytes.
+  bucketCache.keep(file, held, held.offset * 3);
+  return held.entries;
+}
+const EMPTY_BUCKET = new Map();
+
+/** The last complete `{end}` line of a feed's ledger, or undefined when the feed has none. */
+export function feedLedgerEnd(logPath) {
+  const file = ledgerPath(logPath);
+  let fd;
+  try { fd = fs.openSync(file, "r"); }
+  catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
+  try {
+    const size = fs.fstatSync(fd).size;
+    const chunk = Buffer.alloc(Math.min(size, 64 * 1024));
+    let at = size, text = "";
+    while (at > 0) {
+      const from = Math.max(0, at - chunk.length);
+      const count = fs.readSync(fd, chunk, 0, at - from, from);
+      text = chunk.subarray(0, count).toString("utf8") + text;
+      at = from;
+      const lines = text.split("\n");
+      // The last element follows the last newline: a torn or NUL-padded tail, never a complete line.
+      for (let i = lines.length - 2; i >= (at === 0 ? 0 : 1); i -= 1) {
+        const record = parseLine(lines[i]);
+        if (Number.isSafeInteger(record?.end)) return record.end;
+      }
+    }
+    return undefined;
+  } finally { fs.closeSync(fd); }
+}
+
+/** A feed whose ledger says more was admitted into it than its segment holds has lost witnesses. */
+function checkLedger(logPath, size) {
+  const end = feedLedgerEnd(logPath);
+  if (end !== undefined && size < end) {
+    throw new TypeError(`journal segment ${segmentPath(logPath)} lacks witnesses admitted into it: it holds ${size} of the ${end} bytes its ledger records`);
+  }
+}
+
+// ── carrying a v2 root, or rebuilding a root from its segments ──
+
+const carried = new Map();
+const markerFile = (storeRoot) => path.join(locatedIndexDirectory(storeRoot), "formula.json");
+const v2File = (storeRoot, name) => path.join(indexDirectory(storeRoot), `${name}.jsonl`);
+
+function readMarker(storeRoot) {
+  try { return JSON.parse(fs.readFileSync(markerFile(storeRoot), "utf8")); }
+  catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
+}
+
+function writeMarker(storeRoot, marker) {
+  const file = markerFile(storeRoot);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const temporary = `${file}.${process.pid}.tmp`;
+  fs.writeFileSync(temporary, `${canonicalJson(marker)}\n`);
+  syncFile(temporary);
+  fs.renameSync(temporary, file);
+}
+
+/** Appends grouped by file, flushed when they reach `CARRY_BUFFER_BYTES`: a carry holds no more. */
+function carryWriter() {
+  const pending = new Map(), touched = new Set();
+  let bytes = 0;
+  const flush = () => {
+    for (const [file, lines] of pending) {
+      // The first write of a carry passes through the writer's crash-tail repair; later ones append.
+      if (!touched.has(file)) { fs.mkdirSync(path.dirname(file), { recursive: true }); appendDurably(file, lines.join(""), { sync: false }); }
+      else fs.appendFileSync(file, lines.join(""));
+      touched.add(file);
+    }
+    pending.clear();
+    bytes = 0;
+  };
+  return {
+    line(file, value) {
+      const text = `${canonicalJson(value)}\n`;
+      const lines = pending.get(file) ?? [];
+      lines.push(text);
+      pending.set(file, lines);
+      bytes += text.length;
+      if (bytes >= CARRY_BUFFER_BYTES) flush();
+    },
+    close() { flush(); for (const file of touched) syncFile(file); },
+  };
+}
+
+function writePendingFacts(storeRoot, write, record) {
+  write(locatedBucketFile(storeRoot, "pending", record.id), record);
+  for (const dependency of record.missing ?? []) write(locatedBucketFile(storeRoot, "waiting", dependency), { dependency, id: record.id, log: record.log });
+  for (const source of record.statement.sources ?? []) {
+    if (typeof source?.ref === "string") write(locatedBucketFile(storeRoot, "sources", source.ref), { ref: source.ref, id: record.id, log: record.log });
+  }
+}
+
+/** Carry the v2 index lines after `offsets` into buckets and ledgers; returns the new offsets. */
+function carryV2Lines(storeRoot, offsets) {
+  const writer = carryWriter();
+  const next = { ...offsets };
+  const feeds = new Set();
+  for (const name of ["artifacts", "admitted", "blocked", "pending"]) {
+    const tail = readTail(v2File(storeRoot, name), offsets[name] ?? 0, (line) => {
+      const record = parseLine(line);
+      if (record === undefined) return;
+      if (name === "admitted" && typeof record.id === "string" && typeof record.log === "string") {
+        writer.line(locatedBucketFile(storeRoot, "admitted", record.id), { id: record.id, log: record.log });
+        feeds.add(record.log);
+      } else if (name === "blocked" && typeof record.id === "string") {
+        writer.line(locatedBucketFile(storeRoot, "blocked", record.id), { id: record.id, obstruction: record.obstruction ?? null });
+      } else if (name === "pending" && typeof record.id === "string" && typeof record.log === "string" && record.statement) {
+        writePendingFacts(storeRoot, (file, value) => writer.line(file, value), record);
+      } else if (name === "artifacts" && typeof record.ref === "string" && typeof record.canonicalText === "string") {
+        writer.line(locatedBucketFile(storeRoot, "artifacts", record.ref), { ref: record.ref, canonicalText: record.canonicalText });
+      }
+    });
+    next[name] = tail.offset;
+  }
+  // Each carried feed's ledger records what its segment holds now; a missing segment records a byte
+  // it lacks, so its next read fails closed as the v2 index made it.
+  for (const log of feeds) {
+    let size = 0;
+    try { size = fs.statSync(segmentPath(path.resolve(storeRoot, log))).size; } catch { size = 0; }
+    writer.line(ledgerPath(path.resolve(storeRoot, log)), { carried: "v2", end: Math.max(size, 1) });
+  }
+  writer.close();
+  return next;
+}
+
+function rebuildFromSegments(storeRoot) {
+  const writer = carryWriter();
+  for (const segment of segmentFilesUnder(storeRoot)) {
+    const logPath = logPathOfSegment(segment);
+    const log = path.relative(storeRoot, logPath);
+    for (const statement of readSegmentFile(segment).statements) writer.line(locatedBucketFile(storeRoot, "admitted", statement.id), { id: statement.id, log });
+    writer.line(ledgerPath(logPath), { end: fs.statSync(segment).size, rebuilt: true });
+  }
+  writer.close();
+}
 
 /**
- * The admitted witnesses of a root: which feeds each witness id was admitted into. A root holds
- * hundreds of thousands of them (every RPC witness ever admitted), and a Map of id strings to Sets
- * of log strings cost some 200 MB of a node's heap at boot. A content address is 32 bytes, so the
- * ids are packed into one byte table with an open-addressing hash over it, and feeds are interned
- * to small integers: about 50 bytes a witness, no per-witness object. An id that is not a
- * sha-256 content address (none is admitted today) is kept in an ordinary Map, so behaviour is
- * unchanged for any id.
+ * Make a root's located index current with what earlier layouts hold: carried once from v2 (or
+ * rebuilt from segments), then any v2 lines appended since. A carry in progress in another process
+ * is left to it; one older than ten minutes is taken over.
  */
-const ADDRESS_PREFIX = "ni:///sha-256;";
-const DIGEST_BYTES = 32;
-
-class LogIds {
-  constructor(admitted, log) { this.admitted = admitted; this.log = log; }
-  get size() { return this.admitted.entriesOfLog(this.log).length + (this.admitted.oddOfLog.get(this.log)?.size ?? 0); }
-  has(id) { return this.admitted.admittedInto(id, this.log); }
-  *[Symbol.iterator]() {
-    for (const entry of this.admitted.entriesOfLog(this.log)) yield this.admitted.idOf(entry);
-    yield* this.admitted.oddOfLog.get(this.log) ?? [];
+function carryV2(storeRoot) {
+  let state = carried.get(storeRoot);
+  const v2Size = (() => { try { return fs.statSync(v2File(storeRoot, "admitted")).size; } catch { return -1; } })();
+  if (state !== undefined && state.v2Size === v2Size) return;
+  const marked = state?.marked === true;
+  const marker = readMarker(storeRoot);
+  if (marker !== undefined && v2Size <= (marker.carried?.admitted ?? -1)) { carried.set(storeRoot, { v2Size, marked: true }); return; }
+  if (marker === undefined && v2Size < 0 && segmentFilesUnder(storeRoot).length === 0) { carried.set(storeRoot, { v2Size, marked }); return; }
+  const lock = path.join(locatedIndexDirectory(storeRoot), "carrying.lock");
+  fs.mkdirSync(path.dirname(lock), { recursive: true });
+  try { if (Date.now() - fs.statSync(lock).mtimeMs > 600_000) fs.rmSync(lock, { force: true }); } catch { /* none */ }
+  let handle;
+  try { handle = fs.openSync(lock, "wx"); }
+  catch (error) { if (error.code === "EEXIST") return; throw error; }
+  try {
+    const current = readMarker(storeRoot);
+    if (current === undefined && v2Size < 0) {
+      rebuildFromSegments(storeRoot);
+      writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: {} });
+    } else {
+      const offsets = carryV2Lines(storeRoot, current?.carried ?? {});
+      writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: offsets });
+    }
+    carried.set(storeRoot, { v2Size, marked: true });
+  } finally {
+    fs.closeSync(handle);
+    fs.rmSync(lock, { force: true });
   }
 }
 
-class ByLog {
-  constructor(admitted) { this.admitted = admitted; }
-  get size() { return this.admitted.logNames.length; }
-  get(log) { return this.admitted.logNumbers.has(log) ? new LogIds(this.admitted, log) : undefined; }
-  keys() { return this.admitted.logNames[Symbol.iterator](); }
+/** A writer marks a fresh root as located before its first fact, so no later reader rebuilds it. */
+function markLocated(storeRoot) {
+  if (carried.get(storeRoot)?.marked) return;
+  if (readMarker(storeRoot) === undefined) writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: {} });
+  carried.set(storeRoot, { ...carried.get(storeRoot), marked: true });
 }
 
-export class AdmittedIds {
-  constructor() {
-    this.count = 0;
-    this.capacity = 1024;
-    this.digests = new Uint8Array(this.capacity * DIGEST_BYTES);
-    this.logOf = new Int32Array(this.capacity);
-    this.nextSame = new Int32Array(this.capacity);
-    this.table = new Int32Array(this.capacity * 2).fill(-1);
-    this.logNames = [];
-    this.logNumbers = new Map();
-    this.byLogEntries = [];
-    this.odd = new Map();
-    this.oddOfLog = new Map();
-    this.byLog = new ByLog(this);
-  }
-
-  static digestOf(id) {
-    if (typeof id !== "string" || id.length !== ADDRESS_PREFIX.length + 43 || !id.startsWith(ADDRESS_PREFIX)) return undefined;
-    const text = id.slice(ADDRESS_PREFIX.length);
-    const bytes = Buffer.from(text, "base64url");
-    return bytes.length === DIGEST_BYTES && bytes.toString("base64url") === text ? bytes : undefined;
-  }
-
-  idOf(entry) {
-    return `${ADDRESS_PREFIX}${Buffer.from(this.digests.buffer, this.digests.byteOffset + entry * DIGEST_BYTES, DIGEST_BYTES).toString("base64url")}`;
-  }
-
-  entriesOfLog(log) {
-    const number = this.logNumbers.get(log);
-    return number === undefined ? [] : this.byLogEntries[number];
-  }
-
-  slotOf(digest) {
-    const mask = this.table.length - 1;
-    let slot = (digest[0] | (digest[1] << 8) | (digest[2] << 16) | (digest[3] << 24)) & mask;
-    for (;;) {
-      const entry = this.table[slot];
-      if (entry === -1) return { slot, entry: -1 };
-      if (this.sameDigest(entry, digest)) return { slot, entry };
-      slot = (slot + 1) & mask;
-    }
-  }
-
-  sameDigest(entry, digest) {
-    const base = entry * DIGEST_BYTES;
-    for (let i = 0; i < DIGEST_BYTES; i += 1) if (this.digests[base + i] !== digest[i]) return false;
-    return true;
-  }
-
-  firstEntry(id) {
-    const digest = AdmittedIds.digestOf(id);
-    return digest === undefined ? undefined : this.slotOf(digest).entry;
-  }
-
-  has(id) {
-    const entry = this.firstEntry(id);
-    return entry === undefined ? this.odd.has(id) : entry !== -1;
-  }
-
-  admittedInto(id, log) {
-    const number = this.logNumbers.get(log);
-    if (number === undefined) return false;
-    const entry = this.firstEntry(id);
-    if (entry === undefined) return this.odd.get(id)?.has(log) ?? false;
-    for (let at = entry; at !== -1; at = this.nextSame[at]) if (this.logOf[at] === number) return true;
-    return false;
-  }
-
-  /** The feeds a witness was admitted into, as a fresh Set, or undefined when it was not admitted. */
-  get(id) {
-    const entry = this.firstEntry(id);
-    if (entry === undefined) return this.odd.get(id);
-    if (entry === -1) return undefined;
-    const logs = new Set();
-    for (let at = entry; at !== -1; at = this.nextSame[at]) logs.add(this.logNames[this.logOf[at]]);
-    return logs;
-  }
-
-  grow() {
-    this.capacity *= 2;
-    const digests = new Uint8Array(this.capacity * DIGEST_BYTES); digests.set(this.digests); this.digests = digests;
-    const logOf = new Int32Array(this.capacity); logOf.set(this.logOf); this.logOf = logOf;
-    const nextSame = new Int32Array(this.capacity); nextSame.set(this.nextSame); this.nextSame = nextSame;
-    this.table = new Int32Array(this.capacity * 2).fill(-1);
-    for (let entry = 0; entry < this.count; entry += 1) {
-      if (this.isChained(entry)) continue;
-      this.table[this.slotOf(this.digests.subarray(entry * DIGEST_BYTES, (entry + 1) * DIGEST_BYTES)).slot] = entry;
-    }
-  }
-
-  /** A later entry for an id already seen hangs off that id's first entry rather than the table. */
-  isChained(entry) { return this.chained?.has(entry) ?? false; }
-
-  logNumber(log) {
-    let number = this.logNumbers.get(log);
-    if (number === undefined) {
-      number = this.logNames.length;
-      this.logNames.push(log);
-      this.logNumbers.set(log, number);
-      this.byLogEntries.push([]);
-    }
-    return number;
-  }
-
-  add(id, log) {
-    const number = this.logNumber(log);
-    const digest = AdmittedIds.digestOf(id);
-    if (digest === undefined) {
-      const logs = this.odd.get(id) ?? new Set();
-      logs.add(log);
-      this.odd.set(id, logs);
-      const ids = this.oddOfLog.get(log) ?? new Set();
-      ids.add(id);
-      this.oddOfLog.set(log, ids);
-      return;
-    }
-    if (this.count === this.capacity) this.grow();
-    const { slot, entry: first } = this.slotOf(digest);
-    if (first !== -1) {
-      let tail = first;
-      for (let at = first; at !== -1; at = this.nextSame[at]) {
-        if (this.logOf[at] === number) return;
-        tail = at;
+/**
+ * The admission facts of a root, each answered from the one bucket or ledger its address names.
+ * Holds nothing per witness: the object is a set of computed reads over the store.
+ */
+export function locatedIndex(storeRoot) {
+  carryV2(storeRoot);
+  const pendingOf = (id) => {
+    if (admittedLogs(id) !== undefined || blocked(id)) return [];
+    return readBucket(storeRoot, "pending", id).get(id) ?? [];
+  };
+  const admittedLogs = (id) => readBucket(storeRoot, "admitted", id).get(id);
+  const blocked = (id) => readBucket(storeRoot, "blocked", id).has(id);
+  return Object.freeze({
+    storeRoot,
+    /** The feeds (store-relative) a witness was admitted into, or undefined. */
+    admittedLogs,
+    isAdmitted: (id) => admittedLogs(id) !== undefined,
+    isBlocked: blocked,
+    /** A witness's pending entries: none once it is admitted or blocked. */
+    pendingOf,
+    /** The pending witnesses that recorded `dependency` among what they wait on. */
+    waitingOn: (dependency) => readBucket(storeRoot, "waiting", dependency).get(dependency) ?? [],
+    artifactText: (ref) => readBucket(storeRoot, "artifacts", ref).get(ref),
+    /** A source's canonical text carried by a pending witness's statement, or undefined. */
+    pendingSourceText(ref) {
+      for (const { id, log } of readBucket(storeRoot, "sources", ref).get(ref) ?? []) {
+        for (const entry of readBucket(storeRoot, "pending", id).get(id) ?? []) {
+          if (entry.log !== log) continue;
+          const found = entry.statement.sources?.find((source) => source.ref === ref);
+          if (found) return found.canonicalText;
+        }
       }
-      const entry = this.append(digest, number);
-      this.nextSame[tail] = entry;
-      (this.chained ??= new Set()).add(entry);
-      return;
-    }
-    this.table[slot] = this.append(digest, number);
-  }
-
-  append(digest, number) {
-    const entry = this.count;
-    this.digests.set(digest, entry * DIGEST_BYTES);
-    this.logOf[entry] = number;
-    this.nextSame[entry] = -1;
-    this.byLogEntries[number].push(entry);
-    this.count += 1;
-    return entry;
-  }
-}
-
-function emptyIndex() {
-  const admitted = new AdmittedIds();
-  return {
-    offsets: Object.fromEntries(INDEX_FILES.map((name) => [name, 0])),
-    admitted,
-    byLog: admitted.byLog,
-    blocked: new Map(),
-    pending: new Map(),
-    dependents: new Map(),
-    artifacts: new Map(),
-  };
-}
-
-function addDependent(index, dependency, id) {
-  const set = index.dependents.get(dependency) ?? new Set();
-  set.add(id);
-  index.dependents.set(dependency, set);
-}
-
-function deferredPendingEntry(id, log, sourceRefs, location) {
-  return {
-    log,
-    sourceRefs: Object.freeze(sourceRefs),
-    get statement() {
-      const reader = openSegmentReader(location.file), buffer = Buffer.alloc(location.length);
-      try {
-        if (reader.read(buffer, 0, buffer.length, location.offset) < buffer.length) throw new TypeError(`pending witness ${id} is missing from its journal`);
-        const held = parseLine(buffer.toString("utf8"));
-        if (held?.id !== id || held.log !== log || !held.statement) throw new TypeError(`pending witness ${id} changed in its journal`);
-        return held.statement;
-      } finally { reader.close(); }
+      return undefined;
     },
-  };
+  });
 }
 
-function applyLine(index, name, record, location) {
-  if (name === "artifacts" && typeof record.ref === "string" && typeof record.canonicalText === "string") index.artifacts.set(record.ref, record.canonicalText);
-  else if (name === "admitted" && typeof record.id === "string" && typeof record.log === "string") {
-    index.admitted.add(record.id, record.log);
-    index.pending.delete(record.id);
-  } else if (name === "blocked" && typeof record.id === "string") {
-    index.blocked.set(record.id, record.obstruction ?? null);
-    index.pending.delete(record.id);
-  } else if (name === "pending" && typeof record.id === "string" && typeof record.log === "string" && record.statement) {
-    if (index.admitted.has(record.id) || index.blocked.has(record.id)) return;
-    const entries = index.pending.get(record.id) ?? [];
-    if (!entries.some((entry) => entry.log === record.log)) {
-      // Pending witness bodies remain in the authoritative append-only index.
-      // Ordinary standing queries need only identities, dependencies and feeds;
-      // decode a body's exact byte range only when admission actually needs it.
-      entries.push(deferredPendingEntry(record.id, record.log, (record.statement.sources ?? []).map((source) => source.ref), location));
-    }
-    index.pending.set(record.id, entries);
-    for (const dependency of record.missing ?? []) addDependent(index, dependency, record.id);
-  }
-}
-
-/** Every segment under a journal store, walked (used only to rebuild a missing admitted index). */
+/** Every segment under a journal store, walked (rebuilding a root that has no index at all). */
 function segmentFilesUnder(storeRoot) {
   const found = [];
   const visit = (directory) => {
@@ -364,51 +449,29 @@ function segmentFilesUnder(storeRoot) {
   return found.sort();
 }
 
-/** The admitted index is derived from the segments; rebuild it when it is missing. */
-function rebuildAdmittedIndex(storeRoot) {
-  const file = indexFile(storeRoot, "admitted");
-  if (fs.existsSync(file)) return;
-  const lines = [];
-  for (const segment of segmentFilesUnder(storeRoot)) {
-    const log = path.relative(storeRoot, logPathOfSegment(segment));
-    for (const statement of readSegmentFile(segment).statements) lines.push(canonicalJson({ id: statement.id, log }));
-  }
-  if (lines.length === 0) return;
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, `${lines.join("\n")}\n`, { flag: "wx" });
-}
-
-/** Read the required components of the same authoritative append-only index.
- * Admitted-feed discovery and verified replay depend only on membership;
- * receiving decisions require the full causal state. Component offsets remain
- * independent, so a membership read neither decodes nor advances pending,
- * blocked or artifact history. The default retains full admission behavior. */
-export function rootIndex(storeRoot, components = INDEX_FILES) {
-  let index = roots.get(storeRoot);
-  if (index === undefined) {
-    rebuildAdmittedIndex(storeRoot);
-    index = emptyIndex();
-    roots.set(storeRoot, index);
-  }
-  for (const name of components) {
-    const tail = readTail(indexFile(storeRoot, name), index.offsets[name], (line, location) => {
-      const record = parseLine(line);
-      if (record !== undefined) applyLine(index, name, record, location);
-    });
-    if (tail.reset) {
-      roots.delete(storeRoot);
-      return rootIndex(storeRoot, components);
-    }
-    index.offsets[name] = tail.offset;
-  }
-  return index;
-}
-
-/** Forget every in-memory index (tests and migration). */
+/** Forget every in-process reading (tests and migration). */
 export function clearSegmentIndexes() {
-  roots.clear();
+  carried.clear();
+  bucketCache.clear();
+  dayListings.clear();
   segments.clear();
   projections.clear();
+}
+
+function deferredPendingEntry(id, log, sourceRefs, location) {
+  return {
+    log,
+    sourceRefs: Object.freeze(sourceRefs),
+    get statement() {
+      const reader = openSegmentReader(location.file), buffer = Buffer.alloc(location.length);
+      try {
+        if (reader.read(buffer, 0, buffer.length, location.offset) < buffer.length) throw new TypeError(`pending witness ${id} is missing from its journal`);
+        const held = parseLine(buffer.toString("utf8"));
+        if (held?.id !== id || held.log !== log || !held.statement) throw new TypeError(`pending witness ${id} changed in its journal`);
+        return held.statement;
+      } finally { reader.close(); }
+    },
+  };
 }
 
 // ── segments: a feed's admitted witnesses ──
@@ -444,9 +507,9 @@ export function readingCache(budget, maximumEntries = 4096) {
   return cache;
 }
 
-const SEGMENT_CACHE_HEAP = 24 * 1024 * 1024;
+const SEGMENT_CACHE_HEAP = 4 * 1024 * 1024;
 const SEGMENT_DECODED_FACTOR = 2;
-const PROJECTION_CACHE_HEAP = 48 * 1024 * 1024;
+const PROJECTION_CACHE_HEAP = 6 * 1024 * 1024;
 const PROJECTION_DECODED_FACTOR = 3;
 const PROJECTED_ID_HEAP = 100;
 const segments = readingCache(SEGMENT_CACHE_HEAP);
@@ -657,20 +720,15 @@ function readSegmentFile(file) {
   return Object.freeze({ statements: Object.freeze([...cached.byId.values()]) });
 }
 
-/** The witnesses admitted into one feed's segment (none when nothing was admitted into it). The root's
- *  index is read before the segment, so every witness it names was already written there: a segment
- *  that is missing, truncated or overwritten below what was admitted into it throws. */
+/** The witnesses admitted into one feed's segment (none when nothing was admitted into it). A
+ *  witness's line is on disk before its feed's ledger records the segment's size after it, so a
+ *  segment that is missing or truncated below what its ledger records throws. */
 export function segmentStatements(logPath) {
   const file = segmentPath(logPath);
-  const storeRoot = artifactStoreRoot(logPath);
-  const admitted = rootIndex(storeRoot, ["admitted"]).byLog.get(path.relative(storeRoot, path.resolve(logPath)));
-  const statements = fs.existsSync(file) ? readSegmentFile(file).statements : Object.freeze([]);
-  if (admitted !== undefined) {
-    const held = new Set(statements.map((statement) => statement.id));
-    let lost = 0;
-    for (const id of admitted) if (!held.has(id)) lost += 1;
-    if (lost > 0) throw new TypeError(`journal segment ${file} lacks ${lost} of the ${admitted.size} witnesses admitted into it`);
-  }
+  let size = 0;
+  try { size = fs.statSync(file).size; } catch (error) { if (error.code !== "ENOENT") throw error; }
+  const statements = size === 0 && !fs.existsSync(file) ? Object.freeze([]) : readSegmentFile(file).statements;
+  checkLedger(logPath, size);
   return statements;
 }
 
@@ -705,8 +763,7 @@ export function foldSegmentStatements(logPath, extra, visit) {
     for (const id of [...byId.keys()].sort(inIdOrder)) visit(byId.get(id));
     return;
   }
-  const storeRoot = artifactStoreRoot(logPath);
-  const admitted = rootIndex(storeRoot, ["admitted"]).byLog.get(path.relative(storeRoot, path.resolve(logPath)));
+  checkLedger(logPath, stat.size);
   // Verified by streaming, checkpointing as it goes, so what follows decodes only verified bytes
   // and a process killed midway does not lose the verification it had done.
   streamVerifySegment(file);
@@ -719,9 +776,6 @@ export function foldSegmentStatements(logPath, extra, visit) {
     if (typeof id !== "string") throw new TypeError(`journal segment ${file} holds a line that is not a witness`);
     if (!located.has(id)) located.set(id, location);
   });
-  let lost = 0;
-  for (const id of admitted ?? []) if (!located.has(id)) lost += 1;
-  if (lost > 0) throw new TypeError(`journal segment ${file} lacks ${lost} of the ${admitted.size} witnesses admitted into it`);
   const others = new Map();
   for (const statement of extra) if (!located.has(statement.id)) others.set(statement.id, statement);
   for (const id of [...located.keys(), ...others.keys()].sort(inIdOrder)) {
@@ -787,8 +841,6 @@ export function segmentPositionBefore(logPath, bytes) {
 const projections = readingCache(PROJECTION_CACHE_HEAP);
 export function projectSegmentStatements(logPath, project) {
   const file = segmentPath(logPath);
-  const storeRoot = artifactStoreRoot(logPath);
-  const admitted = rootIndex(storeRoot, ["admitted"]).byLog.get(path.relative(storeRoot, path.resolve(logPath)));
   let stat;
   try { stat = fs.statSync(file); }
   catch (error) { if (error.code !== "ENOENT") throw error; }
@@ -825,26 +877,47 @@ export function projectSegmentStatements(logPath, project) {
     advanceReading(file, stat, view, tail.offset);
     recordCheckpoint(file, view.offset, view.digest);
   }
-  let lost = 0;
-  for (const id of admitted ?? []) if (!view.ids.has(id)) lost += 1;
-  if (lost > 0) throw new TypeError(`journal segment ${file} lacks ${lost} of the ${admitted.size} witnesses admitted into it`);
+  checkLedger(logPath, stat?.size ?? 0);
   // Bound disposable typed readings by their own payload, rather than the
   // larger encoded witness bodies. The source and loss checks survive eviction.
   projections.keep(file, { project, view }, view.bytes * PROJECTION_DECODED_FACTOR + view.ids.size * PROJECTED_ID_HEAP);
   return Object.freeze([...view.values.values()]);
 }
 
-const admittedLogLists = new WeakMap();
-/** Every feed of a root that witnesses were admitted into, as logical handles: a reader enumerating a
- *  root's feeds from its directories alone would pass over one whose segment was deleted. An index
- *  only gains feeds, so its listing is held until it gains one. */
+// A feed's address is its proof path (`<YYYY>/<MM>/<DD>/<date>-admit-<subject>.jsonl`), so a root's
+// feeds are found by listing its date directories, not by an index of feeds. A day's listing is held
+// while the directory's own modification time is unchanged.
+const dayListings = new Map();
+const DATE_SEGMENT = [/^\d{4}$/u, /^(0[1-9]|1[0-2])$/u, /^(0[1-9]|[12]\d|3[01])$/u];
+const directoryNames = (directory) => { try { return fs.readdirSync(directory); } catch { return []; } };
+function dayFeeds(directory) {
+  let stat;
+  try { stat = fs.statSync(directory); } catch { dayListings.delete(directory); return []; }
+  const held = dayListings.get(directory);
+  if (held?.mtimeMs === stat.mtimeMs && held.ctimeMs === stat.ctimeMs) return held.logs;
+  const logs = new Set();
+  for (const name of directoryNames(directory)) {
+    if (name.endsWith(`.jsonl${SEGMENT_SUFFIX}`)) logs.add(path.join(directory, name.slice(0, -SEGMENT_SUFFIX.length)));
+    else if (name.endsWith(".jsonl.admitted")) logs.add(path.join(directory, name.slice(0, -".admitted".length)));
+  }
+  const listing = Object.freeze([...logs].sort());
+  dayListings.set(directory, { mtimeMs: stat.mtimeMs, ctimeMs: stat.ctimeMs, logs: listing });
+  return listing;
+}
+
+/** Every feed of a root that holds a segment or an admission ledger, as logical handles. A feed whose
+ *  segment was deleted keeps its ledger, so its read still fails closed rather than dropping out. */
 export function segmentAdmittedLogs(storeRoot) {
-  const index = rootIndex(storeRoot, ["admitted"]);
-  const held = admittedLogLists.get(index);
-  if (held?.size === index.byLog.size) return held.logs;
-  const logs = Object.freeze([...index.byLog.keys()].map((log) => path.resolve(storeRoot, log)).sort());
-  admittedLogLists.set(index, { size: index.byLog.size, logs });
-  return logs;
+  carryV2(storeRoot);
+  const logs = [];
+  for (const year of directoryNames(storeRoot).filter((name) => DATE_SEGMENT[0].test(name)).sort()) {
+    for (const month of directoryNames(path.join(storeRoot, year)).filter((name) => DATE_SEGMENT[1].test(name)).sort()) {
+      for (const day of directoryNames(path.join(storeRoot, year, month)).filter((name) => DATE_SEGMENT[2].test(name)).sort()) {
+        logs.push(...dayFeeds(path.join(storeRoot, year, month, day)));
+      }
+    }
+  }
+  return Object.freeze(logs);
 }
 
 /** The segment file of a feed, when it exists: the feed's source material. */
@@ -864,7 +937,8 @@ export function segmentFiles(logPath) {
  */
 export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
   const storeRoot = artifactStoreRoot(logPath);
-  const index = rootIndex(storeRoot);
+  const index = locatedIndex(storeRoot);
+  markLocated(storeRoot);
   const log = path.relative(storeRoot, path.resolve(logPath));
   // Index lines written by this call, made durable once before it acknowledges.
   const deferred = new Set();
@@ -876,9 +950,8 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
     } catch (error) {
       throw new TypeError(`journal referenced artifact ${artifact.ref}: ${error.message}`);
     }
-    if (index.artifacts.has(artifact.ref)) continue;
-    appendLine(indexFile(storeRoot, "artifacts"), { ref: artifact.ref, canonicalText }, deferred);
-    index.artifacts.set(artifact.ref, canonicalText);
+    if (index.artifactText(artifact.ref) !== undefined) continue;
+    appendLine(locatedBucketFile(storeRoot, "artifacts", artifact.ref), { ref: artifact.ref, canonicalText }, deferred);
   }
 
   const batch = new Map();
@@ -892,15 +965,7 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
   const artifactCache = new Map();
   const artifactAt = (ref) => {
     if (artifactCache.has(ref)) return artifactCache.get(ref);
-    let text = sources.get(ref) ?? index.artifacts.get(ref);
-    if (text === undefined) {
-      for (const entries of index.pending.values()) {
-        const entry = entries[0];
-        if (entry?.sourceRefs && !entry.sourceRefs.includes(ref)) continue;
-        const found = entry?.statement.sources?.find((source) => source.ref === ref);
-        if (found) { text = found.canonicalText; break; }
-      }
-    }
+    const text = sources.get(ref) ?? index.artifactText(ref) ?? index.pendingSourceText(ref);
     let artifact;
     if (text !== undefined) {
       try {
@@ -915,9 +980,9 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
     return artifact;
   };
   const stateOf = (id) => {
-    if (index.admitted.has(id)) return "admitted";
-    if (index.blocked.has(id)) return "blocked";
-    if (index.pending.has(id) || batch.has(id)) return "quarantined";
+    if (index.isAdmitted(id)) return "admitted";
+    if (index.isBlocked(id)) return "blocked";
+    if (index.pendingOf(id).length > 0 || batch.has(id)) return "quarantined";
     return legacy.state?.(id) ?? "not-witness";
   };
 
@@ -927,8 +992,8 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
   // A pending dependent is woken again only when something has been admitted since it was last woken.
   const wokenAt = new Map();
   const enqueueDependents = (dependency) => {
-    for (const dependent of index.dependents.get(dependency) ?? []) {
-      for (const entry of index.pending.get(dependent) ?? []) {
+    for (const dependent of new Set(index.waitingOn(dependency).map((entry) => entry.id))) {
+      for (const entry of index.pendingOf(dependent)) {
         const key = `${dependent}\u0000${entry.log}`;
         if (queued.has(key) || wokenAt.get(key) === newly.size) continue;
         wokenAt.set(key, newly.size);
@@ -940,10 +1005,9 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
 
   // Another process may admit a cause, or record a dependent as pending, between this process's
   // reads and writes. Each side writes before it reads again: a pending record is followed by a
-  // fresh read of what is admitted, and an admission by a fresh read of what is pending, so one of
-  // the two always sees the other and no dependency wakeup is lost.
+  // fresh read of what is admitted, and an admission by a fresh read of what is waiting, so one of
+  // the two always sees the other and no dependency wakeup is lost. Every located read is fresh.
   const wakeDependentsOfAdmitted = () => {
-    rootIndex(storeRoot);
     for (const id of newly) enqueueDependents(id);
   };
   for (;;) {
@@ -956,7 +1020,7 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
     const state = stateOf(id);
     if (state === "blocked") continue;
     if (state === "admitted" || legacy.state?.(id) === "admitted") {
-      if (!index.admitted.get(id)?.has(itemLog)) publish(storeRoot, index, id, itemLog, statement, deferred);
+      if (!index.admittedLogs(id)?.has(itemLog)) publish(storeRoot, id, itemLog, statement, deferred);
       continue;
     }
     const coreArtifact = artifactAt(id);
@@ -974,14 +1038,11 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
       continue;
     }
     if (evaluation.missing.length > 0) {
-      if (!(index.pending.get(id) ?? []).some((entry) => entry.log === itemLog)) {
-        const record = { id, log: itemLog, statement, missing: evaluation.missing };
-        appendLine(indexFile(storeRoot, "pending"), record, deferred);
-        // Read back rather than applied in place: the tail read knows the line's byte range, so the
-        // index holds the body on disk. A body held in memory per pending witness grew a node's heap
-        // with everything that ever waited on a cause.
-        rootIndex(storeRoot);
-        if (evaluation.missing.every((ref) => index.admitted.has(ref) || artifactAt(ref) !== undefined)) {
+      if (!index.pendingOf(id).some((entry) => entry.log === itemLog)) {
+        // The body stays on disk in the witness's pending bucket; the waiting and source buckets
+        // name it by address, so neither a dependency's wakeup nor a source lookup holds it.
+        writePendingFacts(storeRoot, (file, value) => appendLine(file, value, deferred), { id, log: itemLog, statement, missing: evaluation.missing });
+        if (evaluation.missing.every((ref) => index.isAdmitted(ref) || artifactAt(ref) !== undefined)) {
           const key = `${id}\u0000${itemLog}`;
           if (!queued.has(key)) {
             queued.add(key);
@@ -991,7 +1052,7 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
       }
       continue;
     }
-    publish(storeRoot, index, id, itemLog, statement, deferred);
+    publish(storeRoot, id, itemLog, statement, deferred);
     newly.add(id);
     enqueueDependents(id);
   }
@@ -1004,30 +1065,25 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
   })));
 }
 
-function publish(storeRoot, index, id, log, statement, deferred) {
-  // The segment line is on disk before the index line that names it exists.
-  appendLine(segmentPath(path.resolve(storeRoot, log)), { id: statement.id, observation: statement.observation });
-  const record = { id, log };
-  appendLine(indexFile(storeRoot, "admitted"), record, deferred);
-  applyLine(index, "admitted", record);
+function publish(storeRoot, id, log, statement, deferred) {
+  const logPath = path.resolve(storeRoot, log);
+  // The segment line is on disk before the ledger and the bucket that name it exist.
+  appendLine(segmentPath(logPath), { id: statement.id, observation: statement.observation });
+  appendLine(ledgerPath(logPath), { id, end: fs.statSync(segmentPath(logPath)).size }, deferred);
+  appendLine(locatedBucketFile(storeRoot, "admitted", id), { id, log }, deferred);
 }
 
 function block(storeRoot, index, id, obstruction, deferred) {
-  if (index.blocked.has(id)) return;
-  const record = { id, obstruction: JSON.parse(JSON.stringify(obstruction ?? null)) };
-  appendLine(indexFile(storeRoot, "blocked"), record, deferred);
-  applyLine(index, "blocked", record);
+  if (index.isBlocked(id)) return;
+  appendLine(locatedBucketFile(storeRoot, "blocked", id), { id, obstruction: JSON.parse(JSON.stringify(obstruction ?? null)) }, deferred);
 }
 
-/** A witness's admission state in its root's compact index, or undefined when the index holds nothing of it. */
+/** A witness's admission state in its root's located index, or undefined when the index holds nothing of it. */
 export function segmentState(logPath, id) {
-  const storeRoot = artifactStoreRoot(logPath);
-  const index = rootIndex(storeRoot, ["admitted"]);
-  if (index.admitted.has(id)) return "admitted";
-  const causal = rootIndex(storeRoot, ["admitted", "blocked", "pending"]);
-  if (causal.admitted.has(id)) return "admitted";
-  if (causal.blocked.has(id)) return "blocked";
-  if (causal.pending.has(id)) return "quarantined";
+  const index = locatedIndex(artifactStoreRoot(logPath));
+  if (index.isAdmitted(id)) return "admitted";
+  if (index.isBlocked(id)) return "blocked";
+  if (index.pendingOf(id).length > 0) return "quarantined";
   return undefined;
 }
 
@@ -1056,12 +1112,12 @@ function* segmentLines(file, position = 0, length = Infinity) {
   } finally { reader.close(); }
 }
 
-/** One exact admitted witness, located by the existing admission index.
+/** One exact admitted witness, in the feed its admitted bucket names.
  * Receipt lookup verifies only the indexed feed; unrelated territory history
  * is neither an authority input nor a prerequisite for this read. */
 export function segmentWitness(logPath, id) {
   const storeRoot = artifactStoreRoot(logPath);
-  const logs = rootIndex(storeRoot, ["admitted"]).admitted.get(id);
+  const logs = locatedIndex(storeRoot).admittedLogs(id);
   if (logs === undefined) return undefined;
   for (const log of logs) {
     const file = segmentPath(path.resolve(storeRoot, log));
@@ -1080,10 +1136,10 @@ export function segmentWitness(logPath, id) {
  * search for a referenced source. Only the selected witness is decoded and verified. */
 export function segmentArtifact(logPath, ref) {
   const storeRoot = artifactStoreRoot(logPath);
-  const index = rootIndex(storeRoot, ["artifacts", "admitted"]);
-  const explicit = index.artifacts.get(ref);
+  const index = locatedIndex(storeRoot);
+  const explicit = index.artifactText(ref);
   if (explicit !== undefined) return Object.freeze({ ref, canonicalText: explicit });
-  const indexed = [...(index.admitted.get(ref) ?? [])].map(log => path.resolve(storeRoot, log));
+  const indexed = [...(index.admittedLogs(ref) ?? [])].map(log => path.resolve(storeRoot, log));
   const logs = indexed.length > 0 ? indexed
     : [path.resolve(logPath), ...segmentFilesUnder(storeRoot).map(logPathOfSegment)];
   const marker = JSON.stringify(ref);
@@ -1091,7 +1147,7 @@ export function segmentArtifact(logPath, ref) {
     for (const line of segmentLines(segmentPath(candidate))) {
       if (!line.includes(marker)) continue;
       const record = parseLine(line);
-      if (record === undefined || !index.byLog.get(path.relative(storeRoot, candidate))?.has(record.id)) continue;
+      if (record === undefined || !index.admittedLogs(record.id)?.has(path.relative(storeRoot, candidate))) continue;
       const statement = parseJournalWitness(record);
       const source = statement.sources.find(entry => entry.ref === ref);
       if (source) return Object.freeze({ ref, canonicalText: source.canonicalText });
@@ -1125,7 +1181,8 @@ export function compactLegacyStore(storeRoot, legacy) {
     throw error;
   }
   try {
-    const index = rootIndex(storeRoot);
+    const index = locatedIndex(storeRoot);
+    markLocated(storeRoot);
     const sourceRefs = new Set();
     const report = { feeds: 0, admitted: 0, blocked: 0, pending: 0, artifacts: 0, removed: [] };
     for (const logPath of legacy.feeds()) {
@@ -1136,22 +1193,21 @@ export function compactLegacyStore(storeRoot, legacy) {
       for (const statement of statements) {
         for (const source of statement.sources) sourceRefs.add(source.ref);
         if (present.has(statement.id)) continue;
-        publish(storeRoot, index, statement.id, log, statement);
+        publish(storeRoot, statement.id, log, statement);
         report.admitted += 1;
       }
     }
     for (const { id, obstruction } of legacy.blocked()) {
-      if (index.blocked.has(id)) continue;
+      if (index.isBlocked(id)) continue;
       block(storeRoot, index, id, obstruction);
       report.blocked += 1;
     }
     for (const artifact of legacy.artifacts()) {
-      if (sourceRefs.has(artifact.ref) || index.artifacts.has(artifact.ref)) continue;
-      appendLine(indexFile(storeRoot, "artifacts"), artifact);
-      index.artifacts.set(artifact.ref, artifact.canonicalText);
+      if (sourceRefs.has(artifact.ref) || index.artifactText(artifact.ref) !== undefined) continue;
+      appendLine(locatedBucketFile(storeRoot, "artifacts", artifact.ref), { ref: artifact.ref, canonicalText: artifact.canonicalText });
       report.artifacts += 1;
     }
-    const received = legacy.received().filter(({ statement }) => !index.admitted.has(statement.id) && !index.blocked.has(statement.id));
+    const received = legacy.received().filter(({ statement }) => !index.isAdmitted(statement.id) && !index.isBlocked(statement.id));
     const byLog = new Map();
     for (const { logPath, statement } of received) byLog.set(logPath, [...(byLog.get(logPath) ?? []), statement]);
     for (const [logPath, statements] of byLog) {

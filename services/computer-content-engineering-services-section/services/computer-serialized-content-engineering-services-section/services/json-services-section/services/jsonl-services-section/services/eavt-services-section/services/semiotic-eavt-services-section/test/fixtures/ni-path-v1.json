@@ -1,0 +1,120 @@
+{
+  "kind": "semiotic-content-address.ni-path-vectors",
+  "version": 1,
+  "formula": "ni-path-v1",
+  "law": "segments = [algorithm, d[0,w0), d[w0,w0+w1), ...]; bucket = segments.join('/') + '.jsonl'; a non-NI key is located by the NI of its UTF-8 bytes",
+  "vectors": [
+    {
+      "label": "empty",
+      "key": "ni:///sha-256;47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+      "widths": [
+        2
+      ],
+      "segments": [
+        "sha-256",
+        "47"
+      ],
+      "bucket": "sha-256/47.jsonl"
+    },
+    {
+      "label": "empty-wide",
+      "key": "ni:///sha-256;47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU",
+      "widths": [
+        2,
+        2
+      ],
+      "segments": [
+        "sha-256",
+        "47",
+        "DE"
+      ]
+    },
+    {
+      "label": "hello",
+      "key": "ni:///sha-256;LPJNul-wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ",
+      "widths": [
+        2
+      ],
+      "segments": [
+        "sha-256",
+        "LP"
+      ],
+      "bucket": "sha-256/LP.jsonl"
+    },
+    {
+      "label": "hello-wide",
+      "key": "ni:///sha-256;LPJNul-wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ",
+      "widths": [
+        2,
+        2
+      ],
+      "segments": [
+        "sha-256",
+        "LP",
+        "JN"
+      ]
+    },
+    {
+      "label": "witness-id-like",
+      "key": "ni:///sha-256;u5yPnxwoHIiZsq13NeBOHvWCiRwXdQlnP6hFB3vgBv8",
+      "widths": [
+        2
+      ],
+      "segments": [
+        "sha-256",
+        "u5"
+      ],
+      "bucket": "sha-256/u5.jsonl"
+    },
+    {
+      "label": "witness-id-like-wide",
+      "key": "ni:///sha-256;u5yPnxwoHIiZsq13NeBOHvWCiRwXdQlnP6hFB3vgBv8",
+      "widths": [
+        2,
+        2
+      ],
+      "segments": [
+        "sha-256",
+        "u5",
+        "yP"
+      ]
+    },
+    {
+      "label": "dash-underscore-prefix",
+      "key": "ni:///sha-256;e3DTq0x2QVQuHxWLRY7q58-3vbgV1BEMxheLr8_fQ_g",
+      "widths": [
+        2
+      ],
+      "segments": [
+        "sha-256",
+        "e3"
+      ],
+      "bucket": "sha-256/e3.jsonl"
+    },
+    {
+      "label": "dash-underscore-prefix-wide",
+      "key": "ni:///sha-256;e3DTq0x2QVQuHxWLRY7q58-3vbgV1BEMxheLr8_fQ_g",
+      "widths": [
+        2,
+        2
+      ],
+      "segments": [
+        "sha-256",
+        "e3",
+        "DT"
+      ]
+    },
+    {
+      "label": "non-ni-key",
+      "key": "usage:session-1:42",
+      "located-by": "ni:///sha-256;pLIqlC2ijVGnStJy8RGVbTNgUCBuX2VBY-OeGN8EZNc",
+      "bucket": "sha-256/pL.jsonl"
+    },
+    {
+      "label": "non-ni-ref",
+      "key": "urn:example:artifact",
+      "located-by": "ni:///sha-256;1DvgopC8P6sKrrrvjOhre3Ft1vZ7NLjVEqrRlACuwaE",
+      "bucket": "sha-256/1D.jsonl"
+    }
+  ]
+}

@@ -1,37 +1,145 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { appendFileSync, closeSync, existsSync, openSync, writeSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import test from "node:test";
-import { AdmittedIds } from "../src/journal/filesystem/segment-store.mjs";
+import { setFlagsFromString } from "node:v8";
+import { runInNewContext } from "node:vm";
+import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
+import { journalWitness } from "../src/journal/event.mjs";
+import { artifactStoreRoot } from "../src/journal/store-root.mjs";
+import {
+  clearSegmentIndexes, indexDirectory, ledgerPath, locatedAddressOf, locatedBucketFile, locatedBucketPath, locatedIndex,
+  locatedIndexDirectory, segmentAdmit, segmentAdmittedLogs, segmentPath, segmentState, segmentStatements, segmentWitness,
+} from "../src/journal/filesystem/segment-store.mjs";
 
+setFlagsFromString("--expose-gc");
+const gc = runInNewContext("gc");
 const address = (n) => `ni:///sha-256;${createHash("sha256").update(String(n)).digest("base64url")}`;
+const witness = (n, causes = []) => journalWitness({
+  kind: "metroplat.journal.observation", seat: "urn:test:located", claim: tm.mark("located"),
+  address: tm.mark("held"), time: `2026-10-08T00:00:${String(n).padStart(2, "0")}.000Z`, causes, payload: { n },
+});
+function root() {
+  const directory = mkdtempSync(join(tmpdir(), "journal-located-"));
+  const log = join(directory, "data/journals/2026/10/08/2026-10-08-admit-feed.jsonl");
+  return { directory, log, storeRoot: artifactStoreRoot(log) };
+}
 
-test("a packed admitted index answers as a Map of Sets would, across growth and re-admission", () => {
-  const packed = new AdmittedIds();
-  const model = new Map(), byLog = new Map();
-  const logs = ["2026/10/01/a.jsonl", "2026/10/02/b.jsonl", "2026/10/03/c.jsonl"];
-  for (let n = 0; n < 5000; n += 1) {
-    const id = address(n % 3700), log = logs[n % 3];
-    packed.add(id, log);
-    model.set(id, (model.get(id) ?? new Set()).add(log));
-    byLog.set(log, (byLog.get(log) ?? new Set()).add(id));
+test("the located index computes buckets by ni-path-v1, reproducing the address system's vectors", () => {
+  const vectors = JSON.parse(readFileSync(new URL("./fixtures/ni-path-v1.json", import.meta.url), "utf8"));
+  assert.equal(vectors.formula, "ni-path-v1");
+  for (const vector of vectors.vectors) {
+    if (vector.bucket === undefined) continue;
+    assert.equal(locatedBucketPath(vector.key), vector.bucket, vector.label);
+    if (vector["located-by"]) assert.equal(locatedAddressOf(vector.key), vector["located-by"], vector.label);
   }
-  packed.add("odd-id", logs[0]);
-  model.set("odd-id", new Set([logs[0]]));
-  byLog.get(logs[0]).add("odd-id");
-  for (const [id, set] of model) {
-    assert.ok(packed.has(id));
-    assert.deepEqual([...packed.get(id)].sort(), [...set].sort());
-    for (const log of logs) assert.equal(packed.byLog.get(log).has(id), set.has(log));
-  }
-  assert.equal(packed.has(address("absent")), false);
-  assert.equal(packed.get(address("absent")), undefined);
-  assert.equal(packed.byLog.size, 3);
-  assert.deepEqual([...packed.byLog.keys()], logs);
-  assert.equal(packed.byLog.get("nowhere"), undefined);
-  for (const log of logs) {
-    assert.equal(packed.byLog.get(log).size, byLog.get(log).size);
-    assert.deepEqual([...packed.byLog.get(log)].sort(), [...byLog.get(log)].sort());
-  }
+});
+
+test("admitted, pending and woken witnesses are found in the buckets their addresses name, by any process", () => {
+  const { directory, log, storeRoot } = root();
+  try {
+    const cause = witness(1), effect = witness(2, [cause.id]);
+    const [pending] = segmentAdmit(log, [effect]);
+    assert.equal(pending.admission, "quarantined");
+    assert.ok(existsSync(locatedBucketFile(storeRoot, "pending", effect.id)));
+    assert.ok(existsSync(locatedBucketFile(storeRoot, "waiting", cause.id)));
+    clearSegmentIndexes(); // another process admits the cause
+    const results = segmentAdmit(log, [cause]);
+    assert.equal(results[0].admission, "admitted");
+    assert.equal(segmentState(log, effect.id), "admitted", "the waiting effect was woken by its cause's admission");
+    assert.deepEqual(segmentStatements(log).map((s) => s.id).sort(), [cause.id, effect.id].sort());
+    assert.equal(segmentWitness(log, effect.id).id, effect.id);
+    assert.ok(readFileSync(locatedBucketFile(storeRoot, "admitted", cause.id), "utf8").includes(cause.id));
+    assert.deepEqual(segmentAdmittedLogs(storeRoot), [log]);
+    assert.ok(existsSync(ledgerPath(log)));
+  } finally { clearSegmentIndexes(); rmSync(directory, { recursive: true, force: true }); }
+});
+
+test("a truncated segment fails closed against its ledger, and a deleted one is still listed", () => {
+  const { directory, log, storeRoot } = root();
+  try {
+    segmentAdmit(log, [witness(1), witness(2)]);
+    const bytes = readFileSync(segmentPath(log));
+    writeFileSync(segmentPath(log), bytes.subarray(0, bytes.indexOf(10) + 1));
+    clearSegmentIndexes();
+    assert.throws(() => segmentStatements(log), /lacks witnesses admitted into it/u);
+    rmSync(segmentPath(log));
+    clearSegmentIndexes();
+    assert.deepEqual(segmentAdmittedLogs(storeRoot), [log]);
+    assert.throws(() => segmentStatements(log), /lacks witnesses admitted into it/u);
+  } finally { clearSegmentIndexes(); rmSync(directory, { recursive: true, force: true }); }
+});
+
+test("a v2 root is carried into buckets once, and v2 lines written later are carried at the next question", () => {
+  const { directory, log, storeRoot } = root();
+  try {
+    const first = witness(1), second = witness(2), blocked = address("blocked");
+    segmentAdmit(log, [first, second]);
+    // Rewrite the root as the v2 store left it: its index in four whole files, no buckets, no ledgers.
+    rmSync(locatedIndexDirectory(storeRoot), { recursive: true, force: true });
+    rmSync(ledgerPath(log));
+    const relative = "2026/10/08/2026-10-08-admit-feed.jsonl";
+    mkdirSync(indexDirectory(storeRoot), { recursive: true });
+    writeFileSync(join(indexDirectory(storeRoot), "admitted.jsonl"), `${JSON.stringify({ id: first.id, log: relative })}\n`);
+    writeFileSync(join(indexDirectory(storeRoot), "blocked.jsonl"), `${JSON.stringify({ id: blocked, obstruction: { reason: "test" } })}\n`);
+    clearSegmentIndexes();
+    const index = locatedIndex(storeRoot);
+    assert.deepEqual([...index.admittedLogs(first.id)], [relative]);
+    assert.equal(index.isAdmitted(second.id), false, "only what v2 recorded is carried");
+    assert.equal(index.isBlocked(blocked), true);
+    assert.ok(existsSync(ledgerPath(log)));
+    appendFileSync(join(indexDirectory(storeRoot), "admitted.jsonl"), `${JSON.stringify({ id: second.id, log: relative })}\n`);
+    assert.equal(segmentState(log, second.id), "admitted", "a later v2 line is carried");
+    clearSegmentIndexes();
+    assert.equal(locatedIndex(storeRoot).isAdmitted(second.id), true);
+    assert.equal(readFileSync(locatedBucketFile(storeRoot, "admitted", first.id), "utf8").split(first.id).length - 1, 1, "carried once");
+  } finally { clearSegmentIndexes(); rmSync(directory, { recursive: true, force: true }); }
+});
+
+test("a root with segments and no index at all is rebuilt from its segments", () => {
+  const { directory, log, storeRoot } = root();
+  try {
+    const first = witness(1);
+    segmentAdmit(log, [first]);
+    rmSync(join(storeRoot, "index"), { recursive: true, force: true });
+    rmSync(ledgerPath(log));
+    clearSegmentIndexes();
+    assert.equal(locatedIndex(storeRoot).isAdmitted(first.id), true);
+    assert.equal(segmentStatements(log).length, 1);
+  } finally { clearSegmentIndexes(); rmSync(directory, { recursive: true, force: true }); }
+});
+
+// The JavaScript memory a root's index adds once it has answered questions about `count` admitted witnesses.
+function indexGrowth(count) {
+  const { directory, storeRoot } = root();
+  try {
+    const relative = "2026/10/08/2026-10-08-admit-feed.jsonl";
+    mkdirSync(dirname(join(storeRoot, relative)), { recursive: true });
+    writeFileSync(segmentPath(join(storeRoot, relative)), "");
+    mkdirSync(indexDirectory(storeRoot), { recursive: true });
+    const fd = openSync(join(indexDirectory(storeRoot), "admitted.jsonl"), "w");
+    for (let n = 0; n < count; n += 1) writeSync(fd, `{"id":"${address(n)}","log":"${relative}"}\n`);
+    closeSync(fd);
+    clearSegmentIndexes();
+    gc(); gc();
+    const before = process.memoryUsage();
+    const index = locatedIndex(storeRoot);
+    for (let n = 0; n < count; n += Math.max(1, Math.floor(count / 400))) assert.equal(index.isAdmitted(address(n)), true);
+    assert.equal(index.isAdmitted(address("absent")), false);
+    gc(); gc();
+    const after = process.memoryUsage();
+    return (after.heapUsed + after.external + after.arrayBuffers) - (before.heapUsed + before.external + before.arrayBuffers);
+  } finally { clearSegmentIndexes(); rmSync(directory, { recursive: true, force: true }); }
+}
+
+test("the memory a root's index takes does not grow with how many witnesses it has admitted", () => {
+  // What a process holds is its bucket cache, bounded at 4 MB of estimated heap whatever the store
+  // holds; the v2 index held each admitted id for the process's life (about 10 MB for these 200,000).
+  const large = indexGrowth(200_000), larger = indexGrowth(400_000);
+  assert.ok(large < 6 * 1024 * 1024, `200,000 admitted ids took ${(large / 2 ** 20).toFixed(1)} MB`);
+  assert.ok(larger < 6 * 1024 * 1024, `400,000 admitted ids took ${(larger / 2 ** 20).toFixed(1)} MB`);
 });
 
 test("a reading cache is bounded by the heap its readings are estimated to hold, least recently kept first", async () => {
