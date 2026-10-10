@@ -1,6 +1,6 @@
 import { assertKeywordValues } from "../src/assert-keyword-values.mjs";
 import { createHash } from "node:crypto";
-import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/semantic-content-identify-service";
+import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
 import {
   canonical,
   isJsonRecord,

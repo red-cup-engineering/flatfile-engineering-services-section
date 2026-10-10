@@ -20,8 +20,7 @@
   },
   "dependencies": {
     "@red-cup-engineering/proof-path-structuration-service": "0.1.0",
-    "@red-cup-engineering/relation-model-notation-json-codec": "0.0.2",
-    "@red-cup-engineering/relation-model-notation-typing": "0.0.1",
-    "@red-cup-engineering/semantic-content-identify-service": "0.2.2"
+    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*"
   }
 }

@@ -48,7 +48,7 @@
     },
     {
       "capability": "semantic-content-identity",
-      "source": "@red-cup-engineering/semantic-content-identify-service",
+      "source": "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity",
       "owner": "./src/semiotic-content-address/semantic-content-identity.mjs"
     },
     {
