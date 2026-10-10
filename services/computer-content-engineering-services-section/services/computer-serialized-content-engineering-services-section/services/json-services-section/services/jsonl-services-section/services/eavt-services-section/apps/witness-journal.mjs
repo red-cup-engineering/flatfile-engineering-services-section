@@ -15,7 +15,7 @@ import { readJsonlAtPath } from "@red-cup-engineering/jsonl-services-section/rea
 import { latestState } from "../scripts/latest-state.mjs";
 import { situationWindow } from "../scripts/situation-window.mjs";
 import { readEavtState } from "../scripts/read-eavt-state.mjs";
-import { commitSettledRecord, readDatomsAtPath, recordPathFor, settle, settledDatom } from "../services/datom-services-section/src/index.mjs";
+import { commitSettledRecord, readDatomsAtPath, recordPathFor, settle, settledDatom } from "@red-cup-engineering/datom";
 
 const COMMANDS = Object.freeze({
   "resolve-journal-date": { required: ["at"], invoke: ({ at }) => journalPath({ root: ".", feed: "journal", at }).split("/").slice(-4,-1).join("-"), output: "text" },
