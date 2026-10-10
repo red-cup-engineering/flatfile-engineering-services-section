@@ -1,0 +1,15 @@
+{
+  "name": "@red-cup-engineering/dao-ontology-projection-service",
+  "version": "0.1.0",
+  "description": "Projects the scientific Dao glossary schemas into OWL and SHACL carriers.",
+  "type": "module",
+  "scripts": {
+    "generate-ontology": "node ../json-schema-to-owl-shacl-service/scripts/project-json-schema-set-as-ontology.mjs ../../../../../../../../../../../../../science-services-section/services/philosophy-services-section/services/dao-services-section/data/records/schema/glossary/terms https://561.group/ns/schema/ --out-dir ../../../../../../../../../../../../../science-services-section/services/philosophy-services-section/services/dao-services-section/data/ontology/dao"
+  },
+  "keywords": [
+    "ontology-projection",
+    "json-schema",
+    "owl",
+    "shacl"
+  ]
+}

@@ -6,8 +6,8 @@ import { createPublicKey } from "node:crypto";
 import { makeNiUri, verifyNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { keyIdOf, privateSigningKey, publicSigningKey, signCanonicalBody, verifyCanonicalBody } from "./canonical-signature.mjs";
 
-const KIND = "computer-content.signed-export-receipt";
-const DOMAIN = "computer-content.signed-export-receipt.v1\n";
+const KIND = "signstuff.signed-export-receipt";
+const DOMAIN = "signstuff.signed-export-receipt.v1\n";
 const keysAre = (value, names) => value !== null && typeof value === "object" && !Array.isArray(value)
   && Object.keys(value).length === names.length && names.every((name) => Object.hasOwn(value, name));
 const nonempty = (value) => typeof value === "string" && value.length > 0 && value.trim() === value;

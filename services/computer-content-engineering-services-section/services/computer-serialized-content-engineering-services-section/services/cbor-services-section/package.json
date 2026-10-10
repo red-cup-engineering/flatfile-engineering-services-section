@@ -4,7 +4,10 @@
   "type": "module",
   "private": false,
   "license": "MIT",
-  "exports": "./src/cbor.mjs",
+  "exports": {
+    ".": "./src/cbor.mjs",
+    "./transformations": "./src/transformations.mjs"
+  },
   "files": [
     "src",
     "apps",
@@ -13,8 +16,9 @@
   ],
   "dependencies": {
     "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/uri-services-section": "workspace:*",
-    "cbor2": "2.3.0"
+    "@red-cup-engineering/uri-services-section": "0.1.0",
+    "cbor2": "2.4.0",
+    "@red-cup-engineering/json-services-section": "workspace:*"
   },
   "devDependencies": {},
   "scripts": {

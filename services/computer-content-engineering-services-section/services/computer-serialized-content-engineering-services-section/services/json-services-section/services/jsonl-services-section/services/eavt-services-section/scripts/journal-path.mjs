@@ -12,7 +12,7 @@ export const inputSchema = {
 export const outputSchema = { type: "string", minLength: 1 };
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical";
 
 export function journalPath({ root, feed, at } = {}) {
   if (typeof root !== "string" || root === "")

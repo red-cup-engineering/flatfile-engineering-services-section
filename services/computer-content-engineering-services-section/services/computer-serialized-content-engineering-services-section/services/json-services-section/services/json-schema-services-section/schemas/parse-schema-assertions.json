@@ -1,0 +1,9 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["content"]
+  },
+  "output": {
+    "type": "object"
+  }
+}

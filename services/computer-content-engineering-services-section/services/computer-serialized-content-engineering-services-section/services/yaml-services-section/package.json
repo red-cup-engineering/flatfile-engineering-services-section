@@ -1,0 +1,6 @@
+{
+  "name": "@red-cup-engineering/yaml-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Proof-path section for YAML flatfile serialization."
+}

@@ -1,0 +1,3 @@
+# Independent JSON Patch fixtures
+
+Unchanged `tests.json` and `spec_tests.json` from json-patch/json-patch-tests at commit `2a928f9044aad35c74e2788d498bcf2c6b91adea`. The upstream README and package metadata are retained under `UPSTREAM-*`; copyright 2014 The Authors, Apache-2.0. The original suite's four disabled cases remain excluded, including duplicate-op examples whose duplicate members cannot survive fixture JSON parsing. Explicit local controls cover document-root operations and raw HTTP duplicate-member refusal separately. The 108 enabled cases establish finite examples and failures, not universal conformance.
