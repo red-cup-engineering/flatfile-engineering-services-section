@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import { relativeLinkPath } from "./relocate-markdown-tree.mjs";
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 /**
  * Project the correct `../`-relative link text one Markdown carrier would
@@ -19,7 +21,7 @@ export function projectMarkdownRelativeLink(carrierPath, targetPath) {
   return relativeLinkPath(carrierPath, targetPath);
 }
 
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   const [carrierPath, targetPath] = process.argv.slice(2);
   if (!carrierPath || !targetPath) {
     process.stderr.write("usage: project-markdown-relative-link.mjs <carrierPath> <targetPath>\n");

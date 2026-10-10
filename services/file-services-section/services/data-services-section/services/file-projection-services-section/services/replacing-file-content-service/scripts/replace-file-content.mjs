@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { readFile, rename, stat, unlink, writeFile } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { realpathSync } from "node:fs";
 
 export async function replaceFileContent({ path, search, replacement, expectedCount, dryRun = false } = {}) {
   if (typeof path !== "string" || path.length === 0) throw new TypeError("path is required");
@@ -57,7 +58,7 @@ async function main() {
   process.stdout.write(`${JSON.stringify(await replaceFileContent(options))}\n`);
 }
 
-if (resolve(fileURLToPath(import.meta.url)) === resolve(process.argv[1] ?? "")) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   main().catch((error) => {
     process.stderr.write(`${error.message}\n`);
     process.exitCode = 1;

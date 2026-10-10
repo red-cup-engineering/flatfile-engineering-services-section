@@ -16,6 +16,8 @@ import { supersedeEavtRows } from "../scripts/supersede-eavt-rows.mjs";
 import { transferEavtEvidence } from "../scripts/transfer-eavt-evidence.mjs";
 import { verifyContentAddressedEntity } from "../scripts/verify-content-addressed-entity.mjs";
 import { verifyEavtProofClosure } from "../scripts/verify-eavt-proof-closure.mjs";
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 const operations = Object.freeze({
   "append-eavt-row": appendEavtRow,
@@ -42,7 +44,7 @@ export async function runEavtCli({ operation, input } = {}) {
   return operations[operation](input);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   const [operation] = process.argv.slice(2);
   if (!operation || !Object.hasOwn(operations, operation)) throw new TypeError(`usage: eavt-cli.mjs <${Object.keys(operations).join("|")}> < request.json`);
   const chunks = []; for await (const chunk of process.stdin) chunks.push(chunk);

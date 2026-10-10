@@ -112,3 +112,24 @@ test("a journal store with segments and no index is rebuilt and marked offline, 
     assert.deepEqual(carryLocatedIndexes([state]).stores.map((store) => store.path), ["located", "located"]);
   } finally { clearSegmentIndexes(); rmSync(state, { recursive: true, force: true }); }
 });
+
+test("the command runs when invoked through a symlinked package directory, as a machine closure installs it", () => {
+  const state = mkdtempSync(join(tmpdir(), "located-carry-linked-"));
+  try {
+    // node_modules/@scope/pkg -> the package's real directory, as pnpm installs it.
+    const packageDirectory = fileURLToPath(new URL("..", import.meta.url));
+    mkdirSync(join(state, "node_modules/@red-cup-engineering"), { recursive: true });
+    const linked = join(state, "node_modules/@red-cup-engineering/semiotic-eavt-services-section");
+    symlinkSync(packageDirectory, linked, "dir");
+    const linkedScript = join(linked, "scripts/carry-located-indexes.mjs");
+    const usage = spawnSync(process.execPath, [linkedScript], { encoding: "utf8" });
+    assert.equal(usage.status, 1, "with no root it refuses, rather than doing nothing");
+    assert.match(usage.stderr, /usage: carry-located-indexes\.mjs/u);
+    v2Store(state, "data/journals", [address(11)]);
+    const run = spawnSync(process.execPath, [linkedScript, "--root", state], { encoding: "utf8" });
+    assert.equal(run.status, 0, run.stderr);
+    const summary = JSON.parse(run.stdout);
+    assert.equal(summary.kind, "located-index-carry.v1");
+    assert.deepEqual(summary.stores.map((store) => [store.path, store.carried]), [["carried", true]]);
+  } finally { clearSegmentIndexes(); rmSync(state, { recursive: true, force: true }); }
+});

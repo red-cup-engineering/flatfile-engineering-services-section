@@ -2,6 +2,7 @@
 import { opendir, readFile, stat } from "node:fs/promises";
 import { relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { realpathSync } from "node:fs";
 
 const DEFAULT_EXCLUDES = [".git", ".npm", "node_modules"];
 const DEFAULT_MAX_BYTES = 4 * 1024 * 1024;
@@ -78,7 +79,7 @@ async function main() {
   for (const match of await searchFileContent(options)) process.stdout.write(`${JSON.stringify(match)}\n`);
 }
 
-if (resolve(fileURLToPath(import.meta.url)) === resolve(process.argv[1] ?? "")) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   main().catch((error) => {
     process.stderr.write(`${error.message}\n`);
     process.exitCode = 1;

@@ -24,6 +24,8 @@ import path from "node:path";
 import { homedir } from "node:os";
 import { parseArgs } from "node:util";
 import { carryLocatedIndex, indexDirectory, journalStoreRoots, locatedIndexDirectory, v2StoreRoots } from "../src/journal/filesystem/segment-store.mjs";
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 export { journalStoreRoots, v2StoreRoots };
 
@@ -99,7 +101,7 @@ function hasSegments(storeRoot) {
   return visit(storeRoot);
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === new URL(import.meta.url).pathname) {
+if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
   const { values } = parseArgs({ options: { root: { type: "string", multiple: true }, depth: { type: "string", default: "10" } } });
   if (!values.root?.length) throw new Error("usage: carry-located-indexes.mjs --root <state> [--root <state> ...] [--depth 10]");
   const summary = carryLocatedIndexes(values.root.map((given) => path.resolve(homedir(), given)), { depth: Number(values.depth) });
