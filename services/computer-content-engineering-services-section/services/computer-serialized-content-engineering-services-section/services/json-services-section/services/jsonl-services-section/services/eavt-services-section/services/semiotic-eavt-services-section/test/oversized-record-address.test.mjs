@@ -7,7 +7,10 @@ import { join } from "node:path";
 import test from "node:test";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { EAVT_ADDRESS_KEY_BYTES, eavtAddress, eavtId, eavtKey } from "@red-cup-engineering/eavt/row";
+import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
 import { createSemanticRecordJournal } from "../src/record-semantic-record.mjs";
+import { journalWitness, parseJournalWitness } from "../src/journal/event.mjs";
+import { eventForRow } from "../src/journal/filesystem/events.mjs";
 
 const kind = "test.oversized-record";
 function journal(t) {
@@ -47,11 +50,27 @@ test("a record whose row is longer than one string is recorded and read back, ad
   const [row] = records.query({ category: "inbox" });
   assert.equal(row.id, recorded.id);
   assert.deepEqual(row.record, value);
-  const [witness] = witnesses(root);
-  assert.match(JSON.stringify(witness), /ni:\/\/\/sha-256;/u);
+  const [stored] = witnesses(root).map(parseJournalWitness);
+  assert.deepEqual(stored.observation.address, tm.mark(eavtId(stored.observation.payload)), "its witness is addressed by its row's content id");
   // Recording the same record again admits nothing new.
   assert.equal(records.record({ category: "inbox", recordedAt: "2026-10-10T00:00:00.000Z", told: { for: true, against: false }, record: value }).appended, 0);
 });
 
 // A short record's witness is unchanged (its address is still its row's text): record-addresses-stable
 // pins the witness ids of short records, and still passes.
+
+test("a row just under the bound keeps its text address: its witness is the one the text address made", () => {
+  const time = "2026-10-10T00:00:00.000Z";
+  const rowOf = (length) => [jsonToTerm("ni:///sha-256;x"), jsonToTerm("inbox"), jsonToTerm({ body: "z".repeat(length) }), time];
+  // Grow the value until the row's key is as long as the bound allows.
+  let length = EAVT_ADDRESS_KEY_BYTES - 4096;
+  while (Buffer.byteLength(eavtKey(rowOf(length + 1))) <= EAVT_ADDRESS_KEY_BYTES) length += 1;
+  const row = rowOf(length);
+  assert.ok(Buffer.byteLength(eavtKey(row)) <= EAVT_ADDRESS_KEY_BYTES && Buffer.byteLength(eavtKey(rowOf(length + 1))) > EAVT_ADDRESS_KEY_BYTES);
+  const asBefore = journalWitness({ kind: "metroplat.journal.observation", seat: "test", claim: tm.mark("metroplat.eavt.row"),
+    address: tm.mark(eavtKey(row)), time, causes: [], payload: row });
+  assert.equal(eventForRow(row, "test").id, asBefore.id, "byte for byte the witness the text address made");
+  // One byte more and the text address could not be admitted at all; it is addressed by its content id.
+  const over = rowOf(length + 1);
+  assert.deepEqual(eventForRow(over, "test").observation.address, tm.mark(eavtId(over)));
+});
