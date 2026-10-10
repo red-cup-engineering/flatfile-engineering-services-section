@@ -104,6 +104,77 @@ function putLines({ key, revision, length, counts }) {
   return lines;
 }
 
+/** Whether `words` occur as one run, in order, among `text`'s words. */
+function holdsRun(text, words) {
+  outer: for (let start = 0; start + words.length <= text.length; start += 1) {
+    for (let at = 0; at < words.length; at += 1) if (text[start + at] !== words[at]) continue outer;
+    return true;
+  }
+  return false;
+}
+
+/** A query in the FTS5 subset `match` answers, as a tree; null when it asks for nothing. */
+function parseQuery(expression, tokenize) {
+  const tokens = [];
+  const pattern = /\s*(?:(\()|(\))|"((?:[^"]|"")*)"(\*)?|([^\s()"]+))/gyu;
+  let found;
+  pattern.lastIndex = 0;
+  while (pattern.lastIndex < expression.length && (found = pattern.exec(expression)) !== null) {
+    if (found[0].trim() === "") break;
+    if (found[1]) tokens.push({ kind: "open" });
+    else if (found[2]) tokens.push({ kind: "close" });
+    else if (found[3] !== undefined) tokens.push({ kind: "phrase", text: found[3].replaceAll('""', '"'), prefix: Boolean(found[4]) });
+    else {
+      const word = found[5];
+      if (["AND", "OR", "NOT"].includes(word)) tokens.push({ kind: word });
+      else if (/[:^+]/u.test(word) || word === "NEAR" || /^NEAR\(/u.test(word)) throw new TypeError(`unsupported FTS5 query syntax: ${word}`);
+      else tokens.push({ kind: "phrase", text: word.endsWith("*") ? word.slice(0, -1) : word, prefix: word.endsWith("*") });
+    }
+  }
+  if (pattern.lastIndex < expression.length && expression.slice(pattern.lastIndex).trim() !== "") throw new TypeError(`unparsed FTS5 query: ${expression.slice(pattern.lastIndex)}`);
+  let at = 0;
+  const peek = () => tokens[at], take = () => tokens[at++];
+  const leaf = (token) => {
+    const words = tokenize(token.text);
+    if (words.length === 0) return null;
+    if (!token.prefix) return { kind: "phrase", words };
+    const prefix = { kind: "prefix", prefix: words.at(-1) };
+    return words.length === 1 ? prefix : { kind: "and", parts: [{ kind: "phrase", words: words.slice(0, -1) }, prefix] };
+  };
+  const primary = () => {
+    const token = take();
+    if (token === undefined) throw new TypeError("FTS5 query ends where a term was expected");
+    if (token.kind === "open") {
+      const inner = or();
+      if (take()?.kind !== "close") throw new TypeError("FTS5 query has an unclosed parenthesis");
+      return inner;
+    }
+    if (token.kind === "phrase") return leaf(token);
+    throw new TypeError(`FTS5 query has ${token.kind} where a term was expected`);
+  };
+  const not = () => {
+    let node = primary();
+    while (peek()?.kind === "NOT") { take(); const without = primary(); if (node === null) throw new TypeError("NOT needs something to remove from"); if (without !== null) node = { kind: "not", from: node, without }; }
+    return node;
+  };
+  const and = () => {
+    const parts = [not()];
+    while (peek() !== undefined && peek().kind !== "OR" && peek().kind !== "close") { if (peek().kind === "AND") take(); parts.push(not()); }
+    const kept = parts.filter((part) => part !== null);
+    return kept.length === 0 ? null : kept.length === 1 ? kept[0] : { kind: "and", parts: kept };
+  };
+  const or = () => {
+    const parts = [and()];
+    while (peek()?.kind === "OR") { take(); parts.push(and()); }
+    const kept = parts.filter((part) => part !== null);
+    return kept.length === 0 ? null : kept.length === 1 ? kept[0] : { kind: "or", parts: kept };
+  };
+  if (tokens.length === 0) return null;
+  const tree = or();
+  if (at < tokens.length) throw new TypeError("FTS5 query has an unmatched closing parenthesis");
+  return tree;
+}
+
 /**
  * A term index: ranked word search over keyed documents, read from a semantic record journal.
  *
@@ -195,6 +266,23 @@ export function createTermIndex({ root, objectKind = "term-index", tokenize = wo
     flush();
   }
 
+  /** A key's BM25 score over the terms it holds of `terms`. */
+  function scoreOf(key, terms) {
+    const document = documents.get(key), count = documents.size, average = totalLength / count;
+    const norm = k1 * (1 - b + (b * document.length) / average);
+    let score = 0;
+    for (const term of terms) {
+      const frequency = document.counts.get(term);
+      if (!frequency) continue;
+      const weight = Math.max(Math.log((count - postings.get(term).size + 0.5) / (postings.get(term).size + 0.5)), 1e-6);
+      score += (weight * frequency * (k1 + 1)) / (frequency + norm);
+    }
+    return score;
+  }
+  const ranked = (hits, limit) => hits
+    .sort((left, right) => right.score - left.score || (left.key < right.key ? -1 : left.key > right.key ? 1 : 0))
+    .slice(0, limit).map((hit) => Object.freeze(hit));
+
   return Object.freeze({
     /** The revision `key` was indexed at, or undefined. */
     revisionOf: (key) => documents.get(key)?.revision,
@@ -234,25 +322,56 @@ export function createTermIndex({ root, objectKind = "term-index", tokenize = wo
       const sets = terms.map((term) => postings.get(term));
       if (sets.some((keys) => keys === undefined)) return [];
       sets.sort((left, right) => left.size - right.size);
-      const count = documents.size, average = totalLength / count;
-      const weights = terms.map((term) => {
-        const held = postings.get(term).size;
-        return Math.max(Math.log((count - held + 0.5) / (held + 0.5)), 1e-6);
-      });
       const hits = [];
-      for (const key of sets[0]) {
-        if (!sets.every((keys) => keys.has(key))) continue;
-        const document = documents.get(key);
-        const norm = k1 * (1 - b + (b * document.length) / average);
-        let score = 0;
-        terms.forEach((term, index) => {
-          const frequency = document.counts.get(term);
-          score += (weights[index] * frequency * (k1 + 1)) / (frequency + norm);
-        });
-        hits.push({ key, score });
-      }
-      hits.sort((left, right) => right.score - left.score || (left.key < right.key ? -1 : left.key > right.key ? 1 : 0));
-      return hits.slice(0, limit).map((hit) => Object.freeze(hit));
+      for (const key of sets[0]) if (sets.every((keys) => keys.has(key))) hits.push({ key, score: scoreOf(key, terms) });
+      return ranked(hits, limit);
+    },
+    /**
+     * Keys matching a query in the subset of SQLite FTS5's query syntax that a term index can
+     * answer: words, `prefix*`, `"phrases"`, `AND`, `OR`, `NOT` (binding tighter than AND, AND
+     * tighter than OR, juxtaposition as AND) and parentheses, ranked by BM25 over the words the
+     * query asks for. A phrase is matched word for word against `textOf(key)` when the caller can
+     * give a key's text; without it a phrase asks only for its words. Column filters, NEAR and
+     * the `^` and `+` operators are refused, not ignored.
+     */
+    match(expression, { limit = 25, textOf } = {}) {
+      if (limit === 0 || documents.size === 0) return [];
+      const tree = parseQuery(String(expression), tokenize);
+      if (tree === null) return [];
+      const asked = new Set();
+      const evaluate = (node, positive) => {
+        switch (node.kind) {
+          case "or": return node.parts.reduce((all, part) => { for (const key of evaluate(part, positive)) all.add(key); return all; }, new Set());
+          case "and": {
+            const [first, ...rest] = node.parts.map((part) => evaluate(part, positive));
+            return new Set([...first].filter((key) => rest.every((keys) => keys.has(key))));
+          }
+          case "not": {
+            const kept = evaluate(node.from, positive), removed = evaluate(node.without, false);
+            return new Set([...kept].filter((key) => !removed.has(key)));
+          }
+          case "prefix": {
+            const keys = new Set();
+            for (const [term, holders] of postings) {
+              if (!term.startsWith(node.prefix)) continue;
+              if (positive) asked.add(term);
+              for (const key of holders) keys.add(key);
+            }
+            return keys;
+          }
+          case "phrase": {
+            const sets = node.words.map((term) => postings.get(term) ?? new Set());
+            if (positive) for (const term of node.words) asked.add(term);
+            sets.sort((left, right) => left.size - right.size);
+            const keys = new Set([...sets[0]].filter((key) => sets.every((held) => held.has(key))));
+            if (node.words.length < 2 || typeof textOf !== "function") return keys;
+            return new Set([...keys].filter((key) => holdsRun(tokenize(textOf(key)), node.words)));
+          }
+          default: throw new TypeError(`unknown query node ${node.kind}`);
+        }
+      };
+      const keys = evaluate(tree, true), terms = [...asked];
+      return ranked([...keys].map((key) => ({ key, score: scoreOf(key, terms) })), limit);
     },
     get size() { return documents.size; },
     /** The journal root the index reads from and records to, or null in memory. */
