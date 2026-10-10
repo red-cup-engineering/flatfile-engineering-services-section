@@ -11,7 +11,9 @@
     "@red-cup-engineering/semantic-content-identify-service": "0.2.2",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/eavt": "workspace:*"
+    "@red-cup-engineering/eavt": "workspace:*",
+    "@red-cup-engineering/uri-services-section": "0.1.0",
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.0"
   },
   "description": "Canonical Red Cup JSON Schema semantics and path-addressed reading, writing, searching, validation, resolution, projection, and census services.",
   "devDependencies": {
@@ -36,7 +38,10 @@
     "./structural-type": "./src/structural-type.mjs",
     "./validate-schema-instance": "./scripts/validate-schema-instance.mjs",
     "./validation": "./src/validation.mjs",
-    "./write-a-schema": "./services/writing-a-schema/src/write-a-schema.js"
+    "./write-a-schema": "./services/writing-a-schema/src/write-a-schema.js",
+    "./admit-schema": "./scripts/admit-schema.mjs",
+    "./admit-schema-assertion": "./scripts/admit-schema-assertion.mjs",
+    "./unfold-schema": "./scripts/unfold-schema.mjs"
   },
   "files": [
     "dist/",
