@@ -32,6 +32,6 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*"
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.0"
   }
 }
