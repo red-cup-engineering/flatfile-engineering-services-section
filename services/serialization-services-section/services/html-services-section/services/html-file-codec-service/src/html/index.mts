@@ -665,10 +665,10 @@ export const rfc7992Profile: Profile = Object.freeze({
 });
 
 /* ── carrier / document-render engine + CSS style resolution (re-exported) ─
- * Moved out to @red-cup-engineering/css-style-resolution-service (the CSS
+ * Moved out to @red-cup-engineering/css-services-section (the CSS
  * cascade closure and certification) and
  * @red-cup-engineering/html-document-render-service (the carrier +
- * document-render engine, which depends on css-style-resolution-service by
+ * document-render engine, which depends on css-services-section by
  * package name), each re-exported here unchanged so this package's export
  * surface stays identical. The SHP codec, lint, and escaping below stay here.
  */
@@ -687,7 +687,7 @@ export {
   checkStyleResolutionSettled,
   checkClassMapsValid,
   cssTextFromResolvedStyles,
-} from "@red-cup-engineering/css-style-resolution-service";
+} from "@red-cup-engineering/css-services-section/css-style-resolution";
 
 export {
   type HtmlCarrierNode,
