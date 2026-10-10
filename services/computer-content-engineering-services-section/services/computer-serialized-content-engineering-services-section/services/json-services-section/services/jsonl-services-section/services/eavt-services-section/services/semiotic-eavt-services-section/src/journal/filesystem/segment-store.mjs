@@ -302,13 +302,46 @@ function writePendingFacts(storeRoot, write, record) {
   }
 }
 
-/** Carry the v2 index lines after `offsets` into buckets and ledgers; returns the new offsets. */
-function carryV2Lines(storeRoot, offsets) {
+const V2_NAMES = Object.freeze(["artifacts", "admitted", "blocked", "pending"]);
+
+/** How much a carry does at a time: each step carries at most `chunkBytes` of v2 lines, then records where it
+ *  stopped and yields, so no step holds the event loop or the carry lock for long. */
+export const carryLimits = { chunkBytes: 8 * 1024 * 1024 };
+
+/** The v2 lines after `offset`, up to about `budget` bytes and ending at a line boundary (a line longer than the
+ *  budget is read whole, so every step makes progress). */
+function readBoundedTail(file, offset, budget, visit) {
+  let size;
+  try { size = fs.statSync(file).size; } catch (error) { if (error.code === "ENOENT") return { offset: 0, size: -1 }; throw error; }
+  if (size <= offset) return { offset, size };
+  const read = (length) => {
+    const iterator = segmentLines(file, offset, length);
+    let next, position = offset;
+    try {
+      while (!(next = iterator.next()).done) {
+        const bytes = Buffer.byteLength(next.value, "utf8");
+        visit(next.value, { file, offset: position, length: bytes });
+        position += bytes + 1;
+      }
+      return next.value;
+    } finally { iterator.return(); }
+  };
+  let end = read(Math.min(size - offset, budget));
+  if (end === offset && size - offset > budget) end = read(size - offset);
+  return { offset: end, size };
+}
+
+/** Carry at most `budget` bytes of the v2 index lines after `offsets` into buckets and ledgers. Returns the new
+ *  offsets and whether every v2 file has been carried to its end. Re-carrying a line is harmless: every bucket
+ *  reader folds repeated facts by key. */
+function carryV2Lines(storeRoot, offsets, budget = Infinity) {
   const writer = carryWriter();
   const next = { ...offsets };
   const feeds = new Set();
-  for (const name of ["artifacts", "admitted", "blocked", "pending"]) {
-    const tail = readTail(v2File(storeRoot, name), offsets[name] ?? 0, (line) => {
+  let left = budget, done = true;
+  for (const name of V2_NAMES) {
+    const from = offsets[name] ?? 0;
+    const tail = readBoundedTail(v2File(storeRoot, name), from, left, (line) => {
       const record = parseLine(line);
       if (record === undefined) return;
       if (name === "admitted" && typeof record.id === "string" && typeof record.log === "string") {
@@ -323,6 +356,8 @@ function carryV2Lines(storeRoot, offsets) {
       }
     });
     next[name] = tail.offset;
+    left -= tail.offset - from;
+    if (tail.size >= 0 && tail.offset < tail.size) { done = false; break; }
   }
   // Each carried feed's ledger records what its segment holds now; a missing segment records a byte
   // it lacks, so its next read fails closed as the v2 index made it.
@@ -332,7 +367,7 @@ function carryV2Lines(storeRoot, offsets) {
     writer.line(ledgerPath(path.resolve(storeRoot, log)), { carried: "v2", end: Math.max(size, 1) });
   }
   writer.close();
-  return next;
+  return { offsets: next, done };
 }
 
 function rebuildFromSegments(storeRoot) {
@@ -346,39 +381,159 @@ function rebuildFromSegments(storeRoot) {
   writer.close();
 }
 
+const v2Sizes = (storeRoot) => Object.fromEntries(V2_NAMES.map((name) => {
+  try { return [name, fs.statSync(v2File(storeRoot, name)).size]; } catch { return [name, -1]; }
+}));
+const hasV2 = (sizes) => V2_NAMES.some((name) => sizes[name] >= 0);
+/** A marker written by an earlier carry is complete unless it says otherwise and covers every v2 byte. */
+const carriedThrough = (marker, sizes) => marker !== undefined && marker.complete !== false
+  && V2_NAMES.every((name) => sizes[name] <= (marker.carried?.[name] ?? -1));
+
 /**
- * Make a root's located index current with what earlier layouts hold: carried once from v2 (or
- * rebuilt from segments), then any v2 lines appended since. A carry in progress in another process
- * is left to it; one older than ten minutes is taken over.
+ * One step of carrying a root's earlier layouts into its located index: at most `budget` bytes of v2 lines
+ * (or, for a root with no index at all, a rebuild from its segments). The marker records where the step
+ * stopped (`complete: false` until the last byte), so a carry interrupted at any point resumes from its last
+ * step instead of from the start. A step another process holds is left to it; a lock older than ten minutes is
+ * taken over. Returns "located" when nothing is left, "progress", or "held".
  */
-function carryV2(storeRoot) {
-  let state = carried.get(storeRoot);
-  const v2Size = (() => { try { return fs.statSync(v2File(storeRoot, "admitted")).size; } catch { return -1; } })();
-  if (state !== undefined && state.v2Size === v2Size) return;
-  const marked = state?.marked === true;
+function carryStep(storeRoot, budget) {
+  const sizes = v2Sizes(storeRoot);
   const marker = readMarker(storeRoot);
-  if (marker !== undefined && v2Size <= (marker.carried?.admitted ?? -1)) { carried.set(storeRoot, { v2Size, marked: true }); return; }
-  if (marker === undefined && v2Size < 0 && segmentFilesUnder(storeRoot).length === 0) { carried.set(storeRoot, { v2Size, marked }); return; }
+  if (carriedThrough(marker, sizes)) return "located";
+  if (marker === undefined && !hasV2(sizes) && segmentFilesUnder(storeRoot).length === 0) return "located";
   const lock = path.join(locatedIndexDirectory(storeRoot), "carrying.lock");
   fs.mkdirSync(path.dirname(lock), { recursive: true });
   try { if (Date.now() - fs.statSync(lock).mtimeMs > 600_000) fs.rmSync(lock, { force: true }); } catch { /* none */ }
   let handle;
   try { handle = fs.openSync(lock, "wx"); }
-  catch (error) { if (error.code === "EEXIST") return; throw error; }
+  catch (error) { if (error.code === "EEXIST") return "held"; throw error; }
   try {
     const current = readMarker(storeRoot);
-    if (current === undefined && v2Size < 0) {
+    if (carriedThrough(current, sizes)) return "located";
+    if (current === undefined && !hasV2(sizes)) {
       rebuildFromSegments(storeRoot);
       writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: {} });
-    } else {
-      const offsets = carryV2Lines(storeRoot, current?.carried ?? {});
-      writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: offsets });
+      return "located";
     }
-    carried.set(storeRoot, { v2Size, marked: true });
+    const { offsets, done } = carryV2Lines(storeRoot, current?.carried ?? {}, budget);
+    writeMarker(storeRoot, { formula: LOCATED_FORMULA, carried: offsets, ...(done ? {} : { complete: false }) });
+    return done ? "located" : "progress";
   } finally {
     fs.closeSync(handle);
     fs.rmSync(lock, { force: true });
   }
+}
+
+/** Carry a root's earlier layouts into its located index now, to the end (the offline carry ahead of a release).
+ *  Returns "located", or "held" when another process holds the carry. */
+export function carryLocatedIndex(storeRoot, { steps = Infinity } = {}) {
+  for (let taken = 0; ; taken += 1) {
+    // A bounded number of steps leaves the carry where it stopped, as an interrupted process would.
+    if (taken >= steps) return "progress";
+    const step = carryStep(storeRoot, carryLimits.chunkBytes);
+    if (step !== "progress") {
+      if (step === "located") { carried.set(storeRoot, { sizes: v2Sizes(storeRoot), located: true, marked: true }); remainders.delete(storeRoot); }
+      return step;
+    }
+  }
+}
+
+// While a carry is unfinished, a root's questions are answered from its buckets and from the v2 lines not yet
+// carried, read once into memory (read only: the v2 store's own cost, without the bucket writes) and re-read
+// from where they stopped when a v2 writer appends. The carry itself runs in steps off the question path.
+const remainders = new Map();
+const scheduled = new Set();
+
+function v2Facts(storeRoot, remainder) {
+  for (const name of V2_NAMES) {
+    const tail = readTail(v2File(storeRoot, name), remainder.offsets[name] ?? 0, (line, location) => {
+      const record = parseLine(line);
+      if (record === undefined) return;
+      const apply = (kind, value) => applyBucketLine(kind, remainder.kinds.get(kind), value, location);
+      if (name === "admitted" && typeof record.id === "string" && typeof record.log === "string") {
+        // The most numerous facts, held compactly: one interned feed per witness, a set only for several.
+        let log = remainder.logs.get(record.log);
+        if (log === undefined) { log = record.log; remainder.logs.set(log, log); }
+        const held = remainder.admitted.get(record.id);
+        if (held === undefined) remainder.admitted.set(record.id, log);
+        else if (typeof held === "string") { if (held !== log) remainder.admitted.set(record.id, new Set([held, log])); }
+        else held.add(log);
+      }
+      else if (name === "blocked" && typeof record.id === "string") apply("blocked", { id: record.id, obstruction: record.obstruction ?? null });
+      else if (name === "artifacts" && typeof record.ref === "string" && typeof record.canonicalText === "string") apply("artifacts", record);
+      else if (name === "pending" && typeof record.id === "string" && typeof record.log === "string" && record.statement) {
+        // The pending body stays in the v2 file: its line has the bucket line's own shape.
+        apply("pending", record);
+        for (const dependency of record.missing ?? []) apply("waiting", { dependency, id: record.id, log: record.log });
+        for (const source of record.statement.sources ?? []) {
+          if (typeof source?.ref === "string") apply("sources", { ref: source.ref, id: record.id, log: record.log });
+        }
+      }
+    });
+    remainder.offsets[name] = tail.offset;
+  }
+}
+
+function scheduleCarry(storeRoot) {
+  if (scheduled.has(storeRoot)) return;
+  scheduled.add(storeRoot);
+  const step = () => {
+    let next;
+    try { next = carryStep(storeRoot, carryLimits.chunkBytes); } catch { next = "held"; }
+    if (next === "located") {
+      scheduled.delete(storeRoot);
+      carried.set(storeRoot, { sizes: v2Sizes(storeRoot), located: true, marked: true });
+      remainders.delete(storeRoot);
+      return;
+    }
+    // Each step yields the event loop; a carry another process holds is looked at again shortly.
+    setTimeout(step, next === "held" ? 1000 : 0).unref();
+  };
+  setTimeout(step, 0).unref();
+}
+
+/**
+ * Make a root's located index answer for what earlier layouts hold, without carrying on the question path:
+ * a located root answers from its buckets; an unfinished carry answers from its buckets and the uncarried v2
+ * remainder, while the carry continues in bounded steps. A root with no index at all is rebuilt from its
+ * segments (no v2 to answer from in the meantime).
+ */
+function carryV2(storeRoot) {
+  const sizes = v2Sizes(storeRoot), state = carried.get(storeRoot);
+  if (state?.located && V2_NAMES.every((name) => state.sizes[name] === sizes[name])) return;
+  const marker = readMarker(storeRoot);
+  if (carriedThrough(marker, sizes) || (marker === undefined && !hasV2(sizes) && segmentFilesUnder(storeRoot).length === 0)) {
+    carried.set(storeRoot, { sizes, located: true, marked: marker !== undefined || state?.marked === true });
+    remainders.delete(storeRoot);
+    return;
+  }
+  if (marker === undefined && !hasV2(sizes)) { carryLocatedIndex(storeRoot); return; }
+  let remainder = remainders.get(storeRoot);
+  if (remainder === undefined) {
+    remainder = { offsets: { ...(marker?.carried ?? {}) }, kinds: new Map(LOCATED_KINDS.map((kind) => [kind, new Map()])), admitted: new Map(), logs: new Map() };
+    remainders.set(storeRoot, remainder);
+  }
+  v2Facts(storeRoot, remainder);
+  carried.set(storeRoot, { sizes, located: false, marked: marker !== undefined || state?.marked === true });
+  scheduleCarry(storeRoot);
+}
+
+/** Whether a root's located index is complete (`located`) or still being carried from v2 (`carrying`), and how
+ *  far: a service reports this as readiness, apart from its liveness. */
+export function locatedIndexState(storeRoot) {
+  const sizes = v2Sizes(storeRoot), marker = readMarker(storeRoot);
+  if (carriedThrough(marker, sizes)) return Object.freeze({ state: "located" });
+  if (marker === undefined && !hasV2(sizes)) return Object.freeze({ state: segmentFilesUnder(storeRoot).length === 0 ? "located" : "carrying" });
+  return Object.freeze({ state: "carrying", carried: Object.freeze({ ...(marker?.carried ?? {}) }), sizes: Object.freeze(sizes) });
+}
+
+/** Start a root's carry in the background at boot, before any question, and return its state. A service calls
+ *  this when it opens a store, so that little is left uncarried by the time questions arrive (each question
+ *  reads only the uncarried v2 lines), and reports the state as readiness while answering liveness at once. */
+export function prepareLocatedIndex(storeRoot) {
+  const state = locatedIndexState(storeRoot);
+  if (state.state === "carrying") scheduleCarry(storeRoot);
+  return state;
 }
 
 /** A writer marks a fresh root as located before its first fact, so no later reader rebuilds it. */
@@ -394,12 +549,26 @@ function markLocated(storeRoot) {
  */
 export function locatedIndex(storeRoot) {
   carryV2(storeRoot);
+  // A fact is in its bucket, or (while a carry is unfinished) among the v2 lines not yet carried.
+  const uncarried = (kind, key) => remainders.get(storeRoot)?.kinds.get(kind).get(key);
+  const both = (kind, key, same) => {
+    const held = readBucket(storeRoot, kind, key).get(key), more = uncarried(kind, key);
+    if (more === undefined) return held;
+    if (held === undefined) return more;
+    return [...held, ...more.filter((entry) => !held.some((kept) => same(kept, entry)))];
+  };
+  const sameFeed = (a, b) => a.log === b.log, sameWitness = (a, b) => a.id === b.id && a.log === b.log;
   const pendingOf = (id) => {
     if (admittedLogs(id) !== undefined || blocked(id)) return [];
-    return readBucket(storeRoot, "pending", id).get(id) ?? [];
+    return both("pending", id, sameFeed) ?? [];
   };
-  const admittedLogs = (id) => readBucket(storeRoot, "admitted", id).get(id);
-  const blocked = (id) => readBucket(storeRoot, "blocked", id).has(id);
+  const admittedLogs = (id) => {
+    const held = readBucket(storeRoot, "admitted", id).get(id), found = remainders.get(storeRoot)?.admitted.get(id);
+    if (found === undefined) return held;
+    const more = typeof found === "string" ? [found] : [...found];
+    return new Set([...(held ?? []), ...more]);
+  };
+  const blocked = (id) => readBucket(storeRoot, "blocked", id).has(id) || remainders.get(storeRoot)?.kinds.get("blocked").has(id) === true;
   return Object.freeze({
     storeRoot,
     /** The feeds (store-relative) a witness was admitted into, or undefined. */
@@ -409,12 +578,12 @@ export function locatedIndex(storeRoot) {
     /** A witness's pending entries: none once it is admitted or blocked. */
     pendingOf,
     /** The pending witnesses that recorded `dependency` among what they wait on. */
-    waitingOn: (dependency) => readBucket(storeRoot, "waiting", dependency).get(dependency) ?? [],
-    artifactText: (ref) => readBucket(storeRoot, "artifacts", ref).get(ref),
+    waitingOn: (dependency) => both("waiting", dependency, sameWitness) ?? [],
+    artifactText: (ref) => readBucket(storeRoot, "artifacts", ref).get(ref) ?? uncarried("artifacts", ref),
     /** A source's canonical text carried by a pending witness's statement, or undefined. */
     pendingSourceText(ref) {
-      for (const { id, log } of readBucket(storeRoot, "sources", ref).get(ref) ?? []) {
-        for (const entry of readBucket(storeRoot, "pending", id).get(id) ?? []) {
+      for (const { id, log } of both("sources", ref, sameWitness) ?? []) {
+        for (const entry of both("pending", id, sameFeed) ?? []) {
           if (entry.log !== log) continue;
           const found = entry.statement.sources?.find((source) => source.ref === ref);
           if (found) return found.canonicalText;
@@ -450,6 +619,7 @@ function segmentFilesUnder(storeRoot) {
 /** Forget every in-process reading (tests and migration). */
 export function clearSegmentIndexes() {
   carried.clear();
+  remainders.clear();
   bucketCache.clear();
   dayListings.clear();
   segments.clear();
