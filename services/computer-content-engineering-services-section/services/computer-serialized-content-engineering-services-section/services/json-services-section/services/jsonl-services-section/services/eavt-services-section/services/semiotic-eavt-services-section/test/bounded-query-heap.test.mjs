@@ -56,19 +56,22 @@ test("held legacy readings stay within their heap budget over a large journal", 
   assert.equal(one.length, 30 * 20, "every valid record of the category is returned");
   assert.ok(one.every((row) => row.category === "roadmap"));
 
-  // Every category combination, repeatedly, as a long-lived MetroPlat would ask.
-  const baseline = heapUsed();
-  let peakHeld = 0;
-  for (let round = 0; round < 4; round += 1) {
+  // Every category combination, repeatedly, as a long-lived MetroPlat would ask. The
+  // unbounded per-combination readings this replaces held ~200 MB of this journal.
+  const round = () => {
     for (let size = 1; size <= categories.length; size += 1) {
       const rows = querySemanticRecordCategories({ root, objectKind: kind, categories: categories.slice(0, size) });
       assert.equal(rows.length, 30 * 20 * size);
       peakHeld = Math.max(peakHeld, legacyReadingUse().heap);
     }
-  }
-  assert.ok(peakHeld <= legacyReadingLimits.heap, `held readings ${peakHeld} stay within ${legacyReadingLimits.heap}`);
+  };
+  let peakHeld = 0;
+  round(); round();
+  const baseline = heapUsed();
+  for (let n = 0; n < 6; n += 1) round();
   const grown = heapUsed() - baseline;
-  assert.ok(grown < 24 * MB, `heap grew ${Math.round(grown / MB)} MB over 24 rounds of queries (bounded)`);
+  assert.ok(grown < 8 * MB, `heap grew ${Math.round(grown / MB)} MB over 36 further queries (bounded)`);
+  assert.ok(peakHeld <= legacyReadingLimits.heap, `held readings ${peakHeld} stay within ${legacyReadingLimits.heap}`);
 });
 
 test("a returned record is a copy: mutating it does not change the next query", (t) => {

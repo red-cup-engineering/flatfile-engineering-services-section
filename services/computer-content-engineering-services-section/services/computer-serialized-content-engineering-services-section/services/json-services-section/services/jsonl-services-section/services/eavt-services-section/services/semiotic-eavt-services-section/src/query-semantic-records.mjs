@@ -195,7 +195,9 @@ export function querySemanticRecordCategories({ root, objectKind, categories } =
   const seen = new Set();
   const records = [];
   for (const record of [...legacyRecords(custodyRoot, objectKind, selected), ...journalRecords(custodyRoot, objectKind, selected)]) {
-    const key = canonicalJson([record.category, record.event ?? canonicalJson([record.id, record.recordedAt, record.told, record.origin])]);
+    // A legacy SEAVT record carries no telling or origin: its key holds them as null, which
+    // canonical JSON admits, rather than undefined, which it refuses.
+    const key = canonicalJson([record.category, record.event ?? canonicalJson([record.id, record.recordedAt, record.told ?? null, record.origin ?? null])]);
     if (seen.has(key)) continue;
     seen.add(key);
     records.push(record);
