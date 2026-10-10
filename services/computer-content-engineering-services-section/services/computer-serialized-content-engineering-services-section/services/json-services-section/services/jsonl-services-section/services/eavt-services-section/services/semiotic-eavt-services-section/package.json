@@ -34,6 +34,7 @@
     "./record-configured-semantic-record": "./src/record-configured-semantic-record.mjs",
     "./record-semantic-record": "./src/record-semantic-record.mjs",
     "./replay-semantic-record-retirement": "./src/replay-semantic-record-retirement.mjs",
+    "./term-index": "./src/term-index.mjs",
     "./identity": "./src/identity/index.mjs",
     "./identity/primitive-articulation": "./src/identity/primitive-articulation.mjs",
     "./identity/site": "./src/identity/site.mjs",
