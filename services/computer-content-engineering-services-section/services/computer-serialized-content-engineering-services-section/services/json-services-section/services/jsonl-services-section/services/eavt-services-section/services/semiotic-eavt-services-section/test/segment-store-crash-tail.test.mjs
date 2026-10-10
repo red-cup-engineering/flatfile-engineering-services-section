@@ -7,7 +7,7 @@ import { tm } from "@red-cup-engineering/computer-data-engineering-services-sect
 import { artifactStoreRoot } from "../src/journal/store-root.mjs";
 import { journalWitness } from "../src/journal/event.mjs";
 import {
-  clearSegmentIndexes, indexDirectory, rootIndex, segmentAdmit, segmentPath, segmentStatements,
+  clearSegmentIndexes, locatedBucketFile, locatedIndex, segmentAdmit, segmentPath, segmentStatements,
 } from "../src/journal/filesystem/segment-store.mjs";
 
 const witness = (n, causes = []) => journalWitness({
@@ -21,7 +21,7 @@ function store() {
   const first = witness(1), second = witness(2, [first.id]), third = witness(3, [second.id]);
   segmentAdmit(log, [first]);
   clearSegmentIndexes();
-  return { root, storeRoot: artifactStoreRoot(log), log, first, second, third, admitted: join(indexDirectory(artifactStoreRoot(log)), "admitted.jsonl") };
+  return { root, storeRoot: artifactStoreRoot(log), log, first, second, third, admitted: locatedBucketFile(artifactStoreRoot(log), "admitted", first.id) };
 }
 const warnings = () => {
   const seen = [];
@@ -31,23 +31,26 @@ const warnings = () => {
 };
 const settle = () => new Promise((resolve) => setImmediate(resolve));
 
-test("a node starts on an admitted index padded with NUL bytes after its last newline, and its next admission truncates them", async () => {
-  const { root, storeRoot, log, first, second, admitted } = store();
+test("a node starts on an admitted bucket padded with NUL bytes after its last newline, and its next write truncates them", async () => {
+  const { root, storeRoot, log, first, admitted } = store();
+  const other = join(root, "data/journals/2026/10/09/feed.jsonl");
   const watch = warnings();
   try {
     const clean = readFileSync(admitted, "utf8");
     appendFileSync(admitted, Buffer.alloc(1993));
-    assert.equal(rootIndex(storeRoot).admitted.has(first.id), true);
+    assert.equal(locatedIndex(storeRoot).isAdmitted(first.id), true);
     assert.equal(segmentStatements(log).length, 1);
 
-    const [result] = segmentAdmit(log, [second]);
-    assert.equal(result.written, true);
+    // Admitting the same witness into another feed appends to the same bucket.
+    const [result] = segmentAdmit(other, [first]);
+    assert.equal(result.admission, "admitted");
     const text = readFileSync(admitted, "utf8");
     assert.ok(text.startsWith(clean));
     assert.ok(!text.includes("\0"));
     assert.equal(text.trim().split("\n").length, 2);
     clearSegmentIndexes();
-    assert.equal(segmentStatements(log).length, 2);
+    assert.deepEqual([...locatedIndex(storeRoot).admittedLogs(first.id)].sort(), ["2026/10/08/feed.jsonl", "2026/10/09/feed.jsonl"]);
+    assert.equal(segmentStatements(other).length, 1);
 
     await settle();
     const truncated = watch.seen.find((detail) => detail.file === admitted && detail.bytes === 1993 && detail.offset === Buffer.byteLength(clean));
@@ -81,14 +84,14 @@ test("a torn final line is unread, then truncated by the next admission instead 
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test("a NUL byte mid-file or followed by data in an index is still refused", () => {
-  const { root, storeRoot, admitted } = store();
+test("a NUL byte mid-file or followed by data in a bucket is still refused", () => {
+  const { root, storeRoot, first, admitted } = store();
   try {
     const clean = readFileSync(admitted);
     writeFileSync(admitted, Buffer.concat([clean, Buffer.alloc(20), Buffer.from('{"id":"x","log":"y"}\n')]));
-    assert.throws(() => rootIndex(storeRoot), /holds NUL bytes outside its packed prefix/);
+    assert.throws(() => locatedIndex(storeRoot).isAdmitted(first.id), /holds NUL bytes outside its packed prefix/);
     clearSegmentIndexes();
     writeFileSync(admitted, Buffer.concat([clean, Buffer.alloc(20), Buffer.from("data")]));
-    assert.throws(() => rootIndex(storeRoot), /holds NUL bytes outside its packed prefix/);
+    assert.throws(() => locatedIndex(storeRoot).isAdmitted(first.id), /holds NUL bytes outside its packed prefix/);
   } finally { clearSegmentIndexes(); rmSync(root, { recursive: true, force: true }); }
 });

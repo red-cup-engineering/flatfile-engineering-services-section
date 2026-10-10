@@ -11,11 +11,11 @@ import { journalPath } from "../scripts/journal-path.mjs";
 import { readEavtEntries } from "../scripts/read-eavt-entries.mjs";
 import { writeEavtEntries } from "../scripts/write-eavt-entries.mjs";
 import { readEavtJournal } from "../scripts/read-eavt-journal.mjs";
-import { readJsonlAtPath } from "@red-cup-engineering/jsonl-services-section";
+import { readJsonlAtPath } from "@red-cup-engineering/jsonl-services-section/read-jsonl";
 import { latestState } from "../scripts/latest-state.mjs";
 import { situationWindow } from "../scripts/situation-window.mjs";
 import { readEavtState } from "../scripts/read-eavt-state.mjs";
-import { commitSettledRecord, readDatomsAtPath, recordPathFor, settle, settledDatom } from "../services/datom-services-section/src/index.mjs";
+import { commitSettledRecord, readDatomsAtPath, recordPathFor, settle, settledDatom } from "@red-cup-engineering/datom";
 
 const COMMANDS = Object.freeze({
   "resolve-journal-date": { required: ["at"], invoke: ({ at }) => journalPath({ root: ".", feed: "journal", at }).split("/").slice(-4,-1).join("-"), output: "text" },
