@@ -28,7 +28,7 @@ deterministic reading of content and witnessed relations. Its graph and event
 mechanics remain leaf services of that content capability rather than a
 parallel generic-data-structure hierarchy.
 
-`semantic-content-identify-service` owns the registry-compatible version 2
+`semantic-content-identity` (this package's `./semantic-content-identity` export) owns the registry-compatible version 2
 typed normalized-RMN carrier used by existing content consumers. Its identity
 is an RFC 6920 commitment to the exact deterministic-CBOR carrier bytes; it
 does not turn a digest into evidence about an external referent. The service's

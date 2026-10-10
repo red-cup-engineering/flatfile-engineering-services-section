@@ -6,7 +6,7 @@
  *
  * Extracted from @red-cup-engineering/html-structural-projection-service (src/html/index.mts),
  * which now re-exports this surface unchanged. Depends on
- * @red-cup-engineering/css-style-resolution-service by package name for the CSS system
+ * @red-cup-engineering/css-services-section by package name for the CSS system
  * and valuation it renders.
  */
 import {

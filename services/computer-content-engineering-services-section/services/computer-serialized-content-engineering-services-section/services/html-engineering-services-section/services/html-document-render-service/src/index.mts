@@ -6,7 +6,7 @@
  *
  * Extracted from @red-cup-engineering/html-file-codec-service (src/html/index.mts),
  * which now re-exports this surface unchanged. Depends on
- * @red-cup-engineering/css-style-resolution-service by package name for the CSS system
+ * @red-cup-engineering/css-services-section by package name for the CSS system
  * and valuation it renders.
  */
 import {
@@ -20,7 +20,7 @@ import {
   type CssVisualValuation,
   type CssClassFactorMap,
   type CssSettleWitness,
-} from "@red-cup-engineering/css-style-resolution-service";
+} from "@red-cup-engineering/css-services-section/css-style-resolution";
 import type { FormatRegime } from "@lenticule-science/articulating/predicating/positing/settling/analysis/formats-four";
 import {
   html_is_carrier_not_document,
