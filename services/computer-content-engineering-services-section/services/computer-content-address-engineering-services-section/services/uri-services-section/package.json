@@ -11,7 +11,7 @@
     "./uri-template": "./src/uri-template.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.0",
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*"
   },
   "scripts": {

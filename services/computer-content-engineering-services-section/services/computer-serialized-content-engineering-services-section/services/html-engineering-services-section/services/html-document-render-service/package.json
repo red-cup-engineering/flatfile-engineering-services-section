@@ -31,7 +31,7 @@
   "dependencies": {
     "@red-cup-engineering/css-services-section": "workspace:*",
     "@lenticule-science/articulating": "0.1.1",
-    "@red-cup-engineering/json-services-section": "1.0.0"
+    "@red-cup-engineering/json-services-section": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
