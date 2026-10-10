@@ -14,6 +14,7 @@ import { seavtRow } from "./admit-seavt-row.mjs";
 import { eventForRow } from "./journal/filesystem/events.mjs";
 import { segmentAdmit } from "./journal/filesystem/segment-store.mjs";
 import { querySemanticRecords, querySemanticRecordCategories } from "./query-semantic-records.mjs";
+import { readSemanticRecordsSince } from "./read-semantic-records-since.mjs";
 
 /** The FOUR charge a record's evidence pair names: neither side, for only, against only, or both. */
 export const chargeOfTold = ({ for: forSide, against }) => readingOfSides("extremal", Boolean(forSide), Boolean(against));
@@ -166,8 +167,10 @@ export function recordSemanticRecord({
   });
 }
 /** A semantic record journal bound to one custody root and default object
- * kind: `record` and `query` take the rest of a request, and a request may
- * name its own `objectKind`. */
+ * kind: `record`, `query` and `readSince` take the rest of a request, and a
+ * request may name its own `objectKind`. `readSince({ category, cursor })`
+ * returns `{ records, cursor, reset }`: what was admitted since the cursor, and
+ * the cursor to read on from. */
 export function createSemanticRecordJournal({ root, objectKind: defaultObjectKind } = {}) {
   const custodyRoot = resolve(root);
   return Object.freeze({
@@ -175,6 +178,7 @@ export function createSemanticRecordJournal({ root, objectKind: defaultObjectKin
     record: (request) => recordSemanticRecord({ ...request, root: custodyRoot, objectKind: request?.objectKind ?? defaultObjectKind }),
     query: (request) => querySemanticRecords({ ...request, root: custodyRoot, objectKind: request?.objectKind ?? defaultObjectKind }),
     queryCategories: (request) => querySemanticRecordCategories({ ...request, root: custodyRoot, objectKind: request?.objectKind ?? defaultObjectKind }),
+    readSince: (request) => readSemanticRecordsSince({ ...request, root: custodyRoot, objectKind: request?.objectKind ?? defaultObjectKind }),
   });
 }
 

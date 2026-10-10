@@ -36,6 +36,7 @@
     "./record-semantic-record": "./src/record-semantic-record.mjs",
     "./replay-semantic-record-retirement": "./src/replay-semantic-record-retirement.mjs",
     "./field-index": "./src/field-index.mjs",
+    "./read-semantic-records-since": "./src/read-semantic-records-since.mjs",
     "./identity": "./src/identity/index.mjs",
     "./identity/primitive-articulation": "./src/identity/primitive-articulation.mjs",
     "./identity/site": "./src/identity/site.mjs",
@@ -50,6 +51,7 @@
     "./journal/filesystem/segment-bytes": "./src/journal/filesystem/segment-bytes.mjs",
     "./journal/filesystem/segment-store": "./src/journal/filesystem/segment-store.mjs",
     "./journal/filesystem/directory-lock": "./src/journal/filesystem/directory-lock.mjs",
+    "./journal/filesystem/feed-tail": "./src/journal/filesystem/feed-tail.mjs",
     "./package.json": "./package.json"
   },
   "files": [
