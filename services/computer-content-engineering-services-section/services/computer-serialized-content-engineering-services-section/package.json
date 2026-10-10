@@ -29,7 +29,6 @@
     "./pagination-html": "./src/pagination-html.mjs",
     "./services/http-data-services-section/src/link": "./services/http-data-services-section/src/link.mjs",
     "./services/http-data-services-section/src/bearer-authentication": "./services/http-data-services-section/src/bearer-authentication.mjs",
-    "./base58": "./src/base58.mjs",
     "./read-bcp-14-requirements": "./scripts/read-bcp-14-requirements.mjs",
     "./web-feed": "./src/web-feed.mjs",
     "./project-web-feed": "./src/project-web-feed.mjs",
@@ -48,5 +47,8 @@
     "type": "git",
     "url": "https://github.com/red-cup-engineering/computer-data-services-section.git",
     "directory": "services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section"
+  },
+  "devDependencies": {
+    "@red-cup-engineering/base58-encoding-service": "workspace:*"
   }
 }
