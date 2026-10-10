@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readCarrierInput } from "node:fs";
-import { readdirSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { canonicalJson } from "@red-cup-engineering/json-services-section";
 import { dataArtifactAddress } from "@red-cup-engineering/eavt-services-section/data-artifact-address";
@@ -13,7 +13,7 @@ import { tm } from "@red-cup-engineering/computer-data-engineering-services-sect
 import { readEavtEntriesSince } from "@red-cup-engineering/eavt-services-section/read-eavt-entries";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 import { journalDirectoryOf } from "./journal/store-root.mjs";
-import { cacheBudgetFromEnvironment, projectSegmentStatements, readingCache } from "./journal/filesystem/segment-store.mjs";
+import { cacheBudgetFromEnvironment, ledgerPath, projectSegmentStatements, readingCache, segmentPath } from "./journal/filesystem/segment-store.mjs";
 
 /** The feed every semantic record was appended to before records were journal witnesses. */
 const LEGACY_FEED = "witness-journal-seavt";
@@ -169,6 +169,55 @@ function legacyRecords(root, kind, categories) {
   return records;
 }
 
+/**
+ * A small, bounded reading of a completed semantic query. A busy MetroPlat
+ * repeatedly asks for the same office/work categories; without a query reading
+ * it reprojects historical journal witnesses and clones their large values on
+ * every request, even when no source file changed.
+ *
+ * Only source metadata governs reuse, never the age of a prior request. Watch
+ * both witness segments and admission ledgers, and also the legacy SEAVT feeds.
+ * In-memory readings are disposable: a changed/deleted/added file forces a full,
+ * verified source query. Oversize results are never cached. All returned rows
+ * are detached, preserving callers' freedom to mutate record payloads.
+ */
+export const queryResultLimits = { heap: cacheBudgetFromEnvironment("SEAVT_QUERY_RESULT_CACHE_BYTES", 6 * 1024 * 1024), entries: 128 };
+const queryResults = readingCache(queryResultLimits.heap, queryResultLimits.entries);
+export function clearQueryResultReadings() { queryResults.clear(); }
+export function queryResultReadingUse() {
+  return Object.freeze({ heap: queryResults.cost, entries: queryResults.size });
+}
+
+function fileRevision(file) {
+  try {
+    const stat = statSync(file);
+    return [stat.dev, stat.ino, stat.size, stat.mtimeMs, stat.ctimeMs];
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+function sourceRevision(root, objectKind) {
+  const files = [];
+  for (const date of datesUnder(journalDirectoryOf(root))) {
+    const logPath = dataArtifactAddress({ root, tier: "log", encoding: "jsonl", at: date, action: objectKind, subject: objectKind }).path;
+    const segment = fileRevision(segmentPath(logPath));
+    const ledger = fileRevision(ledgerPath(logPath));
+    if (segment !== null || ledger !== null) files.push([logPath, segment, ledger]);
+  }
+  for (const file of legacyFeedFiles(join(root, "data", "logs"))) files.push([file, fileRevision(file)]);
+  return JSON.stringify(files);
+}
+
+function detachReading(rows) {
+  return Object.freeze(structuredClone(rows).map((row) => Object.freeze({
+    ...row,
+    ...(row.told === undefined ? {} : { told: Object.freeze(row.told) }),
+    ...(row.causes === undefined ? {} : { causes: Object.freeze(row.causes) }),
+  })));
+}
+
 /** Every record of one kind and category, from the journal and from the earlier SEAVT feed, once each, in the order recorded. */
 export function querySemanticRecords({ root, objectKind, category } = {}) {
   if (
@@ -193,6 +242,11 @@ export function querySemanticRecordCategories({ root, objectKind, categories } =
   }
   const selected = new Set(categories);
   const custodyRoot = resolve(root);
+  const key = JSON.stringify([custodyRoot, objectKind, [...selected].sort()]);
+  const revision = sourceRevision(custodyRoot, objectKind);
+  const held = queryResults.get(key);
+  if (held?.revision === revision) return detachReading(held.records);
+
   const seen = new Set();
   const records = [];
   for (const record of [...legacyRecords(custodyRoot, objectKind, selected), ...journalRecords(custodyRoot, objectKind, selected)]) {
@@ -203,9 +257,19 @@ export function querySemanticRecordCategories({ root, objectKind, categories } =
     seen.add(key);
     records.push(record);
   }
-  return Object.freeze(records.map((record, index) => ({ record, index }))
+  const answer = Object.freeze(records.map((record, index) => ({ record, index }))
     .sort((left, right) => String(left.record.recordedAt).localeCompare(String(right.record.recordedAt)) || left.index - right.index)
     .map(({ record }) => record));
+  // Avoid extra serialization on enormous one-off histories. Keep only stable,
+  // small queries; metadata changes during the read prevent an inconsistent hit.
+  if (answer.length <= 256 && revision === sourceRevision(custodyRoot, objectKind)) {
+    const encoded = JSON.stringify(answer);
+    const cost = Buffer.byteLength(encoded) * 2 + Buffer.byteLength(key);
+    if (cost <= queryResultLimits.heap) {
+      queryResults.keep(key, { revision, records: structuredClone(answer) }, cost);
+    }
+  }
+  return answer;
 }
 if (import.meta.main)
   process.stdout.write(
