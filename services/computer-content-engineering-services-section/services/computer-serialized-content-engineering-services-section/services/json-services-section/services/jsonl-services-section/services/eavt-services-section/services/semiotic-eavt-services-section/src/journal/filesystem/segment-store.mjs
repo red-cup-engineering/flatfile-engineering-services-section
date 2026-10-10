@@ -527,6 +527,28 @@ export function locatedIndexState(storeRoot) {
   return Object.freeze({ state: "carrying", carried: Object.freeze({ ...(marker?.carried ?? {}) }), sizes: Object.freeze(sizes) });
 }
 
+/** Store roots below `root`: directories holding a v2 causal-admission index (day directories hold witness
+ *  segments, never a store root; symbolic links and node_modules are not followed). */
+export function v2StoreRoots(root, depth = 8) {
+  const found = [];
+  const visit = (directory, left) => {
+    let entries;
+    try { entries = fs.readdirSync(directory, { withFileTypes: true }); } catch { return; }
+    if (fs.existsSync(indexDirectory(directory))) { found.push(directory); return; }
+    if (left === 0) return;
+    for (const entry of entries) {
+      if (entry.isDirectory() && !entry.isSymbolicLink() && entry.name !== "node_modules" && !/^\d{2,4}$/u.test(entry.name)) visit(path.join(directory, entry.name), left - 1);
+    }
+  };
+  visit(root, depth);
+  return found.sort();
+}
+
+/** Prepare every v2 store root below `root` at boot (`prepareLocatedIndex`), returning each one's state. */
+export function prepareLocatedIndexesUnder(root, { depth = 8 } = {}) {
+  return Object.freeze(v2StoreRoots(root, depth).map((storeRoot) => Object.freeze({ storeRoot, ...prepareLocatedIndex(storeRoot) })));
+}
+
 /** Start a root's carry in the background at boot, before any question, and return its state. A service calls
  *  this when it opens a store, so that little is left uncarried by the time questions arrive (each question
  *  reads only the uncarried v2 lines), and reports the state as readiness while answering liveness at once. */

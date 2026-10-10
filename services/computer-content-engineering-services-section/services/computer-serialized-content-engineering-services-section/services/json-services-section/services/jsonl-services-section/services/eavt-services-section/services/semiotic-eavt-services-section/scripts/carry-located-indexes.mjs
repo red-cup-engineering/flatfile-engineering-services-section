@@ -15,24 +15,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { homedir } from "node:os";
 import { parseArgs } from "node:util";
-import { carryLocatedIndex, indexDirectory, locatedIndexDirectory } from "../src/journal/filesystem/segment-store.mjs";
+import { carryLocatedIndex, indexDirectory, locatedIndexDirectory, v2StoreRoots } from "../src/journal/filesystem/segment-store.mjs";
 
-/** Store roots below `root`: directories holding a v2 causal-admission index. */
-export function v2StoreRoots(root, depth = 8) {
-  const found = [];
-  const visit = (directory, left) => {
-    let entries;
-    try { entries = fs.readdirSync(directory, { withFileTypes: true }); } catch { return; }
-    if (fs.existsSync(indexDirectory(directory))) { found.push(directory); return; }
-    if (left === 0) return;
-    for (const entry of entries) {
-      // Day directories hold witness segments, never a store root.
-      if (entry.isDirectory() && !entry.isSymbolicLink() && entry.name !== "node_modules" && !/^\d{2,4}$/u.test(entry.name)) visit(path.join(directory, entry.name), left - 1);
-    }
-  };
-  visit(root, depth);
-  return found.sort();
-}
+export { v2StoreRoots };
 
 const marker = (storeRoot) => {
   try { return JSON.parse(fs.readFileSync(path.join(locatedIndexDirectory(storeRoot), "formula.json"), "utf8")); }

@@ -6,7 +6,7 @@ import { dirname, join } from "node:path";
 import test from "node:test";
 import {
   carryLimits, carryLocatedIndex, clearSegmentIndexes, indexDirectory, locatedBucketFile, locatedIndex, locatedIndexDirectory,
-  locatedIndexState, prepareLocatedIndex, segmentPath,
+  locatedIndexState, prepareLocatedIndex, prepareLocatedIndexesUnder, segmentPath,
 } from "../src/journal/filesystem/segment-store.mjs";
 
 const address = (n) => `ni:///sha-256;${createHash("sha256").update(String(n)).digest("base64url")}`;
@@ -87,4 +87,15 @@ test("a store prepared at boot is carried in the background before any question 
   clearSegmentIndexes();
   assert.equal(locatedIndex(storeRoot).isAdmitted(address(1_234)), true);
   assert.equal(prepareLocatedIndex(storeRoot).state, "located");
+});
+
+test("a host prepares every v2 store below its state root at boot", async (t) => {
+  smallSteps(t);
+  const storeRoot = v2Root(t, 2_000);
+  const states = prepareLocatedIndexesUnder(dirname(storeRoot), { depth: 1 });
+  const mine = states.find((entry) => entry.storeRoot === storeRoot);
+  assert.equal(mine?.state, "carrying");
+  const deadline = Date.now() + 20_000;
+  while (locatedIndexState(storeRoot).state !== "located" && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(locatedIndexState(storeRoot).state, "located");
 });
