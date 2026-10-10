@@ -108,19 +108,22 @@ export function createImmutableContentCustody({ store, maximumBytes: offeredMaxi
     });
   }
 
-  // A store that answers head and read (see file-store.mjs) lets custody serve
-  // byte ranges of large media; the bytes were verified when they were put.
+  // Native file custody verifies the complete current body with bounded I/O
+  // before metadata or a range leaves custody. Other stores use verified get().
   async function head(ni) {
+    if (typeof objects.verify === "function") return objects.verify(immutableContentKey(ni), ni);
     if (typeof objects.head !== "function") {
       const found = await get(ni);
       return found && Object.freeze({ ni, size: found.bytes.length, mediaType: found.mediaType });
     }
-    const found = await objects.head(immutableContentKey(ni));
-    return found && Object.freeze({ ni, size: found.size, mediaType: found.mediaType ?? "application/octet-stream", ...(found.lastModified ? { lastModified: found.lastModified } : {}) });
+    const found = await get(ni);
+    return found && Object.freeze({ ni, size: found.bytes.length, mediaType: found.mediaType });
   }
 
   async function read(ni, range) {
-    if (typeof objects.read === "function") return objects.read(immutableContentKey(ni), range);
+    if (typeof objects.verify === "function") return (await objects.verify(immutableContentKey(ni), ni, { range }))?.bytes ?? null;
+    // A generic store range cannot verify the entire declared body.
+
     const found = await get(ni);
     return found && found.bytes.subarray(range.start, range.end + 1);
   }
