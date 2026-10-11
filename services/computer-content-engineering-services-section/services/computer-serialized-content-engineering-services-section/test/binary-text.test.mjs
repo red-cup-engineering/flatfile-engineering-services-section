@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import * as codecs from "../src/binary-text.mjs";
-import { encode, decode } from "../src/base58.mjs";
+import { encode, decode } from "@red-cup-engineering/base58-encoding-service";
 
 const carrier = bytes => ({ mediaType: "application/octet-stream", contentBase64: Buffer.from(bytes).toString("base64") });
 const pairs = [["Base16", "base16", 65536], ["Base32", "base32", 65536], ["Base58", "base58btc", 1024], ["Base64url", "base64url", 65536]];
