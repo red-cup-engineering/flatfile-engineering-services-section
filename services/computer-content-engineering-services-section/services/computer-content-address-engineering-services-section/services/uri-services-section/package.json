@@ -6,7 +6,10 @@
   "exports": {
     "./ni-uri": "./src/ni-uri.mjs",
     "./package.json": "./package.json",
-    "./http-url": "./src/http-url.mjs",
+    "./http-url": {
+      "types": "./src/http-url.d.mts",
+      "import": "./src/http-url.mjs"
+    },
     "./address-transformations": "./src/address-transformations.mjs",
     "./uri-template": "./src/uri-template.mjs"
   },
