@@ -135,7 +135,7 @@ function parseLine(line) {
 
 export const LOCATED_FORMULA = "ni-path-v1";
 export const locatedIndexDirectory = (storeRoot) => path.join(journalIndexDirectory(storeRoot), "causal-admission", "v3");
-const LOCATED_KINDS = Object.freeze(["admitted", "blocked", "pending", "waiting", "artifacts", "sources"]);
+const LOCATED_KINDS = Object.freeze(["admitted", "blocked", "pending", "waiting", "artifacts", "sources", "threads"]);
 const LOCATED_CACHE_BYTES = 4 * 1024 * 1024;
 const LOCATED_CACHE_ENTRIES = 256;
 const CARRY_BUFFER_BYTES = 4 * 1024 * 1024;
@@ -166,7 +166,10 @@ function applyBucketLine(kind, entries, record, location, ends) {
   } else if (kind === "pending" && typeof record.id === "string" && typeof record.log === "string" && record.statement) {
     const held = list(record.id);
     // Pending bodies stay on disk; a reader decodes one only when admission needs it.
-    if (!held.some((entry) => entry.log === record.log)) held.push(deferredPendingEntry(record.id, record.log, (record.statement.sources ?? []).map((source) => source.ref), location));
+    if (!held.some((entry) => entry.log === record.log)) held.push(deferredPendingEntry(record.id, record.log, (record.statement.sources ?? []).map((source) => source.ref), location, typeof record.thread === "string" ? record.thread : undefined));
+  } else if (kind === "threads" && typeof record.thread === "string" && typeof record.id === "string") {
+    const held = list(record.thread);
+    if (!held.some((member) => member.id === record.id)) held.push(Object.freeze({ id: record.id, causes: Object.freeze(Array.isArray(record.causes) ? [...record.causes] : []) }));
   } else if (kind === "waiting" && typeof record.dependency === "string" && typeof record.id === "string" && typeof record.log === "string") {
     const held = list(record.dependency);
     if (!held.some((entry) => entry.id === record.id && entry.log === record.log)) held.push(Object.freeze({ id: record.id, log: record.log }));
@@ -695,6 +698,8 @@ export function locatedIndex(storeRoot) {
     /** The byte offset at which a witness's line in one feed's segment ends, or undefined when its
      *  admission was recorded before admitted facts named it. */
     admittedEnd: (id, log) => readBucketHeld(storeRoot, "admitted", id).ends.get(admissionKey(id, log)),
+    /** A thread's members, each with its causes, in the order they were admitted. */
+    threadMembers: (thread) => readBucket(storeRoot, "threads", thread).get(thread) ?? [],
     isAdmitted: (id) => admittedLogs(id) !== undefined,
     isBlocked: blocked,
     /** A witness's pending entries: none once it is admitted or blocked. */
@@ -750,9 +755,10 @@ export function clearSegmentIndexes() {
   projections.clear();
 }
 
-function deferredPendingEntry(id, log, sourceRefs, location) {
+function deferredPendingEntry(id, log, sourceRefs, location, thread) {
   return {
     log,
+    thread,
     sourceRefs: Object.freeze(sourceRefs),
     get statement() {
       const reader = openSegmentReader(location.file), buffer = Buffer.alloc(location.length);
@@ -1229,9 +1235,10 @@ export function segmentFiles(logPath) {
  * @param {readonly object} statements witnesses to admit.
  * @param {readonly {ref: string, canonicalText: string}[]} artifacts artifacts their observations reference beyond their sources.
  * @param {{state?: (id: string) => string, artifact?: (ref: string) => object|undefined}} [legacy] the earlier store's view, while it exists.
+ * @param {{thread?: string}} [options] `thread`: the history these witnesses belong to beyond their feed, recorded as each one's membership (the store's threads facts).
  * @returns per statement: whether this call admitted it, and its admission state.
  */
-export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
+export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}, { thread } = {}) {
   const storeRoot = artifactStoreRoot(logPath);
   const index = locatedIndex(storeRoot);
   markLocated(storeRoot);
@@ -1283,7 +1290,7 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
   };
 
   const newly = new Set();
-  const queue = [...batch.keys()].map((id) => ({ id, log, statement: batch.get(id) }));
+  const queue = [...batch.keys()].map((id) => ({ id, log, statement: batch.get(id), thread }));
   const queued = new Set(queue.map((item) => `${item.id}\u0000${item.log}`));
   // A pending dependent is woken again only when something has been admitted since it was last woken.
   const wokenAt = new Map();
@@ -1294,7 +1301,7 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
         if (queued.has(key) || wokenAt.get(key) === newly.size) continue;
         wokenAt.set(key, newly.size);
         queued.add(key);
-        queue.push({ id: dependent, log: entry.log, statement: entry.statement });
+        queue.push({ id: dependent, log: entry.log, statement: entry.statement, thread: entry.thread });
       }
     }
   };
@@ -1311,12 +1318,13 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
       wakeDependentsOfAdmitted();
       if (queue.length === 0) break;
     }
-    const { id, log: itemLog, statement } = queue.shift();
+    const { id, log: itemLog, statement, thread: itemThread } = queue.shift();
     queued.delete(`${id}\u0000${itemLog}`);
     const state = stateOf(id);
     if (state === "blocked") continue;
     if (state === "admitted" || legacy.state?.(id) === "admitted") {
       if (!index.admittedLogs(id)?.has(itemLog)) publish(storeRoot, id, itemLog, statement, deferred);
+      if (itemThread !== undefined) join(storeRoot, index, itemThread, id, statement, deferred);
       continue;
     }
     const coreArtifact = artifactAt(id);
@@ -1337,18 +1345,19 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
       if (!index.pendingOf(id).some((entry) => entry.log === itemLog)) {
         // The body stays on disk in the witness's pending bucket; the waiting and source buckets
         // name it by address, so neither a dependency's wakeup nor a source lookup holds it.
-        writePendingFacts(storeRoot, (file, value) => appendLine(file, value, deferred), { id, log: itemLog, statement, missing: evaluation.missing });
+        writePendingFacts(storeRoot, (file, value) => appendLine(file, value, deferred), { id, log: itemLog, statement, missing: evaluation.missing, ...(itemThread === undefined ? {} : { thread: itemThread }) });
         if (evaluation.missing.every((ref) => index.isAdmitted(ref) || artifactAt(ref) !== undefined)) {
           const key = `${id}\u0000${itemLog}`;
           if (!queued.has(key)) {
             queued.add(key);
-            queue.push({ id, log: itemLog, statement });
+            queue.push({ id, log: itemLog, statement, thread: itemThread });
           }
         }
       }
       continue;
     }
     publish(storeRoot, id, itemLog, statement, deferred);
+    if (itemThread !== undefined) join(storeRoot, index, itemThread, id, statement, deferred);
     newly.add(id);
     enqueueDependents(id);
   }
@@ -1359,6 +1368,31 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
     written: newly.has(statement.id),
     admission: stateOf(statement.id),
   })));
+}
+
+/** Record an admitted witness's membership in a thread, once: the fact names its causes, so the thread's
+ *  frontier is computed from its members without reading them. */
+function join(storeRoot, index, thread, id, statement, deferred) {
+  if (index.threadMembers(thread).some((member) => member.id === id)) return;
+  appendLine(locatedBucketFile(storeRoot, "threads", thread), { thread, id, causes: [...(statement.observation?.causes ?? [])].sort() }, deferred);
+}
+
+/** A thread's frontier: its members no member names as a cause. */
+export function threadFrontier(storeRoot, thread) {
+  const members = locatedIndex(storeRoot).threadMembers(thread);
+  const followed = new Set(members.flatMap((member) => member.causes));
+  return Object.freeze(members.map((member) => member.id).filter((id) => !followed.has(id)).sort());
+}
+
+/** A thread's admitted witnesses, each read where its admitted fact says its line is (THR-3). */
+export function threadWitnesses(storeRoot, thread) {
+  const index = locatedIndex(storeRoot);
+  return Object.freeze(index.threadMembers(thread).flatMap((member) => {
+    const [log] = index.admittedLogs(member.id) ?? [];
+    if (log === undefined) return [];
+    const witness = segmentWitness(path.resolve(storeRoot, log), member.id);
+    return witness === undefined ? [] : [witness];
+  }));
 }
 
 function publish(storeRoot, id, log, statement, deferred) {
