@@ -7,7 +7,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { cacheBudgetFromEnvironment, readingCache } from "../src/journal/filesystem/segment-store.mjs";
 import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
-import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 
 const MB = 1024 * 1024;
 // A fresh process imports this package's own source, so it reads the budgets its environment gives.

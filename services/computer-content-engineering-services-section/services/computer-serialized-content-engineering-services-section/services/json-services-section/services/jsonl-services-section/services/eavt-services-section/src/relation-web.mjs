@@ -2,7 +2,7 @@
 import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
 
 import { createGraph, toJson } from "@red-cup-engineering/metrologic/models/graphs/directed-multigraph";
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 
 const freezeList = (values) => Object.freeze([...values]);
 const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);

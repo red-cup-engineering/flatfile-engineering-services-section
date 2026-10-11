@@ -2,7 +2,7 @@ import {
   admitJsonSemanticContent,
   EMPTY_WITNESS_ROOT,
   identifyJsonSemanticContent,
-} from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+} from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 
 const DOCUMENT_KIND = "witness-journal.document";
 const BATCH_KIND = "witness-journal.batch-receipt";

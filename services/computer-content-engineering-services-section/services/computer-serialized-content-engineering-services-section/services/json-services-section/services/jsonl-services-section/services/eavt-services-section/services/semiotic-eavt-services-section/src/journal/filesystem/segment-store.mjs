@@ -38,6 +38,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { keyBucketPath } from "@red-cup-engineering/computer-content-address-engineering-services-section/ni-path";
 import { StringDecoder } from "node:string_decoder";
 import { canonicalJson, parse } from "@red-cup-engineering/json-services-section";
 import { verifyArtifact } from "../../identity/index.mjs";
@@ -109,7 +110,7 @@ function parseLine(line) {
 // ── the located index: where an admission fact lives is computed from its address ──
 //
 // Every admission fact is a line in a bucket file whose path is computed from the address the fact
-// is about (`ni-path-v1`, semiotic-content-address-system `conformance/ni-path-v1.json`):
+// is about (`ni-path-v1`, computed by `@red-cup-engineering/computer-content-address-engineering-services-section/ni-path`):
 //
 //   <store>/index/causal-admission/v3/<kind>/sha-256/<d0 d1>.jsonl,  d the key's NI digest
 //
@@ -134,30 +135,14 @@ function parseLine(line) {
 export const LOCATED_FORMULA = "ni-path-v1";
 export const locatedIndexDirectory = (storeRoot) => path.join(storeRoot, "index", "causal-admission", "v3");
 const LOCATED_KINDS = Object.freeze(["admitted", "blocked", "pending", "waiting", "artifacts", "sources"]);
-const ADDRESS_PREFIX = "ni:///sha-256;";
 const LOCATED_CACHE_BYTES = 4 * 1024 * 1024;
 const LOCATED_CACHE_ENTRIES = 256;
 const CARRY_BUFFER_BYTES = 4 * 1024 * 1024;
 
-/** The NI address a key is located by: its own when it is one, else the NI of its UTF-8 bytes. */
-export function locatedAddressOf(key) {
-  if (typeof key !== "string" || key.length === 0) throw new TypeError("a located key must be nonempty text");
-  if (key.length === ADDRESS_PREFIX.length + 43 && key.startsWith(ADDRESS_PREFIX)) {
-    const text = key.slice(ADDRESS_PREFIX.length);
-    if (Buffer.from(text, "base64url").toString("base64url") === text) return key;
-  }
-  return `${ADDRESS_PREFIX}${createHash("sha256").update(key, "utf8").digest("base64url")}`;
-}
-
-/** `ni-path-v1`: the bucket of a key, relative to a kind's directory (`sha-256/<d0 d1>.jsonl`). */
-export function locatedBucketPath(key) {
-  return `sha-256/${locatedAddressOf(key).slice(ADDRESS_PREFIX.length, ADDRESS_PREFIX.length + 2)}.jsonl`;
-}
-
 /** The bucket file holding a key's `kind` facts in a store. */
 export function locatedBucketFile(storeRoot, kind, key) {
   if (!LOCATED_KINDS.includes(kind)) throw new TypeError(`unknown located index kind: ${kind}`);
-  return path.join(locatedIndexDirectory(storeRoot), kind, ...locatedBucketPath(key).split("/"));
+  return path.join(locatedIndexDirectory(storeRoot), kind, ...keyBucketPath(key, LOCATED_FORMULA).split("/"));
 }
 
 /** A feed's admission ledger, beside its segment. */

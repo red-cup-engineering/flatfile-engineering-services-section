@@ -29,7 +29,7 @@
  * Terms and witnesses are opaque semiotic JSON values; nothing here reads them
  * except to encode them.
  */
-import { bytesEqual, bytesToHex, bytesToLatin1, retainedCarrier, coincidenceKey, coincides, semanticBytes, semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { bytesEqual, bytesToHex, bytesToLatin1, retainedCarrier, coincidenceKey, coincides, semanticBytes, semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { isReading, knowledgeJoinReading, readingAs, readingOfSides, readingSchema, record, sidesOfReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const present = (value, role) => {

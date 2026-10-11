@@ -1,4 +1,4 @@
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { niUriDigest } from "@red-cup-engineering/uri-services-section/ni-uri";
 function text(value) { if (value === undefined || value === null) return null; const result = String(value).trim(); return result === "" ? null : result; }
 function hash(value) { return niUriDigest(semanticId(value)); }
