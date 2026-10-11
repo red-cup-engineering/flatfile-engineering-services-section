@@ -276,7 +276,7 @@ export function fileJournalStoreByKind(settlementRoot, { dryRun = false } = {}) 
     fs.unlinkSync(oldLink);
     fs.writeFileSync(oldLink, `This settlement's journal is filed by kind under ${journalSegment} since ${new Date().toISOString().slice(0, 10)} (semiotic-eavt-services-section scripts/file-journal-store-by-kind.mjs).\nA release that still writes here runs the dated layout and must be rebuilt.\n`);
     report.steps.push({ guarded: oldLink });
-  } else if (!dryRun && oldStat?.isDirectory() && entries(oldLink).length === 0) {
+  } else if (!dryRun && oldStat?.isDirectory() && lstat(oldLink)?.isDirectory() && entries(oldLink).length === 0) {
     fs.rmdirSync(oldLink);
     report.steps.push({ removed: oldLink });
   }
