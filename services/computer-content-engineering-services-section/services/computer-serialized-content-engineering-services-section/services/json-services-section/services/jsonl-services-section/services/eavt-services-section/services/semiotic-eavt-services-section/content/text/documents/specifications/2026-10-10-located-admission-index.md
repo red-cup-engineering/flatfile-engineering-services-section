@@ -68,7 +68,7 @@ already locates:
 <settlement>/data/state/log-state/             the logs' state (store-root journalIndexDirectory)
   causal-admission/v3/formula.json                  {formula: "ni-path-v1", carried: {v2 offsets}}
   causal-admission/v3/<kind>/sha-256/<d0 d1>.jsonl  buckets, kind in
-      admitted  {id, log}                  keyed by id
+      admitted  {id, log, end}             keyed by id (end: where the witness's segment line ends)
       blocked   {id, obstruction}          keyed by id
       pending   {id, log, statement, missing}  keyed by id
       waiting   {dependency, id, log}      keyed by dependency
@@ -89,6 +89,7 @@ Questions and the one file each opens:
 | question | opens |
 |---|---|
 | is w admitted / into which feeds | `admitted/<bucket(w)>` |
+| w's witness | `admitted/<bucket(w)>`, then one positioned read of the line ending at `end` |
 | is w blocked | `blocked/<bucket(w)>` |
 | w's pending entries (none once admitted or blocked) | `pending/<bucket(w)>` (+ the two above) |
 | who waits on c | `waiting/<bucket(c)>` |

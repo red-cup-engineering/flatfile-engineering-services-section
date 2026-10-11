@@ -151,12 +151,16 @@ export const ledgerPath = (logPath) => `${logPath}.admitted`;
 
 const bucketCache = readingCache(LOCATED_CACHE_BYTES, LOCATED_CACHE_ENTRIES);
 
-function applyBucketLine(kind, entries, record, location) {
+/** The key of one admission in a bucket's line ends: the witness and the feed it was admitted into. */
+const admissionKey = (id, log) => `${id}\u0000${log}`;
+
+function applyBucketLine(kind, entries, record, location, ends) {
   const list = (key) => { let held = entries.get(key); if (held === undefined) { held = []; entries.set(key, held); } return held; };
   if (kind === "admitted" && typeof record.id === "string" && typeof record.log === "string") {
     const logs = entries.get(record.id) ?? new Set();
     logs.add(record.log);
     entries.set(record.id, logs);
+    if (ends !== undefined && Number.isSafeInteger(record.end) && record.end > 0) ends.set(admissionKey(record.id, record.log), record.end);
   } else if (kind === "blocked" && typeof record.id === "string") {
     if (!entries.has(record.id)) entries.set(record.id, record.obstruction ?? null);
   } else if (kind === "pending" && typeof record.id === "string" && typeof record.log === "string" && record.statement) {
@@ -174,30 +178,32 @@ function applyBucketLine(kind, entries, record, location) {
   }
 }
 
-/** One bucket's facts, read from where this process last left it when the file has grown. */
-function readBucket(storeRoot, kind, key) {
+/** One bucket, read from where this process last left it when the file has grown: its facts by key,
+ *  and for admitted facts the byte offset at which each admitted witness's segment line ends. */
+function readBucketHeld(storeRoot, kind, key) {
   const file = locatedBucketFile(storeRoot, kind, key);
   let stat;
   try { stat = fs.statSync(file); }
   catch (error) {
-    if (error.code === "ENOENT") { bucketCache.delete(file); return EMPTY_BUCKET; }
+    if (error.code === "ENOENT") { bucketCache.delete(file); return EMPTY_HELD; }
     throw error;
   }
   let held = bucketCache.get(file);
   if (held !== undefined && (held.ino !== stat.ino || stat.size < held.offset)) held = undefined;
-  if (held === undefined) held = { offset: 0, ino: stat.ino, entries: new Map() };
+  if (held === undefined) held = { offset: 0, ino: stat.ino, entries: new Map(), ends: new Map() };
   if (stat.size > held.offset) {
     const tail = readTail(file, held.offset, (line, location) => {
       const record = parseLine(line);
-      if (record !== undefined) applyBucketLine(kind, held.entries, record, location);
+      if (record !== undefined) applyBucketLine(kind, held.entries, record, location, held.ends);
     });
     held.offset = tail.offset;
   }
   // A decoded bucket line costs about three times its bytes.
   bucketCache.keep(file, held, held.offset * 3);
-  return held.entries;
+  return held;
 }
-const EMPTY_BUCKET = new Map();
+const readBucket = (storeRoot, kind, key) => readBucketHeld(storeRoot, kind, key).entries;
+const EMPTY_HELD = Object.freeze({ entries: new Map(), ends: new Map() });
 
 /** The last complete `{end}` line of a feed's ledger, or undefined when the feed has none. */
 export function feedLedgerEnd(logPath) {
@@ -686,6 +692,9 @@ export function locatedIndex(storeRoot) {
     storeRoot,
     /** The feeds (store-relative) a witness was admitted into, or undefined. */
     admittedLogs,
+    /** The byte offset at which a witness's line in one feed's segment ends, or undefined when its
+     *  admission was recorded before admitted facts named it. */
+    admittedEnd: (id, log) => readBucketHeld(storeRoot, "admitted", id).ends.get(admissionKey(id, log)),
     isAdmitted: (id) => admittedLogs(id) !== undefined,
     isBlocked: blocked,
     /** A witness's pending entries: none once it is admitted or blocked. */
@@ -1354,10 +1363,12 @@ export function segmentAdmit(logPath, statements, artifacts = [], legacy = {}) {
 
 function publish(storeRoot, id, log, statement, deferred) {
   const logPath = path.resolve(storeRoot, log);
-  // The segment line is on disk before the ledger and the bucket that name it exist.
+  // The segment line is on disk before the ledger and the bucket that name it exist. The bucket names
+  // where the line ends, so the witness is read where it is rather than searched for.
   appendLine(segmentPath(logPath), { id: statement.id, observation: statement.observation });
-  appendLine(ledgerPath(logPath), { id, end: fs.statSync(segmentPath(logPath)).size }, deferred);
-  appendLine(locatedBucketFile(storeRoot, "admitted", id), { id, log }, deferred);
+  const end = fs.statSync(segmentPath(logPath)).size;
+  appendLine(ledgerPath(logPath), { id, end }, deferred);
+  appendLine(locatedBucketFile(storeRoot, "admitted", id), { id, log, end }, deferred);
 }
 
 function block(storeRoot, index, id, obstruction, deferred) {
@@ -1399,15 +1410,44 @@ function* segmentLines(file, position = 0, length = Infinity) {
   } finally { reader.close(); }
 }
 
+/** The segment line that ends at byte `end` (its newline the byte before `end`), read backward from
+ *  there in growing windows through the segment's reader (packed or not); undefined when there is none. */
+function segmentLineEndingAt(file, end) {
+  let reader;
+  try { reader = openSegmentReader(file); } catch { return undefined; }
+  try {
+    for (let window = 64 * 1024; ; window *= 4) {
+      const from = Math.max(0, end - window);
+      const buffer = Buffer.alloc(end - from);
+      for (let read = 0; read < buffer.length;) {
+        const got = reader.read(buffer, read, buffer.length - read, from + read);
+        if (got === 0) return undefined;
+        read += got;
+      }
+      if (buffer[buffer.length - 1] !== 0x0a) return undefined;
+      const start = buffer.lastIndexOf(0x0a, buffer.length - 2);
+      if (start >= 0) return buffer.toString("utf8", start + 1, buffer.length - 1);
+      if (from === 0) return buffer.toString("utf8", 0, buffer.length - 1);
+    }
+  } finally {
+    reader.close?.();
+  }
+}
+
 /** One exact admitted witness, in the feed its admitted bucket names.
  * Receipt lookup verifies only the indexed feed; unrelated territory history
  * is neither an authority input nor a prerequisite for this read. */
 export function segmentWitness(logPath, id) {
   const storeRoot = artifactStoreRoot(logPath);
-  const logs = locatedIndex(storeRoot).admittedLogs(id);
+  const index = locatedIndex(storeRoot);
+  const logs = index.admittedLogs(id);
   if (logs === undefined) return undefined;
   for (const log of logs) {
     const file = segmentPath(path.resolve(storeRoot, log));
+    // Where the admitted fact names the line's end, the witness is read there: one positioned read.
+    const end = index.admittedEnd(id, log);
+    const located = end === undefined ? undefined : parseLine(segmentLineEndingAt(file, end) ?? "");
+    if (located?.id === id) return parseJournalWitness(located);
     const marker = JSON.stringify(id);
     for (const line of segmentLines(file)) {
       if (!line.includes(marker)) continue;
