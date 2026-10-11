@@ -1,0 +1,1 @@
+{ "input": { "type": "object", "required": ["value", "keyed"], "properties": { "value": { "type": "object" }, "keyed": { "type": "string" } } }, "output": { "type": "string" } }
