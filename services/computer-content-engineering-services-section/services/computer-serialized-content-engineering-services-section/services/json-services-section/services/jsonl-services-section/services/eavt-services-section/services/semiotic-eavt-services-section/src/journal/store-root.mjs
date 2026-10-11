@@ -3,12 +3,14 @@
  *  A settlement's store is its log tier, `data/logs`, derived from the log tier's
  *  `pathSegment` in the artifact tier table (eavt-services-section `statement`),
  *  never restated. Inside it every directory is `<kind>-logs`: each feed kind's
- *  dated segments (`arrival-logs/2026-10-10-admit-arrival.jsonl.witnesses`), and
- *  the store's own areas, which are logs too: the admission and verification
- *  index (`journal-index-logs`), the content-addressed objects
- *  (`journal-object-logs`) and the oversized source packets
- *  (`journal-packet-logs`). Readers and writers ask this module for these
- *  directories rather than joining their names themselves. */
+ *  dated segments (`arrival-logs/2026-10-10-admit-arrival.jsonl.witnesses`), the
+ *  content-addressed objects (`journal-object-logs`) and the oversized source
+ *  packets (`journal-packet-logs`). What the store derives from its logs to admit
+ *  and read them (the located admission facts, segment verification and stream
+ *  heads) is not a log: it is the logs' state, `data/state/log-state`, beside the
+ *  logs it is about. Readers and writers ask this module for these directories
+ *  rather than joining their names themselves. */
+import fs from "node:fs";
 import path from "node:path";
 
 import { artifactTier } from "@red-cup-engineering/eavt-services-section/statement";
@@ -17,12 +19,17 @@ import { dataArtifactAddress, dataKindDirectoryName } from "@red-cup-engineering
 /** The log tier's POSIX path segment under a settlement root — the store. */
 export const journalSegment = artifactTier("log").pathSegment;
 
-/** The store's own areas, by role: each a `<kind>-logs` directory beside the feed kinds. */
+/** The store's own areas inside it, by role: each a `<kind>-logs` directory beside the feed kinds. */
 export const STORE_AREAS = Object.freeze({
-  index: dataKindDirectoryName("log", "journal-index"),
   objects: dataKindDirectoryName("log", "journal-object"),
   packets: dataKindDirectoryName("log", "journal-packet"),
 });
+
+/** The directory the store's state is kept in, `log-state`: the state of the logs. */
+export const LOG_STATE = dataKindDirectoryName("state", "log");
+
+/** The area the store kept its state in before that state was filed in the state tier. */
+export const SUPERSEDED_INDEX_AREA = dataKindDirectoryName("log", "journal-index");
 const storeAreaNames = new Set(Object.values(STORE_AREAS));
 
 /** Whether a directory name inside a store is one of the store's own areas rather than a feed kind. */
@@ -114,9 +121,17 @@ export function journalDirectoryOf(dataRoot) {
   return path.resolve(dataRoot, ...journalSegment.split("/"));
 }
 
-/** The store's admission and verification index (causal admission, segment verification, field and head readings). */
+/** The store's state (causal admission, segment verification, field and head readings): the logs'
+ *  state in the state tier of the settlement that physically holds the logs, `<settlement>/data/state/
+ *  log-state`. A store linked from elsewhere keeps its state where its logs are; a standalone store keeps
+ *  it inside itself. */
 export function journalIndexDirectory(storeRoot) {
-  return path.join(storeRoot, STORE_AREAS.index);
+  let physical = path.resolve(storeRoot);
+  try { physical = fs.realpathSync.native(physical); } catch { /* A store not yet made is where its path says. */ }
+  const settlement = settlementRootOfStore(physical);
+  return settlement === undefined
+    ? path.join(physical, LOG_STATE)
+    : path.join(settlement, ...artifactTier("state").pathSegment.split("/"), LOG_STATE);
 }
 
 /** The store's content-addressed objects. */
