@@ -11,7 +11,7 @@
  * The wire kind `"sign.cell"` predates that distinction and stays, because it is part
  * of every stored typed mark's address.
  */
-import { canonicalCarrier, semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { canonicalCarrier, semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { admit } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
 import { typedMarkType, semanticReferenceType as typedMarkReferenceType } from "./semantic-carriers.mjs";
 

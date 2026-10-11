@@ -71,12 +71,12 @@ test("settle with a judge that settles nothing keeps every entry live", () => {
   assert.equal(kept.length, 1);
 });
 
-test("recordPathFor sits beside the live journal file under the same dated directory", () => {
+test("recordPathFor is the record tier's projection of the live journal file", () => {
   withTempRoot((root) => {
     const logPath = journalPath({ root, feed: "feed-a", at: AT });
     const recordPath = recordPathFor({ root, feed: "feed-a", at: AT });
-    assert.equal(path.dirname(recordPath), path.dirname(logPath));
-    assert.equal(recordPath, logPath.replace(/\.jsonl$/, ".record.jsonl"));
+    assert.equal(path.dirname(recordPath), path.join(root, "data", "records", "feed-a-records"));
+    assert.equal(path.basename(recordPath), path.basename(logPath).replace("-admit-", "-commit-"));
   });
 });
 

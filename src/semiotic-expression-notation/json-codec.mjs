@@ -448,63 +448,49 @@ export function encodeJsonTermCanonical(value) {
  * @returns {Tm}
  */
 function traverseJson(value, visitor, ancestors = new Set(), path = "$") {
-  if (value === null) return visitor.scalar("null");
-  if (typeof value === "boolean") return visitor.scalar("boolean", value);
-  if (typeof value === "string") return visitor.scalar("string", value);
-  if (typeof value === "number") {
-    // NaN, infinities, and -0 either have no JSON spelling or collapse under
-    // JSON.stringify; admitting them would make this bridge non-injective.
-    if (!Number.isFinite(value) || Object.is(value, -0)) {
-      throw new TypeError(`jsonToTerm: ${path} must be one finite, non-negative-zero JSON number`);
+  const pending = [{kind: "value", value, path}];
+  let result;
+  while (pending.length) {
+    const task = pending.pop();
+    if (task.kind === "end") {
+      result = task.array ? visitor.endArray() : visitor.endObject();
+      ancestors.delete(task.value);
+      continue;
     }
-    return visitor.scalar("number", value);
-  }
-  if (typeof value !== "object") throw new TypeError(`jsonToTerm: ${path} is not a JSON value`);
-  if (ancestors.has(value)) throw new TypeError(`jsonToTerm: ${path} contains a cycle`);
-  ancestors.add(value);
-  try {
-  if (Array.isArray(value)) {
-    const names = Object.getOwnPropertyNames(value);
-    const symbols = Object.getOwnPropertySymbols(value);
-    if (symbols.length > 0 || names.length !== value.length + 1 || names.includes("length") === false) {
-      throw new TypeError(`jsonToTerm: ${path} must be a dense JSON array with no extra properties`);
+    if (task.kind === "key") { visitor.key(task.key); continue; }
+    if (task.kind === "item") { visitor.arrayItem?.(task.index); continue; }
+    const value = task.value, path = task.path;
+    if (value === null) { result = visitor.scalar("null"); continue; }
+    if (typeof value === "boolean" || typeof value === "string") { result = visitor.scalar(typeof value, value); continue; }
+    if (typeof value === "number") {
+      if (!Number.isFinite(value) || Object.is(value, -0)) throw new TypeError(`jsonToTerm: ${path} must be one finite, non-negative-zero JSON number`);
+      result = visitor.scalar("number", value); continue;
     }
-    visitor.startArray(value.length);
-    for (let index = 0; index < value.length; index += 1) {
-      const key = String(index);
-      const descriptor = Object.getOwnPropertyDescriptor(value, key);
-      if (descriptor === undefined || !descriptor.enumerable || !("value" in descriptor)) {
-        throw new TypeError(`jsonToTerm: ${path}[${index}] must be one enumerable data value`);
-      }
-      visitor.arrayItem?.(index);
-      traverseJson(descriptor.value, visitor, ancestors, `${path}[${index}]`);
+    if (typeof value !== "object") throw new TypeError(`jsonToTerm: ${path} is not a JSON value`);
+    if (ancestors.has(value)) throw new TypeError(`jsonToTerm: ${path} contains a cycle`);
+    const array = Array.isArray(value), names = Object.getOwnPropertyNames(value);
+    if (array) {
+      if (Object.getOwnPropertySymbols(value).length || names.length !== value.length + 1 || !names.includes("length")) throw new TypeError(`jsonToTerm: ${path} must be a dense JSON array with no extra properties`);
+    } else {
+      const prototype = Object.getPrototypeOf(value);
+      if (prototype !== Object.prototype && prototype !== null) throw new TypeError(`jsonToTerm: ${path} must be a plain JSON record`);
+      if (Object.getOwnPropertySymbols(value).length) throw new TypeError(`jsonToTerm: ${path} must not have symbol-keyed properties`);
     }
-    return visitor.endArray();
-  }
-  const prototype = Object.getPrototypeOf(value);
-  if (prototype !== Object.prototype && prototype !== null) {
-    throw new TypeError(`jsonToTerm: ${path} must be a plain JSON record`);
-  }
-  if (Object.getOwnPropertySymbols(value).length > 0) {
-    throw new TypeError(`jsonToTerm: ${path} must not have symbol-keyed properties`);
-  }
-  const names = Object.getOwnPropertyNames(value);
-  for (const key of names) {
-    const descriptor = Object.getOwnPropertyDescriptor(value, key);
-    if (!descriptor.enumerable || !("value" in descriptor)) {
-      throw new TypeError(`jsonToTerm: ${path}.${key} must be one enumerable data property`);
+    const keys = array ? Array.from({length:value.length},(_,i)=>String(i)) : names.sort();
+    for (const key of keys) {
+      const descriptor = Object.getOwnPropertyDescriptor(value,key);
+      if (!descriptor || !descriptor.enumerable || !("value" in descriptor)) throw new TypeError(`jsonToTerm: ${path}.${key} must be one enumerable data property`);
+    }
+    ancestors.add(value);
+    if (array) visitor.startArray(value.length); else visitor.startObject(keys.length);
+    pending.push({kind:"end",value,array});
+    for (let i=keys.length-1;i>=0;i--) {
+      const key=keys[i];
+      pending.push({kind:"value",value:Object.getOwnPropertyDescriptor(value,key).value,path:array ? `${path}[${key}]` : `${path}.${key}`});
+      pending.push(array ? {kind:"item",index:i} : {kind:"key",key});
     }
   }
-  visitor.startObject(names.length);
-  for (const key of names.sort()) {
-    const descriptor = Object.getOwnPropertyDescriptor(value, key);
-    visitor.key(key);
-    traverseJson(descriptor.value, visitor, ancestors, `${path}.${key}`);
-  }
-  return visitor.endObject();
-  } finally {
-    ancestors.delete(value);
-  }
+  return result;
 }
 
 /** Decode a normal-form term back to an admitted JSON value.

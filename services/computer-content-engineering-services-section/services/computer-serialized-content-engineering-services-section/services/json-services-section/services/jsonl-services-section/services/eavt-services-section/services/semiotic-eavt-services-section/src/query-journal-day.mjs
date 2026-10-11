@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readCarrierInput } from "node:fs";
-import { basename, dirname, relative, resolve, sep } from "node:path";
+import { basename, resolve } from "node:path";
 import { journalDirectoryOf } from "./journal/store-root.mjs";
 import { projectSegmentStatements, segmentAdmittedLogs } from "./journal/filesystem/segment-store.mjs";
 import { semanticRecordOf } from "./query-semantic-records.mjs";
@@ -31,9 +31,7 @@ export function feedOfLog(logPath, date) {
 
 /** The feeds one settlement root admitted witnesses into on one date, as logical handles. */
 export function journalDayLogs(root, date) {
-  const store = journalDirectoryOf(root);
-  const day = date.split("-").join(sep);
-  return segmentAdmittedLogs(store).filter((log) => dirname(relative(store, log)) === day && feedOfLog(log, date) !== undefined);
+  return segmentAdmittedLogs(journalDirectoryOf(root), { date }).filter((log) => feedOfLog(log, date) !== undefined);
 }
 
 export function queryJournalDay({ roots, date, feeds } = {}) {

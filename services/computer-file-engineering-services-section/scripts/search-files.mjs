@@ -2,7 +2,7 @@ import { resolve } from "node:path";
 
 import { prioritizePosixPaths } from "@red-cup-engineering/computer-filepath-engineering-services-section/prioritize-posix-paths";
 import { walkPosixPaths } from "@red-cup-engineering/computer-filepath-engineering-services-section/walk-posix-paths";
-import { searchFile } from "@red-cup-engineering/file-services/search-file";
+import { searchFile } from "@red-cup-engineering/computer-file-engineering-services-section/search-file";
 
 function requireNeedle(needle) {
   if (!(needle instanceof Uint8Array)) throw new TypeError("needle must be a Uint8Array or Buffer");

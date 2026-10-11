@@ -1,9 +1,9 @@
-import { entities, readEavtEntries, relateFromEavtRows } from "@red-cup-engineering/eavt";
+import { entities, readEavtEntries, relateFromEavtRows } from "@red-cup-engineering/eavt-services-section";
 import { runDischarge, runLint, runReplay, runShow, runValidate, runWitness, runWitnessLog } from "../src/cli/verbs.mjs";
 import { getRecord } from "../src/kernel/record-store.mjs";
 import { replayEventLog, serializeState } from "../src/kernel/replay.mjs";
 import { loadFlatfiles } from "../src/substrate/read-flatfiles.mjs";
-import { readEavtJournal } from "@red-cup-engineering/eavt/read-eavt-journal";
+import { readEavtJournal } from "@red-cup-engineering/eavt-services-section/read-eavt-journal";
 
 const USAGE = `flatfile-resource-graph <verb> [args]
 

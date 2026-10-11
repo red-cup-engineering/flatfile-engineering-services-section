@@ -1,0 +1,30 @@
+{
+  "name": "@red-cup-engineering/html-engineering-services-section",
+  "version": "0.1.1",
+  "type": "module",
+  "description": "The one section for all HTML: rendering documents and fragments, escaping, structural projection, Markdown-to-HTML, and HTML validity. Seated in computer-data serialization beside xml and json, restricting the XML codec rather than owning competing escaping or AST writers.",
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "dependencies": {
+    "@red-cup-engineering/computer-article-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/css-services-section": "workspace:*",
+    "@red-cup-engineering/html-structural-projection-service": "workspace:*",
+    "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/markdown-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section": "workspace:*"
+  },
+  "exports": {
+    "./html-document-render": "./src/html-document-render.mjs",
+    "./article-html": "./src/article-html.mjs",
+    "./page-html": "./src/page-html.mjs",
+    "./page-metadata": "./src/page-metadata.mjs",
+    "./html-template": "./src/html-template.mjs",
+    "./static-page": "./src/static-page.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}

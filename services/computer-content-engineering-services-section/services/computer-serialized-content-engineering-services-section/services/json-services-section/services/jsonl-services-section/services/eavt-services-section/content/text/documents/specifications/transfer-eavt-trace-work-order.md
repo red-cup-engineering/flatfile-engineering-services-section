@@ -1,14 +1,14 @@
 # transfer-eavt-trace
 ## Requirements
-- `computes-fix-delta`: The operation returns `{entity, fiber}` (exactly `@red-cup-engineering/eavt`'s own settled-fiber shape) for `request.subject` over `request.rows`, WITHOUT reading retraction — Fix(Δ) of the braided-tower stratification, "what every cell would hold if retraction never happened."
+- `computes-fix-delta`: The operation returns `{entity, fiber}` (exactly `@red-cup-engineering/eavt-services-section`'s own settled-fiber shape) for `request.subject` over `request.rows`, WITHOUT reading retraction — Fix(Δ) of the braided-tower stratification, "what every cell would hold if retraction never happened."
 - `converse-toggle`: When `request.converse` is present (even `{}`), a declared converse pair redirects a row's evidence onto the negative face of its positive predicate's cell, merged with any in-trace `{a:"has-converse"}` declaration row; when `request.converse` is absent, no redirection happens.
-- `composes-eavt-transfer`: The operation delegates the whole charge-accumulation/converse-redirect closure to `@red-cup-engineering/eavt`'s own `transfer` export; it never re-derives cell accumulation, the bilattice join, or the converse law itself.
+- `composes-eavt-transfer`: The operation delegates the whole charge-accumulation/converse-redirect closure to `@red-cup-engineering/eavt-services-section`'s own `transfer` export; it never re-derives cell accumulation, the bilattice join, or the converse law itself.
 - `pure-operation`: The operation performs no filesystem or network access; it reads only the `subject`, `rows`, and optional `converse` fields of its request.
 ## Prohibitions
 - `missing-fields-refusal`: The operation must refuse (throw `TypeError`) a request whose `subject` is not a non-empty string, or whose `rows` is not an array.
-- `no-second-accumulation`: The operation must not accumulate cell charges, join evidence, or apply a converse-redirect rule itself, nor call any transfer export other than `@red-cup-engineering/eavt`'s own `transfer`.
+- `no-second-accumulation`: The operation must not accumulate cell charges, join evidence, or apply a converse-redirect rule itself, nor call any transfer export other than `@red-cup-engineering/eavt-services-section`'s own `transfer`.
 ## Laws
-- `primitives-exist-once` | 561 Group working discipline | 2026-08-30 | CLAUDE.md | Applies to this operation's own transfer step. | The Δ nucleus (charge-accumulation/converse-transfer closure) lives once, in `@red-cup-engineering/eavt`; this operation composes that export by exact pin rather than reimplementing it.
+- `primitives-exist-once` | 561 Group working discipline | 2026-08-30 | CLAUDE.md | Applies to this operation's own transfer step. | The Δ nucleus (charge-accumulation/converse-transfer closure) lives once, in `@red-cup-engineering/eavt-services-section`; this operation composes that export by exact pin rather than reimplementing it.
 - `braided-tower-stratification` | 561 Group org layering, EAVT custody | 2026-08-30, 2026-04-04, 2026-04-06 | .claude/rules/org-layering.md | Applies to this whole operation source file. | A row's stratum (Level 0 asserted / Level 1 saturated / Level 2 settled) is a derived reading of the trace, never a stored field; σ and Δ are separate nuclei, never one lumped fold — this operation exposes Δ alone.
 - `fabricate-do-not-hand-write` | 561 Group working discipline, dispatch-agents skill | 2026-09-04 | .claude/skills/dispatch-agents/SKILL.md | Applies to this whole operation source file. | The operation is born through the jsnode fabrication line from this work order, never hand-written.
 ## Standards
@@ -17,15 +17,15 @@
 none
 ## Package
 ```json
-{"packageName":"@red-cup-engineering/transfer-eavt-trace-service","packageVersion":"0.1.0","license":"MIT","dependencies":{"@red-cup-engineering/eavt":"0.8.0"},"devDependencies":{}}
+{"packageName":"@red-cup-engineering/transfer-eavt-trace-service","packageVersion":"0.1.0","license":"MIT","dependencies":{"@red-cup-engineering/eavt-services-section":"0.8.0"},"devDependencies":{}}
 ```
 ## Operation
 ```mjs path=scripts/transfer-eavt-trace.mjs
 #!/usr/bin/env node
-import { transfer } from "@red-cup-engineering/eavt";
+import { transfer } from "@red-cup-engineering/eavt-services-section";
 
 /**
- * Computes the Δ nucleus (Fix(Δ), the transfer-stable converse-closed sub-fiber) for one subject over an {e,a,v,t} trace, composing @red-cup-engineering/eavt's own transfer for the whole charge-accumulation/converse-redirect closure. Reads no retraction — feed it a saturated trace, or use stratify-eavt-trace, for the canonical σ-inside/Δ-outside settle order.
+ * Computes the Δ nucleus (Fix(Δ), the transfer-stable converse-closed sub-fiber) for one subject over an {e,a,v,t} trace, composing @red-cup-engineering/eavt-services-section's own transfer for the whole charge-accumulation/converse-redirect closure. Reads no retraction — feed it a saturated trace, or use stratify-eavt-trace, for the canonical σ-inside/Δ-outside settle order.
  * @param {object} request A record with `subject` (the entity to accumulate), `rows` (an {e,a,v,t} row array, any order, may span multiple subjects), and optional `converse` (a `{opposingPredicate: positivePredicate}` map; its mere presence, even `{}`, activates the legacy redirect lane).
  * @returns {object} `{entity, fiber}` — exactly eavt's own settled-fiber shape.
  * @throws {TypeError} When subject is not a non-empty string, rows is not an array, or a row is non-conformant.
@@ -41,7 +41,7 @@ export function transferEavtTrace(request) {
 if (import.meta.main) {
   if (process.argv.includes("--help")) {
     process.stdout.write(
-      "transferEavtTrace — Computes the Δ nucleus (Fix(Δ), the transfer-stable converse-closed sub-fiber) for one subject over an {e,a,v,t} trace, composing @red-cup-engineering/eavt's own transfer for the whole charge-accumulation/converse-redirect closure. Reads no retraction — feed it a saturated trace, or use stratify-eavt-trace, for the canonical σ-inside/Δ-outside settle order.\n",
+      "transferEavtTrace — Computes the Δ nucleus (Fix(Δ), the transfer-stable converse-closed sub-fiber) for one subject over an {e,a,v,t} trace, composing @red-cup-engineering/eavt-services-section's own transfer for the whole charge-accumulation/converse-redirect closure. Reads no retraction — feed it a saturated trace, or use stratify-eavt-trace, for the canonical σ-inside/Δ-outside settle order.\n",
     );
   } else {
     let text = "";

@@ -1,0 +1,17 @@
+{
+  "name": "@red-cup-engineering/record-research-question-service",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Records a first-class research question in a science section's conventional Markdown question directory.",
+  "exports": "./scripts/record-research-question.mjs",
+  "bin": {
+    "record-research-question": "./scripts/record-research-question-cli.mjs"
+  },
+  "files": [
+    "scripts/"
+  ],
+  "scripts": {
+    "check": "node --check scripts/*.mjs && node --check test/*.test.mjs",
+    "test": "node --test test/*.test.mjs"
+  }
+}

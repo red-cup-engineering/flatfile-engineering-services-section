@@ -19,7 +19,7 @@ export { jsonValuesOfText } from "../scripts/json-values-of-text.mjs";
 export { writeJsonText } from "../scripts/write-json-text.mjs";
 export { encodeJsonByteCarrier } from "../scripts/encode-json-byte-carrier.mjs";
 export { decodeJsonByteCarrier } from "../scripts/decode-json-byte-carrier.mjs";
-export { freezeJson } from "../scripts/freeze-json.mjs";
+export { freezeJson, copyJson } from "../scripts/freeze-json.mjs";
 export { parseJson } from "../scripts/parse-json.mjs";
 export { formCloudEvent } from "../scripts/form-cloudevent.mjs";
 export { validateCloudEvent } from "../scripts/validate-cloudevent.mjs";

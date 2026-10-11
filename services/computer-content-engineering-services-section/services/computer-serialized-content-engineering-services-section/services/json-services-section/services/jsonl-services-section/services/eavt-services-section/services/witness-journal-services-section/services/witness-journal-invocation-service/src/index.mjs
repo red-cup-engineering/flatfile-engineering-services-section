@@ -61,7 +61,7 @@ export function feedNameFor(namespace, at) {
  * T=at. Pure.
  *
  * @param {Invocation} invocation
- * @returns {import("@red-cup-engineering/eavt/row").WitnessJournalEntry}
+ * @returns {import("@red-cup-engineering/eavt-services-section/row").WitnessJournalEntry}
  */
 export function invocationEntry(invocation) {
   const predicate = {
@@ -116,7 +116,7 @@ export function filesystemInvocationWitness(dataRoot, namespace) {
  * @param {string} dataRoot
  * @param {string} namespace
  * @param {import("../../../../../../../../../src/index.mjs").JsonValue} at
- * @returns {readonly { readonly entry: import("@red-cup-engineering/eavt/row").WitnessJournalEntry, readonly trace: number }[]}
+ * @returns {readonly { readonly entry: import("@red-cup-engineering/eavt-services-section/row").WitnessJournalEntry, readonly trace: number }[]}
  */
 export function readInvocations(dataRoot, namespace, at) {
   try {
@@ -134,7 +134,7 @@ export function readInvocations(dataRoot, namespace, at) {
  * @param {string} dataRoot
  * @param {string} namespace
  * @param {() => string} [now]
- * @returns {() => readonly { readonly entry: import("@red-cup-engineering/eavt/row").WitnessJournalEntry, readonly trace: number }[]}
+ * @returns {() => readonly { readonly entry: import("@red-cup-engineering/eavt-services-section/row").WitnessJournalEntry, readonly trace: number }[]}
  */
 export function filesystemInvocationLogReader(dataRoot, namespace, now = () => new Date().toISOString()) {
   return () => readInvocations(dataRoot, namespace, now());

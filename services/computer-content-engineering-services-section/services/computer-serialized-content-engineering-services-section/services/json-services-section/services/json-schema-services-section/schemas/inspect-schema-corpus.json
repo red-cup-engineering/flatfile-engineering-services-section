@@ -1,0 +1,15 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["schemas"],
+    "properties": {
+      "schemas": {
+        "type": "array"
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "required": ["ok", "checked", "errors"]
+  }
+}

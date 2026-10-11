@@ -1,0 +1,15 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["assertions"],
+    "properties": {
+      "assertions": {
+        "type": "array"
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "required": ["schema"]
+  }
+}

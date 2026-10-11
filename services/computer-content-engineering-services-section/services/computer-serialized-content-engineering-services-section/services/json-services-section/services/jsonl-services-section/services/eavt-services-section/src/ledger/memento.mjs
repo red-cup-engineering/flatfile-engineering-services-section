@@ -10,7 +10,7 @@ import {
 } from "./memento-schema.mjs";
 import { canonical, requireJsonValue } from "@red-cup-engineering/json-services-section";
 import { projectStateView, } from "./state.mjs";
-import { eavtId } from "@red-cup-engineering/eavt/row";
+import { eavtId } from "@red-cup-engineering/eavt-services-section/row";
 
 export {
   mementoSnapshotCarrier,

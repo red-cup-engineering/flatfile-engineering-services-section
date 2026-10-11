@@ -1,6 +1,6 @@
 import { freezeJson } from "@red-cup-engineering/json-services-section";
 import { parseLines, serializeLines } from "@red-cup-engineering/jsonl-services-section";
-import { admitTextFileCreationProjection } from "@red-cup-engineering/file-services/admit-text-file-creation-projection";
+import { admitTextFileCreationProjection } from "@red-cup-engineering/computer-file-engineering-services-section/admit-text-file-creation-projection";
 import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 
 function refusal(code, message, path = null) {

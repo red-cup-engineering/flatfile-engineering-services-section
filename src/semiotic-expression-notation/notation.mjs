@@ -298,23 +298,31 @@ function validateAtom(constraint, value) {
 }
 
 export function validateSenType(type) {
-  senTagged(type, "type");
-  const form = SEN_TYPE_FORMS[type[0]];
-  const arity = type.length === 1 + (form?.types?.length ?? 0);
-  if (!form || !arity)
-    senFail(
-      "malformed-sen",
-      `unknown or malformed SEN type ${JSON.stringify(type)}`,
-    );
-  for (const index of form.types ?? []) validateSenType(type[index]);
+  const pending = [{value:type}], open = new Set();
+  while (pending.length) {
+    const task = pending.pop();
+    if (task.close) {open.delete(task.close);continue;}
+    const current=task.value;
+    senTagged(current, "type");
+    if (open.has(current)) senFail("malformed-sen", "cyclic SEN type");
+    open.add(current); pending.push({close:current});
+    const form = SEN_TYPE_FORMS[current[0]];
+    if (!form || current.length !== 1 + (form.types?.length ?? 0))
+      senFail("malformed-sen", `unknown or malformed SEN type tag ${current[0]}`);
+    for (const index of [...(form.types ?? [])].reverse()) pending.push({value:current[index]});
+  }
   return type;
 }
 
 export function validateSenTerm(term) {
-  const pending = [term];
+  const pending = [{value:term}], open = new Set();
   while (pending.length > 0) {
-    const current = pending.pop();
+    const task=pending.pop();
+    if (task.close) {open.delete(task.close);continue;}
+    const current=task.value;
     senTagged(current, "term");
+    if (open.has(current)) senFail("malformed-sen", "cyclic SEN term");
+    open.add(current); pending.push({close:current});
     const form = SEN_FORMS[current[0]];
     if (!form)
       senFail("malformed-sen", `unknown or malformed SEN term tag ${current[0]}`);
@@ -322,7 +330,7 @@ export function validateSenTerm(term) {
     if (current.length !== expected) senFail("malformed-sen", `malformed SEN ${current[0]}`);
     for (const [index, constraint] of Object.entries(form.atoms ?? {})) validateAtom(constraint, current[index]);
     for (const index of form.types ?? []) validateSenType(current[index]);
-    for (const index of [...(form.terms ?? [])].reverse()) pending.push(current[index]);
+    for (const index of [...(form.terms ?? [])].reverse()) pending.push({value:current[index]});
   }
   return term;
 }
@@ -330,17 +338,25 @@ export function validateSenTerm(term) {
 /** The sole binding-aware traversal used by validation consumers, substitution, and reduction. */
 export function mapSenTerm(term, visit, depth = 0) {
   validateSenTerm(term);
-  const go = (node, nodeDepth) => {
-    const form = SEN_FORMS[node[0]],
-      out = [...node];
-    for (const index of form.terms ?? [])
-      out[index] = go(
-        node[index],
-        nodeDepth + (form.binders?.includes(index) ? 1 : 0),
-      );
-    return visit(out, nodeDepth);
-  };
-  return go(term, depth);
+  const frame = (node, nodeDepth) => ({node, nodeDepth, out: [...node], slots: SEN_FORMS[node[0]].terms ?? [], next: 0});
+  const pending = [frame(term, depth)];
+  let result;
+  while (pending.length) {
+    const current = pending.at(-1);
+    if (current.next < current.slots.length) {
+      const index = current.slots[current.next++];
+      const form = SEN_FORMS[current.node[0]];
+      pending.push(frame(current.node[index], current.nodeDepth + (form.binders?.includes(index) ? 1 : 0)));
+      continue;
+    }
+    result = visit(current.out, current.nodeDepth);
+    pending.pop();
+    if (pending.length) {
+      const parent = pending.at(-1);
+      parent.out[parent.slots[parent.next - 1]] = result;
+    }
+  }
+  return result;
 }
 
 /** Rebuild one term after mapping every immediate term-bearing child slot. */

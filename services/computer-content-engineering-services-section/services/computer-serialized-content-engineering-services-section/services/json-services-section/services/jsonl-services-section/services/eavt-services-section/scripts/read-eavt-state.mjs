@@ -24,7 +24,7 @@ export const inputSchema = {
 };
 export const outputSchema = { type: "object" };
 import { readFileSync } from "node:fs";
-import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical";
 import { latestState } from "./latest-state.mjs";
 import { situationWindow } from "./situation-window.mjs";
 /** Read each touched EAVT cell's values, latest value, and situational contradiction. */

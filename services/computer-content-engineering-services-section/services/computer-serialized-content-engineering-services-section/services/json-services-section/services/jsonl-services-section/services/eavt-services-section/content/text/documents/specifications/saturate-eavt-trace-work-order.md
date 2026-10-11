@@ -2,13 +2,13 @@
 ## Requirements
 - `computes-fix-sigma`: The operation returns `{rows}`, where `rows` is the trace-wide, deduped, retraction-closed `{e,a,v,t}` rows of `request.rows` — Level 1, Fix(σ), of the braided-tower stratification.
 - `retraction-toggle`: When `request.retract` is `false`, the operation returns the deduped rows unfiltered (retraction disabled); when `retract` is omitted or `true`, every tombstone row (`v === null`) and every earlier same-`(e,a)` positive row a later tombstone retracts is dropped.
-- `composes-eavt-saturate`: The operation delegates the whole dedupe/retraction closure to `@red-cup-engineering/eavt`'s own `saturate` export; it never re-derives row identity, dedupe, or the tombstone law itself.
+- `composes-eavt-saturate`: The operation delegates the whole dedupe/retraction closure to `@red-cup-engineering/eavt-services-section`'s own `saturate` export; it never re-derives row identity, dedupe, or the tombstone law itself.
 - `pure-operation`: The operation performs no filesystem or network access; it reads only the `rows` and optional `retract` fields of its request.
 ## Prohibitions
 - `missing-rows-refusal`: The operation must refuse (throw `TypeError`) a request whose `rows` field is not an array.
-- `no-second-saturation`: The operation must not compute row identity, dedupe rows, or apply a tombstone/retraction rule itself, nor call any saturation export other than `@red-cup-engineering/eavt`'s own `saturate`.
+- `no-second-saturation`: The operation must not compute row identity, dedupe rows, or apply a tombstone/retraction rule itself, nor call any saturation export other than `@red-cup-engineering/eavt-services-section`'s own `saturate`.
 ## Laws
-- `primitives-exist-once` | 561 Group working discipline | 2026-08-30 | CLAUDE.md | Applies to this operation's own saturation step. | The σ nucleus (row-level retraction closure) lives once, in `@red-cup-engineering/eavt`; this operation composes that export by exact pin rather than reimplementing it.
+- `primitives-exist-once` | 561 Group working discipline | 2026-08-30 | CLAUDE.md | Applies to this operation's own saturation step. | The σ nucleus (row-level retraction closure) lives once, in `@red-cup-engineering/eavt-services-section`; this operation composes that export by exact pin rather than reimplementing it.
 - `braided-tower-stratification` | 561 Group org layering, EAVT custody | 2026-08-30, 2026-04-04, 2026-04-06 | .claude/rules/org-layering.md | Applies to this whole operation source file. | A row's stratum (Level 0 asserted / Level 1 saturated / Level 2 settled) is a derived reading of the trace, never a stored field; σ and Δ are separate nuclei, never one lumped fold — this operation exposes σ alone.
 - `fabricate-do-not-hand-write` | 561 Group working discipline, dispatch-agents skill | 2026-09-04 | .claude/skills/dispatch-agents/SKILL.md | Applies to this whole operation source file. | The operation is born through the jsnode fabrication line from this work order, never hand-written.
 ## Standards
@@ -17,15 +17,15 @@
 none
 ## Package
 ```json
-{"packageName":"@red-cup-engineering/saturate-eavt-trace-service","packageVersion":"0.1.0","license":"MIT","dependencies":{"@red-cup-engineering/eavt":"0.8.0"},"devDependencies":{}}
+{"packageName":"@red-cup-engineering/saturate-eavt-trace-service","packageVersion":"0.1.0","license":"MIT","dependencies":{"@red-cup-engineering/eavt-services-section":"0.8.0"},"devDependencies":{}}
 ```
 ## Operation
 ```mjs path=scripts/saturate-eavt-trace.mjs
 #!/usr/bin/env node
-import { saturate } from "@red-cup-engineering/eavt";
+import { saturate } from "@red-cup-engineering/eavt-services-section";
 
 /**
- * Computes the σ nucleus (Level 1, Fix(σ)) of an {e,a,v,t} trace, composing @red-cup-engineering/eavt's own saturate for the whole trace-wide dedupe/retraction closure.
+ * Computes the σ nucleus (Level 1, Fix(σ)) of an {e,a,v,t} trace, composing @red-cup-engineering/eavt-services-section's own saturate for the whole trace-wide dedupe/retraction closure.
  * @param {object} request A record with `rows` (an {e,a,v,t} row array, any order) and optional `retract` (default true; false disables the tombstone law).
  * @returns {object} `{rows}` — the deduped, retraction-closed rows (trace-wide, Level 1).
  * @throws {TypeError} When rows is not an array, or a row is not a conformant {e,a,v,t} row.
@@ -40,7 +40,7 @@ export function saturateEavtTrace(request) {
 if (import.meta.main) {
   if (process.argv.includes("--help")) {
     process.stdout.write(
-      "saturateEavtTrace — Computes the σ nucleus (Level 1, Fix(σ)) of an {e,a,v,t} trace, composing @red-cup-engineering/eavt's own saturate for the whole trace-wide dedupe/retraction closure.\n",
+      "saturateEavtTrace — Computes the σ nucleus (Level 1, Fix(σ)) of an {e,a,v,t} trace, composing @red-cup-engineering/eavt-services-section's own saturate for the whole trace-wide dedupe/retraction closure.\n",
     );
   } else {
     let text = "";

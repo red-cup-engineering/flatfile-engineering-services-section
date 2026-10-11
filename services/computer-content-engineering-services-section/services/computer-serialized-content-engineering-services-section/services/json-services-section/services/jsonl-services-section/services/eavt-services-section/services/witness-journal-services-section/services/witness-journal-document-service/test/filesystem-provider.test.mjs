@@ -8,7 +8,7 @@ import { test } from "node:test";
 
 import { createFilesystemWitnessJournalBinding } from "../src/filesystem-provider.mjs";
 import { querySettlementRecords, recordSettlementRecord, relationalWitnessJournalDocument, resolveWitnessJournalDocument } from "../src/witness-journal-document.mjs";
-import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 
 test("filesystem custody survives binding restart and retains immutable content", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "witness-journal-document-"));

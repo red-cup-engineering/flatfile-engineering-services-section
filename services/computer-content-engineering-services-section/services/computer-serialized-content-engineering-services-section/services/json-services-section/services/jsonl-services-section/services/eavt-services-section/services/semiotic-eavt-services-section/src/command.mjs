@@ -3,7 +3,7 @@
  *  semantic records, check their references and responses, and retire historical record stores. */
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { isEntrypoint, runCommands } from "@red-cup-engineering/eavt/witness-journal";
+import { isEntrypoint, runCommands } from "@red-cup-engineering/eavt-services-section/witness-journal";
 import { appendSeavtEntries } from "./append-seavt-entries.mjs";
 import { readSeavtEntries } from "./read-seavt-entries.mjs";
 import { readSeavtEntriesAtPath } from "./read-seavt-entries-at-path.mjs";

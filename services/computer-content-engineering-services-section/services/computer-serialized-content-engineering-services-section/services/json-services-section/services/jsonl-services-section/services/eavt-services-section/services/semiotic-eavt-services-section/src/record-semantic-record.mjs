@@ -4,12 +4,12 @@ import { resolve } from "node:path";
 import {
   EMPTY_WITNESS_ROOT,
   identifyJsonSemanticContent,
-} from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+} from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { readingOfSides } from "@red-cup-engineering/computer-data-engineering-services-section/four";
-import { dataArtifactAddress } from "@red-cup-engineering/eavt/data-artifact-address";
-import { toEavt } from "@red-cup-engineering/eavt/row";
+import { dataArtifactAddress } from "@red-cup-engineering/eavt-services-section/data-artifact-address";
+import { toEavt } from "@red-cup-engineering/eavt-services-section/row";
 import { seavtRow } from "./admit-seavt-row.mjs";
 import { eventForRow } from "./journal/filesystem/events.mjs";
 import { segmentAdmit } from "./journal/filesystem/segment-store.mjs";

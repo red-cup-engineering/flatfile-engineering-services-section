@@ -1,13 +1,12 @@
 import { closeSync, openSync, readSync, statSync } from "node:fs";
-import { basename, relative } from "node:path";
+import { relative } from "node:path";
 import { segmentAdmittedLogs, segmentPath } from "./segment-store.mjs";
 
 const READ_CHUNK = 1024 * 1024;
 
 /** The feeds of one object kind a journal store admitted witnesses into, in date order, as logical handles. */
 export function kindFeeds(store, objectKind) {
-  const suffix = `-admit-${objectKind}.jsonl`;
-  return segmentAdmittedLogs(store).filter((log) => basename(log).endsWith(suffix));
+  return segmentAdmittedLogs(store, { kind: objectKind });
 }
 
 /** The bytes a feed's segment holds now (0 before its first witness). */
@@ -42,10 +41,14 @@ export function* linesFrom(file, offset, end) {
  * Read what one kind's feeds gained since `positions` (feed, relative to the store, to byte offset):
  * `visit({ line, offset, length, log, feed })` sees each complete witness line, feed by feed in date
  * order. Returns the positions read to, and whether a feed was found shorter than its position (a
- * rewritten segment), in which case nothing was read and the caller starts again from nothing.
+ * rewritten segment), or a position names a feed the store does not hold (a cursor
+ * from before the store was filed by kind), in which case nothing was read and the caller starts again
+ * from nothing.
  */
 export function tailKindFeeds({ store, objectKind, positions = {}, visit }) {
   const feeds = kindFeeds(store, objectKind);
+  const held = new Set(feeds.map((log) => relative(store, log)));
+  if (Object.keys(positions).some((feed) => !held.has(feed))) return { positions, reset: true };
   if (feeds.some((log) => feedSize(log) < (positions[relative(store, log)] ?? 0))) return { positions, reset: true };
   const next = { ...positions };
   for (const log of feeds) {

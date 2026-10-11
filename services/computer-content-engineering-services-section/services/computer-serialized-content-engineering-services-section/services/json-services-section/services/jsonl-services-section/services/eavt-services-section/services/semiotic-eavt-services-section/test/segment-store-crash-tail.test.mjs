@@ -4,7 +4,7 @@ import { appendFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { artifactStoreRoot } from "../src/journal/store-root.mjs";
+import { artifactStoreRoot, journalFeedPath } from "../src/journal/store-root.mjs";
 import { journalWitness } from "../src/journal/event.mjs";
 import {
   clearSegmentIndexes, locatedBucketFile, locatedIndex, segmentAdmit, segmentPath, segmentStatements,
@@ -17,7 +17,7 @@ const witness = (n, causes = []) => journalWitness({
 
 function store() {
   const root = mkdtempSync(join(tmpdir(), "journal-crash-tail-"));
-  const log = join(root, "data/journals/2026/10/08/feed.jsonl");
+  const log = journalFeedPath(root, "feed", "2026-10-08");
   const first = witness(1), second = witness(2, [first.id]), third = witness(3, [second.id]);
   segmentAdmit(log, [first]);
   clearSegmentIndexes();
@@ -33,7 +33,7 @@ const settle = () => new Promise((resolve) => setImmediate(resolve));
 
 test("a node starts on an admitted bucket padded with NUL bytes after its last newline, and its next write truncates them", async () => {
   const { root, storeRoot, log, first, admitted } = store();
-  const other = join(root, "data/journals/2026/10/09/feed.jsonl");
+  const other = journalFeedPath(root, "feed", "2026-10-09");
   const watch = warnings();
   try {
     const clean = readFileSync(admitted, "utf8");
@@ -49,7 +49,7 @@ test("a node starts on an admitted bucket padded with NUL bytes after its last n
     assert.ok(!text.includes("\0"));
     assert.equal(text.trim().split("\n").length, 2);
     clearSegmentIndexes();
-    assert.deepEqual([...locatedIndex(storeRoot).admittedLogs(first.id)].sort(), ["2026/10/08/feed.jsonl", "2026/10/09/feed.jsonl"]);
+    assert.deepEqual([...locatedIndex(storeRoot).admittedLogs(first.id)].sort(), ["feed-logs/2026-10-08-admit-feed.jsonl", "feed-logs/2026-10-09-admit-feed.jsonl"]);
     assert.equal(segmentStatements(other).length, 1);
 
     await settle();

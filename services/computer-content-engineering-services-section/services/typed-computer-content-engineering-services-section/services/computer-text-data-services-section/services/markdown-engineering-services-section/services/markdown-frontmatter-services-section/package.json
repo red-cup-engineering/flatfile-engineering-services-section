@@ -1,0 +1,31 @@
+{
+  "name": "@red-cup-engineering/markdown-frontmatter-services-section",
+  "version": "0.2.3",
+  "type": "module",
+  "exports": {
+    "./note-description": "./scripts/note-description.mjs",
+    "./migrate-notes": "./scripts/migrate-notes.mjs",
+    "./migrate-frontmatter-vocabulary": "./scripts/migrate-frontmatter-vocabulary.mjs",
+    "./strip-key": "./scripts/strip-markdown-frontmatter-key.mjs",
+    "./repair-quoting": "./scripts/repair-yaml-frontmatter-quoting.mjs"
+  },
+  "bin": {
+    "migrate-notes": "scripts/migrate-notes.mjs",
+    "migrate-frontmatter-vocabulary": "scripts/migrate-frontmatter-vocabulary.mjs"
+  },
+  "files": [
+    "scripts",
+    "package.json"
+  ],
+  "scripts": {
+    "check": "node --check scripts/*.mjs && node --check test/*.test.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-text-content-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-file-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/markdown-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/yaml-frontmatter-codec-service": "workspace:*"
+  }
+}

@@ -1,10 +1,10 @@
-import { createRelationWeb, relationKey } from "@red-cup-engineering/eavt/relation-web";
+import { createRelationWeb, relationKey } from "@red-cup-engineering/eavt-services-section/relation-web";
 import {
   foldIndependentEvidence,
   identifyContentAddressedRow,
   independentEvidenceRow,
   unique,
-} from "@red-cup-engineering/eavt";
+} from "@red-cup-engineering/eavt-services-section";
 import { four } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 const freezeList = (values) => Object.freeze([...values]);

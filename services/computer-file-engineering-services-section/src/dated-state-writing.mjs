@@ -1,6 +1,6 @@
 import { appendFile, mkdir, readFile, rename } from "node:fs/promises";
 import { join } from "node:path";
-import { writeFileBytes } from "@red-cup-engineering/file-services/write-file";
+import { writeFileBytes } from "@red-cup-engineering/computer-file-engineering-services-section/write-file";
 import { sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 
 // Same put/get shape as

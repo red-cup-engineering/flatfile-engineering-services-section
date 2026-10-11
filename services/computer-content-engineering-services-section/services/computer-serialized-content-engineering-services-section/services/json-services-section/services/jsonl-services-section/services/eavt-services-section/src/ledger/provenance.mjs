@@ -18,8 +18,8 @@ import {
   structuralProvenanceSignatureSchema,
 } from "./provenance-schema.mjs";
 import { canonical, requireJsonValue } from "@red-cup-engineering/json-services-section";
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
-import { eavtRecord } from "@red-cup-engineering/eavt/row";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+import { eavtRecord } from "@red-cup-engineering/eavt-services-section/row";
 
 export {
   attestationLinkCarrier,

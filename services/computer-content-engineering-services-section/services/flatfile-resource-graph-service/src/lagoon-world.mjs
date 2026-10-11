@@ -1,9 +1,9 @@
-import { appendEavtRow } from "@red-cup-engineering/eavt/append-eavt-row";
-import { constitute } from "@red-cup-engineering/eavt/constitute-entity";
-import { foldEavtEvidence } from "@red-cup-engineering/eavt/fold-eavt-evidence";
-import { entities } from "@red-cup-engineering/eavt/list-entities";
-import { readEavtEntries } from "@red-cup-engineering/eavt/read-eavt-entries";
-import { relateEavtRows } from "@red-cup-engineering/eavt/relate-eavt-rows";
+import { appendEavtRow } from "@red-cup-engineering/eavt-services-section/append-eavt-row";
+import { constitute } from "@red-cup-engineering/eavt-services-section/constitute-entity";
+import { foldEavtEvidence } from "@red-cup-engineering/eavt-services-section/fold-eavt-evidence";
+import { entities } from "@red-cup-engineering/eavt-services-section/list-entities";
+import { readEavtEntries } from "@red-cup-engineering/eavt-services-section/read-eavt-entries";
+import { relateEavtRows } from "@red-cup-engineering/eavt-services-section/relate-eavt-rows";
 
 function attributesOf(address, rows) {
   return foldEavtEvidence({ subject: address, rows }).fiber.find((cell) => cell.predicate === "constituted")?.object;

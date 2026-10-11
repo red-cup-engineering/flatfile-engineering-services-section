@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync as readCarrierInput } from "node:fs";
-import { appendEavtEntries } from "@red-cup-engineering/eavt/append-eavt-entries";
+import { appendEavtEntries } from "@red-cup-engineering/eavt-services-section/append-eavt-entries";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 export const inputSchema = {
   type: "object",

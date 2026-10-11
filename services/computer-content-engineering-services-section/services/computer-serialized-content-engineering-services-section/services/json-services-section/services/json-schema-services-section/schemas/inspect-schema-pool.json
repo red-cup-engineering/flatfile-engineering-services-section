@@ -1,0 +1,16 @@
+{
+  "input": {
+    "type": "object",
+    "required": ["pool"],
+    "properties": {
+      "pool": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "required": ["ok", "checked", "errors"]
+  }
+}

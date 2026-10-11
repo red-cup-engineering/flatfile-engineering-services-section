@@ -2,7 +2,7 @@
 // operations as a plain verbs module: every named export is one verb function, each carrying a
 // `.spec` ({args, returns, refusal}) and, where it has one, an `.effects` array — the shape
 // computer-system-engine's generic stdio verb server (scripts/serve-verbs-over-stdio.mjs) loads
-// with `--verbs @red-cup-engineering/eavt/verbs`. Invents and ports nothing: every verb is a
+// with `--verbs @red-cup-engineering/eavt-services-section/verbs`. Invents and ports nothing: every verb is a
 // direct call to a function this package already publishes.
 //
 // Replaces this package's former standalone stdio worker script, which held both this table AND

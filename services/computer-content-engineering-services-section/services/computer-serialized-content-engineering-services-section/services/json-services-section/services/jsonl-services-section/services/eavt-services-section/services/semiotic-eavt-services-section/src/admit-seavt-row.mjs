@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync as readCarrierInput } from "node:fs";
 import { readFileSync } from "node:fs";
-import { eavtRow } from "@red-cup-engineering/eavt/admit-row";
+import { eavtRow } from "@red-cup-engineering/eavt-services-section/admit-row";
 import {
   inferTy,
   isClosed,

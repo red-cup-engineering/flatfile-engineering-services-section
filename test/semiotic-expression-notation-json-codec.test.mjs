@@ -318,3 +318,13 @@ test("objectTy's field order matches projectField's own traversal order (both so
     assert.deepEqual(reduceFstSnd(projectField(fieldNames, key, object)), jsonToTerm(key));
   }
 });
+
+
+test("JSON bridge retains a deeply nested pair carrier without host recursion", () => {
+  let value="end";
+  for(let i=0;i<10000;i++) value=["pair","head",value];
+  const term=jsonToTerm(value);
+  assert.equal(term[0],"pair");
+  assert.ok(encodeJsonTermCanonical(value).length > 10000);
+  assert.notEqual(inferTy([],term),null);
+});

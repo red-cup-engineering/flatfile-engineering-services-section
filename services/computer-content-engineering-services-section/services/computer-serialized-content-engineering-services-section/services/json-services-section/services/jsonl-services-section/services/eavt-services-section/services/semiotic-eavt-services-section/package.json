@@ -39,6 +39,7 @@
     "./term-index": "./src/term-index.mjs",
     "./field-index": "./src/field-index.mjs",
     "./read-semantic-records-since": "./src/read-semantic-records-since.mjs",
+    "./iterate-semantic-records": "./src/iterate-semantic-records.mjs",
     "./identity": "./src/identity/index.mjs",
     "./identity/primitive-articulation": "./src/identity/primitive-articulation.mjs",
     "./identity/site": "./src/identity/site.mjs",
@@ -65,11 +66,11 @@
     "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
-    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-content-address-engineering-services-section": "workspace:*",
     "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-file-engineering-services-section": "workspace:*",
     "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/eavt": "workspace:*",
-    "@red-cup-engineering/file-services": "workspace:*",
+    "@red-cup-engineering/eavt-services-section": "workspace:*",
     "@red-cup-engineering/json-schema-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/uri-services-section": "workspace:*"

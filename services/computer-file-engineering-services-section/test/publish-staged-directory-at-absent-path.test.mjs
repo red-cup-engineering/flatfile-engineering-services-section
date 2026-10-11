@@ -4,7 +4,7 @@ import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promise
 import path from "node:path";
 import test from "node:test";
 import { serializeLines } from "@red-cup-engineering/jsonl-services-section";
-import { writeFileText } from "@red-cup-engineering/file-services/write-file";
+import { writeFileText } from "@red-cup-engineering/computer-file-engineering-services-section/write-file";
 import { readTextFileCreationStage } from "../scripts/read-text-file-creation-stage.mjs";
 import { publishStagedDirectoryAtAbsentPath } from "../scripts/publish-staged-directory-at-absent-path.mjs";
 

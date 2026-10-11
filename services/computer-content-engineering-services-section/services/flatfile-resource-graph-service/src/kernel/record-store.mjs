@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { dataKindDirectory } from "@red-cup-engineering/eavt-services-section/data-artifact-address";
 
 // A SEAVT journal row's v coordinate is only ever a record's own
 // content-identity id (the semiotic EAVT module's seavtOfJson() call sites in
@@ -20,13 +21,13 @@ import path from "node:path";
 // before/after state, not merely its hash) actually needs.
 //
 // One JSON file per record, named by its own id, under
-// <root>/data/records/. Write-once by convention (a record's id is its
+// <root>/data/records/resource-graph-records/ (eavt `dataKindDirectory`). Write-once by convention (a record's id is its
 // own content hash, so a second write of the same id is always the same
 // bytes); this module does not itself refuse a second write.
 
 function recordFile(root, id) {
   // This is a filesystem filename codec, not a serialized SEAVT coordinate.
-  return path.join(root, "data", "records", `${Buffer.from(id, "utf8").toString("base64url")}.json`);
+  return path.join(dataKindDirectory(root, "record", "resource-graph"), `${Buffer.from(id, "utf8").toString("base64url")}.json`);
 }
 
 export function putRecord(root, record) {

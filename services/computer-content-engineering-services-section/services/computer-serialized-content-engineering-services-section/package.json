@@ -1,10 +1,10 @@
 {
-  "name": "@red-cup-engineering/computer-data-serialization-services-section",
+  "name": "@red-cup-engineering/computer-serialized-content-engineering-services-section",
   "version": "0.1.0",
   "type": "module",
   "description": "Groups codecs that map admitted computer content to and from serial byte or text forms.",
   "dependencies": {
-    "@red-cup-engineering/eavt": "workspace:*",
+    "@red-cup-engineering/eavt-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/uri-services-section": "workspace:*",
     "http-structured-fields": "1.0.0",
@@ -30,7 +30,10 @@
     "./services/http-data-services-section/src/link": "./services/http-data-services-section/src/link.mjs",
     "./services/http-data-services-section/src/bearer-authentication": "./services/http-data-services-section/src/bearer-authentication.mjs",
     "./read-bcp-14-requirements": "./scripts/read-bcp-14-requirements.mjs",
-    "./web-feed": "./src/web-feed.mjs",
+    "./web-feed": {
+      "types": "./src/web-feed.d.mts",
+      "import": "./src/web-feed.mjs"
+    },
     "./project-web-feed": "./src/project-web-feed.mjs",
     "./http-structured-fields": "./services/http-data-services-section/src/structured-fields.mjs",
     "./http-field-transformations": "./services/http-data-services-section/src/field-transformations.mjs",

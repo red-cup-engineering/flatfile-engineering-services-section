@@ -1,4 +1,4 @@
-import { readFileBytes } from "@red-cup-engineering/file-services/read-file";
+import { readFileBytes } from "@red-cup-engineering/computer-file-engineering-services-section/read-file";
 
 function requirePath(path) {
   if (typeof path !== "string" || path.length === 0) throw new TypeError("path must be a nonempty string");

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createSemioticConceptUniverse, differentiateSemioticConceptUniverses, selectSemioticConceptPublication } from "../../../lib/signstuff/signcell/src/semiotic-concept-universe.mjs";
+import { createSemioticConceptUniverse, differentiateSemioticConceptUniverses, selectSemioticConceptPublication } from "@red-cup-engineering/signcell/semiotic-concept-universe";
 
 test("concept universes preserve aliases, provenance, unresolved references, and publication selection", () => {
   const result = createSemioticConceptUniverse({ concepts: [

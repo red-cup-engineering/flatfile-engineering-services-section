@@ -28,7 +28,7 @@ deterministic reading of content and witnessed relations. Its graph and event
 mechanics remain leaf services of that content capability rather than a
 parallel generic-data-structure hierarchy.
 
-`semantic-content-identify-service` owns the registry-compatible version 2
+`semantic-content-identity` (this package's `./semantic-content-identity` export) owns the registry-compatible version 2
 typed normalized-RMN carrier used by existing content consumers. Its identity
 is an RFC 6920 commitment to the exact deterministic-CBOR carrier bytes; it
 does not turn a digest into evidence about an external referent. The service's
@@ -49,3 +49,9 @@ Under addressing, URI, and NI, `immutable-content-custody-service` retains exact
 NI-addressed bytes only through an injected object-store capability. The documents subtree records
 path-relative operational receipts without turning a file path into byte
 identity. Provider output is content, not truth or governance authority.
+
+`dataset-store` (`./dataset-store`) is the canonical relational dataset custody
+recovered from the retired file-data section: a content-addressed store of
+canonical JSON datasets whose provenance is recorded in
+`provenance/dataset-custody-recovery.json`. `content-tree-reading-service`
+reads a content tree.

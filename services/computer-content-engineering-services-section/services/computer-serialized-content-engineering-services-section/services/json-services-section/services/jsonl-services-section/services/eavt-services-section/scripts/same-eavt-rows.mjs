@@ -30,7 +30,7 @@ export const inputSchema = {
   additionalProperties: false,
 };
 export const outputSchema = { type: "boolean" };
-import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical-json";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical";
 import { normalizeEavtRow } from "./normalize-row.mjs";
 /** Test canonical equality of two EAVT row spellings. */
 export function sameEavtRows({ left, right } = {}) {
