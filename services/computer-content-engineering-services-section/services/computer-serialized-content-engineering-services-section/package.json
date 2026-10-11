@@ -31,7 +31,10 @@
     "./services/http-data-services-section/src/bearer-authentication": "./services/http-data-services-section/src/bearer-authentication.mjs",
     "./base58": "./src/base58.mjs",
     "./read-bcp-14-requirements": "./scripts/read-bcp-14-requirements.mjs",
-    "./web-feed": "./src/web-feed.mjs",
+    "./web-feed": {
+      "types": "./src/web-feed.d.mts",
+      "import": "./src/web-feed.mjs"
+    },
     "./project-web-feed": "./src/project-web-feed.mjs",
     "./http-structured-fields": "./services/http-data-services-section/src/structured-fields.mjs",
     "./http-field-transformations": "./services/http-data-services-section/src/field-transformations.mjs",
