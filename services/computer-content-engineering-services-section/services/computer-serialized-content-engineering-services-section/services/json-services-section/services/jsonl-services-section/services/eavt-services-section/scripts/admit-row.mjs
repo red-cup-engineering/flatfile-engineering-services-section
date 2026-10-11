@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { isJsonValue } from "@red-cup-engineering/json-services-section/is-json-value";
+import { copyJson, freezeJson } from "@red-cup-engineering/json-services-section/freeze-json";
 import contracts from "../schemas/operations.json" with { type: "json" };
 export const inputSchema = contracts["admit-row"].input;
 export const outputSchema = contracts["admit-row"].output;
@@ -9,12 +10,7 @@ export const outputSchema = contracts["admit-row"].output;
 // is computed once per row rather than on every pass over a log.
 const admitted = new WeakSet();
 
-const frozenJson = (value) => (value === null || typeof value !== "object" ? value : deepFreeze(structuredClone(value)));
-
-function deepFreeze(value) {
-  for (const child of Object.values(value)) if (child !== null && typeof child === "object") deepFreeze(child);
-  return Object.freeze(value);
-}
+const frozenJson = (value) => freezeJson(copyJson(value));
 
 /** Whether `value` is a row eavtRow admitted (and so an immutable value). */
 export const isAdmittedRow = (value) => admitted.has(value);

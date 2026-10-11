@@ -8,14 +8,43 @@ import { requireJsonValue } from "./require-json-value.mjs";
 export function freezeJson(value) {
   requireJsonValue(value);
   const visited = new Set();
-  const freeze = (child) => {
-    if (child === null || typeof child !== "object" || visited.has(child))
-      return child;
+  const pending = [value];
+  while (pending.length) {
+    const child = pending.pop();
+    if (child === null || typeof child !== "object" || visited.has(child)) continue;
     visited.add(child);
-    for (const nested of Object.values(child)) freeze(nested);
-    return Object.freeze(child);
-  };
-  return freeze(value);
+    for (const nested of Object.values(child)) pending.push(nested);
+    Object.freeze(child);
+  }
+  return value;
+}
+
+/** Copy admitted JSON without consuming the host call stack. Preserve shared
+ * children, negative zero and own property names; never retain mutable input. */
+export function copyJson(value) {
+  requireJsonValue(value);
+  if (value === null || typeof value !== "object") return value;
+  const copies = new Map();
+  const root = Array.isArray(value) ? [] : {};
+  copies.set(value, root);
+  const pending = [value];
+  while (pending.length) {
+    const source = pending.pop(), target = copies.get(source);
+    for (const key of Object.keys(source)) {
+      let child = source[key];
+      if (child !== null && typeof child === "object") {
+        if (!copies.has(child)) {
+          if (!Array.isArray(child) && Object.getPrototypeOf(child) !== Object.prototype) requireJsonValue(child);
+          copies.set(child, Array.isArray(child) ? [] : {});
+          pending.push(child);
+        }
+        child = copies.get(child);
+      } else requireJsonValue(child);
+      Object.defineProperty(target, key, {value: child, enumerable: true, writable: true, configurable: true});
+    }
+  }
+  requireJsonValue(root);
+  return root;
 }
 
 if (import.meta.main)
