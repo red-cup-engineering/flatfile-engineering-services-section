@@ -1,0 +1,33 @@
+{
+  "name": "@red-cup-engineering/flatfile-engineering-services-section",
+  "version": "0.3.0",
+  "type": "module",
+  "description": "Plain flatfile: whole-file atomic text write (temp + fsync + rename), synchronous UTF-8 whole-file text read (readFlatfileText), a binarity sniff over a regular file's leading bytes, and a plain classifier for the file -> regular-file -> flatfile spine. A flatfile is a NUL-free regular file -- the base byte-touch every text codec composes.",
+  "keywords": [
+    "flatfile",
+    "computer-data",
+    "561-group"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/bare-cedar-fog.git",
+    "directory": "services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/computer-file-engineering-services-section/services/flatfile-engineering-services-section"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/flatfile.mjs",
+    "./read-flatfile-text": "./scripts/read-flatfile-text.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "scripts",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}
