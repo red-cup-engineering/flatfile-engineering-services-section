@@ -1,0 +1,129 @@
+{
+  "kind": "source-owner-family-receiving",
+  "parent_repository": "red-cup-engineering/computer-data-engineering-services-section",
+  "parent_base": "34ed5a13d27ef172fb1b4b455a8d27fd01f71041",
+  "previous_supplier_pin": "bcf748fcd80ee6c998e0c190e9fe3f916fb19afc",
+  "receiver_repository": "red-cup-engineering/computer-content-address-engineering-services-section",
+  "receiver_commit": "2c31f3b06e500a5e5b67986f991855bdfb7d242f",
+  "receiver_pull": "https://github.com/red-cup-engineering/computer-content-address-engineering-services-section/pull/2",
+  "supplier_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section",
+  "donors": [
+    {
+      "branch": "claude/custody-file-reference",
+      "head": "75652e54b9d5dec99893f97f1afb5eccb20db2e8",
+      "files": [
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-custody.mjs",
+          "source_blob": "30014903d772eb238db5b20ff03e33ebba3efff1",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-custody.mjs",
+          "receiver_blob": "30014903d772eb238db5b20ff03e33ebba3efff1",
+          "comparison": "byte-identical"
+        },
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/immutable-content-custody.mjs",
+          "source_blob": "6225c305ffa47af09732fed0301849894e4448f5",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/immutable-content-custody.mjs",
+          "receiver_blob": "6225c305ffa47af09732fed0301849894e4448f5",
+          "comparison": "byte-identical"
+        },
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-reference.mjs",
+          "source_blob": "a9abc11ac54daf2993bf8902b802de69998ceb68",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-reference.mjs",
+          "receiver_blob": "a4c8b2a65d3f9770c50228d1cb9ddcbdc659514b",
+          "comparison": "equal after current namespace imports"
+        },
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-store.mjs",
+          "source_blob": "fef8b8da6434f740732bc1e1826698741e12b571",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-store.mjs",
+          "receiver_blob": "05c5cfea1d8635b29b0d17f8ed513750ce4e88c6",
+          "comparison": "equal after current namespace imports"
+        }
+      ],
+      "command_receiving": "Same retain/retain-tree/verify/get/get-tree interface at canonical owner; maintained symlink entrypoint and separate checked tar/gzip formation; native bin/files packaging independently read."
+    },
+    {
+      "branch": "claude/custody-file-reference-on-pin",
+      "head": "b5aa1ed930dfe2f6ba903883ef2cd040528452fc",
+      "files": [
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-custody.mjs",
+          "source_blob": "30014903d772eb238db5b20ff03e33ebba3efff1",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-custody.mjs",
+          "receiver_blob": "30014903d772eb238db5b20ff03e33ebba3efff1",
+          "comparison": "byte-identical"
+        },
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/immutable-content-custody.mjs",
+          "source_blob": "6225c305ffa47af09732fed0301849894e4448f5",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/immutable-content-custody.mjs",
+          "receiver_blob": "6225c305ffa47af09732fed0301849894e4448f5",
+          "comparison": "byte-identical"
+        },
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-reference.mjs",
+          "source_blob": "a9abc11ac54daf2993bf8902b802de69998ceb68",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-reference.mjs",
+          "receiver_blob": "a4c8b2a65d3f9770c50228d1cb9ddcbdc659514b",
+          "comparison": "equal after current namespace imports"
+        },
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-store.mjs",
+          "source_blob": "fef8b8da6434f740732bc1e1826698741e12b571",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-store.mjs",
+          "receiver_blob": "05c5cfea1d8635b29b0d17f8ed513750ce4e88c6",
+          "comparison": "equal after current namespace imports"
+        }
+      ],
+      "command_receiving": "Same retain/retain-tree/verify/get/get-tree interface at canonical owner; maintained symlink entrypoint and separate checked tar/gzip formation; native bin/files packaging independently read."
+    },
+    {
+      "branch": "claude/test-custody-on-pin",
+      "head": "3297534cb8c752a7dcda6e926116069a071f6cb8",
+      "files": [
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-custody.mjs",
+          "source_blob": "30014903d772eb238db5b20ff03e33ebba3efff1",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-custody.mjs",
+          "receiver_blob": "30014903d772eb238db5b20ff03e33ebba3efff1",
+          "comparison": "byte-identical"
+        },
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/immutable-content-custody.mjs",
+          "source_blob": "6225c305ffa47af09732fed0301849894e4448f5",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/immutable-content-custody.mjs",
+          "receiver_blob": "6225c305ffa47af09732fed0301849894e4448f5",
+          "comparison": "byte-identical"
+        },
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-reference.mjs",
+          "source_blob": "a9abc11ac54daf2993bf8902b802de69998ceb68",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-content-reference.mjs",
+          "receiver_blob": "a4c8b2a65d3f9770c50228d1cb9ddcbdc659514b",
+          "comparison": "equal after current namespace imports"
+        },
+        {
+          "donor_path": "services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-store.mjs",
+          "source_blob": "fef8b8da6434f740732bc1e1826698741e12b571",
+          "receiver_path": "services/uri-services-section/services/ni-services-section/services/immutable-content-custody-service/src/file-store.mjs",
+          "receiver_blob": "05c5cfea1d8635b29b0d17f8ed513750ce4e88c6",
+          "comparison": "equal after current namespace imports"
+        }
+      ],
+      "command_receiving": "Same retain/retain-tree/verify/get/get-tree interface at canonical owner; maintained symlink entrypoint and separate checked tar/gzip formation; native bin/files packaging independently read."
+    }
+  ],
+  "namespace_mapping": {
+    "@red-cup-engineering/file-services/write-file": "@red-cup-engineering/computer-file-engineering-services-section/write-file",
+    "@red-cup-engineering/computer-data-serialization-services-section/services/http-data-services-section/src/media-type": "@red-cup-engineering/computer-serialized-content-engineering-services-section/services/http-data-services-section/src/media-type"
+  },
+  "decision": "Core capabilities are received at the extracted owner. Advance its published gitlink and retain donor ancestry without restoring duplicate deleted directories.",
+  "verification": [
+    "Complete four-runtime-module byte/namespace comparison for every donor",
+    "Current public exports and command interface source review",
+    "Offline package formation lists the native command and all core source modules; scripts not executed",
+    "Donor history and source bytes remain recoverable"
+  ],
+  "stage": "source accepted; installation, file custody and machine deployment unclaimed"
+}
