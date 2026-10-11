@@ -1,5 +1,4 @@
 import { closeSync, openSync, readSync } from "node:fs";
-import { readLegacySqlite } from "@red-cup-engineering/computer-system-engine/legacy-sqlite-reader";
 
 const SQLITE_HEADER = "SQLite format 3\u0000";
 
@@ -17,11 +16,12 @@ export function isSqliteFile(file) {
  * The documents an SQLite full-text index (layout 1: `documents (id, path, revision)` beside the
  * FTS5 table `texts (body)`, a document's text at the rowid of its id) held, read once, read-only,
  * so they can be admitted into the journal the index now keeps. No database is opened here: the
- * file is received by computer-system-engine's standalone, bounded Python reader. SQL survives
- * only as that admission path for old bytes; a file of another layout holds nothing to admit (it
+ * file is received by a standalone, bounded reader the caller passes in (computer-system-engine
+ * keeps its historical SQL reader as private source outside its export surface, so this package
+ * does not import it). SQL survives only as that admission path for old bytes; a file of another layout holds nothing to admit (it
  * was a stale cache the old index rebuilt).
  */
-export function importSqlFullTextIndex(file) {
+export function importSqlFullTextIndex(file, readLegacySqlite) {
   return readLegacySqlite(file, [{ table: "documents", order: "id" }, { table: "texts", order: "rowid", rowid: true }], (legacy) => {
     if (!legacy.has("documents") || !legacy.has("texts")) return [];
     const documents = [];
