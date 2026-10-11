@@ -52,5 +52,8 @@
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs test/type-system/*.test.mjs"
+  },
+  "devDependencies": {
+    "@red-cup-engineering/signcell": "workspace:*"
   }
 }
