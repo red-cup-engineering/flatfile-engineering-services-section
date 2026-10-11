@@ -8,6 +8,7 @@ import { createInterface } from "node:readline";
 import { once } from "node:events";
 import { appendEavtEntries } from "../scripts/append-eavt-entries.mjs";
 import { journalPath } from "../scripts/journal-path.mjs";
+import { dataArtifactOfPath } from "../src/data-artifact-address.mjs";
 import { readEavtEntries } from "../scripts/read-eavt-entries.mjs";
 import { writeEavtEntries } from "../scripts/write-eavt-entries.mjs";
 import { readEavtJournal } from "../scripts/read-eavt-journal.mjs";
@@ -18,7 +19,7 @@ import { readEavtState } from "../scripts/read-eavt-state.mjs";
 import { commitSettledRecord, readDatomsAtPath, recordPathFor, settle, settledDatom } from "@red-cup-engineering/datom-services-section";
 
 const COMMANDS = Object.freeze({
-  "resolve-journal-date": { required: ["at"], invoke: ({ at }) => journalPath({ root: ".", feed: "journal", at }).split("/").slice(-4,-1).join("-"), output: "text" },
+  "resolve-journal-date": { required: ["at"], invoke: ({ at }) => dataArtifactOfPath(journalPath({ root: ".", feed: "journal", at })).date, output: "text" },
   "resolve-log-path": { required: ["root", "feed", "at"], invoke: ({ root, feed, at }) => journalPath({ root, feed, at }) },
   "read-entries-at-path": { required: ["path"], invoke: ({ path }) => readEavtEntries({ path }) },
   "read-json-lines-at-path": { required: ["path"], invoke: ({ path }) => readJsonlAtPath(path) },

@@ -1,3 +1,4 @@
+import { journalIndexDirectory } from "../src/journal/store-root.mjs";
 import assert from "node:assert/strict";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -49,7 +50,7 @@ test("the index follows the journal as it grows, and a reopened index reads its 
   journal.record({ category: "occurrence", recordedAt: "2026-10-11T00:00:00.000Z", told: HELD, record: { id: "b1", source: "repo", path: "b.md", revision: "c2" } });
   const reopened = createFieldIndex({ root, objectKind: "test.occurrence", category: "occurrence", fields });
   assert.deepEqual(reopened.get("id", "b1").map((row) => row.record.path), ["a.md", "b.md"], "records of every day's feed");
-  const directory = join(journalDirectoryOf(root), "index", "field", "v1");
+  const directory = join(journalIndexDirectory(journalDirectoryOf(root)), "field", "v1");
   assert.ok(existsSync(directory), "the index is kept beside the journal");
   // A different declaration is a different reading, kept beside the first without disturbing it.
   const narrower = createFieldIndex({ root, objectKind: "test.occurrence", category: "occurrence", fields: { path: "path" } });
@@ -66,7 +67,7 @@ test("a read decodes only the witnesses its key names, however large the journal
   const [body] = index.get("id", "b2");
   assert.equal(body.record.text.length, 80_000);
   assert.ok(body.record.text.startsWith("b2b2"));
-  const declared = join(journalDirectoryOf(root), "index", "field", "v1", "test.body", "body");
+  const declared = join(journalIndexDirectory(journalDirectoryOf(root)), "field", "v1", "test.body", "body");
   const [reading] = readdirSync(declared);
   const shards = readdirSync(join(declared, reading, "id"));
   const held = shards.reduce((total, name) => total + readFileSync(join(declared, reading, "id", name)).length, 0);

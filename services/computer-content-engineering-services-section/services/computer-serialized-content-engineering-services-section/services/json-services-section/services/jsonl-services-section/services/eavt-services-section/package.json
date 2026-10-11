@@ -94,7 +94,8 @@
     "./statement": "./src/statement.mjs",
     "./witness-journal": "./apps/witness-journal.mjs",
     "./data-artifact-address": "./src/data-artifact-address.mjs",
-    "./relation-web": "./src/relation-web.mjs"
+    "./relation-web": "./src/relation-web.mjs",
+    "./data-artifact-listing": "./src/data-artifact-listing.mjs"
   },
   "files": [
     "apps",

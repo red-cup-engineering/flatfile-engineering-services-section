@@ -8,7 +8,7 @@ import { setFlagsFromString } from "node:v8";
 import { runInNewContext } from "node:vm";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { journalWitness } from "../src/journal/event.mjs";
-import { artifactStoreRoot } from "../src/journal/store-root.mjs";
+import { artifactStoreRoot, journalFeedPath, journalIndexDirectory } from "../src/journal/store-root.mjs";
 import {
   carryLocatedIndex, clearSegmentIndexes, indexDirectory, ledgerPath, locatedBucketFile, locatedIndex,
   locatedIndexDirectory, segmentAdmit, segmentAdmittedLogs, segmentPath, segmentState, segmentStatements, segmentWitness,
@@ -23,7 +23,7 @@ const witness = (n, causes = []) => journalWitness({
 });
 function root() {
   const directory = mkdtempSync(join(tmpdir(), "journal-located-"));
-  const log = join(directory, "data/journals/2026/10/08/2026-10-08-admit-feed.jsonl");
+  const log = journalFeedPath(directory, "feed", "2026-10-08");
   return { directory, log, storeRoot: artifactStoreRoot(log) };
 }
 
@@ -70,7 +70,7 @@ test("a v2 root is carried into buckets once, and v2 lines written later are car
     // Rewrite the root as the v2 store left it: its index in four whole files, no buckets, no ledgers.
     rmSync(locatedIndexDirectory(storeRoot), { recursive: true, force: true });
     rmSync(ledgerPath(log));
-    const relative = "2026/10/08/2026-10-08-admit-feed.jsonl";
+    const relative = "feed-logs/2026-10-08-admit-feed.jsonl";
     mkdirSync(indexDirectory(storeRoot), { recursive: true });
     writeFileSync(join(indexDirectory(storeRoot), "admitted.jsonl"), `${JSON.stringify({ id: first.id, log: relative })}\n`);
     writeFileSync(join(indexDirectory(storeRoot), "blocked.jsonl"), `${JSON.stringify({ id: blocked, obstruction: { reason: "test" } })}\n`);
@@ -95,7 +95,7 @@ test("a root with segments and no index at all is rebuilt from its segments", ()
   try {
     const first = witness(1);
     segmentAdmit(log, [first]);
-    rmSync(join(storeRoot, "index"), { recursive: true, force: true });
+    rmSync(journalIndexDirectory(storeRoot), { recursive: true, force: true });
     rmSync(ledgerPath(log));
     clearSegmentIndexes();
     assert.equal(locatedIndex(storeRoot).isAdmitted(first.id), true);
@@ -107,7 +107,7 @@ test("a root with segments and no index at all is rebuilt from its segments", ()
 function indexGrowth(count) {
   const { directory, storeRoot } = root();
   try {
-    const relative = "2026/10/08/2026-10-08-admit-feed.jsonl";
+    const relative = "feed-logs/2026-10-08-admit-feed.jsonl";
     mkdirSync(dirname(join(storeRoot, relative)), { recursive: true });
     writeFileSync(segmentPath(join(storeRoot, relative)), "");
     mkdirSync(indexDirectory(storeRoot), { recursive: true });

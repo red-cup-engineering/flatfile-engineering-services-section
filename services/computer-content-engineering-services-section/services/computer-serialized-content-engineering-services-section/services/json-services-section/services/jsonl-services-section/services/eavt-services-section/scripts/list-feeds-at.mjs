@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
-import { readdirSync } from "node:fs";
-import { feedLogDirFor } from "./feed-log-directory.mjs";
+import { canonicalJson } from "@red-cup-engineering/json-services-section/canonical";
+import { dataDatePartition } from "../src/data-artifact-address.mjs";
+import { dataArtifactFiles } from "../src/data-artifact-listing.mjs";
 export const inputSchema = {
   type: "object",
   required: ["root", "at"],
@@ -9,16 +10,10 @@ export const inputSchema = {
   additionalProperties: false,
 };
 export const outputSchema = { type: "array", items: { type: "string" } };
+/** The plain EAVT feeds a root holds on the date `at` names, by feed name. */
 export function listFeedsAt({ root, at }) {
-  const directory = feedLogDirFor({ root, at });
-  try {
-    return readdirSync(directory, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith(".jsonl"))
-      .map((entry) => entry.name.slice(0, -6))
-      .sort();
-  } catch {
-    return [];
-  }
+  const { date } = dataDatePartition(typeof at === "string" ? at : canonicalJson(at));
+  return [...new Set(dataArtifactFiles(root, "log", { date, match: (name) => name.endsWith(".jsonl") }).map((file) => file.token))].sort();
 }
 if (import.meta.main)
   process.stdout.write(

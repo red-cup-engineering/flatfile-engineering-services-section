@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync as readCarrierInput } from "node:fs";
-import { readdirSync, statSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { statSync } from "node:fs";
+import { resolve } from "node:path";
 import { canonicalJson } from "@red-cup-engineering/json-services-section";
 import { dataArtifactAddress } from "@red-cup-engineering/eavt-services-section/data-artifact-address";
 import {
@@ -12,7 +12,7 @@ import { termToJson } from "@red-cup-engineering/computer-data-engineering-servi
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { readEavtEntriesSince } from "@red-cup-engineering/eavt-services-section/read-eavt-entries";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
-import { journalDirectoryOf } from "./journal/store-root.mjs";
+import { dataArtifactDates, dataArtifactFiles } from "@red-cup-engineering/eavt-services-section/data-artifact-listing";
 import { cacheBudgetFromEnvironment, ledgerPath, projectSegmentStatements, readingCache, segmentPath } from "./journal/filesystem/segment-store.mjs";
 
 /** The feed every semantic record was appended to before records were journal witnesses. */
@@ -37,23 +37,9 @@ export const inputSchema = {
 };
 export const outputSchema = { type: "array", items: { type: "object" } };
 
-/** The dated directories (YYYY/MM/DD) under one tier directory, as dates, in order. */
-export function datesUnder(directory) {
-  const dates = [];
-  const list = (path, pattern) => {
-    try {
-      return readdirSync(path, { withFileTypes: true }).filter((entry) => entry.isDirectory() && pattern.test(entry.name)).map((entry) => entry.name).sort();
-    } catch (error) {
-      if (error.code === "ENOENT") return [];
-      throw error;
-    }
-  };
-  for (const year of list(directory, /^\d{4}$/u)) {
-    for (const month of list(join(directory, year), /^\d{2}$/u)) {
-      for (const day of list(join(directory, year, month), /^\d{2}$/u)) dates.push(`${year}-${month}-${day}`);
-    }
-  }
-  return dates;
+/** The dates one kind's feed holds witnesses for, in order: the log tier's own listing of the kind's directory. */
+export function datesOfKind(root, objectKind) {
+  return dataArtifactDates(root, "log", { subject: objectKind, match: (name) => name.endsWith(".jsonl.witnesses") || name.endsWith(".jsonl.admitted") });
 }
 
 /** A semantic record is a projection of its verified witness. The query keeps
@@ -73,7 +59,7 @@ export function semanticRecordOf(statement) {
 /** Records of one kind and category admitted into the journal as witnesses. */
 function journalRecords(root, kind, categories) {
   const records = [];
-  for (const date of datesUnder(journalDirectoryOf(root))) {
+  for (const date of datesOfKind(root, kind)) {
     const logPath = dataArtifactAddress({ root, tier: "log", encoding: "jsonl", at: date, action: kind, subject: kind }).path;
     for (const record of projectSegmentStatements(logPath, semanticRecordOf)) {
       if (categories.has(record.category)) records.push(Object.freeze({ ...record, objectKind: kind,
@@ -115,19 +101,9 @@ const deepFreeze = (value) => {
   return value;
 };
 
-/** The SEAVT feed files under a root's dated log directories, in order. */
-function legacyFeedFiles(directory) {
-  const found = [];
-  try {
-    for (const item of readdirSync(directory, { withFileTypes: true })) {
-      const path = join(directory, item.name);
-      if (item.isDirectory()) found.push(...legacyFeedFiles(path));
-      else if (item.isFile() && item.name === `${LEGACY_FEED}.jsonl`) found.push(path);
-    }
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-  }
-  return found.sort();
+/** The SEAVT feed's files under a root, in date order: the log tier's listing of the feed's own directory. */
+function legacyFeedFiles(root) {
+  return dataArtifactFiles(root, "log", { subject: LEGACY_FEED, match: (name) => name.endsWith(".jsonl") }).map((file) => file.path).sort();
 }
 
 /** One feed's records of one kind and category, read on from the held reading when there is one. */
@@ -161,7 +137,7 @@ function legacyFeedRecords(path, kind, category) {
 /** Records written to the SEAVT feed before records were journal witnesses: a record is of a kind when its id is its content's address under that kind. */
 function legacyRecords(root, kind, categories) {
   const records = [];
-  for (const path of legacyFeedFiles(join(root, "data", "logs"))) {
+  for (const path of legacyFeedFiles(root)) {
     for (const category of categories) {
       for (const record of legacyFeedRecords(path, kind, category)) records.push(Object.freeze({ ...record, record: structuredClone(record.record) }));
     }
@@ -200,13 +176,13 @@ function fileRevision(file) {
 
 function sourceRevision(root, objectKind) {
   const files = [];
-  for (const date of datesUnder(journalDirectoryOf(root))) {
+  for (const date of datesOfKind(root, objectKind)) {
     const logPath = dataArtifactAddress({ root, tier: "log", encoding: "jsonl", at: date, action: objectKind, subject: objectKind }).path;
     const segment = fileRevision(segmentPath(logPath));
     const ledger = fileRevision(ledgerPath(logPath));
     if (segment !== null || ledger !== null) files.push([logPath, segment, ledger]);
   }
-  for (const file of legacyFeedFiles(join(root, "data", "logs"))) files.push([file, fileRevision(file)]);
+  for (const file of legacyFeedFiles(root)) files.push([file, fileRevision(file)]);
   return JSON.stringify(files);
 }
 
