@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import * as D from "../src/number/deterministic-math.mjs";
+import * as D from "@red-cup-engineering/exact-number-data-service/deterministic-math";
 
 const view = new DataView(new ArrayBuffer(8));
 const bits = (x) => { view.setFloat64(0, x); return view.getBigUint64(0); };
