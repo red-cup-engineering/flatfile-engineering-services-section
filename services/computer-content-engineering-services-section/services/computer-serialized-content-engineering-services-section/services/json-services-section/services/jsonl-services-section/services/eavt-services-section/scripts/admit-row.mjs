@@ -10,7 +10,8 @@ export const outputSchema = contracts["admit-row"].output;
 // is computed once per row rather than on every pass over a log.
 const admitted = new WeakSet();
 
-const frozenJson = (value) => freezeJson(copyJson(value));
+// eavtRow validates all four original fields before taking their snapshots.
+const frozenJson = (value) => freezeJson(copyJson(value, { inputAlreadyAdmitted: true }), { rejectCycles: true });
 
 /** Whether `value` is a row eavtRow admitted (and so an immutable value). */
 export const isAdmittedRow = (value) => admitted.has(value);
