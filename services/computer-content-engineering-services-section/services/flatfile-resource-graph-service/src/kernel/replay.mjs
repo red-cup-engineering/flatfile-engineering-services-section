@@ -1,10 +1,10 @@
-import { readdirSync } from "node:fs";
 import path from "node:path";
 import { canonicalize } from "./identity.mjs";
 import { getRecord } from "./record-store.mjs";
 import { TIER_B_RECORD_TYPES, validateRecord } from "./record-types.mjs";
 import { validateWitness } from "./witness.mjs";
 import { readEavtJournal } from "@red-cup-engineering/eavt-services-section/read-eavt-journal";
+import { dataArtifactDates, dataArtifactFiles } from "@red-cup-engineering/eavt-services-section/data-artifact-listing";
 import { FOUR, four, joinKnowledgeWire } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 // Deterministic replay: fold the append-only event log into in-memory
@@ -102,54 +102,19 @@ export class CausalOrderViolation extends ReplayError {
 
 export const EMPTY_STATE = Object.freeze({ belief: Object.freeze({}), records: Object.freeze({}), witnesses: Object.freeze({}) });
 
-function safeReaddir(dir) {
-  try {
-    return readdirSync(dir, { withFileTypes: true });
-  } catch (error) {
-    if (error && typeof error === "object" && error.code === "ENOENT") return [];
-    throw error;
-  }
-}
-
-function datedDirs(dir) {
-  return safeReaddir(dir).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
-}
-
 // Every channel with at least one journal line under root, named for its
-// feed file's stem, in sorted (thus deterministic) order — the same
-// data/logs/<YYYY>/<MM>/<DD>/<feed>.jsonl layout the EAVT journal's
-// logPathFor writes.
+// feed, in sorted (thus deterministic) order — the log tier's own listing of
+// the plain EAVT feeds (`data/logs/<feed>-logs/<date>-admit-<feed>.jsonl`).
+const isFeedFile = (name) => name.endsWith(".jsonl");
 export function channelsOf(root) {
-  const logsDir = path.join(root, "data", "logs");
-  const channels = new Set();
-  for (const year of datedDirs(logsDir)) {
-    for (const month of datedDirs(path.join(logsDir, year))) {
-      for (const day of datedDirs(path.join(logsDir, year, month))) {
-        for (const entry of safeReaddir(path.join(logsDir, year, month, day))) {
-          if (entry.isFile() && entry.name.endsWith(".jsonl")) channels.add(entry.name.slice(0, -".jsonl".length));
-        }
-      }
-    }
-  }
-  return [...channels].sort();
+  return [...new Set(dataArtifactFiles(root, "log", { match: isFeedFile }).map((file) => file.subject))].sort();
 }
 
-// Every day-partition (YYYY-MM-DD) holding a channel's journal file
-// under root, sorted — the per-channel day sequence readSeavt/streamSeavt
-// need an at value to address one file at a time.
+// Every date holding a channel's journal file under root, sorted — the
+// per-channel day sequence readSeavt/streamSeavt need an at value to address
+// one file at a time.
 function daysOf(root, channel) {
-  const logsDir = path.join(root, "data", "logs");
-  const days = [];
-  for (const year of datedDirs(logsDir)) {
-    for (const month of datedDirs(path.join(logsDir, year))) {
-      for (const day of datedDirs(path.join(logsDir, year, month))) {
-        const hasChannel = safeReaddir(path.join(logsDir, year, month, day))
-          .some((entry) => entry.isFile() && entry.name === `${channel}.jsonl`);
-        if (hasChannel) days.push(`${year}-${month}-${day}`);
-      }
-    }
-  }
-  return days.sort();
+  return [...dataArtifactDates(root, "log", { subject: channel, match: isFeedFile })];
 }
 
 // One channel's full journal, across every day it was ever written to,

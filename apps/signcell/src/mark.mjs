@@ -1,5 +1,5 @@
 import { defineType, instantiate } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
-import { coincides, semanticBytes } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { coincides, semanticBytes } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 /** Opaque present datum: a semiotic carrier, so it has a content address. Payload
  *  interpretation belongs to the selected type or codec. */
 export const MarkSchema = {

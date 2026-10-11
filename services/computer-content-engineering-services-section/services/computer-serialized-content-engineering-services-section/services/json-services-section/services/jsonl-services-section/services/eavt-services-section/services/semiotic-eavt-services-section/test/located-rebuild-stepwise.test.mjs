@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { artifactStoreRoot } from "../src/journal/store-root.mjs";
+import { artifactStoreRoot, journalFeedPath, journalIndexDirectory } from "../src/journal/store-root.mjs";
 import { journalWitness } from "../src/journal/event.mjs";
 import {
   carryLimits, carryLocatedIndex, clearSegmentIndexes, journalStoreRoots, locatedIndex, locatedIndexDirectory, locatedIndexState,
@@ -24,13 +24,13 @@ function segmentOnlyStore(t) {
   const saved = { ...carryLimits };
   t.after(() => { Object.assign(carryLimits, saved); clearSegmentIndexes(); rmSync(root, { recursive: true, force: true }); });
   const feeds = [1, 2, 3].map((day) => {
-    const log = join(root, `data/journals/2026/10/0${day}/feed-${day}.jsonl`);
+    const log = journalFeedPath(root, `feed-${day}`, `2026-10-0${day}`);
     const statements = Array.from({ length: 10 }, (_, n) => witness(day, n));
     segmentAdmit(log, statements);
     return { log, statements };
   });
   const storeRoot = artifactStoreRoot(feeds[0].log);
-  rmSync(join(storeRoot, "index"), { recursive: true, force: true });
+  rmSync(journalIndexDirectory(storeRoot), { recursive: true, force: true });
   clearSegmentIndexes();
   // Each step rebuilds one segment.
   carryLimits.chunkBytes = 1;
@@ -38,14 +38,14 @@ function segmentOnlyStore(t) {
 }
 
 test("a store with segments and no index answers its first question without rebuilding on the question path", async (t) => {
-  const { storeRoot, feeds } = segmentOnlyStore(t);
+  const { root, storeRoot, feeds } = segmentOnlyStore(t);
   const index = locatedIndex(storeRoot);
   for (const { statements } of feeds) assert.equal(index.isAdmitted(statements[3].id), true);
   assert.equal(existsSync(markerFile(storeRoot)), false, "nothing was rebuilt or marked on the question path");
   assert.equal(locatedIndexState(storeRoot).state, "carrying");
   // A writer admitting meanwhile does not mark the root located before it is rebuilt.
   const late = witness(4, 0);
-  segmentAdmit(join(storeRoot, "2026/10/04/feed-4.jsonl"), [late]);
+  segmentAdmit(journalFeedPath(root, "feed-4", "2026-10-04"), [late]);
   assert.notEqual(locatedIndexState(storeRoot).state, "located");
   const deadline = Date.now() + 20_000;
   while (locatedIndexState(storeRoot).state !== "located" && Date.now() < deadline) await new Promise((resolve) => setTimeout(resolve, 20));

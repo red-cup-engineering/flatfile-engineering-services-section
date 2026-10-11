@@ -1,3 +1,4 @@
+import { journalFeedPath } from "../src/journal/store-root.mjs";
 import {test} from 'node:test';
 import {strict as assert} from 'node:assert';
 import {mkdtempSync,readFileSync,writeFileSync,rmSync} from 'node:fs';
@@ -26,7 +27,7 @@ test('Compact observations retain the complete addressed witness and refuse alte
 test('The durable segment stores observations and reads both compact and full carriers through checkpoints',()=>{
   const root=mkdtempSync(join(tmpdir(),'journal-compact-'));
   try{
-    const log=join(root,'data/journals/2026/10/08/article.jsonl');
+    const log=journalFeedPath(root, "article", "2026-10-08");
     const [result]=segmentAdmit(log,[witness]);assert.equal(result.written,true);
     const stored=readFileSync(segmentPath(log),'utf8');
     assert.deepEqual(JSON.parse(stored),compact);

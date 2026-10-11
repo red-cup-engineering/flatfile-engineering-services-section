@@ -1,13 +1,14 @@
+import { journalPath } from "@red-cup-engineering/eavt-services-section/journal-path";
 // The SEAVT reading caches' budgets, set by the environment: a byte count, `unbounded`, or the default.
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { appendFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import test from "node:test";
 import { cacheBudgetFromEnvironment, readingCache } from "../src/journal/filesystem/segment-store.mjs";
 import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
-import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 
 const MB = 1024 * 1024;
 // A fresh process imports this package's own source, so it reads the budgets its environment gives.
@@ -41,15 +42,15 @@ test("a bounded cache refuses a reading dearer than its budget; an unbounded one
 const kind = "test.cache-budgets";
 /** One legacy SEAVT feed whose "move" records estimate far above a small budget. */
 function legacyFeed(root) {
-  const directory = join(root, "data", "logs", "2026", "09", "01");
-  mkdirSync(directory, { recursive: true });
+  const file = journalPath({ root, feed: "witness-journal-seavt", at: "2026-09-01" });
+  mkdirSync(dirname(file), { recursive: true });
   const lines = [];
   for (let n = 0; n < 20; n += 1) {
     const value = { n, body: "x".repeat(16 * 1024) };
     const { id } = identifyJsonSemanticContent({ objectKind: kind, value, witnessRoot: EMPTY_WITNESS_ROOT });
     lines.push(JSON.stringify({ e: jsonToTerm(id), a: jsonToTerm("move"), v: jsonToTerm(value), t: `2026-09-01T00:00:${String(n).padStart(2, "0")}.000Z` }));
   }
-  appendFileSync(join(directory, "witness-journal-seavt.jsonl"), `${lines.join("\n")}\n`);
+  appendFileSync(file, `${lines.join("\n")}\n`);
 }
 
 /** Query the feed twice in a fresh process under `environment`; report whether the reading was held. */

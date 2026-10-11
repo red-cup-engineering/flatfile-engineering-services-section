@@ -1,5 +1,5 @@
 import { compileJsonSchema, } from "@red-cup-engineering/json-schema-services-section/validation";
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 const compiledSchemas = new WeakMap();
 function dataRecord(value) {
     if (value === null || typeof value !== "object" || Array.isArray(value) || !Object.isFrozen(value))

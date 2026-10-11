@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { artifactStoreRoot } from "../src/journal/store-root.mjs";
+import { artifactStoreRoot, journalFeedPath, journalIndexDirectory } from "../src/journal/store-root.mjs";
 import { journalWitness } from "../src/journal/event.mjs";
 import {
   clearSegmentIndexes, foldSegmentStatements, projectSegmentStatements, segmentAdmit, segmentLimits, segmentPath, segmentStatements,
@@ -18,11 +18,11 @@ const witness = (n) => journalWitness({
 const count = 20;
 function store() {
   const root = mkdtempSync(join(tmpdir(), "journal-bounded-"));
-  const log = join(root, "data/journals/2026/10/08/feed.jsonl");
+  const log = journalFeedPath(root, "feed", "2026-10-08");
   const statements = Array.from({ length: count }, (_, n) => witness(n));
   segmentAdmit(log, statements);
   clearSegmentIndexes();
-  const checkpoints = join(artifactStoreRoot(log), "index/segment-verified/v1.jsonl");
+  const checkpoints = join(journalIndexDirectory(artifactStoreRoot(log)), "segment-verified", "v1.jsonl");
   const recorded = () => { try { return readFileSync(checkpoints, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)); } catch { return []; } };
   return { root, log, statements, recorded, file: segmentPath(log) };
 }

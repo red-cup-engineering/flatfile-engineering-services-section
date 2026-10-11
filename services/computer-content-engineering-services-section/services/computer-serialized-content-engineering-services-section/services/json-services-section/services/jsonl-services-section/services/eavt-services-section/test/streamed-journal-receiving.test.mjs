@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { appendFileSync, mkdtempSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import test from "node:test";
 import { iterateEavtEntries, readEavtEntries, readEavtEntriesSince } from "../scripts/read-eavt-entries.mjs";
 import { iterateEavtJournalThroughDate, readEavtJournalThroughDate } from "../scripts/read-eavt-journal.mjs";
@@ -14,7 +14,7 @@ test("streamed recovery retains Unicode across carrier blocks, trace order and t
     const first = { e: "first", a: "observed", v: "🙂".repeat(20000), t: 1 };
     const last = { e: "last", a: "observed", v: false, t: 2 };
     const path = journalPath({ root, feed: "test", at: "2026-10-01" });
-    mkdirSync(join(root, "data/logs/2026/10/01"), { recursive: true });
+    mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, JSON.stringify(first) + "\nmalformed\n" + JSON.stringify(last));
     assert.deepEqual([...iterateEavtEntries({ path })], [first, last]);
     assert.deepEqual(readEavtEntries({ path }, { select: value => value.e === "last" }), [last]);

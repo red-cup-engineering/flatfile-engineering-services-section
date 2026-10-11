@@ -1,6 +1,6 @@
 import { assertKeywordValues } from "../src/assert-keyword-values.mjs";
 import { createHash } from "node:crypto";
-import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 import {
   canonical,
   isJsonRecord,
@@ -431,7 +431,9 @@ export function inspectSchema(schema: unknown, poolIds: ReadonlySet<string> = ne
     for (const [path, child] of childSchemas(node)) visit(schemaNode(child, `schema at ${pointer}/${path}`), `${pointer}/${path}`, root);
   };
   visit(schema, "", schema);
-  for (const name of Object.keys(isJsonRecord(schema["$defs"]) ? schema["$defs"] : {})) {
+  // A JSON record since the guard at the top of the function.
+  const definitions = (schema as Record<string, unknown>)["$defs"];
+  for (const name of Object.keys(isJsonRecord(definitions) ? definitions : {})) {
     if (!canonical(schema).includes(JSON.stringify(`#/$defs/${name}`))) add(`/$defs/${escapePointer(name)}`, "$defs", "definition is never referenced");
   }
   return immutable({ ok: errors.length === 0, errors: Object.freeze(errors) });

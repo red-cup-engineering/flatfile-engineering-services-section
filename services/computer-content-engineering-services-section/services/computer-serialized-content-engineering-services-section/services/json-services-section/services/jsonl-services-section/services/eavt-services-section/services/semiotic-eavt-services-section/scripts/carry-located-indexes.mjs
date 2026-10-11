@@ -4,7 +4,7 @@
  * the release's first question is answered at once instead of carrying or rebuilding the whole store on its
  * event loop (src/journal/filesystem/segment-store.mjs, `carryLocatedIndex`). A release carries in the background
  * itself, in bounded steps; this carries in full beforehand so the release starts ready. A store is a directory holding a v2
- * causal-admission index, a `data/journals` directory or a `.metroplat-journal` directory (the roots
+ * causal-admission index, a settlement's `data/logs` directory or a `.metroplat-journal` directory (the roots
  * `artifactStoreRoot` yields). A store with a v2 index is carried; one with witness segments and no index at
  * all is rebuilt from its segments and marked; one already marked is left as it is.
  *
@@ -24,6 +24,7 @@ import path from "node:path";
 import { homedir } from "node:os";
 import { parseArgs } from "node:util";
 import { carryLocatedIndex, indexDirectory, journalStoreRoots, locatedIndexDirectory, v2StoreRoots } from "../src/journal/filesystem/segment-store.mjs";
+import { isStoreArea } from "../src/journal/store-root.mjs";
 import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -95,7 +96,7 @@ function hasSegments(storeRoot) {
     let entries;
     try { entries = fs.readdirSync(directory, { withFileTypes: true }); } catch { return false; }
     return entries.some((entry) => (entry.isFile() && entry.name.endsWith(".witnesses"))
-      || (entry.isDirectory() && !entry.isSymbolicLink() && !SKIPPED.has(entry.name) && entry.name !== "objects" && entry.name !== "index"
+      || (entry.isDirectory() && !entry.isSymbolicLink() && !SKIPPED.has(entry.name) && !isStoreArea(entry.name)
         && !fs.existsSync(indexDirectory(path.join(directory, entry.name))) && visit(path.join(directory, entry.name))));
   };
   return visit(storeRoot);

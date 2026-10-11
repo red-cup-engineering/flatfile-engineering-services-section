@@ -2,7 +2,7 @@ import {
   admitJsonSemanticContent,
   EMPTY_WITNESS_ROOT,
   identifyJsonSemanticContent,
-} from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+} from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 import { freezeJson } from "@red-cup-engineering/json-services-section";
 import { semanticId } from "./resource-term.mjs";
 

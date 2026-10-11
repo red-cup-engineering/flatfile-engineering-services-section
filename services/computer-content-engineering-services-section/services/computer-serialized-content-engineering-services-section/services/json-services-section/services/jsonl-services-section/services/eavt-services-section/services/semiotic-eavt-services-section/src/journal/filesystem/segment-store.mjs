@@ -8,7 +8,7 @@
  * Derived fields are reconstructed and address-verified; full records remain readable.
  *
  * Where everything lives is computed from an address, never looked up. A feed's address is its proof
- * path (`<YYYY>/<MM>/<DD>/<date>-admit-<subject>.jsonl`). A witness's admission facts live in the
+ * path (`<kind>-logs/<date>-admit-<kind>.jsonl`, store-root.mjs). A witness's admission facts live in the
  * bucket its NI address names (`ni-path-v1`, see "the located index" below), and a feed's ledger
  * `<feed>.jsonl.admitted` records how far its segment had grown at each admission. No table from
  * witness id to feed is held in memory or on disk: a process's memory does not grow with the store.
@@ -38,6 +38,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { keyBucketPath } from "@red-cup-engineering/computer-content-address-engineering-services-section/ni-path";
 import { StringDecoder } from "node:string_decoder";
 import { canonicalJson, parse } from "@red-cup-engineering/json-services-section";
 import { verifyArtifact } from "../../identity/index.mjs";
@@ -45,7 +46,8 @@ import { parseJournalWitness, verifiedJournalWitness } from "../event.mjs";
 import { isCausalWitness } from "../judgment.mjs";
 import { evaluateWitnessDependencies } from "../substrate.mjs";
 import { validateAddressedWitnessCore } from "../witness.mjs";
-import { artifactStoreRoot } from "../store-root.mjs";
+import { dataArtifactFiles, clearDataArtifactListings } from "@red-cup-engineering/eavt-services-section/data-artifact-listing";
+import { artifactStoreRoot, isJournalStoreDirectory, isStoreArea, journalIndexDirectory, journalObjectDirectory, settlementRootOfStore } from "../store-root.mjs";
 import { appendDurably, openSegmentReader, syncFile } from "./segment-bytes.mjs";
 
 /** The suffix of a feed's witness segment, appended to its logical `.jsonl` handle. */
@@ -55,7 +57,7 @@ export const segmentPath = (logPath) => `${logPath}${SEGMENT_SUFFIX}`;
 export const logPathOfSegment = (file) => (file.endsWith(`.jsonl${SEGMENT_SUFFIX}`) ? file.slice(0, -SEGMENT_SUFFIX.length) : undefined);
 
 /** The v2 causal-admission index, read only to carry it into the located index. */
-export const indexDirectory = (storeRoot) => path.join(storeRoot, "index", "causal-admission", "v2");
+export const indexDirectory = (storeRoot) => path.join(journalIndexDirectory(storeRoot), "causal-admission", "v2");
 
 /**
  * Append one canonical JSON line as the file's writer: a crash tail is truncated first, and the line is
@@ -109,7 +111,7 @@ function parseLine(line) {
 // ── the located index: where an admission fact lives is computed from its address ──
 //
 // Every admission fact is a line in a bucket file whose path is computed from the address the fact
-// is about (`ni-path-v1`, semiotic-content-address-system `conformance/ni-path-v1.json`):
+// is about (`ni-path-v1`, computed by `@red-cup-engineering/computer-content-address-engineering-services-section/ni-path`):
 //
 //   <store>/index/causal-admission/v3/<kind>/sha-256/<d0 d1>.jsonl,  d the key's NI digest
 //
@@ -132,32 +134,16 @@ function parseLine(line) {
 // next question (`carryV2`). A root with neither is rebuilt from its segments.
 
 export const LOCATED_FORMULA = "ni-path-v1";
-export const locatedIndexDirectory = (storeRoot) => path.join(storeRoot, "index", "causal-admission", "v3");
+export const locatedIndexDirectory = (storeRoot) => path.join(journalIndexDirectory(storeRoot), "causal-admission", "v3");
 const LOCATED_KINDS = Object.freeze(["admitted", "blocked", "pending", "waiting", "artifacts", "sources"]);
-const ADDRESS_PREFIX = "ni:///sha-256;";
 const LOCATED_CACHE_BYTES = 4 * 1024 * 1024;
 const LOCATED_CACHE_ENTRIES = 256;
 const CARRY_BUFFER_BYTES = 4 * 1024 * 1024;
 
-/** The NI address a key is located by: its own when it is one, else the NI of its UTF-8 bytes. */
-export function locatedAddressOf(key) {
-  if (typeof key !== "string" || key.length === 0) throw new TypeError("a located key must be nonempty text");
-  if (key.length === ADDRESS_PREFIX.length + 43 && key.startsWith(ADDRESS_PREFIX)) {
-    const text = key.slice(ADDRESS_PREFIX.length);
-    if (Buffer.from(text, "base64url").toString("base64url") === text) return key;
-  }
-  return `${ADDRESS_PREFIX}${createHash("sha256").update(key, "utf8").digest("base64url")}`;
-}
-
-/** `ni-path-v1`: the bucket of a key, relative to a kind's directory (`sha-256/<d0 d1>.jsonl`). */
-export function locatedBucketPath(key) {
-  return `sha-256/${locatedAddressOf(key).slice(ADDRESS_PREFIX.length, ADDRESS_PREFIX.length + 2)}.jsonl`;
-}
-
 /** The bucket file holding a key's `kind` facts in a store. */
 export function locatedBucketFile(storeRoot, kind, key) {
   if (!LOCATED_KINDS.includes(kind)) throw new TypeError(`unknown located index kind: ${kind}`);
-  return path.join(locatedIndexDirectory(storeRoot), kind, ...locatedBucketPath(key).split("/"));
+  return path.join(locatedIndexDirectory(storeRoot), kind, ...keyBucketPath(key, LOCATED_FORMULA).split("/"));
 }
 
 /** A feed's admission ledger, beside its segment. */
@@ -625,25 +611,20 @@ export function locatedIndexState(storeRoot) {
 }
 
 const UNWALKED = new Set(["node_modules", ".git"]);
-const journalDirectory = (directory) => path.basename(directory) === ".metroplat-journal"
-  || (path.basename(directory) === "journals" && path.basename(path.dirname(directory)) === "data");
 
-/** Journal stores below `root`: directories holding a v2 causal-admission index, and every `data/journals` and
- *  `.metroplat-journal` directory (the roots `artifactStoreRoot` yields). A store with a v2 index is not walked
- *  further; a journal directory without one is walked for stores below it, past its content objects, its index
- *  and its day directories. Symbolic links, node_modules and .git are not followed. */
+/** Journal stores below `root`: every settlement `data/logs` and `.metroplat-journal` directory (the roots
+ *  `artifactStoreRoot` yields) and any other directory holding a v2 causal-admission index. A store is not
+ *  walked further: everything in it is a feed kind or one of the store's own areas. Symbolic links,
+ *  node_modules, .git and dated content directories are not followed. */
 export function journalStoreRoots(root, depth = 10) {
   const found = [];
   const visit = (directory, left) => {
-    const journal = journalDirectory(directory);
-    if (fs.existsSync(indexDirectory(directory))) { found.push(directory); return; }
-    if (journal) found.push(directory);
+    if (isJournalStoreDirectory(directory) || fs.existsSync(indexDirectory(directory))) { found.push(directory); return; }
     if (left === 0) return;
     let entries;
     try { entries = fs.readdirSync(directory, { withFileTypes: true }); } catch { return; }
     for (const entry of entries) {
       if (!entry.isDirectory() || entry.isSymbolicLink() || UNWALKED.has(entry.name) || /^\d{2,4}$/u.test(entry.name)) continue;
-      if (journal && (entry.name === "objects" || entry.name === "index")) continue;
       visit(path.join(directory, entry.name), left - 1);
     }
   };
@@ -739,7 +720,7 @@ function segmentFilesUnder(storeRoot) {
     for (const entry of entries) {
       const full = path.join(directory, entry.name);
       if (entry.isDirectory()) {
-        if (entry.name === "index" || entry.name === "objects" || entry.name.endsWith(".statements") || entry.name.endsWith(".index")) continue;
+        if (isStoreArea(entry.name) || entry.name.endsWith(".statements") || entry.name.endsWith(".index")) continue;
         visit(full);
       } else if (entry.isFile() && logPathOfSegment(full) !== undefined) found.push(full);
     }
@@ -755,7 +736,7 @@ export function clearSegmentIndexes() {
   carryErrors.clear();
   rebuildLists.clear();
   bucketCache.clear();
-  dayListings.clear();
+  clearDataArtifactListings();
   segments.clear();
   projections.clear();
 }
@@ -836,7 +817,7 @@ const segments = readingCache(SEGMENT_CACHE_HEAP);
 // ── verification checkpoints: `{segment, offset, digest}`, the latest line per segment wins ──
 
 const CHECKPOINT_STRIDE = 64 * 1024;
-const checkpointFile = (storeRoot) => path.join(storeRoot, "index", "segment-verified", "v1.jsonl");
+const checkpointFile = (storeRoot) => path.join(journalIndexDirectory(storeRoot), "segment-verified", "v1.jsonl");
 const checkpoints = new Map();
 
 /** The root's checkpoints, read once per process; lines appended by other processes are not needed. */
@@ -1205,40 +1186,25 @@ export function projectSegmentStatements(logPath, project) {
   return Object.freeze([...view.values.values()]);
 }
 
-// A feed's address is its proof path (`<YYYY>/<MM>/<DD>/<date>-admit-<subject>.jsonl`), so a root's
-// feeds are found by listing its date directories, not by an index of feeds. A day's listing is held
-// while the directory's own modification time is unchanged.
-const dayListings = new Map();
-const DATE_SEGMENT = [/^\d{4}$/u, /^(0[1-9]|1[0-2])$/u, /^(0[1-9]|[12]\d|3[01])$/u];
-const directoryNames = (directory) => { try { return fs.readdirSync(directory); } catch { return []; } };
-function dayFeeds(directory) {
-  let stat;
-  try { stat = fs.statSync(directory); } catch { dayListings.delete(directory); return []; }
-  const held = dayListings.get(directory);
-  if (held?.mtimeMs === stat.mtimeMs && held.ctimeMs === stat.ctimeMs) return held.logs;
-  const logs = new Set();
-  for (const name of directoryNames(directory)) {
-    if (name.endsWith(`.jsonl${SEGMENT_SUFFIX}`)) logs.add(path.join(directory, name.slice(0, -SEGMENT_SUFFIX.length)));
-    else if (name.endsWith(".jsonl.admitted")) logs.add(path.join(directory, name.slice(0, -".admitted".length)));
-  }
-  const listing = Object.freeze([...logs].sort());
-  dayListings.set(directory, { mtimeMs: stat.mtimeMs, ctimeMs: stat.ctimeMs, logs: listing });
-  return listing;
-}
+// A feed's address is its proof path (`<kind>-logs/<date>-admit-<kind>.jsonl`), so a store's feeds are
+// found by the log tier's own listing (eavt `dataArtifactFiles`), not by an index of feeds.
+const isFeedFile = (name) => name.endsWith(`.jsonl${SEGMENT_SUFFIX}`) || name.endsWith(".jsonl.admitted");
+const feedHandleOf = (file) => (file.endsWith(SEGMENT_SUFFIX) ? file.slice(0, -SEGMENT_SUFFIX.length) : file.slice(0, -".admitted".length));
 
-/** Every feed of a root that holds a segment or an admission ledger, as logical handles. A feed whose
- *  segment was deleted keeps its ledger, so its read still fails closed rather than dropping out. */
-export function segmentAdmittedLogs(storeRoot) {
+/** Every feed of a store that holds a segment or an admission ledger, as logical handles, in date then
+ *  path order; `date` keeps one date's feeds and `kind` one kind's. A feed whose segment was deleted
+ *  keeps its ledger, so its read still fails closed rather than dropping out. */
+export function segmentAdmittedLogs(storeRoot, { date, kind } = {}) {
   carryV2(storeRoot);
-  const logs = [];
-  for (const year of directoryNames(storeRoot).filter((name) => DATE_SEGMENT[0].test(name)).sort()) {
-    for (const month of directoryNames(path.join(storeRoot, year)).filter((name) => DATE_SEGMENT[1].test(name)).sort()) {
-      for (const day of directoryNames(path.join(storeRoot, year, month)).filter((name) => DATE_SEGMENT[2].test(name)).sort()) {
-        logs.push(...dayFeeds(path.join(storeRoot, year, month, day)));
-      }
-    }
+  const dataRoot = settlementRootOfStore(storeRoot);
+  if (dataRoot === undefined) return Object.freeze([]);
+  const logs = new Map();
+  for (const file of dataArtifactFiles(dataRoot, "log", { date, subject: kind, match: isFeedFile })) {
+    if (isStoreArea(path.basename(file.directory))) continue;
+    const handle = feedHandleOf(file.path);
+    if (!logs.has(handle)) logs.set(handle, file.date ?? "");
   }
-  return Object.freeze(logs);
+  return Object.freeze([...logs].sort(([left, leftDate], [right, rightDate]) => leftDate.localeCompare(rightDate) || left.localeCompare(right)).map(([handle]) => handle));
 }
 
 /** The segment file of a feed, when it exists: the feed's source material. */
@@ -1487,7 +1453,7 @@ export function segmentArtifact(logPath, ref) {
  * witness back through admission. With `remove`, the earlier layout's statement, index and object
  * directories are deleted once every admitted witness is readable from its segment.
  *
- * @param {string} storeRoot the `data/journals` directory.
+ * @param {string} storeRoot the `data/logs` directory.
  * @param {{feeds: () => string[], statements: (logPath: string) => object[], received: () => {logPath: string, statement: object}[],
  *   blocked: () => {id: string, obstruction: unknown}[], artifacts: () => {ref: string, canonicalText: string}[], remove?: boolean}} legacy
  */
@@ -1548,7 +1514,7 @@ export function compactLegacyStore(storeRoot, legacy) {
           }
         }
       }
-      for (const directory of [path.join(storeRoot, "index", "causal-admission", "v1"), path.join(storeRoot, "objects", "sen")]) {
+      for (const directory of [path.join(journalIndexDirectory(storeRoot), "causal-admission", "v1"), path.join(journalObjectDirectory(storeRoot), "sen")]) {
         if (fs.existsSync(directory)) {
           fs.rmSync(directory, { recursive: true, force: true });
           report.removed.push(path.relative(storeRoot, directory));

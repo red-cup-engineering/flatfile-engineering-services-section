@@ -5,7 +5,7 @@ import {
   identifyValueSemanticContent,
   IDENTITY_SETTLEMENT_PROFILE,
   SEN_NORMALIZATION_PROFILE,
-} from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+} from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 import {
   settleProofCoordinate,
 } from "@red-cup-engineering/proof-path-structuration-service";

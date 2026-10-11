@@ -4,7 +4,7 @@ import { identifierSlug } from "@red-cup-engineering/computer-text-content-engin
 
 /** Encoding names used to derive durable data-artifact extensions. */
 
-/** A UTC calendar partition for a dated `<tier-segment>/YYYY/MM/DD` directory. */
+/** A UTC calendar date (YYYY-MM-DD) and its parts, the leading coordinate of an artifact stem. */
 
 /** A first-class address for one durable artifact under a POSIX data tree. */
 
@@ -75,7 +75,7 @@ function tierPathSegments(tier) {
 }
 
 /** The single-segment act a tier's artifacts are named by: admit statements into
- *  `data/journals`, settle state, commit records, realize content. Filenames read
+ *  `data/logs`, settle state, commit records, realize content. Filenames read
  *  `${date}-${act}-${token}`, so the act must never contain a hyphen — the
  *  token boundary is the first hyphen after the act segment. */
 export function dataTierAct(tier) {
@@ -102,10 +102,30 @@ export function dataDatePartition(at) {
   return Object.freeze({ date, year, month, day });
 }
 
-/** The deterministic dated directory for one artifact tier under a data root. */
-export function dataTierDirectory(root, tier, at) {
-  const { year, month, day } = dataDatePartition(at);
-  return posixJoin(root, dataTierPathSegment(tier), year, month, day);
+/** The directory name a tier files one kind's artifacts under, `<subject>-<kindSuffix>`
+ *  (`arrival-logs`, `land-owner-records`, `clock-state`). A tier is filed by kind, never by
+ *  date: the date is the leading coordinate of each artifact's own stem. */
+export function dataKindDirectoryName(tier, subject) {
+  return `${slug(String(subject).replace(/^@/, ""))}-${artifactTier(tier).kindSuffix}`;
+}
+
+/** The kind a tier directory's name files, or null when the name is not `<subject>-<kindSuffix>`. */
+export function dataKindOfDirectoryName(tier, name) {
+  const suffix = `-${artifactTier(tier).kindSuffix}`;
+  return typeof name === "string" && name.length > suffix.length && name.endsWith(suffix) ? name.slice(0, -suffix.length) : null;
+}
+
+/** The stem of an artifact file in one kind's directory: `<date>-<act>-<subject>` when the name is act-named
+ *  for that kind (a kind may carry dots, as `metroplat.clock.schedule` does), else the name up to its first dot. */
+export function dataArtifactStemOf(filename, subject) {
+  const match = /^\d{4}-\d{2}-\d{2}-[a-z]+-/u.exec(filename);
+  if (match !== null && typeof subject === "string" && filename.startsWith(`${match[0]}${subject}.`)) return `${match[0]}${subject}`;
+  return filename.replace(/\..*$/u, "");
+}
+
+/** The directory one tier files one kind's artifacts in, under a data root. */
+export function dataKindDirectory(root, tier, subject) {
+  return posixJoin(root, dataTierPathSegment(tier), dataKindDirectoryName(tier, subject));
 }
 
 function extensionOf(encoding) {
@@ -165,9 +185,10 @@ export function dataArtifactAddress(options) {
   const action = slug(options.action);
   const subject = slug(options.subject.replace(/^@/, ""));
   const feed = `${partition.date}-${dataTierAct(options.tier)}-${subject}`;
-  const directory = dataTierDirectory(options.root, options.tier, options.at);
+  const kindDirectory = dataKindDirectoryName(options.tier, subject);
+  const directory = posixJoin(options.root, dataTierPathSegment(options.tier), kindDirectory);
   const filename = `${feed}.${extension}`;
-  const relativePath = posixJoin(dataTierPathSegment(options.tier), partition.year, partition.month, partition.day, filename);
+  const relativePath = posixJoin(dataTierPathSegment(options.tier), kindDirectory, filename);
   return Object.freeze({
     kind: "metroplat.data-artifact-address",
     root: options.root,
@@ -233,7 +254,7 @@ export function projectDataArtifactPath(
   const sourceDirectory = parts.slice(0, -1).join("/");
   const match = matchTierDirectory(sourceDirectory);
   const directory = match !== null
-    ? posixJoin(match.root, dataTierPathSegment(tier), match.year, match.month, match.day)
+    ? posixJoin(match.root, dataTierPathSegment(tier), dataKindDirectoryName(tier, match.subject))
     : sourceDirectory;
   const stem = filename.replace(/\.[^.]+$/u, "");
   const parsed = parseArtifactStem(stem);
@@ -303,43 +324,60 @@ function directoryOf(filePath) {
   return absolute ? `/${joined}` : joined;
 }
 
-/** Re-derive a sibling tier's dated directory from a known tier's dated
+/** Re-derive a sibling tier's kind directory from a known tier's kind
  *  directory, by stripping exactly `from`'s own path segments (and the
- *  trailing YYYY/MM/DD) off the end to recover the shared root, then
- *  rebuilding with `to`'s segments. Tiers are not required to share a
- *  parent segment (`content`'s segment is bare; log/state/record's include
- *  `data/`) — the root is whatever remains once `from`'s own segments are
- *  removed, never a hand-matched "data" literal. */
+ *  trailing `<subject>-<kindSuffix>`) off the end to recover the shared root,
+ *  then rebuilding with `to`'s segments and suffix. Tiers are not required to
+ *  share a parent segment (`content`'s segment is bare; log/state/record's
+ *  include `data/`) — the root is whatever remains once `from`'s own segments
+ *  are removed, never a hand-matched "data" literal. */
 function siblingTierDirectory(tierDirectory, from, to) {
   const absolute = tierDirectory.startsWith("/");
   const parts = tierDirectory.split("/").filter(Boolean);
   const fromSegments = tierPathSegments(from);
-  const rootParts = parts.slice(0, Math.max(0, parts.length - 3 - fromSegments.length));
-  const dateParts = parts.slice(parts.length - 3);
-  return `${absolute ? "/" : ""}${[...rootParts, ...tierPathSegments(to), ...dateParts].join("/")}`;
+  const name = parts.at(-1) ?? "";
+  const subject = dataKindOfDirectoryName(from, name) ?? name;
+  const rootParts = parts.slice(0, Math.max(0, parts.length - 1 - fromSegments.length));
+  return `${absolute ? "/" : ""}${[...rootParts, ...tierPathSegments(to), dataKindDirectoryName(to, subject)].join("/")}`;
 }
 
-/** Locate which artifact tier a dated directory belongs to and recover its root,
- *  by matching the directory's segments (excluding the trailing YYYY/MM/DD)
- *  against each tier's own declared path segment — never a literal "data"
- *  index, since `content` does not share that prefix. */
+/** Locate which artifact tier a kind directory belongs to and recover its root
+ *  and kind, by matching the directory's segments (excluding the trailing
+ *  `<subject>-<kindSuffix>`) against each tier's own declared path segment —
+ *  never a literal "data" index, since `content` does not share that prefix. */
 function matchTierDirectory(
   directory,
 ) {
   const absolute = directory.startsWith("/");
   const parts = directory.split("/").filter(Boolean);
-  if (parts.length < 3) return null;
-  const [year, month, day] = parts.slice(-3);
-  const withoutDate = parts.slice(0, parts.length - 3);
+  if (parts.length < 2) return null;
+  const name = parts.at(-1);
+  const withoutKind = parts.slice(0, -1);
   for (const tier of ["log", "state", "record", "content"]) {
+    const subject = dataKindOfDirectoryName(tier, name);
+    if (subject === null) continue;
     const segments = tierPathSegments(tier);
-    if (segments.length === 0 || segments.length > withoutDate.length) continue;
-    const candidate = withoutDate.slice(withoutDate.length - segments.length);
+    if (segments.length === 0 || segments.length > withoutKind.length) continue;
+    const candidate = withoutKind.slice(withoutKind.length - segments.length);
     if (candidate.join("/") !== segments.join("/")) continue;
-    const rootParts = withoutDate.slice(0, withoutDate.length - segments.length);
-    return Object.freeze({ tier, root: `${absolute ? "/" : ""}${rootParts.join("/")}`, year, month, day });
+    const rootParts = withoutKind.slice(0, withoutKind.length - segments.length);
+    return Object.freeze({ tier, root: `${absolute ? "/" : ""}${rootParts.join("/")}`, subject });
   }
   return null;
+}
+
+/** The coordinates of an artifact path this law files: its tier, data root and
+ *  kind, and, when its stem is act-named, its date, act and token. Null for a
+ *  path outside every tier's kind directories. Readers recover coordinates
+ *  here rather than parsing paths themselves. */
+export function dataArtifactOfPath(filePath) {
+  const directory = directoryOf(filePath);
+  const match = matchTierDirectory(directory);
+  if (match === null) return null;
+  const filename = filePath.split("/").filter(Boolean).at(-1) ?? "";
+  const stem = dataArtifactStemOf(filename, match.subject);
+  const parsed = parseArtifactStem(stem);
+  return Object.freeze({ ...match, directory, filename, stem, ...(parsed === null ? {} : parsed) });
 }
 
 /** Recover data-store paths and a feed name from a log artifact path. */

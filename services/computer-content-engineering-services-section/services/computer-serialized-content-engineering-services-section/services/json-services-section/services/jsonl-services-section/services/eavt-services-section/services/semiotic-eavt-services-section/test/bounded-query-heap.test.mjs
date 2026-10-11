@@ -1,7 +1,8 @@
+import { journalPath } from "@red-cup-engineering/eavt-services-section/journal-path";
 import assert from "node:assert/strict";
 import { appendFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { setFlagsFromString } from "node:v8";
 import { runInNewContext } from "node:vm";
 import test from "node:test";
@@ -14,7 +15,7 @@ import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-servi
 import {
   EMPTY_WITNESS_ROOT,
   identifyJsonSemanticContent,
-} from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+} from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 
 setFlagsFromString("--expose-gc");
 const collect = runInNewContext("gc");
@@ -29,8 +30,8 @@ function writeLegacyFeeds(root, { days, perCategory, bytes }) {
   const filler = "x".repeat(bytes);
   for (let day = 1; day <= days; day += 1) {
     const dd = String(day).padStart(2, "0");
-    const directory = join(root, "data", "logs", "2026", "09", dd);
-    mkdirSync(directory, { recursive: true });
+    const file = journalPath({ root, feed: "witness-journal-seavt", at: `2026-09-${dd}` });
+    mkdirSync(dirname(file), { recursive: true });
     const lines = [];
     for (const category of categories) {
       for (let n = 0; n < perCategory; n += 1) {
@@ -39,7 +40,7 @@ function writeLegacyFeeds(root, { days, perCategory, bytes }) {
         lines.push(JSON.stringify({ e: jsonToTerm(id), a: jsonToTerm(category), v: jsonToTerm(value), t: `2026-09-${dd}T00:00:${String(n % 60).padStart(2, "0")}.000Z` }));
       }
     }
-    appendFileSync(join(directory, "witness-journal-seavt.jsonl"), `${lines.join("\n")}\n`);
+    appendFileSync(file, `${lines.join("\n")}\n`);
   }
 }
 

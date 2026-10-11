@@ -8,7 +8,7 @@ import { isArtifactRef } from "../../identity/index.mjs";
 import { requireJsonValue } from "@red-cup-engineering/json-services-section";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { journalWitness } from "../event.mjs";
-import { artifactStoreRoot } from "../store-root.mjs";
+import { artifactStoreRoot, journalIndexDirectory, journalObjectDirectory } from "../store-root.mjs";
 import { toEavt, eavtAddress, eavtRecord, parse as parseEavt } from "@red-cup-engineering/eavt-services-section/row";
 
 const CAUSAL_ADMISSION_INDEX_VERSION = 1;
@@ -37,7 +37,7 @@ export function referenceOfDigest(segment) {
 
 /** The directory of the journal's content-addressed artifact objects. */
 export function artifactObjectDirectory(logPath) {
-  return path.join(artifactStoreRoot(logPath), "objects", "sen", "sha-256");
+  return path.join(journalObjectDirectory(artifactStoreRoot(logPath)), "sen", "sha-256");
 }
 
 export function eventDirectoryPath(logPath) {
@@ -73,7 +73,7 @@ export function receivedPath(logPath, id) {
 }
 
 export function causalAdmissionIndexRoot(logPath) {
-  return path.join(artifactStoreRoot(logPath), "index", "causal-admission", `v${CAUSAL_ADMISSION_INDEX_VERSION}`);
+  return path.join(journalIndexDirectory(artifactStoreRoot(logPath)), "causal-admission", `v${CAUSAL_ADMISSION_INDEX_VERSION}`);
 }
 
 export function admittedIndexDirectoryPath(logPath) {

@@ -1,7 +1,7 @@
 /** Plain `{s, p, o}` triples projected from EAVT rows or object datoms by
  *  dropping time and operation. */
 import { requireJsonValue } from "@red-cup-engineering/json-services-section";
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { assertObjectDatom } from "@red-cup-engineering/datom-services-section";
 import { eavtRecord } from "./row.mjs";
 

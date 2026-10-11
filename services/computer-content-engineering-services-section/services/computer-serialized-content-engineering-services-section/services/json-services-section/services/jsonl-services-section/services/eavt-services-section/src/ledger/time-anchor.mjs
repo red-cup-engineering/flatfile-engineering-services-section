@@ -15,7 +15,7 @@ import {
   timestampedWitnessSchema,
 } from "./time-anchor-schema.mjs";
 import { canonical, requireJsonValue } from "@red-cup-engineering/json-services-section";
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { eavtId, eavtRecord } from "@red-cup-engineering/eavt-services-section/row";
 
 export {
