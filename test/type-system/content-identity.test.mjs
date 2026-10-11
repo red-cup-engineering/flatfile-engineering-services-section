@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { defineType, specializeType, collectTypeSystem, isSubtypeOf, typeIdentity, sameType, admit } from '../../src/type-system/type-system.mjs';
-import { semanticId } from '@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address';
+import { semanticId } from '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address';
 
 const value = (result) => { assert.equal(result.ok, true, JSON.stringify(result)); return result.value; };
 const base = (schema = { type: 'string' }) => value(defineType({ id: 'urn:test:portable', name: 'Portable', description: 'Portable declaration', parents: [], schema }));

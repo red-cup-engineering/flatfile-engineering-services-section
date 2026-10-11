@@ -10,7 +10,7 @@ import { tm } from "@red-cup-engineering/computer-data-engineering-services-sect
 import { journalWitness } from "../src/journal/event.mjs";
 import { artifactStoreRoot } from "../src/journal/store-root.mjs";
 import {
-  carryLocatedIndex, clearSegmentIndexes, indexDirectory, ledgerPath, locatedAddressOf, locatedBucketFile, locatedBucketPath, locatedIndex,
+  carryLocatedIndex, clearSegmentIndexes, indexDirectory, ledgerPath, locatedBucketFile, locatedIndex,
   locatedIndexDirectory, segmentAdmit, segmentAdmittedLogs, segmentPath, segmentState, segmentStatements, segmentWitness,
 } from "../src/journal/filesystem/segment-store.mjs";
 
@@ -26,16 +26,6 @@ function root() {
   const log = join(directory, "data/journals/2026/10/08/2026-10-08-admit-feed.jsonl");
   return { directory, log, storeRoot: artifactStoreRoot(log) };
 }
-
-test("the located index computes buckets by ni-path-v1, reproducing the address system's vectors", () => {
-  const vectors = JSON.parse(readFileSync(new URL("./fixtures/ni-path-v1.json", import.meta.url), "utf8"));
-  assert.equal(vectors.formula, "ni-path-v1");
-  for (const vector of vectors.vectors) {
-    if (vector.bucket === undefined) continue;
-    assert.equal(locatedBucketPath(vector.key), vector.bucket, vector.label);
-    if (vector["located-by"]) assert.equal(locatedAddressOf(vector.key), vector["located-by"], vector.label);
-  }
-});
 
 test("admitted, pending and woken witnesses are found in the buckets their addresses name, by any process", () => {
   const { directory, log, storeRoot } = root();

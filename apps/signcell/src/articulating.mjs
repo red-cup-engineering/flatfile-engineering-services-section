@@ -6,7 +6,7 @@
  * request and of itself. A request crosses a wire as the canonical bytes of
  * `{ kind, operation, input }`.
  */
-import { bytesEqual, decodeSemantic, semanticBytes, semanticId, utf8Bytes } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { bytesEqual, decodeSemantic, semanticBytes, semanticId, utf8Bytes } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { mark } from "./mark.mjs";
 import { articulate, utterance } from "./utterance.mjs";
 

@@ -1,7 +1,7 @@
 import { constants } from "node:fs";
 import { mkdir, open, writeFile } from "node:fs/promises";
 import { resolve, sep } from "node:path";
-import { admitJsonSemanticContent, EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+import { admitJsonSemanticContent, EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 import { niUriDigest } from "@red-cup-engineering/uri-services-section/ni-uri";
 
 async function readDatasetFile(path) {

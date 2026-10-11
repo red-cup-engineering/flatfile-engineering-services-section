@@ -5,7 +5,7 @@ import {
   EMPTY_WITNESS_ROOT,
   identifyBytesSemanticContent,
   identifyValueSemanticContent,
-} from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+} from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 import { isNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { inferTy } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
 import { seavtRow } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";

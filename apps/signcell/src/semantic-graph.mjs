@@ -1,5 +1,5 @@
 import { createRelationalField, defineRelation } from "@red-cup-engineering/computer-data-engineering-services-section/type-system/relations";
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { admit } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
 import { semanticGraphType } from "./semantic-carriers.mjs";
 import { admitTypedMarkCarrier, referenceOf, typedMarkReferenceType } from "./typed-mark.mjs";

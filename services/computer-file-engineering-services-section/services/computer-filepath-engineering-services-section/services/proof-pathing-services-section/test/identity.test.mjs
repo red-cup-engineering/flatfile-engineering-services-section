@@ -14,7 +14,7 @@ import {
   SEMANTIC_ENVELOPE_KIND,
   SEMANTIC_ENVELOPE_VERSION,
   decodeSemanticEnvelope,
-} from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+} from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 
 const request = Object.freeze({
   resourceType: "semiotic-atom",

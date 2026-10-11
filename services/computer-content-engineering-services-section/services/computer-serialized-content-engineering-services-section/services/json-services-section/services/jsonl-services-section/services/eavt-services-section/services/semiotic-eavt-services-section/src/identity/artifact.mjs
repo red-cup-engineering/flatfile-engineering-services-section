@@ -5,7 +5,7 @@
  */
 import { JSON_RESOURCE_ENVELOPE, admitCanonicalJson, canonicalizeJson } from "@red-cup-engineering/json-services-section";
 import { isNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { semanticIdOf } from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+import { semanticIdOf } from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 
 export const ARTIFACT_KIND = "metroplat.artifact";
 

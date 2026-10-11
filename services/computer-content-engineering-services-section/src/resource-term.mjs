@@ -4,7 +4,7 @@ import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-engin
 import {
   EMPTY_WITNESS_ROOT,
   identifyJsonSemanticContent,
-} from "@red-cup-engineering/computer-content-engineering-services-section/semantic-content-identity";
+} from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
 
 export function semanticId(value) {
   return identifyJsonSemanticContent({

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync as readInput } from "node:fs";
 import { assertObjectDatom } from "./admit-datom-fact.mjs";
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 export { default as inputSchema } from "../schemas/identify-datom-fact.input.schema.json" with { type: "json" };
 export { default as outputSchema } from "../schemas/identify-datom-fact.output.schema.json" with { type: "json" };
 export function objectDatomId(value) {

@@ -1,4 +1,4 @@
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { eavtRow, memoizeOnRow } from "./admit-row.mjs";
 export const inputSchema = Object.freeze({ type: "object", required: ["row"] });
 export const outputSchema = Object.freeze({

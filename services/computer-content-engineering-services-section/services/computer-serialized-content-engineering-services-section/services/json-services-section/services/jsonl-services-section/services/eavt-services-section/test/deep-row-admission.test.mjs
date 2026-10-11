@@ -4,7 +4,7 @@ import { eavtRow, isAdmittedRow, memoizeOnRow } from '../scripts/admit-row.mjs';
 import { encode } from '../scripts/encode-row.mjs';
 import { identify } from '../scripts/identify-row.mjs';
 import { identifyContentAddressedRow } from '../scripts/identify-content-addressed-row.mjs';
-import { semanticBytes, semanticId } from '@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address';
+import { semanticBytes, semanticId } from '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address';
 import { canonicalJson } from '@red-cup-engineering/json-services-section/canonical-json';
 
 const rowOf = v => ({e: 'entity', a: 'attribute', v, t: '2026-10-11T00:00:00Z'});

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { defineType, typeIdentity } from "../../src/type-system/type-system.mjs";
-import { semanticId } from "@red-cup-engineering/computer-content-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { makeThing } from "../../src/type-system/thing.mjs";
 const admitted = (result) => {
     assert.equal(result.ok, true, result.ok ? undefined : result.refusal?.message);
