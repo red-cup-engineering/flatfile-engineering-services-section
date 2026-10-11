@@ -243,7 +243,13 @@ export function feedLedgerEnd(logPath) {
 function checkLedger(logPath, size) {
   const end = feedLedgerEnd(logPath);
   if (end !== undefined && size < end) {
-    throw new TypeError(`journal segment ${segmentPath(logPath)} lacks witnesses admitted into it: it holds ${size} of the ${end} bytes its ledger records`);
+    // A concurrent writer appends the segment before advancing its ledger. The
+    // reading's earlier stat can predate that append; compare the retained ledger
+    // with current physical custody, not the stale size of this query's snapshot.
+    let currentSize;
+    try { currentSize = fs.statSync(segmentPath(logPath)).size; }
+    catch (error) { if (error.code !== "ENOENT") throw error; currentSize = 0; }
+    if (currentSize < end) throw new TypeError(`journal segment ${segmentPath(logPath)} lacks witnesses admitted into it: it holds ${currentSize} of the ${end} bytes its ledger records`);
   }
 }
 
