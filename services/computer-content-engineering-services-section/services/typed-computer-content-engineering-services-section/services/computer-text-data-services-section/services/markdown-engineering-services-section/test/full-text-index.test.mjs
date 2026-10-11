@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { openFullTextIndex } from "../src/vault/full-text-index.mjs";
 import { isSqliteFile } from "../src/vault/import-sql-full-text-index.mjs";
-import { writeLegacySqlite } from "./write-legacy-sqlite.mjs";
+import { writeLegacySqlite } from "./fixtures/write-legacy-sqlite.mjs";
 
 test("a query ranks the documents holding every one of its words, folded, diacritics kept", () => {
   const index = openFullTextIndex();
