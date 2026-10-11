@@ -39,7 +39,7 @@ function datedSettlement(t) {
     mkdirSync(day, { recursive: true });
     for (const suffix of [".witnesses", ".admitted"]) renameSync(`${journalFeedPath(scratch, "feed", `2026-10-0${n}`)}${suffix}`, join(day, `2026-10-0${n}-admit-feed.jsonl${suffix}`));
   }
-  // A closed day's segment, packed as pack-closed-segments leaves it: its bytes in a zstd frame beside it.
+  // A closed day's segment, packed as stores once packed them: its bytes in a zstd frame beside it.
   const packing = packSegment(join(state, "2026", "10", "01", "2026-10-01-admit-feed.jsonl.witnesses"), { frameBytes: 64 });
   mkdirSync(join(state, "index", "causal-admission", "v2"), { recursive: true });
   writeFileSync(join(state, "index", "causal-admission", "v2", "admitted.jsonl"),
