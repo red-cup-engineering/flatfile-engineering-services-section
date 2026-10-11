@@ -19,7 +19,7 @@ import {
   checkTy,
 } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
-import { eavtAddress } from "@red-cup-engineering/eavt-services-section/row";
+import { eavtAddress, isEavtAddressOf } from "@red-cup-engineering/eavt-services-section/row";
 import { isCausalWitness } from "./judgment.mjs";
 import { addressWitnessCore } from "./witness.mjs";
 
@@ -339,7 +339,9 @@ function exactTimestamp(value) {
   return value;
 }
 
-function buildUniqueRecord(commandValue, optionsValue) {
+/** `address` is the stored witness's address term when a record is read back: the content address,
+ *  or the equality key a record admitted before 2026-10-11 carries. */
+function buildUniqueRecord(commandValue, optionsValue, address) {
   checkEnvelope();
   const options = snapshot(optionsValue, "options");
   sameKeys(options, ["journal", "seat", "admittedAt", "artifacts"], "options fields");
@@ -356,7 +358,7 @@ function buildUniqueRecord(commandValue, optionsValue) {
     kind: "metroplat.journal.observation",
     seat: options.seat,
     claim: tm.mark(UNIQUE_ADMISSION),
-    address: tm.mark(eavtAddress(payload)),
+    address: address ?? tm.mark(eavtAddress(payload)),
     time: options.admittedAt,
     causes: command.causes,
     payload,
@@ -418,12 +420,14 @@ export function parseUniqueJournalRecord(value, journalIdentity, expectedSlotDig
     if (!Array.isArray(observation.payload) || observation.payload.length !== 4) bad("observation payload");
     const command = observation.payload[2];
     if (observation.payload[1] !== UNIQUE_ADMISSION || observation.payload[3] !== observation.time) bad("observation correspondence");
+    const address = observation.address;
+    if (!Array.isArray(address) || address.length !== 2 || address[0] !== "mark" || !isEavtAddressOf(address[1], observation.payload)) bad("observation address");
     const reconstructed = buildUniqueRecord(command, {
       journal: supplied.journal,
       seat: observation.seat,
       admittedAt: observation.time,
       artifacts: supplied.artifacts,
-    });
+    }, address);
     if (reconstructed.slotDigest !== expectedSlotDigest) bad("slot digest");
     if (canonicalJson(supplied) !== canonicalJson(reconstructed.record)) bad("record correspondence");
     const reference = Object.freeze({

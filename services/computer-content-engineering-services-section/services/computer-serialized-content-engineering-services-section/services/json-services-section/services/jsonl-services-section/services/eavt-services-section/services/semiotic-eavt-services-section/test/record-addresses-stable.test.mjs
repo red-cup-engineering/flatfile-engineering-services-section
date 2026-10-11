@@ -10,24 +10,25 @@ const PINNED_IDS = [
   {
     "id": "ni:///sha-256;Vj4_TJpCCOxnzzvBZxrU3hNZJB-xx-ZwPZv8N-un7_Q",
     "events": [
-      "ni:///sha-256;7ZtXEjCCP5N_9GeanShkUHzeaptxMBm9jmeFl5ooedU"
+      "ni:///sha-256;Lc9LYTIoUhgLP8R50337Csc4yr5c5Xn0I7ICNvrty1w"
     ]
   },
   {
     "id": "ni:///sha-256;mMyMH2qM-hSjNhjsTDdcMfVf8v5ZqxZnWhZJAHBVVbA",
     "events": [
-      "ni:///sha-256;TDalEUj2QL4IJnDLL1sbsdMiMWefTXbnLM8zfbTVwLQ"
+      "ni:///sha-256;RBxicNU-SoLHVP-oKwQi1wb7O1Ikg0QXjLwfUusQtiM"
     ]
   },
   {
     "id": "ni:///sha-256;pz-g1LsrgIkL4fJg7viSCKJM6BjvnWXnuK6k40p5AtE",
     "events": [
-      "ni:///sha-256;nV1Hw4cEOtTx3Tkm-ZFF2GamVwJyoRUAeyqqkRgWzuo"
+      "ni:///sha-256;cS7YiNPDPDeksdCkqMAoKoli3Vi_EE0mO6zCdJhWVYA"
     ]
   }
 ];
 
-// Event ids pinned from the canonicalizer before list spines stopped counting as nesting.
+// Record ids pinned from the canonicalizer before list spines stopped counting as nesting; event ids
+// since 2026-10-11, when a witness began naming its row by content address.
 const records = [
   { record: { type: "Observation", value: 1 } },
   { record: { ids: Array.from({ length: 40 }, (_, index) => `ni:///sha-256;item-${index}`), nested: { a: [[1, 2], [3]] } } },

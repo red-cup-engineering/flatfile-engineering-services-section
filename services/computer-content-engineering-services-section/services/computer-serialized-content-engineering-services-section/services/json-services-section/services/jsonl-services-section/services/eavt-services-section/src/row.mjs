@@ -1,4 +1,4 @@
-import { canonicalJson, isJsonValue, JSON_RESOURCE_ENVELOPE, requireJsonValue } from "@red-cup-engineering/json-services-section";
+import { canonicalJson, isJsonValue, requireJsonValue } from "@red-cup-engineering/json-services-section";
 import { parseLines, serializeLines } from "@red-cup-engineering/jsonl-services-section";
 import { jsonlProjector } from "@red-cup-engineering/jsonl-services-section/jsonl-projector";
 import { restrict } from "@red-cup-engineering/computer-content-engineering-services-section/typed-resource-classification";
@@ -47,17 +47,16 @@ export function eavtKey(row) {
   return identify(eavtRecord(row));
 }
 
-/** The longest key a row's journal address carries as text: what one string of a bounded canonical
- *  JSON value may hold, so the address of a witness admitted under that bound is always admissible. */
-export const EAVT_ADDRESS_KEY_BYTES = JSON_RESOURCE_ENVELOPE.maxStringBytes;
-
-/** A row's journal address: its equality key while the key fits `EAVT_ADDRESS_KEY_BYTES`, else its
- *  content address (`eavtId`). Every row that could be addressed by its key still is, so no witness
- *  already written changes; a row whose key is too long to be one string is addressed by its id
- *  instead of being refused. */
+/** A row's journal address: its content address (`eavtId`). A witness names its row by address and
+ *  carries the row once, as its payload. */
 export function eavtAddress(row) {
-  const key = eavtKey(row);
-  return Buffer.byteLength(key, "utf8") <= EAVT_ADDRESS_KEY_BYTES ? key : eavtId(row);
+  return eavtId(row);
+}
+
+/** Whether `address` addresses `row`: its content address, or its equality key, the address that
+ *  witnesses admitted before 2026-10-11 carry and that still reads. */
+export function isEavtAddressOf(address, row) {
+  return typeof address === "string" && (address === eavtId(row) || address === eavtKey(row));
 }
 
 /** An EAVT JSONL document as records; lines of neither spelling are skipped. */
