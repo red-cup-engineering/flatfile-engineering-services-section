@@ -406,6 +406,47 @@ function retireLegacyDescription(file, current) {
 }
 
 /**
+ * Read a packed segment back into a plain file a person can read: its bytes, taken through its packing,
+ * replace the file whole, and its packing description goes, with its frame data unless another
+ * description in the directory names it. Returns `{ unpacked, unchanged }`; a segment that is not packed
+ * is left as it is. Its bytes do not change, so a verification checkpoint over them still holds.
+ */
+export function unpackSegment(file) {
+  const packing = packingOf(file);
+  if (packing === null) return { unpacked: 0, unchanged: true };
+  const size = Math.max(fs.statSync(file).size, packing.packed);
+  const temporary = `${file}.unpacking-${process.pid}`;
+  const reader = openSegmentReader(file);
+  const out = fs.openSync(temporary, "wx");
+  try {
+    const chunk = Buffer.alloc(4 * 1024 * 1024);
+    for (let position = 0; position < size;) {
+      const got = reader.read(chunk, 0, Math.min(chunk.length, size - position), position);
+      if (got === 0) throw new TypeError(`unpacking ${file}: its packing ended at ${position} of ${size} bytes`);
+      for (let written = 0; written < got;) written += fs.writeSync(out, chunk, written, got - written);
+      position += got;
+    }
+    fs.fsyncSync(out);
+  } catch (error) {
+    fs.closeSync(out);
+    fs.rmSync(temporary, { force: true });
+    reader.close();
+    throw error;
+  }
+  fs.closeSync(out);
+  reader.close();
+  fs.renameSync(temporary, file);
+  fs.rmSync(packing.descriptionPath, { force: true });
+  descriptions.delete(file);
+  const directory = path.dirname(file);
+  const stillNamed = fs.readdirSync(directory)
+    .filter((name) => name.startsWith(".packing-") && name.endsWith(PACKING_SUFFIX))
+    .some((name) => { try { return JSON.parse(fs.readFileSync(path.join(directory, name), "utf8")).data === packing.data; } catch { return false; } });
+  if (!stillNamed) fs.rmSync(packing.dataPath, { force: true });
+  return { unpacked: size, unchanged: false };
+}
+
+/**
  * Pack the complete lines of a closed segment into seekable zstd frames and free their plain bytes.
  * Returns `{ packed, size, unchanged }`: the packed prefix, its compressed size, and whether it was
  * already packed through its last complete line.
