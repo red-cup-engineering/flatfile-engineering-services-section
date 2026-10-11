@@ -11,6 +11,14 @@ CAIRN use those same source observations. YAML syntax belongs to the YAML codec;
 Markdown owns its leading envelope and body. Invalid metadata can be returned
 as a diagnostic while the document's prose remains readable.
 
+`createMarkdownDocument(view, options)` retains own metadata keys, including
+`__proto__`, without interpreting them as prototype setters. Its existing
+default omits null and undefined attributes. A carrier that needs to preserve
+an authored null can select `nullFrontmatter: "preserve"`; undefined remains
+absent. `nullFrontmatter: "omit"` makes the default explicit. Other option
+values are refused. This policy does not change body-key selection or semantic
+linefeed normalization, and it does not admit arbitrary non-JSON YAML values.
+
 The public package entry exports `invokeMarkdownService(operation, request)`.
 The installed command uses the same operations:
 
