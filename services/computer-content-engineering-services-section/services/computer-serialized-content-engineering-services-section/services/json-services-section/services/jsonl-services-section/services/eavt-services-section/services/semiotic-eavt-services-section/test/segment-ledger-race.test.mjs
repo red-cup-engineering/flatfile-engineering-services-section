@@ -1,3 +1,4 @@
+import { journalFeedPath } from "../src/journal/store-root.mjs";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { tmpdir } from "node:os";
@@ -25,7 +26,7 @@ const readers = {
 };
 function fixture(run) {
   const directory = fs.mkdtempSync(join(tmpdir(), "journal-ledger-race-"));
-  const log = join(directory, "data/journals/2026/10/08/2026-10-08-admit-feed.jsonl");
+  const log = journalFeedPath(directory, "feed", "2026-10-08");
   const streamedBytes = segmentLimits.streamedBytes;
   const statSync = fs.statSync;
   try {

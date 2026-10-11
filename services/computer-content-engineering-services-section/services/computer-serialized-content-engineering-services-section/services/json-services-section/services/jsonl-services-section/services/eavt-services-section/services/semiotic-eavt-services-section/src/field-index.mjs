@@ -6,7 +6,7 @@ import { parseJournalWitness } from "./journal/event.mjs";
 import { segmentPath } from "./journal/filesystem/segment-store.mjs";
 import { kindFeedsGrew, tailKindFeeds } from "./journal/filesystem/feed-tail.mjs";
 import { withDirectoryLock } from "./journal/filesystem/directory-lock.mjs";
-import { journalDirectoryOf } from "./journal/store-root.mjs";
+import { journalDirectoryOf, journalIndexDirectory } from "./journal/store-root.mjs";
 import { semanticRecordOf } from "./query-semantic-records.mjs";
 
 const LAYOUT = 1;
@@ -81,7 +81,7 @@ export function createFieldIndex({ root, objectKind, category, fields } = {}) {
   const declaration = canonicalJson(Object.entries(fields).map(([name, path]) => [name, typeof path === "function" ? `function:${path.toString()}` : path]).sort());
   const store = journalDirectoryOf(resolve(root));
   // Each declaration keeps its own reading, so two readers declaring different fields never rebuild each other's.
-  const directory = join(store, "index", "field", "v1", encodeURIComponent(objectKind), encodeURIComponent(category), createHash("sha256").update(declaration).digest("hex").slice(0, 16));
+  const directory = join(journalIndexDirectory(store), "field", "v1", encodeURIComponent(objectKind), encodeURIComponent(category), createHash("sha256").update(declaration).digest("hex").slice(0, 16));
   const cursorFile = join(directory, "cursor.json");
   const shardFile = (field, shard) => join(directory, encodeURIComponent(field), `${shard}.jsonl`);
   const readCursor = () => {

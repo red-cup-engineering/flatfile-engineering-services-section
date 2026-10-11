@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import {
   crossFeedReading,
+  journalPath,
   listFeedsAt,
   readAllFeedsEntries,
 } from "../src/index.mjs";
@@ -13,15 +14,15 @@ test("discovers and composes independent feed custody", (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "cross-feed-reading-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const at = "2026-08-14T12:00:00Z";
-  const dir = path.join(root, "data", "logs", "2026", "08", "14");
-  mkdirSync(dir, { recursive: true });
+  const feedPath = (feed) => journalPath({ root, feed, at });
+  for (const feed of ["alpha", "beta"]) mkdirSync(path.dirname(feedPath(feed)), { recursive: true });
   const base = { e: "urn:e", a: "urn:a" };
   writeFileSync(
-    path.join(dir, "alpha.jsonl"),
+    feedPath("alpha"),
     `${JSON.stringify({ ...base, v: "one", t: at })}\n`,
   );
   writeFileSync(
-    path.join(dir, "beta.jsonl"),
+    feedPath("beta"),
     `${JSON.stringify({ ...base, v: "two", t: at })}\n`,
   );
   assert.deepEqual(listFeedsAt({ root, at }), ["alpha", "beta"]);

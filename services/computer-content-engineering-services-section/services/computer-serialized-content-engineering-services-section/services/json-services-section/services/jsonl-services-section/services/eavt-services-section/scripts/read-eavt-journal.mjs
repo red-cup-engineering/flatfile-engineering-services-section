@@ -26,8 +26,8 @@ export const outputSchema = {
     additionalProperties: false,
   },
 };
-import { readFileSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, statSync } from "node:fs";
+import { dataArtifactDates } from "../src/data-artifact-listing.mjs";
 import { journalPath } from "./journal-path.mjs";
 import { iterateEavtEntries } from "./read-eavt-entries.mjs";
 /** Read one dated EAVT journal and derive its append-order trace. */
@@ -41,30 +41,12 @@ export function readEavtJournal(input) {
   return Object.freeze([...iterateEavtJournal(input)]);
 }
 
-/** The dates of a root's dated cuts through an inclusive calendar frontier, in order. */
+/** The dates of a feed's dated cuts through an inclusive calendar frontier, in order. */
 function datesThrough({ root, feed, throughDate }) {
   if (typeof throughDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/u.test(throughDate)) throw new TypeError("EAVT journal frontier must be a calendar date");
   // Validate root and feed with the same address law as an individual read.
   journalPath({ root, feed, at: throughDate });
-  const entries = (directory) => {
-    try {
-      return readdirSync(directory, { withFileTypes: true });
-    } catch (error) {
-      if (["ENOENT", "ENOTDIR"].includes(error?.code)) return [];
-      throw error;
-    }
-  };
-  const logs = join(root, "data", "logs");
-  const dates = [];
-  for (const year of entries(logs).filter((entry) => entry.isDirectory() && /^\d{4}$/u.test(entry.name)).sort((left, right) => left.name.localeCompare(right.name))) {
-    for (const month of entries(join(logs, year.name)).filter((entry) => entry.isDirectory() && /^(0[1-9]|1[0-2])$/u.test(entry.name)).sort((left, right) => left.name.localeCompare(right.name))) {
-      for (const day of entries(join(logs, year.name, month.name)).filter((entry) => entry.isDirectory() && /^(0[1-9]|[12]\d|3[01])$/u.test(entry.name)).sort((left, right) => left.name.localeCompare(right.name))) {
-        const date = `${year.name}-${month.name}-${day.name}`;
-        if (date <= throughDate) dates.push(date);
-      }
-    }
-  }
-  return dates;
+  return dataArtifactDates(root, "log", { subject: feed, through: throughDate, match: (name) => name.endsWith(".jsonl") });
 }
 
 /** Read a feed's dated cuts through an inclusive calendar frontier. */
