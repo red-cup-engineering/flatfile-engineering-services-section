@@ -1,15 +1,17 @@
-# Retired: copy of base58-encoding-service
+# Base58 implementation received at its serialized-data owner
 
-`src/base58.mjs` (Git blob c6dcd03c) was byte-identical to `@red-cup-engineering/base58-encoding-service`
-(red-cup-engineering/serialized-data-services-section, `services/base58-encoding-service`). That service is
-its owner by domain and by history: added in eb3ac27 (2026-10-06T06:15Z, "Recover shared
-base58-encoding-service outside machine snapshot"). This section's copy came in 3314bea (2026-10-07T04:18Z).
-It is kept here byte for byte. Under `legacy/`, the release tooling reads no runtime file from it.
+The canonical codec is `@red-cup-engineering/base58-encoding-service` in
+`red-cup-engineering/serialized-data-services-section`, at
+`services/base58-encoding-service/src/base58.mjs` (provider blob
+`c6dcd03ca3b2673e94215685b6b40dca4b3ac04f`). Its Bitcoin alphabet and
+leading-zero handling retain the byte-input and Buffer-output interface.
 
-| Copy (was) | Owner's export now |
-|---|---|
-| `./base58` → `src/base58.mjs` (`encode`, `decode`) | `@red-cup-engineering/base58-encoding-service` (`encode`, `decode`) |
+The receiving merge preserves current main’s later `@scure/base` wrapper
+byte for byte under this directory. The original proposal’s older codec
+remains in its Git history. Neither legacy carrier is a runtime source.
 
-The section's `./base58` export retires with the copy. No source Cold Red Gate pins imported it; only this
-section's `test/binary-text.test.mjs` did, and it now reads the owner (a dev dependency). The section's own
-`binary-text.mjs` keeps reading `@scure/base` directly, as before.
+The existing section export `./base58` remains available through a forwarding
+module. Its canonical owner is a runtime dependency, so consumers can continue
+using the public path without importing the preserved implementation or
+requiring a development-only dependency. Binary-text’s independent codecs
+continue to use `@scure/base`.

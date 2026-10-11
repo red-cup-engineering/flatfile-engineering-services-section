@@ -9,7 +9,8 @@
     "@red-cup-engineering/uri-services-section": "workspace:*",
     "http-structured-fields": "1.0.0",
     "@scure/base": "2.4.0",
-    "whatwg-mimetype": "5.0.0"
+    "whatwg-mimetype": "5.0.0",
+    "@red-cup-engineering/base58-encoding-service": "workspace:*"
   },
   "exports": {
     "./services/http-data-services-section/src/content-type": "./services/http-data-services-section/src/content-type.mjs",
@@ -41,7 +42,8 @@
     "./text-codecs": "./src/text-codecs.mjs",
     "./binary-text": "./src/binary-text.mjs",
     "./mime-type": "./src/mime-type.mjs",
-    "./http-date-transformations": "./services/http-data-services-section/src/date-transformations.mjs"
+    "./http-date-transformations": "./services/http-data-services-section/src/date-transformations.mjs",
+    "./base58": "./src/base58.mjs"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs services/http-data-services-section/test/*.test.mjs"
@@ -50,8 +52,5 @@
     "type": "git",
     "url": "https://github.com/red-cup-engineering/computer-data-services-section.git",
     "directory": "services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section"
-  },
-  "devDependencies": {
-    "@red-cup-engineering/base58-encoding-service": "workspace:*"
   }
 }
