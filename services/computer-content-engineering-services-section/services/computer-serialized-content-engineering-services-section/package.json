@@ -9,8 +9,7 @@
     "@red-cup-engineering/uri-services-section": "workspace:*",
     "http-structured-fields": "1.0.0",
     "@scure/base": "2.4.0",
-    "whatwg-mimetype": "5.0.0",
-    "@red-cup-engineering/base58-encoding-service": "workspace:*"
+    "whatwg-mimetype": "5.0.0"
   },
   "exports": {
     "./services/http-data-services-section/src/content-type": "./services/http-data-services-section/src/content-type.mjs",
