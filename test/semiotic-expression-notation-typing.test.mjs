@@ -363,3 +363,17 @@ test("fold over an array-encoded list has its accumulator type", () => {
   assert.deepEqual(inferTy([], fold), base);
   assert.equal(checkTy([], fold, base), true);
 });
+
+
+test("binding-aware traversal admits a long JSON pair spine without host recursion", () => {
+  let term = ["star"];
+  for (let i=0;i<10000;i++) term=["pair",["mark",String(i)],term];
+  assert.equal(isClosed(term),true);
+  assert.equal(termSize(term),20001);
+  assert.deepEqual([...termUses(term)].sort(),["mark","pair","star"]);
+  let inferred=inferTy([],term), count=0;
+  while(inferred[0]==="prod") {assert.deepEqual(inferred[1],["base"]);count++;inferred=inferred[2];}
+  assert.equal(count,10000);assert.deepEqual(inferred,["unit"]);
+  assert.equal(isClosed(["pair",term,["var",0]]),false);
+  assert.equal(isClosed(["lam",["pair",term,["var",0]]]),true);
+});
