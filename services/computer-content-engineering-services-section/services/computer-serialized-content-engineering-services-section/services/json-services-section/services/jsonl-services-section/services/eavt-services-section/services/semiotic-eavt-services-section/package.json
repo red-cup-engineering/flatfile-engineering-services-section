@@ -30,6 +30,7 @@
     "./normalize-seavt-row": "./src/normalize-seavt-row.mjs",
     "./profile": "./src/profile.mjs",
     "./query-semantic-records": "./src/query-semantic-records.mjs",
+    "./query-journal-day": "./src/query-journal-day.mjs",
     "./read-seavt-entries-at-path": "./src/read-seavt-entries-at-path.mjs",
     "./read-seavt-entries": "./src/read-seavt-entries.mjs",
     "./record-configured-semantic-record": "./src/record-configured-semantic-record.mjs",
