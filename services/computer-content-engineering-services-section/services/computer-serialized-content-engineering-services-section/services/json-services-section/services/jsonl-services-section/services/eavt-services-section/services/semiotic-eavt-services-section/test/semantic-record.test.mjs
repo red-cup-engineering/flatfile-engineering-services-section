@@ -408,3 +408,19 @@ test(
     assert.equal((await exited)[0], 0, stderr);
   },
 );
+
+
+test("native custody retains all 8132 source references through independent journal readback", (t) => {
+  const root=mkdtempSync(join(tmpdir(),"native-custody-stack-"));
+  t.after(()=>rmSync(root,{recursive:true,force:true}));
+  const record={type:"NativeCustodyStackFixture",fixture:true,
+    originalWitnessEvents:Array.from({length:8132},(_,i)=>`fixture-witness-${i}`)};
+  const request={root,objectKind:"activitypub.historical-custody",category:"installation-fixture",
+    recordedAt:"2026-10-11T00:00:00.000Z",told:{for:true,against:false},record};
+  const admitted=recordSemanticRecord(request);
+  const received=querySemanticRecords({root,objectKind:request.objectKind,category:request.category});
+  assert.equal(received.length,1);
+  assert.equal(received[0].id,admitted.id);
+  assert.deepEqual(received[0].record,record);
+  assert.equal(received[0].record.originalWitnessEvents.length,8132);
+});

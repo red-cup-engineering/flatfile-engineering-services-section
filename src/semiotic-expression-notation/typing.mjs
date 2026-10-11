@@ -7,7 +7,16 @@ import {
 } from "./notation.mjs";
 
 export function tyEqual(left, right) {
-  return JSON.stringify(left) === JSON.stringify(right);
+  const pending = [[left,right]];
+  while (pending.length) {
+    const [a,b] = pending.pop();
+    if (a === b) continue;
+    if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) return false;
+      for (let i=a.length-1;i>=0;i--) pending.push([a[i],b[i]]);
+    } else if (JSON.stringify(a) !== JSON.stringify(b)) return false;
+  }
+  return true;
 }
 
 /** The sole recursive inference/checking engine. `expected` selects checking. */
@@ -15,7 +24,30 @@ export function judgeSen(ctx, source, expected = undefined) {
   const checkedContext = ctx.map(validateSenType);
   const term = validateSenTerm(source);
   const want = expected === undefined ? undefined : validateSenType(expected);
+  const valueType = inferClosedValueType(term);
+  if (valueType !== undefined) {
+    if (want === undefined) return valueType;
+    if (tyEqual(valueType,want)) return true;
+  }
   return judge(checkedContext, term, want);
+}
+
+/** The mark/star/product fragment is already closed and normal. Derive its
+ * exact product type in postorder, using the same rules as judge without
+ * consuming the host stack for a nested carrier value. Other forms still
+ * enter the contextual inference/checking engine. */
+function inferClosedValueType(term) {
+  const pending = [{term,next:0}], results = [];
+  while (pending.length) {
+    const frame=pending.at(-1), value=frame.term;
+    if (value[0] === "mark" || value[0] === "star") {
+      results.push([value[0] === "mark" ? "base" : "unit"]); pending.pop();
+    } else if (value[0] === "pair") {
+      if (frame.next < 2) { pending.push({term:value[++frame.next],next:0}); continue; }
+      const right=results.pop(),left=results.pop(); results.push(["prod",left,right]); pending.pop();
+    } else return undefined;
+  }
+  return results[0];
 }
 
 function judge(ctx, term, want = undefined) {
@@ -130,8 +162,14 @@ function judge(ctx, term, want = undefined) {
   };
   if (term[0] === "lam" && want)
     return want[0] === "arrow" && judge([want[1], ...ctx], term[1], want[2]);
-  if (term[0] === "pair" && want?.[0] === "prod")
-    return judge(ctx, term[1], want[1]) && judge(ctx, term[2], want[2]);
+  if (term[0] === "pair" && want?.[0] === "prod") {
+    let value = term, expected = want;
+    while (value[0] === "pair" && expected[0] === "prod") {
+      if (!judge(ctx,value[1],expected[1])) return false;
+      value=value[2]; expected=expected[2];
+    }
+    return judge(ctx,value,expected);
+  }
   if (term[0] === "inl" && want?.[0] === "sum")
     return tyEqual(term[2], want[2]) && judge(ctx, term[1], want[1]);
   if (term[0] === "inr" && want?.[0] === "sum")
