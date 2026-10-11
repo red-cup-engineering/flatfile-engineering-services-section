@@ -88,7 +88,6 @@
     "./package.json": "./package.json",
     "./vault/text-index": "./src/vault/text-index.mjs",
     "./vault/full-text-index": "./src/vault/full-text-index.mjs",
-    "./vault/import-sql-full-text-index": "./src/vault/import-sql-full-text-index.mjs",
     "./vault/room-index-search": "./src/vault/room-index-search.mjs",
     "./vault/fibration": "./src/vault/fibration.mjs",
     "./vault/filing": "./src/vault/filing.mjs",
@@ -98,9 +97,6 @@
     "./vault/diataxis-coverage-schema": "./src/vault/diataxis-coverage-schema.mjs",
     "./vault/directory-listing": "./src/vault/directory-listing.mjs"
   },
-  "sqlAdmissionPaths": [
-    "src/vault/import-sql-full-text-index.mjs"
-  ],
   "bin": {
     "admit-markdown-date-path": "./scripts/markdown-services.mjs",
     "admit-markdown-link-target": "./scripts/markdown-services.mjs",
@@ -156,19 +152,22 @@
     "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/toml-file-codec-service": "workspace:*",
-    "@red-cup-engineering/toml-services-section": "workspace:*",
-    "@red-cup-engineering/computer-system-engine": "workspace:*"
+    "@red-cup-engineering/toml-services-section": "workspace:*"
   },
   "files": [
     "src",
     "scripts",
     "apps",
     "types",
-    "docs"
+    "docs",
+    "!scripts/historical-full-text-index-receiving"
   ],
   "scripts": {
     "check": "for f in $(find src scripts apps -name '*.mjs'); do node --check \"$f\" || exit 1; done",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "test:legacy-sql": "node --test scripts/historical-full-text-index-receiving/original/test/full-text-index.test.mjs",
+    "test:legacy-sql:prior-76c7539f": "node --test scripts/historical-full-text-index-receiving/prior-76c7539f/test/full-text-index.test.mjs",
+    "test:legacy-sql:prior-18f32f3a": "node --test scripts/historical-full-text-index-receiving/prior-18f32f3a/test/full-text-index.test.mjs"
   },
   "engines": {
     "node": ">=22"
