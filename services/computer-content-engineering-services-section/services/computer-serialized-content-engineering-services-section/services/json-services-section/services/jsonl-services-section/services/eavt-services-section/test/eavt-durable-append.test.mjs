@@ -14,7 +14,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 
 import { appendEavtRow, readEavtTrace, cellsOfEavtRows } from "../src/index.mjs";
-import { canonicalJson as jcs } from "../../../../../src/index.mjs";
+import { canonicalJson as jcs } from "@red-cup-engineering/json-services-section";
 
 const append = (path, row) => appendEavtRow({ path, row });
 const readEavt = (path) => readEavtTrace({ path }).rows;
