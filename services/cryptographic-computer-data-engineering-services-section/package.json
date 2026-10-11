@@ -22,6 +22,10 @@
     "url": "https://github.com/red-cup-engineering/computer-data-services-section.git",
     "directory": "services/cryptographic-computer-data-engineering-services-section"
   },
+  "bin": {
+    "solicit-service": "./src/cryptographic-services.mjs",
+    "invoke-service": "./src/cryptographic-services.mjs"
+  },
   "scripts": {
     "test": "node --test test/*.test.mjs"
   },
