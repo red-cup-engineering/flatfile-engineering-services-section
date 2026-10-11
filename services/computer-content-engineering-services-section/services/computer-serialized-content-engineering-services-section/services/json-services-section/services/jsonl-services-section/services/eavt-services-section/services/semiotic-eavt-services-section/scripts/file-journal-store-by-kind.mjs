@@ -5,14 +5,17 @@
  * settlement kept under `data/logs/<YYYY>/<MM>/<DD>/<feed>.jsonl` move to the same law.
  *
  * For each settlement root, in this order:
- *   1. the old store's `index/` is renamed `journal-index-logs/` where it stands, and every v2
+ *   1. the old store's `index/` becomes the store's state where it stands, and every v2
  *      causal-admission line is carried into the located (v3) index while the feeds are still at
  *      their dated paths (a carry writes each carried feed's ledger beside it);
  *   2. every file of every day directory moves to its kind directory (segments, ledgers, the
  *      earlier statement and index directories beside a feed), each day's `packets/` into
- *      `journal-packet-logs/` and each day's head `index/` into `journal-index-logs/heads/<date>/`;
+ *      `journal-packet-logs/` and each day's head `index/` into the state's `heads/<date>/`;
  *      the store's `objects/` becomes `journal-object-logs/`;
  *   Books (`data/logs/ledgers/*.beancount`) are records and move to `data/records/ledger-records/`.
+ *   The store's state (located admission facts, segment checkpoints, heads) is the logs' state, kept in
+ *   `<settlement>/data/state/log-state/` (store-root `journalIndexDirectory`); a store filed by kind before
+ *   that has its `journal-index-logs/` moved there.
  *   3. the feed paths the located index and the segment checkpoints hold are rewritten to the kind
  *      layout, and the carried v2 index is removed;
  *   4. `data/logs` becomes the store: when the old store was a symbolic link into machine state
@@ -35,7 +38,7 @@ import { parseArgs } from "node:util";
 import { dataArtifactAddress, dataKindDirectory, dataKindDirectoryName, parseArtifactStem, projectDataArtifactPath } from "@red-cup-engineering/eavt-services-section/data-artifact-address";
 import { journalPath } from "@red-cup-engineering/eavt-services-section/journal-path";
 import { carryLocatedIndex, clearSegmentIndexes } from "../src/journal/filesystem/segment-store.mjs";
-import { STORE_AREAS, journalSegment } from "../src/journal/store-root.mjs";
+import { LOG_STATE, STORE_AREAS, SUPERSEDED_INDEX_AREA, journalIndexDirectory, journalSegment } from "../src/journal/store-root.mjs";
 
 const OLD_STORE = path.join("data", "journals");
 const DATED = [/^\d{4}$/u, /^\d{2}$/u, /^\d{2}$/u];
@@ -169,8 +172,8 @@ export function fileJournalStoreByKind(settlementRoot, { dryRun = false } = {}) 
   if (oldStore !== undefined) {
     // 1. The index takes its kind name where it stands, and v2 is carried while the feeds are still dated.
     const oldIndex = path.join(oldStore, "index");
-    if (lstat(oldIndex)?.isDirectory()) move(oldIndex, path.join(oldStore, STORE_AREAS.index));
-    if (!dryRun && lstat(path.join(oldStore, STORE_AREAS.index, "causal-admission", "v2"))?.isDirectory()) {
+    if (lstat(oldIndex)?.isDirectory()) move(oldIndex, journalIndexDirectory(oldStore));
+    if (!dryRun && lstat(path.join(journalIndexDirectory(oldStore), "causal-admission", "v2"))?.isDirectory()) {
       clearSegmentIndexes();
       const carried = carryLocatedIndex(oldStore);
       report.steps.push({ carry: carried });
@@ -183,7 +186,7 @@ export function fileJournalStoreByKind(settlementRoot, { dryRun = false } = {}) 
         const from = path.join(directory, entry.name);
         if (entry.isFile() && (entry.name.startsWith(".packing-") || entry.name.startsWith(".packed-"))) continue;
         if (entry.isDirectory() && entry.name === "packets") { move(path.join(from, "sha256"), path.join(store, STORE_AREAS.packets, "sha256")); continue; }
-        if (entry.isDirectory() && entry.name === "index") { move(from, path.join(store, STORE_AREAS.index, "heads", date)); continue; }
+        if (entry.isDirectory() && entry.name === "index") { move(from, path.join(journalIndexDirectory(store), "heads", date)); continue; }
         const relative = kindRelativeOf(date, entry.name);
         if (relative === undefined) { report.leftInPlace.push(from); continue; }
         // A packed segment's description (named from its basename) and the data it names (by a name in
@@ -203,9 +206,10 @@ export function fileJournalStoreByKind(settlementRoot, { dryRun = false } = {}) 
       for (const data of packed.keys()) if (!dryRun) fs.rmSync(path.join(directory, data), { force: true });
       for (const entry of entries(directory)) if (entry.name.startsWith(".packing-") || entry.name.startsWith(".packed-")) report.leftInPlace.push(path.join(directory, entry.name));
     }
-    for (const [from, area] of [["index", STORE_AREAS.index], [STORE_AREAS.index, STORE_AREAS.index], ["objects", STORE_AREAS.objects]]) {
+    for (const [from, to] of [["index", journalIndexDirectory(store)], [SUPERSEDED_INDEX_AREA, journalIndexDirectory(store)],
+      [LOG_STATE, journalIndexDirectory(store)], ["objects", path.join(store, STORE_AREAS.objects)]]) {
       const source = path.join(oldStore, from);
-      if (lstat(source)?.isDirectory() && path.join(oldStore, from) !== path.join(store, area)) move(source, path.join(store, area));
+      if (lstat(source)?.isDirectory() && source !== to) move(source, to);
     }
     for (const entry of entries(oldStore).filter((each) => each.isFile() && each.name.startsWith("objects-anchor.jsonl"))) {
       move(path.join(oldStore, entry.name), path.join(store, dataKindDirectoryName("log", "objects-anchor"), entry.name));
@@ -242,12 +246,16 @@ export function fileJournalStoreByKind(settlementRoot, { dryRun = false } = {}) 
     if (!dryRun && entries(ledgers).length === 0) fs.rmdirSync(ledgers);
   }
 
+  // The store's state is the logs' state, not a log: a store filed by kind before that left it in `journal-index-logs/`.
+  const supersededIndex = path.join(store, SUPERSEDED_INDEX_AREA);
+  if (lstat(supersededIndex)?.isDirectory()) move(supersededIndex, journalIndexDirectory(store));
+
   // 3. The located index and the segment checkpoints name feeds by their kind paths; the carried v2 index goes.
-  const located = path.join(store, STORE_AREAS.index, "causal-admission");
+  const located = path.join(journalIndexDirectory(store), "causal-admission");
   for (const kind of LOCATED_KINDS_WITH_FEEDS) {
     for (const file of filesBelow(path.join(located, "v3", kind)).filter((each) => each.endsWith(".jsonl"))) rewriteLines(file, "log", kindLogOf, report, dryRun);
   }
-  const checkpoints = path.join(store, STORE_AREAS.index, "segment-verified", "v1.jsonl");
+  const checkpoints = path.join(journalIndexDirectory(store), "segment-verified", "v1.jsonl");
   if (lstat(checkpoints)?.isFile()) {
     rewriteLines(checkpoints, "segment", (segment) => {
       const at = segment.indexOf(".jsonl");

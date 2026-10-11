@@ -62,22 +62,27 @@ already locates:
 ## 3. Layout (v3)
 
 ```text
-<store>/                                       data/journals
-  <YYYY>/<MM>/<DD>/<date>-admit-<subject>.jsonl.witnesses    segment: {id, observation} per line
-  <YYYY>/<MM>/<DD>/<date>-admit-<subject>.jsonl.admitted     ledger: {id, end} per admission
-  index/causal-admission/v3/formula.json                     {formula: "ni-path-v1", carried: {v2 offsets}}
-  index/causal-admission/v3/<kind>/sha-256/<d0 d1>.jsonl     buckets, kind in
+<settlement>/data/logs/                        the store (store-root artifactStoreRoot)
+  <kind>-logs/<date>-admit-<kind>.jsonl.witnesses   segment: {id, observation} per line
+  <kind>-logs/<date>-admit-<kind>.jsonl.admitted    ledger: {id, end} per admission
+<settlement>/data/state/log-state/             the logs' state (store-root journalIndexDirectory)
+  causal-admission/v3/formula.json                  {formula: "ni-path-v1", carried: {v2 offsets}}
+  causal-admission/v3/<kind>/sha-256/<d0 d1>.jsonl  buckets, kind in
       admitted  {id, log}                  keyed by id
       blocked   {id, obstruction}          keyed by id
       pending   {id, log, statement, missing}  keyed by id
       waiting   {dependency, id, log}      keyed by dependency
       artifacts {ref, canonicalText}       keyed by ref
       sources   {ref, id, log}             keyed by ref (sources a pending statement carries)
-  index/segment-verified/v1.jsonl                            verification checkpoints (unchanged)
+  segment-verified/v1.jsonl                         verification checkpoints (unchanged)
+  heads/<date>/<namespace>/                         stream heads (computer-system-engine)
 ```
 
-`d` is the key's NI digest (a non-NI key is located by the NI of its UTF-8 bytes). Every file is
-append-only canonical JSON lines written by `appendDurably` (crash-tail repair unchanged).
+`log` paths are relative to the store. The admission facts are not logs. They are what the store
+derives from its logs in order to admit and read them, so they sit in the state tier of the settlement that
+physically holds the logs. Where `data/logs` links into machine state, the state lives there too and never
+enters the repository. `d` is the key's NI digest (a non-NI key is located by the NI of its UTF-8 bytes).
+Every file is append-only canonical JSON lines written by `appendDurably` (crash-tail repair unchanged).
 
 Questions and the one file each opens:
 
@@ -90,7 +95,7 @@ Questions and the one file each opens:
 | explicit artifact r | `artifacts/<bucket(r)>` |
 | a pending statement's source r | `sources/<bucket(r)>`, then that witness's pending bucket |
 | has feed f lost witnesses | the tail of `f.admitted` and the size of `f.witnesses` |
-| which feeds exist through date t | the date directories (`<YYYY>/<MM>/<DD>`) through t |
+| which feeds exist through date t | the dated file names of the kind directories (`<kind>-logs/<date>-…`) through t |
 
 ## 4. Migration (v2 to v3)
 

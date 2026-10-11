@@ -5,7 +5,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { tm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 import { journalWitness } from "../src/journal/event.mjs";
-import { journalDirectoryOf, journalFeedPath, STORE_AREAS } from "../src/journal/store-root.mjs";
+import { journalDirectoryOf, journalFeedPath, journalIndexDirectory, STORE_AREAS, SUPERSEDED_INDEX_AREA } from "../src/journal/store-root.mjs";
 import { clearSegmentIndexes, locatedIndex, segmentAdmit, segmentAdmittedLogs, segmentStatements } from "../src/journal/filesystem/segment-store.mjs";
 import { packSegment } from "../src/journal/filesystem/segment-bytes.mjs";
 import { fileJournalStoreByKind, kindLogOf } from "../scripts/file-journal-store-by-kind.mjs";
@@ -72,12 +72,15 @@ test("a dated store is filed by kind once, its index rewritten, and data/logs be
   const feed = (n) => join(store, "feed-logs", `2026-10-0${n}-admit-feed.jsonl`);
   for (const n of [1, 2]) assert.ok(existsSync(`${feed(n)}.witnesses`) && existsSync(`${feed(n)}.admitted`));
   assert.ok(existsSync(join(store, STORE_AREAS.packets, "sha256", "abc.json")));
-  assert.ok(existsSync(join(store, STORE_AREAS.index, "heads", "2026-10-01", "work-heads", "key.json")));
+  assert.ok(existsSync(join(journalIndexDirectory(store), "heads", "2026-10-01", "work-heads", "key.json")));
   assert.ok(existsSync(join(store, STORE_AREAS.objects)));
   assert.ok(existsSync(join(store, "witness-journal-seavt-logs", "2026-09-20-admit-witness-journal-seavt.jsonl")));
   assert.ok(existsSync(join(root, "data", "records", "witness-records", "2026-09-20-commit-witness.jsonl")));
   // The v2 index was carried before the move and every feed path it holds names the kind layout; v2 is gone.
-  assert.equal(existsSync(join(store, STORE_AREAS.index, "causal-admission", "v2")), false);
+  assert.equal(existsSync(join(journalIndexDirectory(store), "causal-admission", "v2")), false);
+  // The store's state is the logs' state, in the state tier of the settlement that holds the logs, not a log.
+  assert.equal(journalIndexDirectory(store), join(store, "..", "state", "log-state"));
+  assert.equal(existsSync(join(store, SUPERSEDED_INDEX_AREA)), false);
   clearSegmentIndexes();
   const index = locatedIndex(store);
   assert.deepEqual([...index.admittedLogs(statements[0].id)], ["feed-logs/2026-10-01-admit-feed.jsonl"]);
@@ -115,4 +118,23 @@ test("a dry run moves nothing", (t) => {
   assert.ok(report.moved > 0);
   assert.equal(existsSync(join(store, "feed-logs")), false);
   assert.ok(existsSync(join(root, "data", "journals", "2026", "10", "01", "2026-10-01-admit-feed.jsonl.witnesses")));
+});
+
+test("a store filed by kind before its state left data/logs has journal-index-logs moved to data/state/log-state", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "journal-state-"));
+  t.after(() => { clearSegmentIndexes(); rmSync(root, { recursive: true, force: true }); });
+  const statement = witness(3);
+  const log = journalFeedPath(root, "feed", "2026-10-03");
+  segmentAdmit(log, [statement]);
+  const store = journalDirectoryOf(root);
+  const state = journalIndexDirectory(store);
+  renameSync(state, join(store, SUPERSEDED_INDEX_AREA));
+  rmSync(join(root, "data", "state"), { recursive: true, force: true });
+  clearSegmentIndexes();
+  const report = fileJournalStoreByKind(root);
+  assert.deepEqual(report.conflicts, []);
+  assert.equal(existsSync(join(store, SUPERSEDED_INDEX_AREA)), false);
+  assert.ok(existsSync(join(root, "data", "state", "log-state", "causal-admission", "v3", "formula.json")));
+  clearSegmentIndexes();
+  assert.deepEqual([...locatedIndex(store).admittedLogs(statement.id)], [readdirSync(join(store, "feed-logs")).length > 0 ? "feed-logs/2026-10-03-admit-feed.jsonl" : ""]);
 });
