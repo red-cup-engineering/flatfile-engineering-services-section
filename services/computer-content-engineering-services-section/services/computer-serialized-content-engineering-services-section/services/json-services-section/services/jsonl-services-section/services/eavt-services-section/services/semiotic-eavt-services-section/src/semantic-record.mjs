@@ -15,7 +15,7 @@ import { seavtRow } from "./admit-seavt-row.mjs";
 import { normalizeSeavtRow } from "./normalize-seavt-row.mjs";
 import { journalWitness, parseJournalWitness } from "./journal/event.mjs";
 import { addressArtifact, isArtifactRef, verifyArtifact } from "./identity/index.mjs";
-import { eavtAddress, toEavt } from "@red-cup-engineering/eavt-services-section/row";
+import { eavtAddress, isEavtAddressOf, toEavt } from "@red-cup-engineering/eavt-services-section/row";
 
 const EXPECTED_ENVELOPE = Object.freeze({
   maxSourceBytes: 1048576,
@@ -143,12 +143,17 @@ function recognizedCharge(claim) {
   return null;
 }
 
-function witnessForRow(row, origin, causes, claim) {
+/** Whether a witness's address term addresses its payload row (see `isEavtAddressOf`). */
+function addressesRow(address, payload) {
+  return Array.isArray(address) && address.length === 2 && address[0] === "mark" && isEavtAddressOf(address[1], payload);
+}
+
+function witnessForRow(row, origin, causes, claim, address) {
   const payload = toEavt(row);
   return journalWitness({
     kind: "metroplat.journal.observation",
     payload,
-    address: tm.mark(eavtAddress(payload)),
+    address: address ?? tm.mark(eavtAddress(payload)),
     time: String(row.t),
     seat: origin,
     causes,
@@ -302,7 +307,7 @@ function modernResult(witness, objectKind, category, charge) {
   }
   const payload = toEavt(row);
   if (!equalJson(payload, observation.payload, "modern payload normalization")) invalid("modern payload normalization");
-  if (!equalJson(observation.address, tm.mark(eavtAddress(payload)), "modern row address")) invalid("modern row address");
+  if (!addressesRow(observation.address, payload)) invalid("modern row address");
   if (observation.time !== String(row.t)) invalid("modern row time");
   const origin = scalar(observation.seat, "modern origin");
   const causes = references(observation.causes, "modern causes");
@@ -316,7 +321,7 @@ function modernResult(witness, objectKind, category, charge) {
     invalid("modern content identity");
   }
   if (id !== expectedId) return null;
-  const reconstructed = witnessForRow(row, origin, causes, tm.mark(`semantic-record.${charge}`));
+  const reconstructed = witnessForRow(row, origin, causes, tm.mark(`semantic-record.${charge}`), observation.address);
   if (!equalJson(witness, reconstructed, "modern witness correspondence")) invalid("modern witness correspondence");
   if (rowCategory !== category) return null;
   const [forTold, againstTold] = sidesOfReading(charge);
