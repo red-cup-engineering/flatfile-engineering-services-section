@@ -1153,42 +1153,59 @@ export function segmentPositionBefore(logPath, bytes) {
 }
 
 /** A typed reader retains its projected values, rather than decoded witness bodies.
- * Source bytes and admitted identities remain authoritative. Changed prefixes
- * rebuild the reading; appended witnesses extend it after normal verification. */
+ * A partitioned reader instead retains verified witness byte locations and
+ * projects only selected partitions. Source bytes and admitted identities remain
+ * authoritative. Changed prefixes rebuild the reading; appended witnesses extend
+ * it after normal verification. */
 const projections = readingCache(PROJECTION_CACHE_HEAP);
-export function projectSegmentStatements(logPath, project) {
+export function projectSegmentStatements(logPath, project, { partitionBy, selectedPartitions } = {}) {
+  if (partitionBy !== undefined && (typeof partitionBy !== "function" || !(selectedPartitions instanceof Set)))
+    throw new TypeError("partitioned journal projection requires a partition function and selected Set");
   const file = segmentPath(logPath);
   let stat;
   try { stat = fs.statSync(file); }
   catch (error) { if (error.code !== "ENOENT") throw error; }
   if (stat !== undefined && stat.size > segmentLimits.streamedBytes && !projections.has(file)) streamVerifySegment(file);
   const kept = projections.get(file);
-  let view = kept?.project === project ? kept.view : undefined;
+  let view = kept?.project === project && kept.partitionBy === partitionBy ? kept.view : undefined;
   if (view !== undefined && (stat === undefined || !readingHolds(file, stat, view))) view = undefined;
   if (view === undefined) {
-    view = { offset: 0, mtimeMs: 0, digest: "", ids: new Set(), values: new Map(), bytes: 0 };
+    view = { offset: 0, mtimeMs: 0, digest: "", ids: new Set(), values: new Map(), partitions: new Map(), bytes: 0 };
     const verified = stat === undefined ? undefined : verifiedPrefix(file, stat.size);
     if (verified !== undefined) {
+      let offset = 0;
       for (const line of readPrefixLines(file, verified.offset)) {
         const record = parseLine(line);
         if (record === undefined || typeof record.id !== "string") throw new TypeError(`journal segment ${file} holds a line that is not a witness`);
-        if (view.ids.has(record.id)) continue;
-        const value = project(verifiedJournalWitness(record));
-        view.ids.add(record.id);
-        if (value !== undefined) { view.values.set(record.id, value); view.bytes += Buffer.byteLength(JSON.stringify(value)); }
+        const length = Buffer.byteLength(line);
+        if (!view.ids.has(record.id)) retain(verifiedJournalWitness(record), { offset, length });
+        offset += length + 1;
       }
       Object.assign(view, { hash: verified.hash, offset: verified.offset });
       advanceReading(file, stat, view, verified.offset);
       if (verified.offset !== stat.size) view.mtimeMs = 0;
     }
   }
-  const tail = readTail(file, view.offset, (line) => {
+  function retain(statement, location) {
+    view.ids.add(statement.id);
+    if (partitionBy === undefined) {
+      const value = project(statement);
+      if (value !== undefined) { view.values.set(statement.id, value); view.bytes += Buffer.byteLength(JSON.stringify(value)); }
+      return;
+    }
+    const partition = partitionBy(statement);
+    if (partition === undefined) return;
+    if (typeof partition !== "string") throw new TypeError("journal projection partition must be a string");
+    if (!view.partitions.has(partition)) view.partitions.set(partition, []);
+    const entry = Object.freeze({ id: statement.id, ...location });
+    view.partitions.get(partition).push(entry);
+    view.bytes += Buffer.byteLength(JSON.stringify(entry)) + Buffer.byteLength(partition);
+  }
+  const tail = readTail(file, view.offset, (line, location) => {
     const record = parseLine(line);
     if (record === undefined || typeof record.id !== "string") throw new TypeError(`journal segment ${file} holds a line that is not a witness`);
     if (view.ids.has(record.id)) return;
-    const value = project(parseJournalWitness(record));
-    view.ids.add(record.id);
-    if (value !== undefined) { view.values.set(record.id, value); view.bytes += Buffer.byteLength(JSON.stringify(value)); }
+    retain(parseJournalWitness(record), { offset: location.offset, length: location.length });
   });
   if (stat !== undefined && (tail.offset !== view.offset || stat.mtimeMs !== view.mtimeMs)) {
     advanceReading(file, stat, view, tail.offset);
@@ -1197,8 +1214,23 @@ export function projectSegmentStatements(logPath, project) {
   checkLedger(logPath, stat?.size ?? 0);
   // Bound disposable typed readings by their own payload, rather than the
   // larger encoded witness bodies. The source and loss checks survive eviction.
-  projections.keep(file, { project, view }, view.bytes * PROJECTION_DECODED_FACTOR + view.ids.size * PROJECTED_ID_HEAP);
-  return Object.freeze([...view.values.values()]);
+  projections.keep(file, { project, partitionBy, view }, view.bytes * PROJECTION_DECODED_FACTOR + view.ids.size * PROJECTED_ID_HEAP);
+  if (partitionBy === undefined) return Object.freeze([...view.values.values()]);
+  const values = [];
+  const selected = [...selectedPartitions].flatMap(partition =>
+    (view.partitions.get(partition) ?? []).map(location => ({ partition, location })))
+    .sort((left, right) => left.location.offset - right.location.offset);
+  for (const { partition, location } of selected) {
+      const record = parseLine(lineAt(file, location));
+      if (record?.id !== location.id) throw new TypeError(`journal segment ${file} changed while it was read`);
+      // A partition label never admits a witness. Independently verify the
+      // selected source bytes and require their category to match the reading.
+      const statement = parseJournalWitness(record);
+      if (partitionBy(statement) !== partition) throw new TypeError(`journal segment ${file} changed its selected partition`);
+      const value = project(statement);
+      if (value !== undefined) values.push(value);
+  }
+  return Object.freeze(values);
 }
 
 // A feed's address is its proof path (`<kind>-logs/<date>-admit-<kind>.jsonl`), so a store's feeds are

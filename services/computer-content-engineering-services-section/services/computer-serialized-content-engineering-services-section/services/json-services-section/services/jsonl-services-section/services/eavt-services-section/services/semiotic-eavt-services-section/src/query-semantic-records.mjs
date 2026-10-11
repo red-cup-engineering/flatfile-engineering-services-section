@@ -56,12 +56,24 @@ export function semanticRecordOf(statement) {
     origin: statement.observation.seat, causes: statement.observation.causes });
 }
 
+/** The category coordinate alone: selecting a record must not decode unrelated
+ * payload coordinates. The journal reader verifies the whole source witness
+ * before retaining this disposable partition reading. */
+function semanticRecordCategoryOf(statement) {
+  const row = statement.observation.payload;
+  if (!Array.isArray(row) || row.length !== 4) return undefined;
+  if (!CHARGE_OF_CLAIM.has(canonicalJson(statement.observation.claim))) return undefined;
+  return termToJson(row[1]);
+}
+
 /** Records of one kind and category admitted into the journal as witnesses. */
 function journalRecords(root, kind, categories) {
   const records = [];
   for (const date of datesOfKind(root, kind)) {
     const logPath = dataArtifactAddress({ root, tier: "log", encoding: "jsonl", at: date, action: kind, subject: kind }).path;
-    for (const record of projectSegmentStatements(logPath, semanticRecordOf)) {
+    for (const record of projectSegmentStatements(logPath, semanticRecordOf, {
+      partitionBy: semanticRecordCategoryOf, selectedPartitions: categories,
+    })) {
       if (categories.has(record.category)) records.push(Object.freeze({ ...record, objectKind: kind,
         record: structuredClone(record.record), origin: structuredClone(record.origin),
         causes: Object.freeze([...record.causes]) }));
