@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { openFullTextIndex } from "../src/vault/full-text-index.mjs";
 import { isSqliteFile } from "../src/vault/import-sql-full-text-index.mjs";
+import { writeLegacySqlite } from "./write-legacy-sqlite.mjs";
 
 test("a query ranks the documents holding every one of its words, folded, diacritics kept", () => {
   const index = openFullTextIndex();
@@ -42,16 +43,15 @@ test("an SQLite index file is read into the journal beside it once, and the jour
   try {
     const file = join(dir, "full-text.sqlite");
     // The layout the SQLite index wrote (layout 1).
-    const { DatabaseSync } = process.getBuiltinModule("node:sqlite");
-    const db = new DatabaseSync(file);
-    db.exec(`CREATE TABLE documents (id INTEGER PRIMARY KEY, path TEXT NOT NULL UNIQUE, revision TEXT NOT NULL);
+    writeLegacySqlite(file, [
+      `CREATE TABLE documents (id INTEGER PRIMARY KEY, path TEXT NOT NULL UNIQUE, revision TEXT NOT NULL);
       CREATE VIRTUAL TABLE texts USING fts5(body, tokenize = 'unicode61 remove_diacritics 0');
-      PRAGMA user_version = 1;`);
-    db.prepare("INSERT INTO documents (id, path, revision) VALUES (?, ?, ?)").run(1, "a.md", "r1");
-    db.prepare("INSERT INTO texts (rowid, body) VALUES (?, ?)").run(1, "cedar fog");
-    db.prepare("INSERT INTO documents (id, path, revision) VALUES (?, ?, ?)").run(2, "b.md", "r7");
-    db.prepare("INSERT INTO texts (rowid, body) VALUES (?, ?)").run(2, "salt cedar");
-    db.close();
+      PRAGMA user_version = 1;`,
+      ["INSERT INTO documents (id, path, revision) VALUES (?, ?, ?)", 1, "a.md", "r1"],
+      ["INSERT INTO texts (rowid, body) VALUES (?, ?)", 1, "cedar fog"],
+      ["INSERT INTO documents (id, path, revision) VALUES (?, ?, ?)", 2, "b.md", "r7"],
+      ["INSERT INTO texts (rowid, body) VALUES (?, ?)", 2, "salt cedar"],
+    ]);
     assert.equal(isSqliteFile(file), true);
 
     const opened = openFullTextIndex({ file });

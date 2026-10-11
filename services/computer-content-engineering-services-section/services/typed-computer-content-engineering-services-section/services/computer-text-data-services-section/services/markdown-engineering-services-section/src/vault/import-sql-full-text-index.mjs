@@ -1,4 +1,5 @@
 import { closeSync, openSync, readSync } from "node:fs";
+import { readLegacySqlite } from "@red-cup-engineering/computer-system-engine/legacy-sqlite-reader";
 
 const SQLITE_HEADER = "SQLite format 3\u0000";
 
@@ -14,16 +15,25 @@ export function isSqliteFile(file) {
 
 /**
  * The documents an SQLite full-text index (layout 1: `documents (id, path, revision)` beside the
- * FTS5 table `texts (body)`) held, read once, read-only, so they can be admitted into the
- * journal the index now keeps. SQL survives here only as that admission path for old bytes;
- * a file of another layout holds nothing to admit (it was a stale cache the old index rebuilt).
+ * FTS5 table `texts (body)`, a document's text at the rowid of its id) held, read once, read-only,
+ * so they can be admitted into the journal the index now keeps. No database is opened here: the
+ * file is received by computer-system-engine's standalone, bounded Python reader. SQL survives
+ * only as that admission path for old bytes; a file of another layout holds nothing to admit (it
+ * was a stale cache the old index rebuilt).
  */
 export function importSqlFullTextIndex(file) {
-  const { DatabaseSync } = process.getBuiltinModule("node:sqlite");
-  const db = new DatabaseSync(file, { readOnly: true });
-  try {
-    if (db.prepare("PRAGMA user_version").get().user_version !== 1) return [];
-    return db.prepare("SELECT documents.path AS path, documents.revision AS revision, texts.body AS text FROM documents JOIN texts ON texts.rowid = documents.id ORDER BY documents.id")
-      .all().map((row) => ({ path: row.path, revision: row.revision, text: row.text }));
-  } finally { db.close(); }
+  return readLegacySqlite(file, [{ table: "documents", order: "id" }, { table: "texts", order: "rowid", rowid: true }], (legacy) => {
+    if (!legacy.has("documents") || !legacy.has("texts")) return [];
+    const documents = [];
+    for (const row of legacy.rows("documents")) {
+      if (typeof row.id !== "number" || typeof row.path !== "string" || typeof row.revision !== "string") return [];
+      documents.push(row);
+    }
+    const texts = new Map();
+    for (const row of legacy.rows("texts")) {
+      if (typeof row.body !== "string") return [];
+      texts.set(row.rowid, row.body);
+    }
+    return documents.filter((row) => texts.has(row.id)).map((row) => ({ path: row.path, revision: row.revision, text: texts.get(row.id) }));
+  });
 }
