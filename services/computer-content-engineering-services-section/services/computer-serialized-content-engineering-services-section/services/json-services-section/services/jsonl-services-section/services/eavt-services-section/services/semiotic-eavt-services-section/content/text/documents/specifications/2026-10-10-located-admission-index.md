@@ -127,3 +127,33 @@ inside the node's first start, holding at most the 4 MB buffer.
 
 The remaining 119 MB is not this store's: compiled modules (~53 MB), the agency registry holder (~21 MB),
 and catalog contracts (see the bare-cedar-fog requirement's measured record).
+
+## 6. Threads: a subject's history without a feed per subject
+
+A writer that keeps one history per instance (a work intent's ledger) gave each instance a feed of its
+own, so `data/logs` held a directory per instance: about 500 `structured-work-intent-<id>-logs` on Bare
+Cedar Fog, 344 MB together. A reader of one history (`journal.scanCausalSubject`) read every day of that
+feed and held all its events in memory to sort them. The instance is not a type, and a day's log is not
+the right unit to read one history from. Its own witnesses are the right unit, and an address locates
+each of them.
+
+A writer already names both: the feed's action is the type (`claim-session`, `encounter`), and its
+subject, where it differs, is the instance. That instance is the thread.
+
+- **THR-1 (ubiquitous).** A thread's witnesses shall be admitted into their type's log of the day
+  (`<type>-logs/<date>`), like any other witness of that type.
+- **THR-2 (event-driven).** When a witness is admitted into a thread, the segment store shall append the
+  membership fact `{thread, id, causes}` to `threads/<bucket(thread)>` (the bucket keyed by the NI of
+  the thread's name, ni-path-v1).
+- **THR-3 (ubiquitous).** A thread shall be read from its bucket: its members, each fetched by its
+  admitted fact (one positioned read). Its frontier is the members no member names as a cause. A member's
+  causes outside the thread are external causes.
+- **THR-4 (ubiquitous).** Membership facts are append-only and order-free, so processes that admit into
+  one thread at once need no coordination. A reader may keep a fold of a thread and reuse it while the
+  thread's member count is unchanged.
+- **THR-5 (state-driven).** While a store holds per-instance feeds, `file-instance-feeds-by-type`
+  shall file them under their type and record each witness's membership in the thread the instance feed
+  was.
+
+Its first consumer is the work ledger: feltos `admitStructuredWorkIntent` and its readers, through
+computer-system-engine's `scanCausalSubject`, whose signature stays.

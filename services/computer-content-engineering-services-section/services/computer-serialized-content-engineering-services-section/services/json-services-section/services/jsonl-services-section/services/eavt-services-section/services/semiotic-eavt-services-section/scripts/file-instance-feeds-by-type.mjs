@@ -14,7 +14,10 @@
  *      the emptied directory with them.
  * A witness the type's segment already holds is not appended twice. A second run finds nothing to do.
  *
- *   file-instance-feeds-by-type.mjs --store <data/logs> --prefix encounter --type encounter [--dry-run]
+ * With --threads, each witness is also recorded as a member of the thread its instance feed was
+ * (the instance kind's name), so its history is still read as one (THR-5).
+ *
+ *   file-instance-feeds-by-type.mjs --store <data/logs> --prefix encounter --type encounter [--threads] [--dry-run]
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -24,7 +27,7 @@ import { parseArgs } from "node:util";
 import { canonicalJson } from "@red-cup-engineering/json-services-section";
 import { dataKindDirectoryName, dataKindOfDirectoryName } from "@red-cup-engineering/eavt-services-section/data-artifact-address";
 import { journalIndexDirectory } from "../src/journal/store-root.mjs";
-import { clearSegmentIndexes, ledgerPath, locatedIndexDirectory, logPathOfSegment, segmentPath } from "../src/journal/filesystem/segment-store.mjs";
+import { clearSegmentIndexes, ledgerPath, locatedBucketFile, locatedIndexDirectory, logPathOfSegment, segmentPath } from "../src/journal/filesystem/segment-store.mjs";
 import { appendDurably, openSegmentReader, packingOf } from "../src/journal/filesystem/segment-bytes.mjs";
 
 const LOCATED_KINDS_WITH_FEEDS = ["admitted", "pending", "waiting", "sources"];
@@ -95,7 +98,7 @@ function filesBelow(directory) {
 }
 
 /** File one store's `<prefix>-…` instance feeds under `type`. */
-export function fileInstanceFeedsByType(store, { prefix, type, dryRun = false }) {
+export function fileInstanceFeedsByType(store, { prefix, type, threads = false, dryRun = false }) {
   const report = { kind: "instance-feed-filing.v1", store, prefix, type, dryRun, feeds: 0, appended: 0, duplicates: 0, rewritten: 0, removed: [] };
   const typeDirectory = dataKindDirectoryName("log", type);
   const moved = new Map();
@@ -115,8 +118,14 @@ export function fileInstanceFeedsByType(store, { prefix, type, dryRun = false })
         fs.mkdirSync(path.dirname(targetLog), { recursive: true });
         const held = idsOf(segmentPath(targetLog));
         for (const line of segmentLinesOf(file)) {
-          let id;
-          try { id = JSON.parse(line).id; } catch { continue; }
+          let id, causes;
+          try { const record = JSON.parse(line); id = record.id; causes = record.observation?.causes ?? []; } catch { continue; }
+          // The instance feed was a thread (THR-5): each of its witnesses is a member of it.
+          if (threads && typeof id === "string") {
+            const bucket = locatedBucketFile(store, "threads", kind);
+            fs.mkdirSync(path.dirname(bucket), { recursive: true });
+            appendDurably(bucket, `${canonicalJson({ thread: kind, id, causes: [...causes].sort() })}\n`);
+          }
           if (typeof id !== "string") continue;
           if (held.has(id)) { report.duplicates += 1; continue; }
           appendDurably(segmentPath(targetLog), `${line}\n`);
@@ -168,11 +177,11 @@ export function fileInstanceFeedsByType(store, { prefix, type, dryRun = false })
 }
 
 if ((process.argv[1] !== undefined && (() => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } })())) {
-  const { values } = parseArgs({ options: { store: { type: "string" }, prefix: { type: "string" }, type: { type: "string" }, "dry-run": { type: "boolean", default: false } } });
+  const { values } = parseArgs({ options: { store: { type: "string" }, prefix: { type: "string" }, type: { type: "string" }, threads: { type: "boolean", default: false }, "dry-run": { type: "boolean", default: false } } });
   if (!values.store || !values.prefix || !values.type) {
-    process.stderr.write("usage: file-instance-feeds-by-type.mjs --store <data/logs> --prefix <instance prefix> --type <type> [--dry-run]\n");
+    process.stderr.write("usage: file-instance-feeds-by-type.mjs --store <data/logs> --prefix <instance prefix> --type <type> [--threads] [--dry-run]\n");
     process.exit(1);
   }
-  const report = fileInstanceFeedsByType(path.resolve(values.store), { prefix: values.prefix, type: values.type, dryRun: values["dry-run"] });
+  const report = fileInstanceFeedsByType(path.resolve(values.store), { prefix: values.prefix, type: values.type, threads: values.threads, dryRun: values["dry-run"] });
   process.stdout.write(`${JSON.stringify({ ...report, removed: report.removed.length })}\n`);
 }
