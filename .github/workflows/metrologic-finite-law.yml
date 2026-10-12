@@ -3,12 +3,16 @@ on:
   push:
     paths:
       - 'lib/metrologic/src/number/finite-law.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/laplacian.mjs'
+      - 'lib/metrologic/test/number/oriented-incidence.test.mjs'
       - 'lib/metrologic/test/number/finite-law.test.mjs'
       - 'lib/metrologic/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
   pull_request:
     paths:
       - 'lib/metrologic/src/number/finite-law.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/laplacian.mjs'
+      - 'lib/metrologic/test/number/oriented-incidence.test.mjs'
       - 'lib/metrologic/test/number/finite-law.test.mjs'
       - 'lib/metrologic/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
@@ -24,5 +28,7 @@ jobs:
           node-version: '22'
       - name: Check generic finite-law source
         run: node --check lib/metrologic/src/number/finite-law.mjs
+      - name: Check exact directed-incidence algebra syntax
+        run: node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/laplacian.mjs
       - name: Verify total-variation extrema and mass-weighted tails
         run: node --test lib/metrologic/test/number/finite-law.test.mjs
