@@ -3,7 +3,7 @@ import { runDischarge, runLint, runReplay, runShow, runValidate, runWitness, run
 import { getRecord } from "../src/kernel/record-store.mjs";
 import { replayEventLog, serializeState } from "../src/kernel/replay.mjs";
 import { loadFlatfiles } from "../src/substrate/read-flatfiles.mjs";
-import { readEavtJournal } from "@red-cup-engineering/eavt-services-section/read-eavt-journal";
+import { readLog } from "@red-cup-engineering/semiotic-eavt-services-section/store";
 
 const USAGE = `flatfile-resource-graph <verb> [args]
 
@@ -59,7 +59,7 @@ async function main({ argv, stdin, stdout, stderr }) {
     case "witness-log": {
       const [root, channel, at] = rest;
       if (!root || !channel || !at) return usageError("witness-log: missing <root> <channel> <at>");
-      const rows = readEavtJournal({ root: root, feed: channel, at: at });
+      const rows = [...readLog(root, channel, at.slice(0, 10))].map(({ line }, index) => ({ entry: { e: line.e, a: line.a, v: line.v, t: line.at }, trace: index + 1 }));
       const witnessesById = {};
       for (const row of rows) {
         const id = row.entry.v;

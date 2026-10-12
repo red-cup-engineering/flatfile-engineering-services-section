@@ -7,8 +7,7 @@ import { putRecord } from "../kernel/record-store.mjs";
 import { makeWitness } from "../kernel/witness.mjs";
 import { parseFrontmatter } from "../substrate/flatfile.mjs";
 import { classify } from "./kind.mjs";
-import { appendSeavtEntries } from "@red-cup-engineering/semiotic-eavt-services-section/append-seavt-entries";
-import { seavtOfJson } from "@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row";
+import { append } from "@red-cup-engineering/semiotic-eavt-services-section/store";
 
 function deepEqual(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
@@ -105,7 +104,7 @@ export function rewriteLink(text, oldTargetRaw, newTargetRaw) {
 // (design spec S5): a Witness is minted only after its two gates —
 // witnessBit's WIT law and, when a settlement is supplied, the
 // settling-monotonicity check — both clear; the SEAVT append happens
-// next, then the witness's full body lands in the content-addressed
+// next (one line `{at, e, a, v}` of the channel's log), then the witness's full body lands in the content-addressed
 // record store (kernel/record-store.mjs) keyed by the same id the SEAVT
 // row's v coordinate carries; the file is written last, only once both
 // have actually landed. Any throw along this chain — a gate refusal, an
@@ -129,7 +128,7 @@ function completeEdit({ root, absPath, target, operator, oldText, newText, detai
     channel,
     settlement,
   });
-  appendSeavtEntries({ root: root, feed: channel, entries: [seavtOfJson(target, operator, witness.id, ts)], at: ts });
+  append(root, channel, { at: ts, e: target, a: operator, v: witness.id });
   putRecord(root, witness);
   writeFileSync(absPath, newText, "utf8");
   return { ...preview, witness };
@@ -211,7 +210,7 @@ export function moveNote(root, from, to, options = {}) {
     channel,
     settlement,
   });
-  appendSeavtEntries({ root: root, feed: channel, entries: [seavtOfJson(from, operator, witness.id, ts)], at: ts });
+  append(root, channel, { at: ts, e: from, a: operator, v: witness.id });
   putRecord(root, witness);
   mkdirSync(dirname(toAbs), { recursive: true });
   renameSync(fromAbs, toAbs);

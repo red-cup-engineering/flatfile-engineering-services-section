@@ -3,8 +3,8 @@ import { canonicalize } from "./identity.mjs";
 import { getRecord } from "./record-store.mjs";
 import { TIER_B_RECORD_TYPES, validateRecord } from "./record-types.mjs";
 import { validateWitness } from "./witness.mjs";
-import { readEavtJournal } from "@red-cup-engineering/eavt-services-section/read-eavt-journal";
-import { dataArtifactDates, dataArtifactFiles } from "@red-cup-engineering/eavt-services-section/data-artifact-listing";
+import { logDates, readLog } from "@red-cup-engineering/semiotic-eavt-services-section/store";
+import { dataArtifactFiles } from "@red-cup-engineering/eavt-services-section/data-artifact-listing";
 import { FOUR, four, joinKnowledgeWire } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 
 // Deterministic replay: fold the append-only event log into in-memory
@@ -104,7 +104,7 @@ export const EMPTY_STATE = Object.freeze({ belief: Object.freeze({}), records: O
 
 // Every channel with at least one journal line under root, named for its
 // feed, in sorted (thus deterministic) order — the log tier's own listing of
-// the plain EAVT feeds (`data/logs/<feed>-logs/<date>-admit-<feed>.jsonl`).
+// the plain EAVT feeds (`data/logs/<feed>-logs/<date>.jsonl`).
 const isFeedFile = (name) => name.endsWith(".jsonl");
 export function channelsOf(root) {
   return [...new Set(dataArtifactFiles(root, "log", { match: isFeedFile }).map((file) => file.subject))].sort();
@@ -114,7 +114,7 @@ export function channelsOf(root) {
 // per-channel day sequence readSeavt/streamSeavt need an at value to address
 // one file at a time.
 function daysOf(root, channel) {
-  return [...dataArtifactDates(root, "log", { subject: channel, match: isFeedFile })];
+  return [...logDates(root, channel)];
 }
 
 // One channel's full journal, across every day it was ever written to,
@@ -125,7 +125,7 @@ function readChannel(root, channel) {
   const lines = [];
   for (const day of daysOf(root, channel)) {
     try {
-      for (const { entry } of readEavtJournal({ root: root, feed: channel, at: `${day}T00:00:00Z` })) lines.push(entry);
+      for (const { line } of readLog(root, channel, day)) lines.push({ e: line.e, a: line.a, v: line.v, t: line.at });
     } catch (error) {
       throw new CorruptedLogLineError(`channel ${channel}: unreadable journal line: ${error.message}`);
     }

@@ -4,7 +4,9 @@ import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promis
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { runBundleMarkdownVaultCarriers } from "../scripts/bundle-markdown-vault-carriers.mjs";
+import { MARKDOWN_VAULT_BUNDLE_TYPE, runBundleMarkdownVaultCarriers } from "../scripts/bundle-markdown-vault-carriers.mjs";
+import { get } from "@red-cup-engineering/semiotic-eavt-services-section/store";
+import { sha256Digest } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 
 async function buildFixture(root) {
   await mkdir(join(root, "content/text/glossary/terms"), { recursive: true });
@@ -23,12 +25,10 @@ test("writes bundle files and manifest.json to output, and records a run receipt
     assert.equal(written.length, result.manifest.files.length + 1);
     const manifestOnDisk = JSON.parse(await readFile(join(output, "manifest.json"), "utf8"));
     assert.deepEqual(manifestOnDisk, result.manifest);
-    assert.equal(result.receipt.objectKind, "markdown-vault-bundle.run-record");
-    assert.equal(result.receipt.charge.support, true);
-    assert.equal(result.receipt.charge.refutation, false);
-    const logPath = join(journalRoot, "data", "logs", "2026", "09", "01", "witness-journal-seavt.jsonl");
-    const logged = await readFile(logPath, "utf8");
-    assert.match(logged, /markdown-vault-bundle\.run/);
+    assert.match(result.receipt.id, /^ni:\/\/\/sha-256;/u);
+    const run = get(journalRoot, MARKDOWN_VAULT_BUNDLE_TYPE, result.receipt.id);
+    assert.equal(run.recordedAt, "2026-09-01T00:00:00.000Z");
+    assert.equal(run.manifestDigest, sha256Digest(`${JSON.stringify(result.manifest, null, 2)}\n`));
   } finally {
     await rm(root, { recursive: true, force: true });
     await rm(output, { recursive: true, force: true });
