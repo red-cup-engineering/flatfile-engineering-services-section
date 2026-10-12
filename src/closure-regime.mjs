@@ -7,10 +7,14 @@
  *   transfinite-bounded  ω < κ < ω₁  non-Scott, countable cofinality
  *   aperiodic            κ ≥ ω₁      non-Scott, uncountable cofinality
  *
- * The names are listed in completion-cost order (`regimeCost`), so a regime's cost is its
- * place in the list. A regime's completion is decidable when it settles by κ ≤ ω, which is
- * strict and scott (`regimeDecidable`). Reading a regime off an ordinal or closure data is
- * metrologic's work; this module only names the four values, as FOUR names its points.
+ * The names are listed in ordinal-class order (`regimeCost`). Reaching a fixed
+ * point at ordinal ω does NOT imply finite-stage decidability: the Scott rung
+ * can have strictly increasing finite iterates and a limit-stage fixed point.
+ *
+ * Obsmetrologia.Closure.Regime.cohomologyVanishes, separately, holds on the
+ * strict and Scott rungs. Do not confuse its H¹-vanishing classification
+ * with a guarantee that iteration halts after finitely many steps.
+ * Reading a regime off actual closure data belongs to Metrologic.
  */
 
 /** The four closure regimes by their Obsmetrologia names, in completion-cost order. */
@@ -29,8 +33,15 @@ function admitted(name, verb) {
 /** A regime's completion cost: its closure-ordinal class's height (Lean `regimeCost`). */
 export const regimeCost = (name) => closureRegimeNames.indexOf(admitted(name, "regimeCost"));
 
-/** Whether a regime's completion is decidable: it settles by κ ≤ ω (Lean `regimeDecidable`). */
-export const regimeDecidable = (name) => regimeCost(name) <= scottCost;
+/** The finite-stage settlement guarantee supplied by the regime alone:
+ * only strict (κ < ω) ensures a fixed point is attained at some finite step.
+ * This is not a generic termination guarantee for arbitrary unbounded keys. */
+export const regimeDecidable = (name) => regimeCost(name) === 0;
+
+/** The Boolean regime table from
+ * Obsmetrologia.Closure.Regime.cohomologyVanishes: true on strict and Scott.
+ * This readout is NOT a computed H¹ group for an arbitrary supplied sheaf. */
+export const regimeCohomologyVanishes = (name) => regimeCost(name) <= scottCost;
 
 /** The costlier of two regimes. */
 export const costlierRegime = (left, right) => (regimeCost(right) > regimeCost(left) ? right : left);

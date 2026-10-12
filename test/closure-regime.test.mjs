@@ -7,6 +7,7 @@ import {
   isClosureRegimeName,
   regimeCost,
   regimeDecidable,
+  regimeCohomologyVanishes,
 } from "@red-cup-engineering/computer-data-engineering-services-section/closure-regime";
 
 const names = ["strict", "scott", "transfinite-bounded", "aperiodic"];
@@ -18,12 +19,19 @@ test("closure regimes expose the four frozen names and their schema through the 
   assert.ok(Object.isFrozen(closureRegimeSchema));
 });
 
-test("closure regime cost and decidability preserve the four original strata", () => {
+test("Scott H1-vanishing does not claim finite-stage decidability", () => {
   for (const [cost, name] of names.entries()) {
     assert.equal(isClosureRegimeName(name), true);
     assert.equal(regimeCost(name), cost);
-    assert.equal(regimeDecidable(name), cost <= 1);
+    assert.equal(regimeDecidable(name), cost === 0, "finite arrival only on strict rung");
+    assert.equal(
+      regimeCohomologyVanishes(name),
+      cost <= 1,
+      "Obsmetrologia.Closure.Regime.cohomologyVanishes classification",
+    );
   }
+  assert.equal(regimeCohomologyVanishes("scott"), true);
+  assert.equal(regimeDecidable("scott"), false, "κ=ω is not finite termination");
 });
 
 test("costlierRegime returns the higher original stratum for every pair", () => {
@@ -39,6 +47,7 @@ test("closure regime exports refuse names outside the original vocabulary", () =
     assert.equal(isClosureRegimeName(name), false);
     assert.throws(() => regimeCost(name), TypeError);
     assert.throws(() => regimeDecidable(name), TypeError);
+    assert.throws(() => regimeCohomologyVanishes(name), TypeError);
     assert.throws(() => costlierRegime(name, "strict"), TypeError);
     assert.throws(() => costlierRegime("strict", name), TypeError);
   }
