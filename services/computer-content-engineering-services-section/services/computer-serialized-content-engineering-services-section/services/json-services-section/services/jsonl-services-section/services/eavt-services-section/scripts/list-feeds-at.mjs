@@ -13,7 +13,7 @@ export const outputSchema = { type: "array", items: { type: "string" } };
 /** The plain EAVT feeds a root holds on the date `at` names, by feed name. */
 export function listFeedsAt({ root, at }) {
   const { date } = dataDatePartition(typeof at === "string" ? at : canonicalJson(at));
-  return [...new Set(dataArtifactFiles(root, "log", { date, match: (name) => name.endsWith(".jsonl") }).map((file) => file.token))].sort();
+  return [...new Set(dataArtifactFiles(root, "log", { date, match: (name) => name.endsWith(".jsonl") }).map((file) => file.subject))].sort();
 }
 if (import.meta.main)
   process.stdout.write(

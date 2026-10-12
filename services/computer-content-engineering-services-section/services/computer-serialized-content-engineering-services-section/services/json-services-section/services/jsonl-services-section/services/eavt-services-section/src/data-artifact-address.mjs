@@ -74,25 +74,15 @@ function tierPathSegments(tier) {
   return dataTierPathSegment(tier).split("/").filter(Boolean);
 }
 
-/** The single-segment act a tier's artifacts are named by: admit statements into
- *  `data/logs`, settle state, commit records, realize content. Filenames read
- *  `${date}-${act}-${token}`, so the act must never contain a hyphen — the
- *  token boundary is the first hyphen after the act segment. */
-export function dataTierAct(tier) {
-  if (tier === "log") return "admit";
-  if (tier === "state") return "settle";
-  if (tier === "record") return "commit";
-  return "realize";
-}
-
-const TIER_ACTS = new Set(["admit", "settle", "commit", "realize"]);
-
-/** Parse a `${date}-${act}-${token}` artifact stem; null when not act-named. */
+/** Parse an artifact stem: a day's file is named by its date alone, `<date>`; null for any other stem.
+ *  The directory already names the kind and the tier. */
 export function parseArtifactStem(stem) {
-  const match = /^(\d{4}-\d{2}-\d{2})-([a-z]+)-(.+)$/u.exec(stem);
-  if (match === null || !TIER_ACTS.has(match[2])) return null;
-  return Object.freeze({ date: match[1], act: match[2], token: match[3] });
+  const match = /^(\d{4}-\d{2}-\d{2})$/u.exec(stem);
+  if (match === null) return null;
+  return Object.freeze({ date: match[1] });
 }
+
+const KIND_NAME = /^[a-z]+(?:-[a-z]+)*$/u;
 
 /** The UTC date (YYYY-MM-DD) named by a statement coordinate; safe fallback otherwise. */
 export function dataDatePartition(at) {
@@ -106,7 +96,8 @@ export function dataDatePartition(at) {
  *  (`arrival-logs`, `land-owner-records`, `clock-state`). A tier is filed by kind, never by
  *  date: the date is the leading coordinate of each artifact's own stem. */
 export function dataKindDirectoryName(tier, subject) {
-  return `${slug(String(subject).replace(/^@/, ""))}-${artifactTier(tier).kindSuffix}`;
+  if (typeof subject !== "string" || !KIND_NAME.test(subject)) throw new TypeError(`dataKindDirectoryName: ${JSON.stringify(subject)} is not a type name (letters and hyphens only)`);
+  return `${subject}-${artifactTier(tier).kindSuffix}`;
 }
 
 /** The kind a tier directory's name files, or null when the name is not `<subject>-<kindSuffix>`. */
@@ -115,11 +106,8 @@ export function dataKindOfDirectoryName(tier, name) {
   return typeof name === "string" && name.length > suffix.length && name.endsWith(suffix) ? name.slice(0, -suffix.length) : null;
 }
 
-/** The stem of an artifact file in one kind's directory: `<date>-<act>-<subject>` when the name is act-named
- *  for that kind (a kind may carry dots, as `metroplat.clock.schedule` does), else the name up to its first dot. */
-export function dataArtifactStemOf(filename, subject) {
-  const match = /^\d{4}-\d{2}-\d{2}-[a-z]+-/u.exec(filename);
-  if (match !== null && typeof subject === "string" && filename.startsWith(`${match[0]}${subject}.`)) return `${match[0]}${subject}`;
+/** The stem of an artifact file in one kind's directory: the name up to its first dot (`<date>` for a day's file). */
+export function dataArtifactStemOf(filename) {
   return filename.replace(/\..*$/u, "");
 }
 
@@ -183,8 +171,8 @@ export function dataArtifactAddress(options) {
   const extension = extensionOf(options.encoding);
   const rootName = rootNameOf(options.root, options.rootName);
   const action = slug(options.action);
-  const subject = slug(options.subject.replace(/^@/, ""));
-  const feed = `${partition.date}-${dataTierAct(options.tier)}-${subject}`;
+  const subject = options.subject;
+  const feed = partition.date;
   const kindDirectory = dataKindDirectoryName(options.tier, subject);
   const directory = posixJoin(options.root, dataTierPathSegment(options.tier), kindDirectory);
   const filename = `${feed}.${extension}`;
@@ -259,7 +247,7 @@ export function projectDataArtifactPath(
   const stem = filename.replace(/\.[^.]+$/u, "");
   const parsed = parseArtifactStem(stem);
   const projectedStem = parsed !== null
-    ? `${parsed.date}-${dataTierAct(tier)}-${parsed.token}`
+    ? parsed.date
     : /-(log|state|record|content)$/u.test(stem)
       ? stem.replace(/-(log|state|record|content)$/u, `-${tierFileLabel(tier)}`)
       : `${stem}-${tierFileLabel(tier)}`;
@@ -375,7 +363,7 @@ export function dataArtifactOfPath(filePath) {
   const match = matchTierDirectory(directory);
   if (match === null) return null;
   const filename = filePath.split("/").filter(Boolean).at(-1) ?? "";
-  const stem = dataArtifactStemOf(filename, match.subject);
+  const stem = dataArtifactStemOf(filename);
   const parsed = parseArtifactStem(stem);
   return Object.freeze({ ...match, directory, filename, stem, ...(parsed === null ? {} : parsed) });
 }

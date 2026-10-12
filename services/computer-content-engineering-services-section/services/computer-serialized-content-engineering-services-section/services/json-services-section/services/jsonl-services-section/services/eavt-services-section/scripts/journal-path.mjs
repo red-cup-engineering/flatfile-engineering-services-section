@@ -16,7 +16,7 @@ import { canonicalJson } from "@red-cup-engineering/json-services-section/canoni
 import { dataArtifactAddress } from "../src/data-artifact-address.mjs";
 
 /** A plain EAVT feed's file: the log tier's address of `feed` on the date `at` names
- *  (`data/logs/<feed>-logs/<date>-admit-<feed>.jsonl`), derived from the one tier law. */
+ *  (`data/logs/<feed>-logs/<date>.jsonl`), derived from the one tier law. */
 export function journalPath({ root, feed, at } = {}) {
   if (typeof root !== "string" || root === "")
     throw new TypeError("EAVT journal root must be a nonempty string");

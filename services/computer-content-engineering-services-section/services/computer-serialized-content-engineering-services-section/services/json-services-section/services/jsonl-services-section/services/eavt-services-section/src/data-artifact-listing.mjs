@@ -1,7 +1,7 @@
 /**
  * The one reader of where a data root keeps its artifacts. A tier files each kind in its own
  * directory (`data/logs/arrival-logs/`, `data/records/land-owner-records/`), and each artifact's
- * stem begins with its date (`2026-10-10-admit-arrival.jsonl`), so the artifacts of one kind are
+ * stem begins with its date (`2026-10-10.jsonl`), so the artifacts of one kind are
  * one listing and the artifacts of one date are found by stem. Every reader of a tier lists it
  * here rather than walking directories itself.
  *
@@ -50,8 +50,8 @@ export function dataKinds(root, tier) {
 
 /**
  * The artifact files one tier holds under a data root, as
- * `{ path, directory, filename, subject, stem, date, act, token }` (date, act and token only for an
- * act-named stem), in kind then filename order. `subject` lists that one kind's directory;
+ * `{ path, directory, filename, subject, stem, date }` (date only for a
+ * day-named stem), in kind then filename order. `subject` lists that one kind's directory;
  * `date` keeps one date's artifacts and `through` those on or before a date; `match(filename)`
  * keeps the files a reader asks for (a suffix, an encoding).
  */
@@ -63,7 +63,7 @@ export function dataArtifactFiles(root, tier, { subject, date, through, match } 
   for (const kind of kinds) {
     for (const entry of heldListing(kind.directory)) {
       if (!entry.file || (match !== undefined && !match(entry.name))) continue;
-      const stem = dataArtifactStemOf(entry.name, kind.subject);
+      const stem = dataArtifactStemOf(entry.name);
       const parsed = parseArtifactStem(stem);
       if (date !== undefined && parsed?.date !== date) continue;
       if (through !== undefined && (parsed === null || parsed.date > through)) continue;
