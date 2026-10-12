@@ -1,0 +1,354 @@
+{
+  "type": "SourceReceivingSpecification",
+  "version": 1,
+  "reviewedBy": {
+    "agent": "codex",
+    "task": "no_op_history_review",
+    "method": "assess-code-family"
+  },
+  "work": "https://github.com/red-cup-engineering/computer-data-engineering-services-section/issues/113",
+  "proposal": {
+    "branch": "claude/witness-attestation-profile",
+    "head": "b4e513646282e9d251188860ef64b67607f0eba7",
+    "judgment": "aligned-incomplete"
+  },
+  "requirements": [
+    "An explicitly mounted successor site can retain independently verifiable Ed25519 claims over an articulation.",
+    "Initial-site identities and ordinary un-attested witness bytes retain their original meaning.",
+    "Signing-key possession does not grant issuer authentication, standing, governing authority or institutional acceptance.",
+    "Missing attestation artifacts obstruct causal readiness; invalid claims or articulation mismatches obstruct admission."
+  ],
+  "specification": {
+    "attestationKind": "metroplat.identity-attestation",
+    "version": 1,
+    "fields": [
+      "kind",
+      "version",
+      "profile",
+      "articulation",
+      "publicKey",
+      "claim"
+    ],
+    "profile": "metroplat-ed25519-content-claim-attestation-1",
+    "signedPurpose": "metroplat.witness-articulation",
+    "signedMediaType": "application/json",
+    "signedBytes": "Exact canonical JSON source bytes of the addressed primitive-articulation artifact. The artifact semantic reference and raw-byte NI identity remain distinct.",
+    "publicKey": "Bounded public SPKI PEM only; no private material is accepted or generated.",
+    "signatureOwner": "@red-cup-engineering/computer-content-engineering-services-section/signed-content-claim",
+    "identityBound": "The attestation proves signature validity under the carried public key. The claim issuer is claimed text; independent issuer/key binding and standing remain the receiver responsibility.",
+    "bounds": {
+      "maxAttestationRefs": 256,
+      "maxPublicKeyCharacters": 4096
+    },
+    "refusals": [
+      "Unmounted or unsupported profile",
+      "Malformed, duplicate, unordered or excessive reference sets",
+      "Malformed public-key or claim artifacts",
+      "Invalid signature or wrong exact articulation",
+      "Missing artifacts remain causal quarantine"
+    ]
+  },
+  "design": {
+    "sharedOwner": "semiotic-eavt-services-section identity artifacts and shared journal dependency evaluation",
+    "dependencyOrder": "Data artifacts use existing JSON/content-identity/signature suppliers; journal logic composes these without networking or runtime authority.",
+    "mechanism": [
+      "Retain the original profile unchanged and admit the exact successor profile.",
+      "Canonicalize/address attestation data in the existing identity family.",
+      "Verify bounded attestation dependencies in evaluateWitnessDependencies, shared by source-set and incremental admission.",
+      "journalWitness stores the explicit successor constitution and attestation artifacts in observation/source material so ordinary parse reconstructs their exact identities.",
+      "Expose the pure articulation preparation through the current journal event module; key custody and signing stay with the hiring consumer."
+    ],
+    "preserved": [
+      "Initial site and un-attested witness identity",
+      "Causal graph/cycle checks",
+      "JSON envelope",
+      "Existing compact verified-record reconstruction",
+      "No automatic signer, issuer or governance admission"
+    ]
+  },
+  "guidance": {
+    "methodBlob": "1d7a3ff5545816bae3e8a398fb0767f6269869ed",
+    "integratedHistory": "Retain received proposal history in main without archive aliases.",
+    "runtimeRuleCheck": "Native capability unavailable; source context does not claim runtime office authority."
+  },
+  "qualification": {
+    "sourceReview": true,
+    "testsExecuted": false,
+    "signingExecuted": false,
+    "runtimeReceiving": false,
+    "deployment": false,
+    "signatureExecution": false
+  },
+  "sourceGraphRepair": {
+    "removedEdge": {
+      "from": "@red-cup-engineering/computer-data-engineering-services-section",
+      "to": "@red-cup-engineering/computer-content-engineering-services-section",
+      "reason": "No import in any of the 34 owned implementation/command files or the 20 existing owning examples consumes this package. Artifact fabrication uses the extracted content-address owner."
+    },
+    "ownedSourceFootprint": [
+      {
+        "path": "bin/differentiate-data.mjs",
+        "blob": "7a9d1af92a1e8d25ddf5a5883234cb78a959fdad",
+        "imports": [
+          "@red-cup-engineering/json-services-section/differentiate-data",
+          "@red-cup-engineering/computer-data-engineering-services-section/run-json-command"
+        ]
+      },
+      {
+        "path": "bin/differentiate-sequences.mjs",
+        "blob": "8be260459fdc79889a17f14cf18310b69f33466d",
+        "imports": [
+          "@red-cup-engineering/json-services-section/differentiate-sequences",
+          "@red-cup-engineering/computer-data-engineering-services-section/run-json-command"
+        ]
+      },
+      {
+        "path": "src/artifact-fabrication.mjs",
+        "blob": "533a1e91caf533663a6414a8f2e23f7f91c95e22",
+        "imports": [
+          "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address",
+          "@red-cup-engineering/uri-services-section/ni-uri"
+        ]
+      },
+      {
+        "path": "src/closure-regime.mjs",
+        "blob": "32e258369ad626301460da7867e72efd6c35b40b",
+        "imports": []
+      },
+      {
+        "path": "src/four.mjs",
+        "blob": "249f465dfcb4f5cfb26ae45d0d71c1621b71daee",
+        "imports": []
+      },
+      {
+        "path": "src/media/audio.mjs",
+        "blob": "11c268c8847dfead3fe0ab3de56cfd3389346706",
+        "imports": [
+          "node:fs/promises",
+          "node:path",
+          "node:os",
+          "node:child_process",
+          "node:util"
+        ]
+      },
+      {
+        "path": "src/media/raster.mjs",
+        "blob": "77b5104a8b3db9c09f177e3def0e406af4ae154b",
+        "imports": [
+          "node:fs/promises",
+          "node:path",
+          "node:child_process",
+          "node:util"
+        ]
+      },
+      {
+        "path": "src/number/decimal-string.mjs",
+        "blob": "dd5c51569aaa470f5f7b899ec298eea9d45cdc4c",
+        "imports": [
+          "@red-cup-engineering/exact-number-data-service/decimal-string"
+        ]
+      },
+      {
+        "path": "src/number/deterministic-math.mjs",
+        "blob": "0e1fdbbc1562b0fc1939a2f0a811180dfcfa67f2",
+        "imports": [
+          "@red-cup-engineering/exact-number-data-service/deterministic-math"
+        ]
+      },
+      {
+        "path": "src/number/exact-number-host.mjs",
+        "blob": "9a2324fe17dba289c2c5c249a671f39067460731",
+        "imports": [
+          "@red-cup-engineering/exact-number-data-service/exact-number-host"
+        ]
+      },
+      {
+        "path": "src/number/exact-number.mjs",
+        "blob": "2d3f5c06b8bd3a2b9c67e4feed5c161a0b820ad3",
+        "imports": [
+          "@red-cup-engineering/exact-number-data-service/exact-number"
+        ]
+      },
+      {
+        "path": "src/number/graded.mjs",
+        "blob": "c7828a5098edfc2d0fd5cb4ec82d7710f72cde60",
+        "imports": [
+          "@red-cup-engineering/exact-number-data-service/graded"
+        ]
+      },
+      {
+        "path": "src/number/quadratic.mjs",
+        "blob": "0ebb0d1d6df5fe65c6113713e480789f078e40f9",
+        "imports": [
+          "@red-cup-engineering/exact-number-data-service/quadratic"
+        ]
+      },
+      {
+        "path": "src/number/rational-matrix.mjs",
+        "blob": "7f6f68a73966ed99041074e90f9cb416c40aaa98",
+        "imports": [
+          "@red-cup-engineering/exact-number-data-service/rational-matrix"
+        ]
+      },
+      {
+        "path": "src/operation-refusal-schema.mjs",
+        "blob": "7c236f156c6e97ddd1d6c0fd149afb3f2d3655da",
+        "imports": []
+      },
+      {
+        "path": "src/randomization/hash-seed.mjs",
+        "blob": "98df96532dbae0d714d3c7298124b9f283c681f3",
+        "imports": []
+      },
+      {
+        "path": "src/randomization/index.mjs",
+        "blob": "8314bc6b716d0877329564be00e88dd2674c2a9d",
+        "imports": [
+          "./hash-seed.mjs",
+          "./mulberry32.mjs",
+          "./stream.mjs"
+        ]
+      },
+      {
+        "path": "src/randomization/mulberry32.mjs",
+        "blob": "9a146a2efe9ed818e018a09855f65d784ab5e729",
+        "imports": []
+      },
+      {
+        "path": "src/randomization/stream.mjs",
+        "blob": "b4da785fcb755297d606ebe9723bfe350d67f97a",
+        "imports": [
+          "./hash-seed.mjs",
+          "./mulberry32.mjs"
+        ]
+      },
+      {
+        "path": "src/run-json-command.mjs",
+        "blob": "b97711964ffd9c60133b3a654e39bce5a7f7d179",
+        "imports": [
+          "node:fs",
+          "node:url"
+        ]
+      },
+      {
+        "path": "src/semiotic-expression-notation/json-codec.mjs",
+        "blob": "75aa1fcff2c702f6a65225c60df130dea50cb930",
+        "imports": [
+          "./notation.mjs",
+          "@red-cup-engineering/cbor-services-section",
+          "./notation/types.mjs",
+          "./notation/types.mjs"
+        ]
+      },
+      {
+        "path": "src/semiotic-expression-notation/notation.mjs",
+        "blob": "31007c76b3e6c64a2f7ca494a5883b6c1549ced3",
+        "imports": [
+          "./notation/schema.mjs",
+          "./notation/validator.mjs",
+          "./notation/forms.mjs",
+          "./notation/forms.mjs",
+          "../four.mjs"
+        ]
+      },
+      {
+        "path": "src/semiotic-expression-notation/notation/forms.mjs",
+        "blob": "e730b56d7bfee8c52df5bf55f566b2ba3aadaa05",
+        "imports": []
+      },
+      {
+        "path": "src/semiotic-expression-notation/notation/schema.mjs",
+        "blob": "a6d4ded97e3db3527ef1e5757ffecc0f2b804f60",
+        "imports": [
+          "./forms.mjs"
+        ]
+      },
+      {
+        "path": "src/semiotic-expression-notation/notation/types.mjs",
+        "blob": "d2f5f3a9ebe54a0df48496bddc843c3756b122f1",
+        "imports": []
+      },
+      {
+        "path": "src/semiotic-expression-notation/notation/validator.mjs",
+        "blob": "56f35694ac9928e522112fb97a03d8f1d2c1fe5c",
+        "imports": [
+          "../notation.mjs"
+        ]
+      },
+      {
+        "path": "src/semiotic-expression-notation/typing.mjs",
+        "blob": "f0bb27b94bc835699e9c4939a492999b2a6b3467",
+        "imports": [
+          "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address",
+          "./notation.mjs"
+        ]
+      },
+      {
+        "path": "src/tally.mjs",
+        "blob": "ba5ee29941f996459bb87c6dfe94bfa18da0b402",
+        "imports": [
+          "@red-cup-engineering/json-services-section/canonical-json",
+          "./four.mjs"
+        ]
+      },
+      {
+        "path": "src/type-system/document.mjs",
+        "blob": "e1d24bfdb09fded558a8849a34c83c1670a783c4",
+        "imports": [
+          "./type-system.mjs",
+          "@red-cup-engineering/json-schema-services-section/validation",
+          "@red-cup-engineering/cbor-services-section"
+        ]
+      },
+      {
+        "path": "src/type-system/relations.mjs",
+        "blob": "65aedbd4fdbfb78bf839e9b9bb41af790953e6fd",
+        "imports": [
+          "./type-system.mjs",
+          "./document.mjs",
+          "@red-cup-engineering/cbor-services-section"
+        ]
+      },
+      {
+        "path": "src/type-system/schema-type.mjs",
+        "blob": "7bbee129a979e40375b537262f14fca913d3e6ca",
+        "imports": [
+          "./type-system.mjs"
+        ]
+      },
+      {
+        "path": "src/type-system/thing.mjs",
+        "blob": "d6816bce95269ff555ed8b6a6cf156fe5517a599",
+        "imports": [
+          "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address",
+          "./type-system.mjs"
+        ]
+      },
+      {
+        "path": "src/type-system/type-system.mjs",
+        "blob": "97f56dac98015e00065a2323b3f4b9f05afd8d35",
+        "imports": [
+          "@red-cup-engineering/json-schema-services-section/validation",
+          "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address"
+        ]
+      },
+      {
+        "path": "src/typed-operation-message.mjs",
+        "blob": "04fb52a987a1a232f20258dcbc8556248878a013",
+        "imports": [
+          "./type-system/type-system.mjs"
+        ]
+      }
+    ],
+    "rootExportAndCommandMapsPreserved": true,
+    "allOwnedImplementationAndExampleSourcePreserved": true,
+    "retainedEdge": "computer-content-engineering-services-section \u2192 computer-data-engineering-services-section: content providers consume Data primitives.",
+    "newSignatureDependencyClosure": [
+      "node:crypto",
+      "json-services-section",
+      "uri-services-section",
+      "computer-content-engineering-services-section/src/canonical-signature.mjs"
+    ],
+    "promotionProof": "Both CausalSubstrate receive methods invoke promoteAvailable, which invokes evaluateDependencies and the shared evaluateWitnessDependencies. Primitive articulation validation occurs before attestation checks; missing sources stay quarantined, invalid signatures become blocked."
+  }
+}

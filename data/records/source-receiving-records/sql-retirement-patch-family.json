@@ -1,0 +1,154 @@
+{
+  "type": "SourceReceivingJudgment",
+  "version": 1,
+  "reviewedBy": {
+    "agent": "codex",
+    "task": "no_op_history_review",
+    "method": "assess-code-family"
+  },
+  "repository": "red-cup-engineering/computer-data-engineering-services-section",
+  "work": "https://github.com/red-cup-engineering/computer-data-engineering-services-section/issues/113",
+  "proposal": {
+    "branch": "claude/sql-retirement-patches",
+    "head": "260818fd10b7b055bba0d426fc22a56061a95613",
+    "judgment": "superseded",
+    "historyReceiving": "Reviewed supersession join retains the original patch-carrier history without placing foreign implementation in Data."
+  },
+  "requirements": [
+    "Keep native history operations on the shared content-addressed kernel over admitted storage ports.",
+    "Read a selected subject or predicate through the canonical history model; preserve causal revisions, checkpoint identity, evidence and atomic publication.",
+    "Keep ordinary startup independent of SQL and require explicit offline receiving of historical custody.",
+    "Receive source at its actual owner instead of retaining displaced patch directories."
+  ],
+  "sourceOwner": {
+    "repository": "red-cup-engineering/computer-engineering-services-section",
+    "commit": "fa7314dc6394e55f8d30332a0fbb19c2e691bd80"
+  },
+  "patches": [
+    {
+      "path": "patches/computer-services-section/inference-ledgers/0001-computer-inference-engine-the-ledgers-read-SQL-only-.patch",
+      "blob": "5eda3dcf15c1c62d90e6a8565a3e8a12a1dcaf61",
+      "judgment": "superseded",
+      "receivedPull": "https://github.com/red-cup-engineering/computer-engineering-services-section/pull/174",
+      "receivedMerge": "797b4eb17207f5571da4601a31ac04071b8e4045",
+      "currentReceiving": "Ledger callers now call openLedgerJournal; its native-custody guard executes before directory creation. Original ledger paths and sidecars require explicit offline receiving. The automatic SQL admission module is absent."
+    },
+    {
+      "path": "patches/computer-services-section/signcraft-kernel-bounded-reads-only/0001-signcraft-the-history-kernel-gains-bounded-reads-ove.patch",
+      "blob": "9906a46e6a7f3b76d2147d03f3101ead1e6aae87",
+      "judgment": "already-landed",
+      "currentReceiving": "Both target implementation blobs match exactly; native in-memory/file media and observe examples match exactly. The contract examples differ only by removal of an obsolete SQL-specific comment."
+    },
+    {
+      "path": "patches/computer-services-section/signcraft-kernel-bounded-reads/0001-signcraft-the-history-kernel-gains-bounded-reads-the.patch",
+      "blob": "9d356aefdfa71f01cf7da5ac94a1a7a21d55f750",
+      "judgment": "superseded",
+      "currentReceiving": "Its kernel/history delta equals the native-only series and is already landed. Its additional SQL port, automatic table receiving/retirement and SQL fixture adapter are superseded by native flatfile opening with explicit historical receiving; those changes are not installed."
+    }
+  ],
+  "retainedSources": [
+    {
+      "path": "services/signcraft/src/content-history-store.mjs",
+      "blob": "a0bdddd44005013f4eeb6c5030f07af7cd005fea",
+      "role": "Exact target kernel for both proposed series; implements observe/readSubject/readPredicate/subjects over shared addressed tries."
+    },
+    {
+      "path": "services/signcraft/src/history.mjs",
+      "blob": "4eb9fbd2ef4e3ca6db4c6c920539b00826d02bc3",
+      "role": "Exact target history model and identity/projection helpers for both series."
+    },
+    {
+      "path": "services/signcraft/src/file-history-store.mjs",
+      "blob": "2f441644e41240b6856e1f01a12990fd56d0163b",
+      "role": "Actual native storage consumer constructs createContentHistoryStore and refuses unreceived historical custody before native construction."
+    },
+    {
+      "path": "services/signcraft/test/_history-store-media.mjs",
+      "blob": "fb3bfc20c742042ce64b3c66e2c2f92a2cc59cd2",
+      "role": "Exact native proposed example adapter; source reviewed, not executed."
+    },
+    {
+      "path": "services/signcraft/test/history-store-observe.test.mjs",
+      "blob": "cfc768a7fd403dba7011bc856a143b7df5ea5e00",
+      "role": "Exact native proposed bounded-observation examples; source reviewed, not executed."
+    },
+    {
+      "path": "services/signcraft/test/history-store-contract.test.mjs",
+      "blob": "57e4e50a9b77f32fa066238ff5ab01d9ef87f66d",
+      "role": "Complete native proposed contract body, with obsolete SQL comment removed; source reviewed, not executed."
+    },
+    {
+      "path": "services/signcraft/specifications/native-file-history-admission.md",
+      "blob": "a4461c7f3a9b307b3509d06e7f7782858e021076",
+      "role": "Current explicit receiving and native opening specification."
+    }
+  ],
+  "inferenceReceiving": {
+    "prefix": "services/computer-systems-engineering-services-section/services/computer-inference-system-services-section/apps/computer-inference-engine/",
+    "sources": {
+      "src/media/ledger-journal.mjs": "a7ed8a70fab93f47432f056fc413f0b409b85fd8",
+      "src/media/native-ledger-custody.mjs": "c5e3f67a2268d6211cd2168d924b335bd000c6ee",
+      "src/media/account-artifact-capacity.mjs": "38ba574e01091b293ab6e73e67e449166e7ca3ab",
+      "src/media/allowance-ledger.mjs": "3518c76d5a21e9d7cdc30a6be61382fa3f39013b"
+    },
+    "supplier": "@red-cup-engineering/semiotic-eavt-services-section/record-semantic-record"
+  },
+  "sourceSpecification": {
+    "input": "The exact three immutable patch blobs and their declared target paths.",
+    "output": "Revision-bound judgments identifying the current native owner implementation and retained histories.",
+    "invariants": [
+      "No foreign patch source installed in Data.",
+      "No ordinary SQL port or startup conversion restored.",
+      "Original donor commit retained in received history.",
+      "Unrelated current source preserved."
+    ],
+    "receivingBoundary": "Source-history receiving only; supplier installation, runtime state receiving and operating release are separate."
+  },
+  "design": {
+    "sharedOwner": "The existing SignCraft content history kernel and inference ledger journal at their current canonical Computer owner.",
+    "transformation": "Normalize the stale cross-repository patch carrier by recording its complete current-owner disposition and retaining its proposal history."
+  },
+  "guidance": {
+    "methodBlob": "1d7a3ff5545816bae3e8a398fb0767f6269869ed",
+    "integratedRefs": "Integrated source has no archive ref; retain its history in main.",
+    "ruleStore": "561-group-services-section/lib/agency/rules",
+    "runtimeRuleCheck": "Native runtime capability unavailable; no runtime authorization or office admission is claimed."
+  },
+  "validation": {
+    "sourceComparison": "Complete kernel/history target identity; complete native-example body comparison; current actual storage and ledger consumer source review.",
+    "testsExecuted": false,
+    "candidateSourceExecuted": false,
+    "runtimeReceiving": false
+  },
+  "carrierIndex": {
+    "path": "patches/README.md",
+    "blob": "d48467985c3ed48d26029c69fa5331a2355e5b9e",
+    "judgment": "superseded",
+    "currentReceiving": "Its inference series is received through Computer PR174; both declared SignCraft target kernel/history blobs are already present at current Computer owner. The parked-founder and git-am instructions are stale patch-delivery notes, superseded by the current native-custody contract and this exact source-owner disposition. Data has no patches/README.md in the receiving tree."
+  },
+  "coverage": {
+    "changedPaths": 4,
+    "allChangedPaths": [
+      "patches/README.md",
+      "patches/computer-services-section/inference-ledgers/0001-computer-inference-engine-the-ledgers-read-SQL-only-.patch",
+      "patches/computer-services-section/signcraft-kernel-bounded-reads-only/0001-signcraft-the-history-kernel-gains-bounded-reads-ove.patch",
+      "patches/computer-services-section/signcraft-kernel-bounded-reads/0001-signcraft-the-history-kernel-gains-bounded-reads-the.patch"
+    ],
+    "uniqueCommits": [
+      {
+        "sha": "260818fd10b7b055bba0d426fc22a56061a95613",
+        "subject": "patches: SignCraft kernel bounded reads alone, split from the parked SQL-medium change"
+      },
+      {
+        "sha": "81647a10b245e6fa488f9b99e73b9fa95a9fe58e",
+        "subject": "patches: SignCraft history kernel bounded reads; the SQL store becomes its SQL byte port"
+      },
+      {
+        "sha": "4f510872b2fa501afa4410c88fa1f836928993b0",
+        "subject": "patches: computer-inference-engine ledgers read SQL only in their read-once admission"
+      }
+    ],
+    "allUniqueCommitCount": 3,
+    "basis": "Complete merge-base-to-original-head path coverage, complete original carrier-index text and complete target-family comparisons. No intermediate patch-delivery instruction becomes governing authority."
+  }
+}
