@@ -1,9 +1,99 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { knowledgeJoinReading } from "../src/four.mjs";
+import {
+  bilatticeLawReceipt,
+  fusionReading,
+  gauge,
+  gaugeElementNames,
+  gaugeMul,
+  knowledgeBottom,
+  knowledgeJoinReading,
+  knowledgeLeqReading,
+  knowledgeTop,
+  kleinFourGaugeReceipt,
+  linearUnit,
+  readingAs,
+  readingFamilies,
+  readingOfSides,
+  readingOfWire,
+  residuationHolds,
+  sidesOfReading,
+  truthBottom,
+  truthLeqReading,
+  truthTop,
+  wireOfReading,
+} from "../src/four.mjs";
 
-test("the knowledge join over FOUR: absurd is its bottom, potential and active join to stable, and it is idempotent", () => {
+// Conformance against Obsmetrologia/Language/Positing/Charge.lean:
+// Charge.ofSlots, kBot/tTop/tBot/kTop, joinK, leK, leT, negate and
+// fuse_leT_iff. This tests every value/combination of the actual FOUR
+// carrier, not a random sample. It does not assert a compiled Lean ↔ JS proof.
+const CORNERS = Object.freeze([
+  ["absurd", false, false, "neither"],
+  ["potential", true, false, "true"],
+  ["active", false, true, "false"],
+  ["stable", true, true, "both"],
+]);
+
+const points = readingFamilies.knowledge;
+
+test("FOUR's complete value table has exactly the four Lean Charge corners", () => {
+  assert.deepEqual(points, CORNERS.map(([name]) => name));
+  for (const [name, positive, negative, truthName] of CORNERS) {
+    assert.deepEqual(sidesOfReading(name), [positive, negative]);
+    assert.equal(readingOfSides("knowledge", positive, negative), name);
+    assert.equal(readingAs("truth", name), truthName);
+    assert.equal(readingOfWire(wireOfReading(name)), truthName);
+  }
+  assert.equal(knowledgeBottom(), "absurd");
+  assert.equal(knowledgeTop(), "stable");
+  assert.equal(truthTop(), "potential");
+  assert.equal(truthBottom(), "active");
+});
+
+test("FOUR knowledge join is commutative, idempotent, and preserves conflict", () => {
   assert.equal(knowledgeJoinReading("absurd", "potential"), "potential");
   assert.equal(knowledgeJoinReading("potential", "active"), "stable");
-  assert.equal(knowledgeJoinReading("potential", "potential"), "potential");
+  for (const a of points) {
+    assert.equal(knowledgeJoinReading(a, a), a);
+    for (const b of points) {
+      assert.equal(knowledgeJoinReading(a, b), knowledgeJoinReading(b, a));
+      assert.equal(knowledgeLeqReading(a, knowledgeJoinReading(a, b)), true);
+      assert.equal(knowledgeLeqReading(b, knowledgeJoinReading(a, b)), true);
+    }
+  }
+});
+
+test("all asserted lattice laws hold exhaustively, including the truth order", () => {
+  const { kind, ...laws } = bilatticeLawReceipt();
+  assert.equal(kind, "four.bilatticeLaws:witness");
+  assert.ok(Object.keys(laws).length >= 20);
+  for (const [name, holds] of Object.entries(laws)) {
+    assert.equal(holds, true, `FOUR law violated: ${name}`);
+  }
+  for (const a of points) {
+    assert.equal(truthLeqReading(truthBottom(), a), true);
+    assert.equal(truthLeqReading(a, truthTop()), true);
+    for (const b of points) {
+      for (const c of points) {
+        assert.equal(residuationHolds(a, b, c), true, `residuation failed: ${a} ${b} ${c}`);
+      }
+    }
+    assert.equal(fusionReading(a, linearUnit()), a);
+  }
+});
+
+test("the Klein-four gauge is a genuine action on all FOUR points", () => {
+  const { kind, ...receipt } = kleinFourGaugeReceipt();
+  assert.equal(kind, "four.kleinFourGauge:witness");
+  for (const law of ["closure", "associative", "identity", "selfInverse", "abelian", "actionHomomorphism"]) {
+    assert.equal(receipt[law], true, law);
+  }
+  for (const a of gaugeElementNames) {
+    for (const b of gaugeElementNames) {
+      for (const value of points) {
+        assert.equal(gauge(gaugeMul(a, b), value), gauge(a, gauge(b, value)));
+      }
+    }
+  }
 });
