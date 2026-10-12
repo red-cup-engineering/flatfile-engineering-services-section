@@ -60,10 +60,18 @@ export function createSignGraph(input) {
   return carrier.ok ? accepted(graph) : refused("invalid-graph", "graph did not satisfy its shipped carrier schema");
 }
 export function edgesFrom(graph, subject) { const reference = subject?.kind === "sign.cell" ? referenceOf(subject) : subject; return Object.freeze(graph.edges.filter(entry => entry.edge.subject.id === reference.id)); }
-/** Glue graph cuts into one section. Cells and edges are content-addressed and simply unite; a
- * predicate the cuts declare alike is kept. A predicate two cuts declare differently is an
- * obstruction to gluing there: it and its edges are left out and reported, and the rest of the
- * section still glues. The result does not depend on the order of the cuts. */
+/** Glue an entire family of graph cuts in one comparison. Identical relation
+ * declarations, cells and edges agree by SCA identity; incompatible
+ * declarations of the same predicate obstruct gluing on that predicate and
+ * its edges, while compatible predicates still glue. The result is
+ * permutation-invariant for this fixed family of cuts.
+ *
+ * IMPORTANT: with obstructions this is a *partial section projection*, not
+ * an associative join of graphs. The returned graph has forgotten all
+ * obstructed declarations and edges. Applying glueSignGraphs again to just
+ * that projected graph can reintroduce a formerly obstructed predicate.
+ * Retain the source cuts and obstruction receipt to revisit consistency;
+ * do not treat a projection as a lossless CRDT state. */
 export function glueSignGraphs(...graphs) {
   const cells = new Map(), declarations = new Map(), edges = new Map();
   for (const graph of graphs) {

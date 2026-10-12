@@ -47,3 +47,74 @@ test("semantic graph preserves typed endpoint and witness membership through adm
   assert.equal(glueSignGraphs(elsewhere.value, full.value).value.graph.id, obstructed.value.graph.id);
   assert.equal(glueSignGraphs().value.graph.cells.length, 0);
 });
+
+
+test("SignGraph gluing is permutation-invariant over compatible cuts and localizes schema obstructions", () => {
+  const source = referenceOf(cell.value), type = defined.value.id;
+  const supports = { id: "supports", subjectTypes: [type], objectTypes: [type], witnessTypes: [type] };
+  const mentions = { ...supports, id: "mentions" };
+  const opposedSupports = { ...supports, objectTypes: [type, "other.type@1"] };
+  const edge = predicate => ({ subject: source, predicate, object: source, witness: source });
+  const graph = (relations, edges) => {
+    const admitted = createSignGraph({ cells: [cell.value], relations, edges });
+    assert.equal(admitted.ok, true);
+    return admitted.value;
+  };
+  const a = graph([supports], [edge("supports")]);
+  const b = graph([mentions], [edge("mentions")]);
+  const c = graph([opposedSupports], []);
+  const expected = glueSignGraphs(a, b, c);
+  assert.equal(expected.ok, true);
+  assert.deepEqual(expected.value.graph.relations.map(r => r.id), ["mentions"]);
+  assert.deepEqual(expected.value.graph.edges.map(e => e.edge.predicate), ["mentions"]);
+  assert.deepEqual(expected.value.obstructions, [{
+    code: "conflicting-relation",
+    relation: "supports",
+    graphs: [a.id, c.id].sort(),
+  }]);
+
+  for (const ordered of [
+    [a, b, c], [a, c, b], [b, a, c],
+    [b, c, a], [c, a, b], [c, b, a],
+  ]) {
+    const glued = glueSignGraphs(...ordered);
+    assert.equal(glued.ok, true);
+    assert.equal(glued.value.graph.id, expected.value.graph.id);
+    assert.deepEqual(glued.value.obstructions, expected.value.obstructions);
+  }
+
+  const compatible = glueSignGraphs(a, b);
+  assert.equal(compatible.ok, true);
+  assert.deepEqual(compatible.value.obstructions, []);
+  assert.deepEqual(compatible.value.graph.relations.map(r => r.id), ["mentions", "supports"]);
+  assert.equal(compatible.value.graph.edges.length, 2);
+});
+
+test("a projected SignGraph after obstruction must not be re-glued as a lossless accumulator", () => {
+  const source = referenceOf(cell.value), type = defined.value.id;
+  const supports = { id: "supports", subjectTypes: [type], objectTypes: [type], witnessTypes: [type] };
+  const opposed = { ...supports, witnessTypes: [type, "other.type@1"] };
+  const graph = relation => {
+    const accepted = createSignGraph({ cells: [cell.value], relations: [relation], edges: [] });
+    assert.equal(accepted.ok, true);
+    return accepted.value;
+  };
+  const a = graph(supports), b = graph(opposed);
+  const projected = glueSignGraphs(a, b);
+  assert.equal(projected.ok, true);
+  assert.equal(projected.value.graph.relations.length, 0);
+  assert.equal(projected.value.obstructions.length, 1);
+
+  // The third source agrees with a, but the two incompatible original source
+  // declarations remain. A one-shot 3-cut comparison still obstructs.
+  const allCuts = glueSignGraphs(a, b, a);
+  assert.equal(allCuts.ok, true);
+  assert.equal(allCuts.value.graph.relations.length, 0);
+  assert.equal(allCuts.value.obstructions.length, 1);
+
+  // Regrafting from only the projected graph has thrown away that obstruction.
+  const improperlyAccumulated = glueSignGraphs(projected.value.graph, a);
+  assert.equal(improperlyAccumulated.ok, true);
+  assert.equal(improperlyAccumulated.value.graph.relations.length, 1);
+  assert.deepEqual(improperlyAccumulated.value.obstructions, []);
+});
