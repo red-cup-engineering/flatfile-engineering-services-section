@@ -17,9 +17,13 @@
  * falls (absurd reached, witnesses kept), or after a conflation or a
  * presumption (signchain's bilattice).
  *
- * Each evidence side is a grow-only set, deduplicated and ordered by canonical
- * bytes, so merge is a join-semilattice (commutative, associative, idempotent):
- * a state-based G-Set CRDT per side.
+ * Each evidence side is a grow-only set over canonical content identities,
+ * deduplicated and ordered by canonical bytes. Merge is associative,
+ * commutative and idempotent on that quotient (a state-based G-Set CRDT per
+ * side). Raw representatives need not be identical under input permutation:
+ * retaining the last coincident witness is a presentation choice, not another
+ * semantic identity. Compare canonical bytes, not raw object equality, when
+ * asserting the semilattice laws.
  *
  * A cell's address is the content address of its triple alone — never of its
  * evidence — so identity does not move when evidence arrives. Addresses and
