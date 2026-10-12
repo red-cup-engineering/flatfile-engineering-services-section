@@ -44,8 +44,8 @@ export const CORNER_BITS = Object.freeze(Object.fromEntries(
 export function leqK(a, b) {
   return knowledgeLeqReading(CORNER_READING[a], CORNER_READING[b]);
 }
-/** Whether a rung's completion is decidable: it names a closure regime that settles by
- *  κ ≤ ω (Lean `regimeDecidable`), which only `strict` and `scott` do. */
+/** Whether the supplier admits a rung's completion as finite-decidable.
+ *  A fixed point at omega does not imply settlement at a finite stage. */
 export const isDecidable = (rung) => isClosureRegimeName(rung) && regimeDecidable(rung);
 /** Define a root projector (no parent). */
 export function define(spec) {
@@ -182,8 +182,9 @@ export function rungOf(projector) {
   return projector.rung ?? "strict";
 }
 /** The decidability invariant: a projector that READS (settles surface into
- *  carried items) must do so at a decidable rung — never `transfinite-bounded` or
- *  `aperiodic`. Write-only projectors (e.g. presentational HTML/SVG) are exempt:
+ *  carried items) must satisfy the supplier's finite-decidability law. Grade
+ *  the actual read, not a separate evaluation of its carried syntax.
+ *  Write-only projectors (e.g. presentational HTML/SVG) are exempt:
  *  emitting an aperiodic form is sound; depending on its *completed* state is not. */
 export function readIsDecidable(projector) {
   return projector.read === undefined || isDecidable(rungOf(projector));
