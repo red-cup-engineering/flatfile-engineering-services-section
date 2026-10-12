@@ -1,4 +1,5 @@
 import { Mark, MarkSchema, mark, coincides, isMark } from "./mark.mjs";
+import { canonicalCarrier } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 export { Mark, MarkSchema, mark, coincides, isMark };
 export const TokenSchema = {
     type: "object",
@@ -73,11 +74,11 @@ export const articulationCellSchema = {
 };
 /** A token: the frozen left-hand utterance carrier holding one mark. Callable with or without `new`. */
 export function Token(mark) {
-    return Object.freeze({ kind: "utterance.token", hand: "left", mark });
+    return canonicalCarrier({ kind: "utterance.token", hand: "left", mark });
 }
 /** A claim: the frozen right-hand utterance carrier holding one mark. Callable with or without `new`. */
 export function Claim(mark) {
-    return Object.freeze({ kind: "utterance.claim", hand: "right", mark });
+    return canonicalCarrier({ kind: "utterance.claim", hand: "right", mark });
 }
 /** The complete finite enumeration of `RelMath.Mark.Kind`. */
 export const markKinds = Object.freeze(["token", "claim"]);
@@ -98,11 +99,11 @@ export function claim(markCarrier) {
     return Claim(markCarrier);
 }
 /** A hand's datum let in as a Mark: a datum already a Mark is that Mark (marking is idempotent). */
-const marked = (datum) => isMark(datum) ? datum : mark(datum);
+const marked = (datum) => isMark(datum) ? canonicalCarrier(datum) : mark(datum);
 /** Constructs an utterance carrier from two hands: left becomes a token, right a claim, each
  *  carrying the Mark of its datum. This is the one utterance (`RelMath.Utterance`). */
 export function utterance(left, right) {
-    return Object.freeze({ kind: "utterance.carrier", token: token(marked(left)), claim: claim(marked(right)) });
+    return canonicalCarrier({ kind: "utterance.carrier", token: token(marked(left)), claim: claim(marked(right)) });
 }
 /** `RelMath.Utterance.at_`: the Mark an utterance carries at a mark kind. */
 export function utteranceAt(carrier, kind) {
@@ -139,11 +140,11 @@ export function utterEvidenceSet(entries) {
 }
 /** The innermost `RelMath.Articulating.utter` constructor. */
 export function articulatingUtter(carrier) {
-    return Object.freeze({ kind: "articulating.utter", utterance: carrier });
+    return canonicalCarrier({ kind: "articulating.utter", utterance: carrier });
 }
 /** The recursive `RelMath.Articulating.pair` constructor. */
 export function articulatingPair(carrier, nested) {
-    return Object.freeze({ kind: "articulating.pair", utterance: carrier, articulating: nested });
+    return canonicalCarrier({ kind: "articulating.pair", utterance: carrier, articulating: nested });
 }
 /** `RelMath.Articulating.head`: the utterance at the head of the recursion. */
 export function articulatingHead(carrier) {

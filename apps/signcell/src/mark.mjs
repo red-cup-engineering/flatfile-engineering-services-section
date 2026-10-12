@@ -1,5 +1,5 @@
 import { defineType, instantiate } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
-import { coincides, semanticBytes } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+import { canonicalCarrier, coincides } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 /** Opaque present datum: a semiotic carrier, so it has a content address. Payload
  *  interpretation belongs to the selected type or codec. */
 export const MarkSchema = {
@@ -18,10 +18,9 @@ export const MarkType = definition.value;
 /** A Mark: a frozen plain carrier, so it is itself content-addressable and survives a transport
  *  round-trip unchanged. Callable with or without `new`. */
 export function Mark(value) {
-    const carrier = Object.freeze({ kind: "utterance.mark", value });
+    const carrier = canonicalCarrier({ kind: "utterance.mark", value });
     if (!instantiate(MarkType, carrier).ok)
         throw new TypeError("Mark: value must be present");
-    semanticBytes(value);
     return carrier;
 }
 export function mark(value) { return Mark(value); }

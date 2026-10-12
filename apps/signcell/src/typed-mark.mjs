@@ -26,7 +26,7 @@ export function createTypedMark(type, content) {
   if (!admitted.ok) return refused("invalid-content", admitted.refusal.issues.map(issue => `${issue.path || "/"} ${issue.message}`).join("; "));
   try {
     const canonical = canonicalCarrier(admitted.value);
-    return accepted(Object.freeze({ kind: TYPED_MARK, id: typedMarkIdentity(type.id, canonical), type: type.id, content: canonical }));
+    return accepted(canonicalCarrier({ kind: TYPED_MARK, id: typedMarkIdentity(type.id, canonical), type: type.id, content: canonical }));
   } catch (error) { return refused("invalid-content", error instanceof Error ? error.message : String(error)); }
 }
 /** Re-admit an addressed typed mark against the receiver's type declaration. */
@@ -42,8 +42,10 @@ export function admitTypedMark(type, input) {
 export function admitTypedMarkCarrier(input) {
   const carrier = admit(typedMarkType, input);
   if (!carrier.ok) return refused("invalid-cell", "typed mark must have kind, id, declared type, and content");
-  const value = carrier.value;
-  return value.id === typedMarkIdentity(value.type, value.content) ? accepted(value) : refused("identity-mismatch", "typed mark's bytes do not match its advertised identity");
+  try {
+    const value = canonicalCarrier(carrier.value);
+    return value.id === typedMarkIdentity(value.type, value.content) ? accepted(value) : refused("identity-mismatch", "typed mark's bytes do not match its advertised identity");
+  } catch (error) { return refused("invalid-content", error instanceof Error ? error.message : String(error)); }
 }
 export function referenceOf(typedMark) {
   return Object.freeze({ id: typedMark.id, type: typedMark.type });
