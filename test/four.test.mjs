@@ -97,3 +97,18 @@ test("the Klein-four gauge is a genuine action on all FOUR points", () => {
     }
   }
 });
+
+
+test("natural evidence tallies refuse lossy IEEE-754 integer arithmetic", async () => {
+  const { record, recordAdd, attestationRecord } = await import("../src/four.mjs");
+  const limit = Number.MAX_SAFE_INTEGER;
+
+  assert.deepEqual(record(limit, 0), { pos: limit, neg: 0 });
+  assert.deepEqual(recordAdd(record(2, 3), record(4, 5)), record(6, 8));
+  assert.deepEqual(attestationRecord([2, 1]), record(1, 1));
+
+  assert.throws(() => record(limit + 1, 0), TypeError);
+  assert.throws(() => recordAdd(record(limit, 0), record(1, 0)), TypeError);
+  assert.throws(() => attestationRecord([limit + 1]), TypeError);
+  assert.throws(() => attestationRecord([limit, 2]), TypeError);
+});

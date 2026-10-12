@@ -201,7 +201,14 @@ export const truthMeetOfCensus = (counts) => truthMeetAll(presentIn(counts));
 // operations; the counting merge is pointwise addition, and topMass = min pos neg is the contradiction
 // mass that merging never destroys (topMass_add) though the reading's join collapses it.
 
-const tally = (count) => { if (!Number.isInteger(count) || count < 0) throw new TypeError(`four: a tally is a natural number, not ${String(count)}`); return count; };
+/** A Number-based tally is only exact for safe natural integers. The arbitrary-
+ * precision natural-number regime must use the exact-number layer, not silently
+ * round evidence multiplicities in this wire carrier. */
+const tally = (count) => {
+  if (!Number.isSafeInteger(count) || count < 0)
+    throw new TypeError(`four: a tally must be an exactly representable natural number, not ${String(count)}`);
+  return count;
+};
 
 /** A record: how many times told true, how many times told false. */
 export const record = (pos = 0, neg = 0) => Object.freeze({ pos: tally(pos), neg: tally(neg) });
@@ -224,8 +231,10 @@ export const topMass = (r) => Math.min(r.pos, r.neg);
  *  corroborated and none other attested, false when attestations only disagree, both when a state is
  *  corroborated and contradicted, and neither when fewer than two attested anything. */
 export const attestationRecord = (counts) => {
-  if (counts.some((count) => !Number.isInteger(count) || count < 1)) throw new TypeError("four: a distinct state is attested at least once");
-  return record(counts.reduce((sum, count) => sum + count, 0) - counts.length, Math.max(0, counts.length - 1));
+  if (counts.some((count) => !Number.isSafeInteger(count) || count < 1)) throw new TypeError("four: a distinct state is attested at least once");
+  // Check every intermediate addition: a rounded subtotal is not a witness.
+  const total = counts.reduce((sum, count) => tally(sum + count), 0);
+  return record(total - counts.length, Math.max(0, counts.length - 1));
 };
 
 // — the Klein four-group of symmetries: identity, negation, conflation, both —
