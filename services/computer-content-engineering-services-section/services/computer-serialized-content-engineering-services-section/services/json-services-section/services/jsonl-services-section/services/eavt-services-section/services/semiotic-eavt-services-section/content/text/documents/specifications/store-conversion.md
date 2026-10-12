@@ -112,6 +112,7 @@ An enterprise `setting` row is not a record: the newest value for each (enterpri
 | `service-lifecycle-logs` | `service-lifecycle-logs/<date>.jsonl`, one line `{at, service, event, ok}` per row |
 | `arrival-logs` (677 MB) and the packets they cite | a record of type `arrival` per distinct arrival (`from`, `kind`, `received`, and `body`, the `ni:` address of its bytes) and a line `{at, from, kind, of}` in `arrival-logs/<date>.jsonl`; each cited packet's bytes go to content custody under their address; packets no row cites are deleted |
 | `witness-journal-seavt-logs` (plain EAVT rows) | `witness-journal-logs/<date>.jsonl`, one line `{at, e, a, v}` per row with `termToJson` applied to terms |
+| ActivityPub custody in `activitypub.sqlite` (Cold Red Gate, `{stateRoot}/activitypub.sqlite`) | The earlier SQLite carrier is not read by any package: a settlement that still holds one is converted once, outside the released packages. Each verified arrival becomes an `activitypub-inbox` record in the thread named by `threadName` of its `{type, name}`, each follower an `activitypub-follower` record, each outgoing activity an `activitypub-outbox` record, each pending delivery a file of `ACTIVITYPUB_STATE_DIR/queue`, and each cached key-value pair a file of `ACTIVITYPUB_STATE_DIR/kv`. Cold Red Gate's `machine.json` names `receive-native-cutover.mjs` and `carry-located-indexes.mjs` in `preActivation`; both are deleted, so that list changes with the conversion. |
 
 ### Deleted with no replacement
 
