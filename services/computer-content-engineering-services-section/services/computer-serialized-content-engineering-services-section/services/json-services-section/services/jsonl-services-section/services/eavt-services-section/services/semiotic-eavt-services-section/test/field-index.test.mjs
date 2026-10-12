@@ -15,6 +15,19 @@ const scratch = (t) => { const root = mkdtempSync(join(tmpdir(), "field-index-")
 let tick = 0;
 const at = () => new Date(Date.UTC(2026, 9, 10, 0, 0, tick++)).toISOString();
 
+test("an incomplete field-index turn refuses a complete answer and resumes its persisted positions", (t) => {
+  const root = scratch(t), journal = createSemanticRecordJournal({ root, objectKind: "test.turn-index" });
+  for (let n = 0; n < 35; n += 1) journal.record({ category: "fact", recordedAt: at(), told: HELD, record: { id: "same", n } });
+  const options = { root, objectKind: "test.turn-index", category: "fact", fields: { id: "id" } };
+  assert.throws(() => createFieldIndex(options).get("id", "same"), /outstanding journal turns/u);
+  const reopened = createFieldIndex(options);
+  const resumed = reopened.refresh();
+  assert.equal(resumed.visited, 3);
+  assert.equal(resumed.more, false);
+  assert.deepEqual(reopened.get("id", "same").map(row => row.record.n), Array.from({ length: 35 }, (_, n) => n));
+  assert.equal(reopened.refresh().visited, 0);
+});
+
 test("point reads by field: nested paths, array members, other categories and kinds passed over", (t) => {
   const root = scratch(t);
   const cash = createSemanticRecordJournal({ root, objectKind: "test.ledger" });

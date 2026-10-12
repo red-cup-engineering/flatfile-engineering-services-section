@@ -168,7 +168,7 @@ export function recordSemanticRecord({
 }
 /** A semantic record journal bound to one custody root and default object
  * kind: `record`, `query` and `readSince` take the rest of a request, and a
- * request may name its own `objectKind`. `readSince({ category, cursor })`
+ * request may name its own `objectKind`. `readSince({ category, cursor, maxRecords, maxBytes })`
  * returns `{ records, cursor, reset }`: what was admitted since the cursor, and
  * the cursor to read on from. */
 export function createSemanticRecordJournal({ root, objectKind: defaultObjectKind } = {}) {

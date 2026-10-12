@@ -93,7 +93,7 @@ export function createFieldIndex({ root, objectKind, category, fields } = {}) {
   const stale = (cursor) => cursor === null || kindFeedsGrew(store, objectKind, cursor.feeds);
 
   function catchUp() {
-    withDirectoryLock(directory, () => {
+    return withDirectoryLock(directory, () => {
       let cursor = readCursor();
       const rebuild = () => {
         for (const field of readers.keys()) rmSync(join(directory, encodeURIComponent(field)), { recursive: true, force: true });
@@ -129,9 +129,13 @@ export function createFieldIndex({ root, objectKind, category, fields } = {}) {
       mkdirSync(directory, { recursive: true });
       writeFileSync(`${cursorFile}.${process.pid}.tmp`, JSON.stringify(cursor));
       renameSync(`${cursorFile}.${process.pid}.tmp`, cursorFile);
+      return Object.freeze({ more: read.more, visited: read.visited, decodedBytes: read.decodedBytes });
     });
   }
-  const current = () => { if (stale(readCursor())) catchUp(); };
+  const current = () => {
+    if (stale(readCursor()) && catchUp().more)
+      throw new TypeError("field index has outstanding journal turns; refresh before requesting a complete point reading");
+  };
 
   function locations(field, value) {
     if (!readers.has(field)) throw new TypeError(`field index does not index ${field}`);
@@ -179,6 +183,6 @@ export function createFieldIndex({ root, objectKind, category, fields } = {}) {
     /** How many records' `field` holds `value`, read from the index alone. */
     count: (field, value) => locations(field, value).length,
     /** Bring the index up to the journal now (reads do this themselves). */
-    refresh: () => current(),
+    refresh: () => stale(readCursor()) ? catchUp() : Object.freeze({ more: false, visited: 0, decodedBytes: 0 }),
   });
 }
