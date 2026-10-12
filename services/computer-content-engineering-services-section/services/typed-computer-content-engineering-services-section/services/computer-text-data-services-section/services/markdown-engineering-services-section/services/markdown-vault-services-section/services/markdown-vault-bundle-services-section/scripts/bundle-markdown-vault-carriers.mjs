@@ -1,19 +1,16 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createSemanticRecordJournal } from "@red-cup-engineering/semiotic-eavt-services-section/record-semantic-record";
+import { put } from "@red-cup-engineering/semiotic-eavt-services-section/store";
 import { bundleMarkdownVaultCarriers } from "../src/bundle-markdown-vault-carriers.mjs";
 import { MARKDOWN_VAULT_BUNDLE_ROLES } from "../src/select-markdown-vault-carriers.mjs";
 import { sha256Digest, sha256Hex } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/integrity";
 
-/** This package's own root; the default semantic-record-journal custody root (writes land at data/logs/, per house data-custody law). */
+/** This package's own root; the default store custody root (records land at data/records/, per house data-custody law). */
 export const NODE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
-/** The objectKind this section's semantic record journal uses for bundle-run records. */
-export const MARKDOWN_VAULT_BUNDLE_OBJECT_KIND = "markdown-vault-bundle.run-record";
-
-/** The journal category bundle-run records are written and queried under. */
-export const MARKDOWN_VAULT_BUNDLE_CATEGORY = "markdown-vault-bundle.run";
+/** The store type bundle-run records are written under. */
+export const MARKDOWN_VAULT_BUNDLE_TYPE = "vault-bundle-run";
 
 
 function parseArguments(argv) {
@@ -43,7 +40,7 @@ function parseArguments(argv) {
 /**
  * Bundle a Markdown vault subtree to disk: writes the aggregate bundle
  * files and manifest.json to `output`, then records a run receipt through
- * this section's semantic record journal.
+ * this section's store.
  * @param {{root: string, output: string, roles?: readonly string[], wordBudget?: number, maxFiles?: number, rootLabel?: string, journalRoot?: string, recordedAt?: string}} options
  * @returns {Promise<{output: string, manifest: object, receipt: object, defects: readonly {path: string, reason: string}[]}>}
  * @throws {TypeError} when root or output is missing.
@@ -75,11 +72,8 @@ export async function runBundleMarkdownVaultCarriers({
   }
   const manifestText = `${JSON.stringify(bundle.manifest, null, 2)}\n`;
   await writeFile(join(resolvedOutput, "manifest.json"), manifestText, "utf8");
-  const journal = createSemanticRecordJournal({ root: journalRoot, objectKind: MARKDOWN_VAULT_BUNDLE_OBJECT_KIND });
-  const receipt = journal.record({
-    category: MARKDOWN_VAULT_BUNDLE_CATEGORY,
-    recordedAt,
-    record: {
+  const receipt = { id: put(journalRoot, MARKDOWN_VAULT_BUNDLE_TYPE, {
+      recordedAt,
       root: resolvedRoot,
       output: resolvedOutput,
       roles: bundle.manifest.roles,
@@ -91,9 +85,7 @@ export async function runBundleMarkdownVaultCarriers({
       files: bundle.manifest.files,
       defects: bundle.defects,
       manifestDigest: sha256Digest(manifestText),
-    },
-    told: { for: true, against: false },
-  });
+    }) };
   return { output: resolvedOutput, manifest: bundle.manifest, receipt, defects: bundle.defects };
 }
 
