@@ -33,22 +33,41 @@ const isObject = (value) => value !== null && typeof value === "object" && !Arra
  * A line longer than the bound, or not beginning with `prefix`, is passed over without being held.
  * An absent file has no lines.
  */
-function* scanLines(file, { from = 0, prefix = null } = {}) {
+function openStrictRegular(file) {
+  if (!Number.isInteger(constants.O_NOFOLLOW) || !Number.isInteger(constants.O_NONBLOCK))
+    throw new StoreError("strict-file-open", "strict discovery requires no-follow nonblocking file opens");
   let fd;
-  try { fd = openSync(file, "r"); } catch (error) { if (error.code === "ENOENT" || error.code === "ENOTDIR") return; throw error; }
+  try { fd = openSync(file, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK); }
+  catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
+  try {
+    if (!fstatSync(fd).isFile()) throw new StoreCorruption(`${file} is not a regular record or head file`);
+    return fd;
+  } catch (error) { closeSync(fd); throw error; }
+}
+
+function* scanLines(file, { from = 0, prefix = null, strict = false } = {}) {
+  let fd;
+  try { fd = strict ? openStrictRegular(file) : openSync(file, "r"); } catch (error) { if (error.code === "ENOENT" || (!strict && error.code === "ENOTDIR")) return; throw error; }
+  if (fd === undefined) return;
   try {
     const chunk = Buffer.allocUnsafe(CHUNK_BYTES);
     const want = prefix === null ? null : Buffer.from(prefix, "utf8");
     let position = from, parts = [], held = 0, skipping = false, checked = want === null;
     for (;;) {
       const read = readSync(fd, chunk, 0, CHUNK_BYTES, position);
-      if (read === 0) return;
+      if (read === 0) {
+        if (strict && (held > 0 || skipping)) throw new StoreCorruption(`${file} has an unterminated record line`);
+        return;
+      }
       let start = 0;
       while (start < read) {
         const found = chunk.indexOf(NEWLINE, start);
         const end = found < 0 || found >= read ? read : found;
         if (!skipping) {
-          if (held + (end - start) > LINE_BYTES_MAX) { skipping = true; parts = []; held = 0; } else {
+          if (held + (end - start) > LINE_BYTES_MAX) {
+            if (strict) throw new StoreCorruption(`${file} has an overlong record line`);
+            skipping = true; parts = []; held = 0;
+          } else {
             parts.push(Buffer.from(chunk.subarray(start, end)));
             held += end - start;
             if (!checked && held >= want.length) {
@@ -129,18 +148,27 @@ function* bucketPaths() {
   for (const a of NAME_ALPHABET) for (const b of NAME_ALPHABET) yield niBucketPath(`ni:///sha-256;${a}${b}${"A".repeat(41)}`, NI_PATH_VERSION);
 }
 
-/** Every record of a type, bucket by bucket in name order and line by line in file order. */
-export function* each(root, type) {
+/** Every record of a type, bucket by bucket in name order and line by line in file order.
+ * Strict discovery refuses malformed, misplaced or unverifiable rows. Consumers must exhaust
+ * the iterator before using its result as complete; a yielded prefix is not a successful read.
+ * This is streaming discovery, not a transaction or a snapshot across concurrent writers.
+ */
+export function* each(root, type, { strict = false } = {}) {
   checkRoot(root);
   const directory = recordsDirectory(root, type);
   for (const bucket of bucketPaths()) {
-    for (const { text } of scanLines(`${directory}/${bucket}`)) {
+    const file = `${directory}/${bucket}`;
+    for (const { text } of scanLines(file, { strict })) {
       let line;
-      try { line = parseJsonValue(text); } catch { continue; }
-      if (!isObject(line) || typeof line.id !== "string" || !isObject(line.record) || !isNiUri(line.id)) continue;
-      if (!bucketOf(line.id, bucket)) continue;
-      const record = verifiedRecord(text, line.id);
+      try { line = parseJsonValue(text); } catch (error) {
+        if (strict) throw new StoreCorruption(`${file} contains malformed record JSON`);
+        continue;
+      }
+      const valid = isObject(line) && typeof line.id === "string" && isObject(line.record)
+        && isNiUri(line.id) && bucketOf(line.id, bucket);
+      const record = valid ? verifiedRecord(text, line.id) : undefined;
       if (record !== undefined) yield { address: line.id, record };
+      else if (strict) throw new StoreCorruption(`${file} contains an invalid or unverifiable record`);
     }
   }
 }
@@ -204,6 +232,7 @@ export function* walk(root, type, from, { limit = 256 } = {}) {
     if (missing) { yield { address: reference.id, type: reference.type, missing: true }; continue; }
     const record = find(root, reference.type, reference.id, false);
     if (record !== undefined) yield { address: reference.id, type: reference.type, record };
+    else yield { address: reference.id, type: reference.type, missing: true };
   }
   if (truncated) yield { truncated: true };
 }
@@ -235,9 +264,9 @@ export function* readLog(root, type, date, { from = 0 } = {}) {
   }
 }
 
-function* directoryNames(directory) {
+function* directoryNames(directory, { strict = false } = {}) {
   let dir;
-  try { dir = opendirSync(directory); } catch (error) { if (error.code === "ENOENT" || error.code === "ENOTDIR") return; throw error; }
+  try { dir = opendirSync(directory); } catch (error) { if (error.code === "ENOENT" || (!strict && error.code === "ENOTDIR")) return; throw error; }
   try { for (let entry = dir.readSync(); entry !== null; entry = dir.readSync()) yield entry.name; } finally { dir.closeSync(); }
 }
 
@@ -277,9 +306,15 @@ function withFileLock(lock, work) {
   try { return work(); } finally { try { unlinkSync(lock); } catch { /* already gone */ } }
 }
 
-function readHeadFile(file) {
+function readHeadFile(file, { strict = false } = {}) {
   let text;
-  try { text = readFileSync(file, "utf8"); } catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
+  if (strict) {
+    const fd = openStrictRegular(file);
+    if (fd === undefined) return undefined;
+    try { text = readFileSync(fd, "utf8"); } finally { closeSync(fd); }
+  } else {
+    try { text = readFileSync(file, "utf8"); } catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
+  }
   const head = parseJsonValue(text);
   if (!isObject(head) || !Array.isArray(head.frontier)) throw new StoreCorruption(`${file} is not a head`);
   return head;
@@ -336,13 +371,28 @@ export function extend(root, object, name, record, { causes, closed } = {}) {
   });
 }
 
-/** The heads of a type of thread, from the directory listing: `{name, head}`. */
-export function* heads(root, object) {
+/** The heads of a type of thread, from the directory listing: `{name, head}`.
+ * Strict discovery propagates unavailable reads and refuses malformed heads/frontiers instead
+ * of silently omitting them. Fully exhaust before admitting a complete set. Concurrent writers
+ * still require the consumer's ordinary final source check; this does not create a snapshot.
+ */
+export function* heads(root, object, { strict = false } = {}) {
   const directory = stateDirectory(checkRoot(root), object);
-  for (const file of directoryNames(directory)) {
+  for (const file of directoryNames(directory, { strict })) {
     if (!file.endsWith(".json")) continue;
     let head;
-    try { head = readHeadFile(`${directory}/${file}`); } catch { continue; }
+    try {
+      head = readHeadFile(`${directory}/${file}`, { strict });
+      if (strict && head === undefined) throw new StoreCorruption(`${directory}/${file} disappeared during head discovery`);
+      if (strict) frontierEntries(head.frontier, object);
+    } catch (error) {
+      if (strict) {
+        // Preserve genuine filesystem failures (and their cause) without echoing parsed values.
+        if (typeof error?.code === "string" && /^E[A-Z]+$/u.test(error.code)) throw error;
+        throw new StoreCorruption(`${directory}/${file} is not a valid head`);
+      }
+      continue;
+    }
     if (head !== undefined) yield { name: decodeHeadName(file.slice(0, -".json".length)), head };
   }
 }
