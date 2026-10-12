@@ -4,6 +4,7 @@
  * (content identity of the triple), one set of moves. This module adds only what predication
  * names over those cells: entity and predicate sets, sites and the base category.
  */
+import { canonicalCarrier } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { readingSchema } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { MarkSchema, TokenSchema, ClaimSchema, coincides } from "./utterance.mjs";
 import { cell as signCell, cellSet as signCellSet, converse, hasEvidence, objectProjection, sameCell, specialize, subjectProjection } from "./cell.mjs";
@@ -26,7 +27,7 @@ export const CellSchema = {
 /** A predicate: an object of the predicate category, a frozen carrier of a Claim and its mark.
  *  Callable with or without `new`. */
 export function Predicate(claimCarrier) {
-    return Object.freeze({ kind: "predication.predicate", claim: claimCarrier, mark: claimCarrier.mark });
+    return canonicalCarrier({ kind: "predication.predicate", claim: claimCarrier, mark: claimCarrier.mark });
 }
 // — coincidence: content identity, read through the carried marks —
 /** Whether two terms coincide (by their token's mark value). */
@@ -71,11 +72,11 @@ export function predicateOfClaim(claimCarrier) {
 }
 /** Build an entity set, deduplicating by the given sameness. */
 export function entitySet(entities, same) {
-    return Object.freeze({ kind: "predication.entitySet", entities: uniqueBy([...entities], same) });
+    return canonicalCarrier({ kind: "predication.entitySet", entities: uniqueBy([...entities], same) });
 }
 /** Build a predicate set, deduplicating by the given sameness. */
 export function predicateSet(predicates, same) {
-    return Object.freeze({ kind: "predication.predicateSet", predicates: uniqueBy([...predicates], same) });
+    return canonicalCarrier({ kind: "predication.predicateSet", predicates: uniqueBy([...predicates], same) });
 }
 /** Build a cell set: SignCell's cell set (one cell per triple, tellings merged), with its entity and
  *  predicate sets derived. */
@@ -90,7 +91,7 @@ export function cellSet(cells) {
 }
 /** Present Φ = E × Π × E by its generators. */
 export function generatedPredicationCellSet(entities, predicates) {
-    return Object.freeze({ kind: "predication.generatedCellSet", entities, predicates });
+    return canonicalCarrier({ kind: "predication.generatedCellSet", entities, predicates });
 }
 /** A predication cell: the SignCell cell over (subject, predicate, object), with its evidence (none
  *  by default). The object is a token, so it is never null. */
