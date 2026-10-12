@@ -36,8 +36,9 @@ export function toEavt(value) {
   return Object.freeze([r.e, r.a, r.v, r.t]);
 }
 
-/** A row's content address: the ni URI of its record's canonical CBOR. An
- *  unchanged cell re-witnesses to the same id. */
+/** The SCA name of one complete EAVT *witness*, including its time: the ni URI
+ * of the complete record's canonical CBOR. The same (e,a,v) observed at a
+ * different time is a different witness even though it names the same cell. */
 export function eavtId(row) {
   return identifyContentAddressedRow({ row: eavtRecord(row) }).identity;
 }
@@ -81,7 +82,9 @@ export function serializeDatoms(datoms) {
   return serializeLines(datoms.map((datom) => [...datom]));
 }
 
-/** The monotone union of row logs by content address, sorted by address. */
+/** The monotone G-set union of complete witness identities, sorted by SCA
+ * address. Raw row representatives may differ when canonically coincident
+ * rows arrive in different orders; the semilattice laws concern addresses. */
 export function mergeEavtLogs(...logs) {
   const byId = new Map();
   for (const value of logs.flat()) {

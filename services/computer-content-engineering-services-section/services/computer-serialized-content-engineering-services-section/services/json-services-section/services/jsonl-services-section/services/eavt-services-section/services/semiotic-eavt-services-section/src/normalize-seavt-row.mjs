@@ -30,6 +30,11 @@ export const outputSchema = {
   required: ["e", "a", "v", "t"],
   additionalProperties: false,
 };
+/** Normalize only the EAVT tuple/record *carrier shape* and verify that
+ * e/a/v are closed, type-inferable SEN terms. This operation must not
+ * beta-normalize a witnessed expression or merge two different times:
+ * preserved witness syntax is distinct from SCA's normalized semantic-content
+ * identity, which is an explicit separate projection. */
 export function normalizeSeavtRow(value) {
   return seavtRow(normalizeEavtRow(value));
 }
