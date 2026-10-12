@@ -76,7 +76,7 @@ test("recordPathFor is the record tier's projection of the live journal file", (
     const logPath = journalPath({ root, feed: "feed-a", at: AT });
     const recordPath = recordPathFor({ root, feed: "feed-a", at: AT });
     assert.equal(path.dirname(recordPath), path.join(root, "data", "records", "feed-a-records"));
-    assert.equal(path.basename(recordPath), path.basename(logPath).replace("-admit-", "-commit-"));
+    assert.equal(path.basename(recordPath), path.basename(logPath));
   });
 });
 
