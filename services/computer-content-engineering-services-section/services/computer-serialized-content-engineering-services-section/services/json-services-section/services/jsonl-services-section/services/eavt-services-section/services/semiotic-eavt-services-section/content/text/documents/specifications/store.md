@@ -3,7 +3,7 @@ title: "The store: records, logs and heads, found by address"
 description: "The semiotic-eavt store: content-addressed records at the path the ni-path formula computes, plain per-type day logs, and heads as state records named by the thing they head. Nothing in it grows with history, no reader keeps an index, and a record exists exactly when its file line exists."
 date-created: 2026-10-12
 type: specification
-status: designed; realized by feltos-node specification section 8, item 1
+status: designed; the store module is built (src/store.mjs, layout.mjs, exchange.mjs), consumers and deletions follow in later waves; realizes feltos-node specification section 8, item 1
 owner: semiotic-eavt-services-section
 answers:
   - multi-agent-computer-platform-engineering-services-section/content/text/documents/specifications/feltos-node.md (sections 4, 5 and 8 item 1)
@@ -248,3 +248,18 @@ These are decisions the design takes. Each can be reversed by changing one named
 5. **Heads hold frontiers and `closed`, nothing derived.** A board lists open threads by walking each; a faster board is a derived readout of the consumer, not the store's.
 6. **Search indexes leave the package.** The term index and field index move to the features that search.
 7. **The converter lives on an unmerged branch, deleted after the second world converts.** It is cut from the last commit that holds the earlier store and reads the earlier layout with the earlier readers; `main` holds none.
+
+## 14. Decisions taken in building the store
+
+The store is built as `store` (re-exports), `store-core` (the operations), `layout` (paths, names, refusals) and `exchange` (`pull`, `directoryRemote`); package exports `./store`, `./layout`, `./exchange`. Where this document was silent the build decided as follows, from the glossary term `content-addressed-store` (content equals address, deterministic layout, no load-bearing index) and the Leader's words quoted under basis.
+
+1. **`pull` is the one asynchronous operation.** A peer answers over a network, so `pull` awaits `remote.heads(object)` and `remote.get(type, address)`; either may be synchronous. Section 3's "every function is synchronous" holds for the rest. `pull(root, remote, object, {limit, walkLimit})` returns `{heads, converged, records, truncated}`; `limit` bounds heads per call (default 256), `walkLimit` bounds the addresses one head's walk visits (default 4096).
+2. **Truncated pulls make progress without lying.** Reaching addresses is one pass (addresses only), putting is a second pass causes first; a record is put only if none of its causes was left unreached, so "the store has this address" still implies its causes were fetched or absent from the remote. A head whose walk was truncated is not written; the next pull continues from what is now held.
+3. **The maximal frontier** of a pull drops an address that is a cause of a record walked from the remote, or that lies behind the local frontier within `walkLimit` records; nothing else.
+4. **Type names are letters only.** `^[a-z]+(-[a-z]+)*$`, words of at most 24 characters, whole at most 64: a digit is an identifier or a date and is refused (ST-13). `dataKindDirectoryName` still slugifies; the store checks the name first, and the stem-law change of section 9 belongs to the wave that deletes the old store.
+5. **Head names.** `/`, `\`, `#`, `%`, control characters and a leading dot are percent-encoded; a name is 1 to 200 characters. The head file holds `name` (the unencoded name), `frontier` (sorted, one entry per address), `at`, and `closed` only when true. `extend` takes `{causes, closed}`; omitting `closed` reopens the thread.
+6. **`walk` order and memory.** The walk is a depth-first pass whose reverse finishing order is effects first for every edge among the visited addresses (also when truncated). It holds the visited addresses (at most `limit`) and a stack of frames; a frame holds its record's causes only when there are at most 8 and otherwise re-reads the record, so no frame holds a record. Records are read again when yielded. Yielded items carry `type` as well as `address`. A bucket line that names the address but does not hash to it is treated as absent by `walk` and `pull` (`get` and `has` throw `StoreCorruption` as section 3 says).
+7. **`each` and `logDates` list nothing into memory.** `each` visits the 4096 bucket names built through `niBucketPath` in name order and skips absent files; `logDates` makes one pass of the directory per date, keeping the smallest date greater than the last yielded. `heads` streams the directory without sorting.
+8. **`readLog` yields parsed lines**; a line that does not parse as a JSON object is skipped. A line longer than 65,536 bytes plus 1,024 is passed over unread into memory.
+9. **The head lock** is a file created exclusively inside `store-core`, older than 30 seconds taken over, waited on up to 15 seconds; `directory-lock` (a lock directory) stays until the wave that deletes the old store, which then retires it.
+10. **ST-14 is judged at 30,000 records, not one million.** Writing a million hashed lines would load the machine for minutes; the test fixture writes 30,000 bucket lines and 30,000 log lines, runs the operations, and asserts that what the process retains after collection differs from the same operations over an empty root by under 2 MiB. The one-million measurement remains the node's `check-memory-budget.mjs`.

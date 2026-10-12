@@ -55,6 +55,9 @@
     "./journal/filesystem/segment-store": "./src/journal/filesystem/segment-store.mjs",
     "./journal/filesystem/directory-lock": "./src/journal/filesystem/directory-lock.mjs",
     "./journal/filesystem/feed-tail": "./src/journal/filesystem/feed-tail.mjs",
+    "./store": "./src/store.mjs",
+    "./layout": "./src/layout.mjs",
+    "./exchange": "./src/exchange.mjs",
     "./package.json": "./package.json"
   },
   "files": [
