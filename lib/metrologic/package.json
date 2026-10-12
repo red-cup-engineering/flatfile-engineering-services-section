@@ -392,7 +392,10 @@
     "./models/physics/models/kinetic-theory/boltzmann-entropy": "./src/models/physics/models/kinetic-theory/boltzmann-entropy.mjs",
     "./number/evidence-bits": "./src/number/evidence-bits.mjs",
     "./number/polynomial-ints": "./src/number/polynomial-ints.mjs",
-    "./models/order/quantale": "./src/models/order/quantale.mjs"
+    "./models/order/quantale": "./src/models/order/quantale.mjs",
+    "./number/finite-law": {
+      "import": "./src/number/finite-law.mjs"
+    }
   },
   "files": [
     "README.md",

@@ -1,0 +1,28 @@
+name: Metrologic finite-law mathematical operations
+on:
+  push:
+    paths:
+      - 'lib/metrologic/src/number/finite-law.mjs'
+      - 'lib/metrologic/test/number/finite-law.test.mjs'
+      - 'lib/metrologic/package.json'
+      - '.github/workflows/metrologic-finite-law.yml'
+  pull_request:
+    paths:
+      - 'lib/metrologic/src/number/finite-law.mjs'
+      - 'lib/metrologic/test/number/finite-law.test.mjs'
+      - 'lib/metrologic/package.json'
+      - '.github/workflows/metrologic-finite-law.yml'
+permissions:
+  contents: read
+jobs:
+  finite-law:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check generic finite-law source
+        run: node --check lib/metrologic/src/number/finite-law.mjs
+      - name: Verify total-variation extrema and mass-weighted tails
+        run: node --test lib/metrologic/test/number/finite-law.test.mjs

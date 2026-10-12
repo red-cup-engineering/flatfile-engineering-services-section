@@ -59,6 +59,32 @@ computer-proofing-system.
 
 Each surface has its own README in the corresponding directory.
 
+## Finite numerical probability laws (distinct from FOUR knowledge)
+
+`@red-cup-engineering/metrologic/number/finite-law` owns three
+source-agnostic finite numerical operations: linear expectation over one
+normalized joint probability vector, a minimum/maximum linear expectation
+over an assumed total-variation ball on that SAME simplex, and an upper-tail
+mean with fractional boundary mass. The implementation uses compensated
+binary64 sums and source/destination mass ledgers to avoid losing later
+transfers after a sub-ULP probability movement.
+
+This is the **shared numeric mathematical operator**, not another event,
+market, forecast, account, trade or SignCell carrier. Probabilities are
+conditional assumptions, never FOUR supporting/opposing witnesses or a
+substitute for a source-clock/provenance record. The caller continues to
+own its observed worlds, net payoff units, information filtration,
+confidence claims, feasible action menu and authorization. For example,
+a financial caller may send per-world total *portfolio* payoff values;
+Metrologic knows nothing of Kalshi contracts, Alpaca shares, GMX collateral
+or the issuer that supplied a forecast.
+
+The finite transport proof obligation and expected-shortfall variational
+law belong upstream to Obsmetrologia. JavaScript does not emit a Lean theorem
+receipt or guarantee that an empirically unknown distribution lies in the
+assumed ball. Scientific verification requires an actual checked theorem and
+an independently qualified empirical uncertainty model.
+
 ## Use From Computer
 
 Computer packages should name their descent explicitly:
