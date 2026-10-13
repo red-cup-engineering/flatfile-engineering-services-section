@@ -34,6 +34,8 @@ function selection(witness,kind,context){
  const common={original:witness.id,identity:semantic?.id,at:semantic?.recordedAt??witness.observation.time,namedCauses:witness.observation.causes??[]};
  if((object(e)&&e.kind==='metroplat.claim-session')||kind.startsWith('structured-work-intent-')||kind.startsWith('actor-')||kind.startsWith('ni-sha-256-')){
   const thread=claimSubject({...context,kind,row,witness});if(thread===undefined)return {unqualified:'claim-thread-subject-unresolved'};
+  // Current claim-session consumers address this exact name; hashing would invent a new subject.
+  if(thread.length>200)return {...common,originalOnly:'legacy-subject-exceeds-current-name-law'};
   return {...common,type:'claim-session',thread,claim:true,log:true,record:{...plain,thread,...(witness.observation.seat===undefined?{}:{seat:witness.observation.seat})}};
  }
  if(kind==='capability-assertions'&&v?.kind==='capability.assertion')return {...common,type:'capability-assertion',thread:'capability-assertions',record:v};
@@ -72,6 +74,7 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
  report.mainConsumers={claimSession:'feltos/src/work/claim-session-store.mjs',capabilities:'computer-system-engine/src/rpc/capability-assertions.mjs',offices:'metroplat/src/offices.mjs',bodies:'metroplat/src/bodies.mjs',clock:'organizing/src/work/recurring.mjs'};
  report.unqualifiedSources??={};report.sourceOnly??={};report.sourceSegments??=[];report.types??={};
  report.referencesRewritten??=0;report.referencesLeft??=0;report.causesDropped??=0;
+ report.originalOnlyDispositions={file:'.conversion-original-only-dispositions.jsonl',count:0,reasons:{}};
  report.referenceDispositions={file:'.conversion-reference-dispositions.jsonl',count:0,unresolvedNamedCitations:0};
  const disposition=(item,reference,reason,role)=>{fs.appendFileSync(path.join(output,report.referenceDispositions.file),JSON.stringify({original:item.original,reference,type:item.type,thread:item.thread??null,originalKind:maps.get('original-kind',maps.get('identity',reference)??reference)??null,reason,role})+'\n',{mode:0o600});report.referenceDispositions.count++;};
  const count=type=>report.types[type]??={read:0,written:0,duplicates:0,heads:0,verified:0};
@@ -92,8 +95,14 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   let selected=0;
   for(const line of streamJsonLines(file,{openReader:openSegmentReader})){
    if(NI.test(line.record.id)&&maps.get('original-kind',line.record.id)===undefined)maps.put('original-kind',line.record.id,kind);
+   const witness=parseJournalWitness(line.record),semantic=semanticRecordOf(witness);
+   // The identity is witnessed even when its original kind is not a current consumer.
+   if(semantic?.id&&NI.test(semantic.id)&&maps.get('identity',semantic.id)===undefined)maps.put('identity',semantic.id,witness.id);
    if(['rpc','metroplat.clock','settlement-signal'].includes(kind)){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;}
-   const witness=parseJournalWitness(line.record),item=selection(witness,kind,{...context,file});
+   const item=selection(witness,kind,{...context,file});
+   if(item?.originalOnly){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;
+    fs.appendFileSync(path.join(output,report.originalOnlyDispositions.file),JSON.stringify({original:witness.id,kind,reason:item.originalOnly})+'\n',{mode:0o600});
+    report.originalOnlyDispositions.count++;report.originalOnlyDispositions.reasons[item.originalOnly]=(report.originalOnlyDispositions.reasons[item.originalOnly]??0)+1;continue;}
    if(item?.unqualified){report.unqualifiedSources[item.unqualified]=(report.unqualifiedSources[item.unqualified]??0)+1;continue;}
    if(!item){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;}
    if(!object(item.record)||!instant(item.at))throw new TypeError('selected original is not a dated object record');
