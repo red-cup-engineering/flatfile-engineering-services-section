@@ -73,8 +73,23 @@ export function edgesFrom(graph, subject) { const reference = subject?.kind === 
  * Retain the source cuts and obstruction receipt to revisit consistency;
  * do not treat a projection as a lossless CRDT state. */
 export function glueSignGraphs(...graphs) {
-  const cells = new Map(), declarations = new Map(), edges = new Map();
+  // Treat graph cuts as untrusted at the gluing boundary: reconstruct every
+  // member and verify its content address before taking evidence from it.
+  // A forged or stale graph must never enter a downstream decision projection.
+  const verified = [];
   for (const graph of graphs) {
+    if (!graph || !Array.isArray(graph.edges)) return refused("invalid-graph", "graph cut needs addressed edges");
+    const checked = createSignGraph({
+      cells: graph.cells,
+      relations: graph.relations,
+      edges: graph.edges.map(entry => entry?.edge),
+    });
+    if (!checked.ok) return checked;
+    if (checked.value.id !== graph.id) return refused("identity-mismatch", "graph cut's contents do not match its advertised identity");
+    verified.push(checked.value);
+  }
+  const cells = new Map(), declarations = new Map(), edges = new Map();
+  for (const graph of verified) {
     for (const cell of graph.cells) { const prior = cells.get(cell.id); if (prior && semanticId(prior) !== semanticId(cell)) return refused("duplicate-cell", `cell ${cell.id} has conflicting content across graph cuts`); cells.set(cell.id, cell); }
     for (const relation of graph.relations) {
       const told = declarations.get(relation.id) ?? new Map(), key = semanticId(relation), cuts = told.get(key) ?? { relation, graphs: [] };
