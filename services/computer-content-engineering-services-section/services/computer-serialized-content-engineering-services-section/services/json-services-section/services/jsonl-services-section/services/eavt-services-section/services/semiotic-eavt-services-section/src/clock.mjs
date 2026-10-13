@@ -24,3 +24,17 @@ export function compareAbsoluteSeavtClocks(left, right) {
   const ap = af.padEnd(width, "0"), bp = bf.padEnd(width, "0");
   return ap === bp ? 0 : ap < bp ? -1 : 1;
 }
+
+/**
+ * Source-time admission corresponding to Obsmetrologia's
+ * CausalSets.Causal.RegimeSection.sourceVisibleAt:
+ * publication, reception and observation are independent witnessed clocks.
+ * A missing clock is unknown, never treated as evidence of availability.
+ * This tests supplied values only; it does not authenticate their issuers.
+ */
+export function sourceClocksVisibleAt({ publishedAt, receivedAt, observedAt } = {}, cutoff) {
+  if (!isAbsoluteSeavtClock(cutoff))
+    throw new TypeError("SEAVT source clock cutoff must be an absolute instant");
+  return [publishedAt, receivedAt, observedAt].every(stamp =>
+    isAbsoluteSeavtClock(stamp) && compareAbsoluteSeavtClocks(stamp, cutoff) <= 0);
+}

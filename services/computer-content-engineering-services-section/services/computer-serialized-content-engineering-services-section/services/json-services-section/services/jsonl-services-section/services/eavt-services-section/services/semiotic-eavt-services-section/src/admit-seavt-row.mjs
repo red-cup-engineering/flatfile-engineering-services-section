@@ -9,7 +9,7 @@ import {
 import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
 import { admitCell, address as cellAddress } from "@red-cup-engineering/signcell/cell";
 import { isAbsoluteSeavtClock } from "./clock.mjs";
-export { isAbsoluteSeavtClock, compareAbsoluteSeavtClocks } from "./clock.mjs";
+export { isAbsoluteSeavtClock, compareAbsoluteSeavtClocks, sourceClocksVisibleAt } from "./clock.mjs";
 export const inputSchema = {
   type: "object",
   properties: {
