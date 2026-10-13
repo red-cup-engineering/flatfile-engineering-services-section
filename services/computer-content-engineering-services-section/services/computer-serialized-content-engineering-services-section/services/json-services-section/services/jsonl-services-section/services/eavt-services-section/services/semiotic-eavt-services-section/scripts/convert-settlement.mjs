@@ -29,10 +29,11 @@ const store = await load(path.join(newRoot, 'src/store.mjs'));
 const { semanticAddress } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address');
 const { niBucketPath } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/ni-path');
 const { canonicalJson } = await supplier(newRequire, '@red-cup-engineering/json-services-section/canonical-json');
+const { streamJsonLines, hashSource } = await import('./conversion-buckets.mjs');
 fs.mkdirSync(output, { mode: 0o700, recursive: true });
 process.umask(0o077);
 const report = { type: 'OneTimeStoreConversion', version: 1, source, output, originalsPreserved: true, ordersExecuted: false, transportActivated: false,
-  suppliers: { oldStore: oldRoot, newStore: newRoot, oldWitnessReader: sha(fs.readFileSync(path.join(oldRoot,'src/journal/event.mjs'))), newWriter: sha(fs.readFileSync(path.join(newRoot,'src/store-core.mjs'))) },
+  suppliers: { oldStore: oldRoot, newStore: newRoot, oldWitnessReader: sha(fs.readFileSync(path.join(oldRoot,'src/journal/event.mjs'))), oldPackedReader:sha(fs.readFileSync(path.join(oldRoot,'src/journal/filesystem/segment-bytes.mjs'))), oldSemanticProjection:sha(fs.readFileSync(path.join(oldRoot,'src/query-semantic-records.mjs'))), newWriter: sha(fs.readFileSync(path.join(newRoot,'src/store-core.mjs'))) },
   types: {}, sourceOnly: {}, referencesRewritten: 0, referencesLeft: 0, causesDropped: 0, sourceSegments: [], missingBodies: [], queue: { activated: 0 } };
 const counts = type => report.types[type] ??= { read: 0, written: 0, duplicates: 0, heads: 0, verified: 0 };
 const files = function* (root) { if (!fs.existsSync(root)) return; observe(root); for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
@@ -43,18 +44,17 @@ const stamps = new Map();
 const stamp = file => { const s=fs.statSync(file); return [s.dev,s.ino,s.size,s.mtimeMs,s.ctimeMs]; };
 const observe = file => { if(!stamps.has(file)) stamps.set(file,stamp(file)); };
 function* witnesses(file) {
-  observe(file);const end=fs.statSync(file).size, reader=openSegmentReader(file), chunk=Buffer.alloc(65536);let position=0,carry=Buffer.alloc(0);
-  try { while(position<end){const size=reader.read(chunk,0,Math.min(chunk.length,end-position),position);if(!size)break;position+=size;
-    const bytes=carry.length?Buffer.concat([carry,chunk.subarray(0,size)]):Buffer.from(chunk.subarray(0,size));let start=0,index;
-    while((index=bytes.indexOf(10,start))>=0){const line=bytes.subarray(start,index);if(line.length>1048576)throw new RangeError('source witness exceeds old provider bound');
-      const raw=JSON.parse(line.toString('utf8'));yield parseJournalWitness(raw);start=index+1;}
-    carry=Buffer.from(bytes.subarray(start));if(carry.length>1048576)throw new RangeError('source witness exceeds old provider bound');
-  } if(carry.length && !carry.every(byte=>byte===0)) throw new TypeError('torn source witness requires original custody judgment');
-  } finally {reader.close();}
+  observe(file);
+  const ledger=file.replace(/\.witnesses$/u,'.admitted');
+  if(fs.existsSync(ledger)){
+    observe(ledger);for(const {record}of streamJsonLines(ledger))if(!Number.isSafeInteger(record.end)||record.end<0||record.end>fs.statSync(file).size)throw new TypeError('original segment lacks its admitted custody');
+  }
+  for(const {record}of streamJsonLines(file,{openReader:openSegmentReader}))yield parseJournalWitness(record);
 }
 if (!args.activitypub) {
   const { convertMainWorld } = await import('./conversion-main-world.mjs');
-  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress});
+  const { dataArtifactAddress } = await supplier(createRequire(path.join(oldRoot,'package.json')), '@red-cup-engineering/eavt-services-section/data-artifact-address');
+  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress});
 } else {
   if (typeof args['old-activitypub'] !== 'string') throw new TypeError('--old-activitypub is required');
   const oldAp = fs.realpathSync(args['old-activitypub']);
@@ -109,7 +109,7 @@ if (!args.activitypub) {
       if (headName !== undefined) { store.writeHead(output,type,headName,{frontier:[id]}); count.heads++; }
       report.apOrigins.push({original:witness.id, oldIdentity:original.id, current:id, type, ...(record.activityNi === undefined ? {} : {bodyNi:record.activityNi})});
     }
-    report.sourceSegments.push({path:path.relative(source,file),bytes:fs.statSync(file).size,selected});
+    report.sourceSegments.push({path:path.relative(source,file),bytes:fs.statSync(file).size,sha256:hashSource(file,{openReader:openSegmentReader}),selected});
   }
   if (args.queue) {
     if (typeof args.queue !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('queue receiving requires exact original queue and current ActivityPub provider');
@@ -150,7 +150,7 @@ for (const [type, expected] of Object.entries(report.types)) {
   for (const {head} of store.heads(output,type)) for (const step of store.walk(output,type,head.frontier,{limit:100000})) if(step.missing || step.truncated) throw new TypeError('native head receiving is incomplete');
 }
 for(const [file,original] of stamps) if(JSON.stringify(stamp(file)) !== JSON.stringify(original)) throw new TypeError('original custody changed during conversion; candidate is unqualified');
-report.qualified = report.missingBodies.length === 0;
+report.qualified = report.missingBodies.length === 0 && report.mainQualified !== false;
 fs.writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
 console.log(JSON.stringify({type:report.type,qualified:report.qualified,types:report.types,missingBodies:report.missingBodies.length,originalsPreserved:true,ordersExecuted:false,transportActivated:false}));
 
