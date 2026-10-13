@@ -4,7 +4,7 @@ import {cell,address,told,coincides,witnessFor,witnessAgainst} from "@red-cup-en
 import {inferTy,isClosed} from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
 import {jsonToTerm,termToJson} from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
 import {eavtId} from "@red-cup-engineering/eavt-services-section/row";
-import {seavtOfSignCell,signCellOfSeavt,seavtOfJson,isAbsoluteSeavtClock} from "../src/admit-seavt-row.mjs";
+import {seavtOfSignCell,signCellOfSeavt,seavtOfJson,isAbsoluteSeavtClock,compareAbsoluteSeavtClocks} from "../src/admit-seavt-row.mjs";
 
 const when="2026-10-12T21:00:00-05:00";
 const original=()=>cell(
@@ -98,4 +98,15 @@ test("SEAVT source time is a real calendar instant, not Date.parse rollover",()=
    assert.throws(()=>seavtOfSignCell(original(),invalid),/absolute source/);
    assert.throws(()=>signCellOfSeavt({...seavtOfSignCell(original(),good),t:invalid}),/native SignCell SEAVT/);
  }
+});
+
+
+test("SEAVT clock ordering retains fractional precision and timezone equality", () => {
+  const first = "2026-10-12T14:00:00.000000001Z";
+  const second = "2026-10-12T14:00:00.000000002Z";
+  assert.equal(compareAbsoluteSeavtClocks(first, second), -1);
+  assert.equal(compareAbsoluteSeavtClocks(second, first), 1);
+  assert.equal(compareAbsoluteSeavtClocks(first, "2026-10-12T09:00:00.000000001-05:00"), 0);
+  assert.equal(compareAbsoluteSeavtClocks("2026-10-12T14:00:00.5Z", "2026-10-12T14:00:00.5000Z"), 0);
+  assert.equal(compareAbsoluteSeavtClocks("2026-10-12T14:00:00.499999999Z", "2026-10-12T14:00:00.5Z"), -1);
 });
