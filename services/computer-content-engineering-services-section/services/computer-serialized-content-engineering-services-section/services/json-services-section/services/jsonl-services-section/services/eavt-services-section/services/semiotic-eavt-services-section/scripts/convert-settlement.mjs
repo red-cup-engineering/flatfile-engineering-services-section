@@ -15,6 +15,8 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((out, value, index,
 for (const key of ['settlement', 'into', 'old-store', 'new-store', 'report']) if (typeof args[key] !== 'string') throw new TypeError(`required --${key}`);
 const source = fs.realpathSync(args.settlement), output = path.resolve(args.into);
 if (source === output || output.startsWith(source + path.sep) || source.startsWith(output + path.sep)) throw new TypeError('conversion requires a separate nonnested output');
+const reportPath = path.resolve(args.report);
+if (reportPath === source || reportPath.startsWith(source + path.sep)) throw new TypeError('report must preserve original custody');
 if (fs.existsSync(output)) throw new TypeError('output must not exist; originals remain in their original custody');
 const oldRoot = fs.realpathSync(args['old-store']), newRoot = fs.realpathSync(args['new-store']);
 const load = file => import(pathToFileURL(file).href);
@@ -33,7 +35,7 @@ const report = { type: 'OneTimeStoreConversion', version: 1, source, output, ori
   suppliers: { oldStore: oldRoot, newStore: newRoot, oldWitnessReader: sha(fs.readFileSync(path.join(oldRoot,'src/journal/event.mjs'))), newWriter: sha(fs.readFileSync(path.join(newRoot,'src/store-core.mjs'))) },
   types: {}, sourceOnly: {}, referencesRewritten: 0, referencesLeft: 0, causesDropped: 0, sourceSegments: [], missingBodies: [], queue: { activated: 0 } };
 const counts = type => report.types[type] ??= { read: 0, written: 0, duplicates: 0, heads: 0, verified: 0 };
-const files = function* (root) { if (!fs.existsSync(root)) return; for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+const files = function* (root) { if (!fs.existsSync(root)) return; observe(root); for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
   const file=path.join(root,entry.name); if(entry.isSymbolicLink()) throw new TypeError('source custody contains a symlink');
   if(entry.isDirectory()) yield* files(file); else if(entry.isFile()) yield file;
 } };
@@ -61,6 +63,7 @@ if (!args.activitypub) {
   const { createFileStoreSync: newFileStore } = await supplier(newRequire, '@red-cup-engineering/immutable-content-custody-service/file-store');
   const { immutableContentKey } = await supplier(newRequire, '@red-cup-engineering/immutable-content-custody-service');
   const { makeNiUri } = await supplier(newRequire, '@red-cup-engineering/uri-services-section/ni-uri');
+  if (!fs.existsSync(path.join(source,'bodies'))) throw new TypeError('original cited body custody is unavailable');
   const oldBodies = oldFileStore(path.join(source, 'bodies')), bodyStore = newFileStore(path.join(output, 'custody'));
   for(const file of files(path.join(source,'bodies')))observe(file);
   report.suppliers.oldActivitypub = oldAp;
@@ -148,7 +151,7 @@ for (const [type, expected] of Object.entries(report.types)) {
 }
 for(const [file,original] of stamps) if(JSON.stringify(stamp(file)) !== JSON.stringify(original)) throw new TypeError('original custody changed during conversion; candidate is unqualified');
 report.qualified = report.missingBodies.length === 0;
-fs.writeFileSync(path.resolve(args.report),JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
+fs.writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
 console.log(JSON.stringify({type:report.type,qualified:report.qualified,types:report.types,missingBodies:report.missingBodies.length,originalsPreserved:true,ordersExecuted:false,transportActivated:false}));
 
 }
