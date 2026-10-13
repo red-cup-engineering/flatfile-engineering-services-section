@@ -79,10 +79,17 @@ export function glueSignGraphs(...graphs) {
   const verified = [];
   for (const graph of graphs) {
     if (!graph || !Array.isArray(graph.edges)) return refused("invalid-graph", "graph cut needs addressed edges");
+    // Each persisted edge address is part of the claimed graph cut, not decoration.
+    // Refuse an altered member identity even when recomputing the enclosing
+    // graph would otherwise produce the advertised graph address.
+    for (const entry of graph.edges) {
+      if (!entry || typeof entry !== "object" || !entry.edge || entry.id !== semanticId(entry.edge))
+        return refused("identity-mismatch", "graph cut contains an edge whose advertised identity does not match its content");
+    }
     const checked = createSignGraph({
       cells: graph.cells,
       relations: graph.relations,
-      edges: graph.edges.map(entry => entry?.edge),
+      edges: graph.edges.map(entry => entry.edge),
     });
     if (!checked.ok) return checked;
     if (checked.value.id !== graph.id) return refused("identity-mismatch", "graph cut's contents do not match its advertised identity");
