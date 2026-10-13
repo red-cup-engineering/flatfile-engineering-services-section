@@ -4,7 +4,7 @@ import {cell,address,told,coincides,witnessFor,witnessAgainst} from "@red-cup-en
 import {inferTy,isClosed} from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
 import {jsonToTerm,termToJson} from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
 import {eavtId} from "@red-cup-engineering/eavt-services-section/row";
-import {seavtOfSignCell,signCellOfSeavt,seavtOfJson} from "../src/admit-seavt-row.mjs";
+import {seavtOfSignCell,signCellOfSeavt,seavtOfJson,isAbsoluteSeavtClock} from "../src/admit-seavt-row.mjs";
 
 const when="2026-10-12T21:00:00-05:00";
 const original=()=>cell(
@@ -88,4 +88,14 @@ test("SEAVT does not turn an unverified source allegation into affirmative testi
 test("the native projection is the existing seavtOfJson bridge, not a parallel serialization",()=>{
  const c=original();
  assert.deepEqual(seavtOfSignCell(c,when),seavtOfJson(address(c),"signcell:cell",c,when));
+});
+
+test("SEAVT source time is a real calendar instant, not Date.parse rollover",()=>{
+ const good="2024-02-29T23:59:59-05:00";
+ assert.equal(isAbsoluteSeavtClock(good),true);
+ for(const invalid of ["2026-02-30T12:00:00Z","2025-02-29T00:00:00Z","2026-13-01T00:00:00Z","yesterday"]){
+   assert.equal(isAbsoluteSeavtClock(invalid),false);
+   assert.throws(()=>seavtOfSignCell(original(),invalid),/absolute source/);
+   assert.throws(()=>signCellOfSeavt({...seavtOfSignCell(original(),good),t:invalid}),/native SignCell SEAVT/);
+ }
 });
