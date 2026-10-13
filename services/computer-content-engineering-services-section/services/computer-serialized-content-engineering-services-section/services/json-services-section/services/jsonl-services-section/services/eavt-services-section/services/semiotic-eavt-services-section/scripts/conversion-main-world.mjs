@@ -21,7 +21,8 @@ function claimSubject({kind,row,witness,file,source,dataArtifactAddress}){
  const matches=[...new Set(candidates.filter(text))].filter(subject=>{
   if(subject===kind)return true;
   if(typeof dataArtifactAddress!=='function')return false;
-  const described=dataArtifactAddress({root:source,tier:'log',encoding:'jsonl',at:String(row[3]),action:'claim-session',subject});
+  // Old journalFeedPath calls the original formula with kind in BOTH coordinates.
+  const described=dataArtifactAddress({root:source,tier:'log',encoding:'jsonl',at:String(row[3]),action:subject,subject});
   return path.basename(described.path)===path.basename(file).replace(/\.witnesses$/u,'');
  });
  return matches.length===1?matches[0]:undefined;
