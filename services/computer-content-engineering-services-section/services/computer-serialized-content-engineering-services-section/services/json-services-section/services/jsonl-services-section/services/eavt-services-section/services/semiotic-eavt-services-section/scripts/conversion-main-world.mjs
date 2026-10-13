@@ -80,8 +80,12 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
  const load=position=>{const witness=witnessAt(position,{openSegmentReader,parseJournalWitness});if(witness.id!==position.original)throw new TypeError('original witness position differs from pass one');return selection(witness,position.kind,{...context,file:position.file});};
  // Snapshot all legacy custody metadata before the stream; packed backing bytes
  // and descriptions remain part of the original provider's source.
- for(const file of sourceFiles(path.join(source,'data/journals')))observe(file);
- for(const file of sourceFiles(path.join(source,'data/journals'))){if(!file.endsWith('.witnesses'))continue;
+ // The original provider used both layouts during its lifetime. They are
+ // one-time inputs only; neither layout becomes a current runtime reader.
+ const originalRoots=['data/journals','data/logs'].map(relative=>path.join(source,relative));
+ function* originalFiles(){for(const root of originalRoots)yield* sourceFiles(root);}
+ for(const file of originalFiles())observe(file);
+ for(const file of originalFiles()){if(!file.endsWith('.witnesses'))continue;
   const kind=path.basename(file).split('-admit-')[1]?.replace(/\.jsonl\.witnesses$/u,'');if(!kind)throw new TypeError('original segment kind unavailable');
   const ledger=file.replace(/\.witnesses$/u,'.admitted');
   if(fs.existsSync(ledger))for(const {record}of streamJsonLines(ledger))if(!Number.isSafeInteger(record.end)||record.end<0||record.end>fs.statSync(file).size)throw new TypeError('original segment lost admitted custody');
