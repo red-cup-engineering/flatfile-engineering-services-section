@@ -2,7 +2,7 @@
  * normalize impossible calendar dates such as February 30. */
 export const isAbsoluteSeavtClock = value => {
   if (typeof value !== "string") return false;
-  const match = /^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:\\.\\d+)?(?:Z|[+-](\\d{2}):(\\d{2}))$/u.exec(value);
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\\.\d+)?(?:Z|[+-](\d{2}):(\d{2}))$/u.exec(value);
   if (!match) return false;
   const [, , , , hour, minute, second, offsetHour, offsetMinute] = match;
   // RFC 3339 does not admit hour 24; Date.parse otherwise rolls it forward.
