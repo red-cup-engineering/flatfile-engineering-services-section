@@ -8,8 +8,6 @@ on:
       - 'lib/metrologic/test/number/finite-law.test.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/chromatic-lorentzian.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
-      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/chromatic-lorentzian.mjs'
-      - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
   pull_request:
@@ -18,6 +16,8 @@ on:
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/laplacian.mjs'
       - 'lib/metrologic/test/number/oriented-incidence.test.mjs'
       - 'lib/metrologic/test/number/finite-law.test.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/chromatic-lorentzian.mjs'
+      - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
 permissions:
