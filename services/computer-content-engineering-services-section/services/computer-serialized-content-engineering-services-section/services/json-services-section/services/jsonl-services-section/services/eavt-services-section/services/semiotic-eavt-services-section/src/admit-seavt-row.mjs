@@ -80,6 +80,22 @@ export const isAbsoluteSeavtClock = value => {
   return Number.isFinite(midnight.getTime()) && midnight.toISOString().slice(0, 10) === day;
 };
 
+/** Exact order of SEAVT instants, including all fractional-second digits.
+ * JS Date.parse is suitable for validating the whole-second calendar and
+ * UTC offset, but its millisecond truncation must not define evidence order.
+ * Returns -1, 0, or 1. Equal-offset representations denote one instant. */
+export function compareAbsoluteSeavtClocks(left, right) {
+  if (!isAbsoluteSeavtClock(left) || !isAbsoluteSeavtClock(right))
+    throw new TypeError("SEAVT comparison requires two absolute observation instants");
+  const withoutFraction = value => value.replace(/\.\d+(?=(?:Z|[+-]\d{2}:\d{2})$)/u, "");
+  const a = Date.parse(withoutFraction(left)), b = Date.parse(withoutFraction(right));
+  if (a !== b) return a < b ? -1 : 1;
+  const digits = value => value.match(/\.(\d+)(?=(?:Z|[+-]\d{2}:\d{2})$)/u)?.[1] ?? "";
+  const af = digits(left), bf = digits(right), width = Math.max(af.length, bf.length);
+  const ap = af.padEnd(width, "0"), bp = bf.padEnd(width, "0");
+  return ap === bp ? 0 : ap < bp ? -1 : 1;
+}
+
 export function seavtOfSignCell(input, observedAt) {
   if (!isAbsoluteSeavtClock(observedAt))
     throw new TypeError("SignCell SEAVT observation requires an absolute source/receiver clock");
