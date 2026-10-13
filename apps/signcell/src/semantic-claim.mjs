@@ -6,7 +6,6 @@
  * without a witness having told it.
  */
 import { admit } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
-import { sidesOfReading } from "@red-cup-engineering/computer-data-engineering-services-section/four";
 import { cell, merge, sameCell } from "./cell.mjs";
 import { semanticClaimType } from "./semantic-carriers.mjs";
 
@@ -24,15 +23,11 @@ export function createSignClaim(input) {
   } catch (error) { return refused(error instanceof Error ? error.message : String(error)); }
 }
 
-/** Read a stored claim. A carrier from before claims carried evidence (`kind: "sign.claim"` with a
- *  stated `reading`) is read as that reading told by `witness`, the record that stated it. */
-export function readSignClaim(input, witness) {
-  if (input?.kind !== "sign.claim") return createSignClaim(input);
-  const { kind: _kind, reading, ...triple } = input;
-  let sides;
-  try { sides = sidesOfReading(reading); } catch { return refused("a stored claim's reading must be a reading of FOUR"); }
-  if (witness === undefined && (sides[0] || sides[1])) return refused("a stored claim's reading needs the witness that told it");
-  return createSignClaim({ ...triple, for: sides[0] ? [witness] : [], against: sides[1] ? [witness] : [] });
+/** Admit a persisted claim exactly as a SignCell carrier. Historical sign.claim
+ * records must be migrated once at custody, with their original witnesses;
+ * do not synthesize evidence from a stored reading during normal reads. */
+export function readSignClaim(input) {
+  return createSignClaim(input);
 }
 
 /** The tellings of one claim together (Valued.joinK): every witness of either kept. */
