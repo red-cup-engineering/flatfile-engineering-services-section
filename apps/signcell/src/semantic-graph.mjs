@@ -79,20 +79,29 @@ export function glueSignGraphs(...graphs) {
   const verified = [];
   for (const graph of graphs) {
     if (!graph || !Array.isArray(graph.edges)) return refused("invalid-graph", "graph cut needs addressed edges");
-    // Each persisted edge address is part of the claimed graph cut, not decoration.
-    // Refuse an altered member identity even when recomputing the enclosing
-    // graph would otherwise produce the advertised graph address.
-    for (const entry of graph.edges) {
-      if (!entry || typeof entry !== "object" || !entry.edge || entry.id !== semanticId(entry.edge))
-        return refused("identity-mismatch", "graph cut contains an edge whose advertised identity does not match its content");
-    }
+    const carrier = admit(semanticGraphType, graph);
+    if (!carrier.ok) return refused("invalid-graph", "graph cut does not satisfy its declared carrier");
     const checked = createSignGraph({
       cells: graph.cells,
       relations: graph.relations,
       edges: graph.edges.map(entry => entry.edge),
     });
     if (!checked.ok) return checked;
-    if (checked.value.id !== graph.id) return refused("identity-mismatch", "graph cut's contents do not match its advertised identity");
+    // A graph's content address binds its actual stored representation,
+    // including the EAVT-addressed member edges. Do not infer edge identity
+    // from semanticId(edge): relationalField addresses {e,a,v,t}, not the
+    // {subject,predicate,object,witness} representation of an edge.
+    try {
+      const suppliedContent = { kind: graph.kind, cells: graph.cells, relations: graph.relations, edges: graph.edges };
+      if (semanticId(suppliedContent) !== graph.id || checked.value.id !== graph.id)
+        return refused("identity-mismatch", "graph cut's contents do not match its advertised identity");
+      const expected = new Map(checked.value.edges.map(entry => [semanticId(entry.edge), entry.id]));
+      if (graph.edges.length !== expected.size ||
+          graph.edges.some(entry => expected.get(semanticId(entry.edge)) !== entry.id))
+        return refused("identity-mismatch", "graph cut contains an edge whose EAVT identity does not match its content");
+    } catch {
+      return refused("identity-mismatch", "graph cut contains unaddressable content");
+    }
     verified.push(checked.value);
   }
   const cells = new Map(), declarations = new Map(), edges = new Map();
