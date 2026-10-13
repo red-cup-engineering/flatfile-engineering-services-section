@@ -4,7 +4,7 @@ import { defineType } from "@red-cup-engineering/computer-data-engineering-servi
 import { createTypedMark, admitTypedMark, referenceOf } from "../src/typed-mark.mjs";
 import { createSignClaim, conflateClaims } from "../src/semantic-claim.mjs";
 import { knowledgeReading } from "../src/cell.mjs";
-import { createSignGraph, glueSignGraphs } from "../src/semantic-graph.mjs";
+import { createSignGraph, edgesFrom, glueSignGraphs } from "../src/semantic-graph.mjs";
 import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 const defined = defineType({ id: "test.semantic.source@1", name: "Semantic source", description: "A source used to prove carrier admission.", schema: { type: "object", required: ["text"], properties: { text: { type: "string", minLength: 1 } }, additionalProperties: false }, parents: [] });
 if (!defined.ok) throw new Error(defined.refusal.message);
@@ -47,6 +47,39 @@ test("semantic graph preserves typed endpoint and witness membership through adm
   assert.deepEqual(obstructed.value.obstructions, [{ code: "conflicting-relation", relation: "supports", graphs: [full.value.id, elsewhere.value.id].sort() }]);
   assert.equal(glueSignGraphs(elsewhere.value, full.value).value.graph.id, obstructed.value.graph.id);
   assert.equal(glueSignGraphs().value.graph.cells.length, 0);
+});
+
+test("SignGraph outgoing reads consume opaque field patterns and keep every addressed witness", () => {
+  const marks = [cell.value, ...["target", "witness-a", "witness-b"].map(text => {
+    const result = createTypedMark(defined.value, { text });
+    assert.equal(result.ok, true); return result.value;
+  })];
+  const [source, target, witnessA, witnessB] = marks.map(referenceOf);
+  const relation = id => ({ id, subjectTypes: [defined.value.id], objectTypes: [defined.value.id], witnessTypes: [defined.value.id] });
+  const admitted = createSignGraph({ cells: marks, relations: [relation("supports"), relation("refutes")], edges: [
+    { subject: source, predicate: "supports", object: target, witness: witnessA },
+    { subject: source, predicate: "supports", object: target, witness: witnessB },
+    { subject: source, predicate: "refutes", object: target, witness: witnessA },
+    { subject: target, predicate: "supports", object: source, witness: witnessB },
+  ] });
+  assert.equal(admitted.ok, true); if (!admitted.ok) return;
+  const graph = admitted.value;
+  const all = edgesFrom(graph, marks[0]);
+  assert.equal(all.length, 3);
+  assert.deepEqual(edgesFrom(graph, { id: source.id }), all);
+  assert.deepEqual(edgesFrom(graph, { id: source.id, type: "legacy-id-only-selection" }), all);
+  const scoped = edgesFrom(graph, source, { predicate: "supports", object: target });
+  assert.equal(scoped.length, 2);
+  assert.deepEqual(new Set(scoped.map(entry => entry.edge.witness.id)), new Set([witnessA.id, witnessB.id]));
+  assert.deepEqual(edgesFrom(graph, source, { witness: witnessB }), scoped.filter(entry => entry.edge.witness.id === witnessB.id));
+  assert.deepEqual(edgesFrom(graph, source, { predicate: "missing" }), []);
+  assert.equal(Object.isFrozen(scoped), true);
+  assert.ok(scoped.every(entry => graph.edges.includes(entry)), "the original addressed edges are returned");
+  const wire = JSON.parse(JSON.stringify(graph));
+  assert.deepEqual(edgesFrom(wire, source, { predicate: "supports" }), scoped);
+  wire.edges[0].edge.predicate = "changed-by-caller";
+  assert.deepEqual(edgesFrom(wire, source, { predicate: "supports" }), wire.edges.filter(entry => entry.edge.subject.id === source.id && entry.edge.predicate === "supports"));
+  assert.throws(() => edgesFrom(graph, source, { witness: undefined }), TypeError);
 });
 
 
@@ -140,3 +173,4 @@ test("SignGraph gluing respects the EAVT member addresses issued by the relation
   assert.equal(refused.ok, false);
   assert.equal(refused.refusal.code, "identity-mismatch");
 });
+

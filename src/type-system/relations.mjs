@@ -1,9 +1,12 @@
 import { admit, collectTypeSystem } from "./type-system.mjs";
 import { typeSystemDocument } from "./document.mjs";
 import { canonicalCborToNiUri, encodeCanonical } from "@red-cup-engineering/cbor-services-section";
+import { coincidenceKey } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 const accepted = (value) => Object.freeze({ ok: true, value });
 const refused = (code, message) => Object.freeze({ ok: false, refusal: Object.freeze({ code, message }) });
 const relations = new WeakSet();
+const fields = new WeakSet();
+const queryIndexes = new WeakMap();
 const identify = (value) => canonicalCborToNiUri(encodeCanonical(value));
 /** Copy a portable value without retaining mutable caller-owned data. */
 function snapshot(value, ancestors = new Set()) {
@@ -84,11 +87,50 @@ export function createRelationalField(declarations, values = []) {
             return result;
         statements.set(result.value.id, result.value);
     }
-    return accepted(Object.freeze({ catalogIdentity, relations: Object.freeze(order([...byId.values()])), statements: Object.freeze(order([...statements.values()])) }));
+    const field = Object.freeze({ catalogIdentity, relations: Object.freeze(order([...byId.values()])), statements: Object.freeze(order([...statements.values()])) });
+    fields.add(field);
+    return accepted(field);
 }
-/** Query all matching assertions. Contradictory objects remain separately addressable. */
-export function queryRelationalField(field, predicate) {
-    return Object.freeze(field.statements.filter(item => item.statement.predicate === predicate));
+const positions = ["subject", "predicate", "object", "witness"];
+// Predicate names select an established relation exactly. The other positions
+// are opaque marks: only the shared SCA coincidence reads their contents.
+const positionKey = (position, value) => position === "predicate" ? value : coincidenceKey(value);
+function queryIndex(field, position) {
+    const indexes = queryIndexes.get(field) ?? new Map();
+    const prior = indexes.get(position);
+    if (prior !== undefined) return prior;
+    const index = new Map();
+    for (const item of field.statements) {
+        const key = positionKey(position, item.statement[position]);
+        const bucket = index.get(key) ?? [];
+        bucket.push(item); index.set(key, bucket);
+    }
+    for (const bucket of index.values()) Object.freeze(bucket);
+    // Only owned, immutable fields may retain an index. A decoded or caller-
+    // mutable presentation is read again, never cached as an admitted field.
+    if (fields.has(field)) { indexes.set(position, index); queryIndexes.set(field, indexes); }
+    return index;
+}
+/** Query a predicate name, or a pattern over any of the four statement positions.
+ * Omitted pattern positions are wildcards; explicit null is a mark and undefined
+ * is refused. Every matching assertion and witness remains in field address order.
+ * This is a read projection of the existing field, independent of document paths,
+ * labels or payload interpretation; statement identities and catalogs are unchanged.
+ */
+export function queryRelationalField(field, pattern) {
+    if (typeof pattern === "string") pattern = { predicate: pattern };
+    const query = snapshot(pattern);
+    if (!query || typeof query !== "object" || Array.isArray(query) || Object.keys(query).some(position => !positions.includes(position)))
+        throw new TypeError("field query must be a predicate name or a subject/predicate/object/witness pattern");
+    if (Object.hasOwn(query, "predicate") && typeof query.predicate !== "string")
+        throw new TypeError("field query predicate must be a relation name");
+    const entries = Object.entries(query);
+    if (entries.length === 0) return Object.freeze([...field.statements]);
+    const buckets = entries.map(([position, value]) => queryIndex(field, position).get(positionKey(position, value)) ?? []);
+    buckets.sort((left, right) => left.length - right.length);
+    const [candidates, ...rest] = buckets;
+    const memberships = rest.map(bucket => new Set(bucket));
+    return Object.freeze(candidates.filter(item => memberships.every(members => members.has(item))));
 }
 /** Merge replica assertions against one receiving catalog; all bytes are re-admitted. */
 export function mergeRelationalFields(declarations, ...fields) {
@@ -133,3 +175,4 @@ export function admitRelationalFieldDocument(declarations, input) {
     }
     return field;
 }
+
