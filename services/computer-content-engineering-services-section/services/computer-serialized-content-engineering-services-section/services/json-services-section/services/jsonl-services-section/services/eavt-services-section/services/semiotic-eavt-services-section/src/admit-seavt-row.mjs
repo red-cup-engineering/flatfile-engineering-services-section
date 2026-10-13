@@ -69,12 +69,19 @@ export function seavtOfJson(entity, attribute, value, time) {
  * Raw source bytes remain retained in their original custody: never convert
  * bytes or a provider's JSON claim into authenticated truth by projection.
  */
-const instant = value => typeof value === "string" &&
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(value) &&
-  Number.isFinite(Date.parse(value));
+/** Admit a real absolute observation instant. Date.parse alone can silently
+ * normalize impossible calendar dates such as February 30. */
+export const isAbsoluteSeavtClock = value => {
+  if (typeof value !== "string" ||
+      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(value) ||
+      !Number.isFinite(Date.parse(value))) return false;
+  const day = value.slice(0, 10);
+  const midnight = new Date(day + "T00:00:00Z");
+  return Number.isFinite(midnight.getTime()) && midnight.toISOString().slice(0, 10) === day;
+};
 
 export function seavtOfSignCell(input, observedAt) {
-  if (!instant(observedAt))
+  if (!isAbsoluteSeavtClock(observedAt))
     throw new TypeError("SignCell SEAVT observation requires an absolute source/receiver clock");
   const admitted = admitCell(input);
   // The carrier and evidence are kept ENTIRE: not a hand-picked parallel
@@ -87,7 +94,7 @@ export function seavtOfSignCell(input, observedAt) {
  * presentation, rejecting an invented or mismatched SCA subject. */
 export function signCellOfSeavt(input) {
   const row = seavtRow(input);
-  if (!instant(row.t) || termToJson(row.a) !== "signcell:cell")
+  if (!isAbsoluteSeavtClock(row.t) || termToJson(row.a) !== "signcell:cell")
     throw new TypeError("native SignCell SEAVT coordinate and source clock required");
   const identity = termToJson(row.e);
   if (typeof identity !== "string")
