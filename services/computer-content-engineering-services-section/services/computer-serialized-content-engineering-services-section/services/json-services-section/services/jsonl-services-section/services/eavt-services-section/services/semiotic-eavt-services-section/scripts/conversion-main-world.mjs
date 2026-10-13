@@ -71,6 +71,8 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
  report.mainConsumers={claimSession:'feltos/src/work/claim-session-store.mjs',capabilities:'computer-system-engine/src/rpc/capability-assertions.mjs',offices:'metroplat/src/offices.mjs',bodies:'metroplat/src/bodies.mjs',clock:'organizing/src/work/recurring.mjs'};
  report.unqualifiedSources??={};report.sourceOnly??={};report.sourceSegments??=[];report.types??={};
  report.referencesRewritten??=0;report.referencesLeft??=0;report.causesDropped??=0;
+ report.referenceDispositions={file:'.conversion-reference-dispositions.jsonl',count:0,unresolvedNamedCitations:0};
+ const disposition=(item,reference,reason,role)=>{fs.appendFileSync(path.join(output,report.referenceDispositions.file),JSON.stringify({original:item.original,reference,type:item.type,thread:item.thread??null,reason,role})+'\n',{mode:0o600});report.referenceDispositions.count++;};
  const count=type=>report.types[type]??={read:0,written:0,duplicates:0,heads:0,verified:0};
  const observe=file=>{for(let current=file;current===source||current.startsWith(source+path.sep);current=path.dirname(current)){if(!stamps.has(current))stamps.set(current,sourceStamp(current));if(current===source)break;}};
  const context={source,semanticRecordOf,dataArtifactAddress};
@@ -83,8 +85,9 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   const ledger=file.replace(/\.witnesses$/u,'.admitted');
   if(fs.existsSync(ledger))for(const {record}of streamJsonLines(ledger))if(!Number.isSafeInteger(record.end)||record.end<0||record.end>fs.statSync(file).size)throw new TypeError('original segment lost admitted custody');
   let selected=0;
-  if(['rpc','metroplat.clock','settlement-signal'].includes(kind)){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;}
   for(const line of streamJsonLines(file,{openReader:openSegmentReader})){
+   if(NI.test(line.record.id)&&maps.get('original-kind',line.record.id)===undefined)maps.put('original-kind',line.record.id,kind);
+   if(['rpc','metroplat.clock','settlement-signal'].includes(kind)){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;}
    const witness=parseJournalWitness(line.record),item=selection(witness,kind,{...context,file});
    if(item?.unqualified){report.unqualifiedSources[item.unqualified]=(report.unqualifiedSources[item.unqualified]??0)+1;continue;}
    if(!item){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;}
@@ -96,12 +99,12 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   report.sourceSegments.push({path:path.relative(source,file),bytes:fs.statSync(file).size,logicalSha256:hashSource(file,{openReader:openSegmentReader}),selected});
  }
  const lookup=id=>maps.get('identity',id)??id;
- function rewrite(value){
+ function rewrite(value,item){
   if(typeof value==='string'&&NI.test(value)){
-   const original=lookup(value);if(maps.get('source',original)){const converted=convert(original);report.referencesRewritten++;return converted.id;}report.referencesLeft++;return value;
+   const original=lookup(value);if(maps.get('source',original)){const converted=convert(original);report.referencesRewritten++;return converted.id;}report.referencesLeft++;disposition(item,value,maps.get('original-kind',original)?'original-kind-not-converted':'external-or-unresolved-original-reference','record-reference');return value;
   }
-  if(Array.isArray(value))return value.map(rewrite);
-  if(object(value))return Object.fromEntries(Object.entries(value).map(([key,item])=>[key,rewrite(item)]));
+  if(Array.isArray(value))return value.map(value=>rewrite(value,item));
+  if(object(value))return Object.fromEntries(Object.entries(value).map(([key,value])=>[key,rewrite(value,item)]));
   return value;
  }
  function convert(original){
@@ -109,11 +112,13 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   if(active.has(original))throw new TypeError('original references contain a causal/content cycle');active.add(original);
   const position=maps.get('source',original);if(!position)throw new TypeError('selected original witness unavailable');
   const item=load(position);if(!item||item.unqualified)throw new TypeError('selected original changed meaning between passes');
-  let record=rewrite(item.record);const named=[];
-  for(const cause of item.namedCauses){const old=lookup(cause),prior=maps.get('source',old);if(!prior){report.causesDropped++;continue;}const held=convert(old);named.push(held.type===item.type?held.id:{type:held.type,id:held.id});}
+  let record=rewrite(item.record,item);const named=[],unresolvedCites=[];
+  for(const cause of item.namedCauses){const old=lookup(cause),prior=maps.get('source',old);if(!prior){report.causesDropped++;const originalKind=maps.get('original-kind',old);disposition(item,cause,originalKind?'original-kind-not-converted':'original-cause-unavailable',item.claim?'named-claim-citation':'cause');
+    if(item.claim){unresolvedCites.push(cause);report.referenceDispositions.unresolvedNamedCitations++;if(!originalKind)report.unqualifiedSources['named-claim-citation-unavailable']=(report.unqualifiedSources['named-claim-citation-unavailable']??0)+1;}continue;}
+   const held=convert(old);named.push(held.type===item.type?held.id:{type:held.type,id:held.id});}
   const causeKey=cause=>typeof cause==='string'?`${item.type} ${cause}`:`${cause.type} ${cause.id}`;
   const causes=[...new Map(named.map(cause=>[causeKey(cause),cause])).entries()].sort(([a],[b])=>a.localeCompare(b)).map(([,cause])=>cause);
-  if(item.claim&&causes.length)record={...record,cites:causes};
+  if(item.claim&&(causes.length||unresolvedCites.length))record={...record,cites:[...causes,...unresolvedCites]};
   const content=semanticAddress({type:item.type,thread:item.thread??null,record}).id,earlier=maps.get('content',content);let id;
   if(earlier){id=earlier;count(item.type).duplicates++;}
   else{
@@ -153,6 +158,7 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   if(reached<expected.count)throw new TypeError('converted thread lost distinct original rows');
  }
  assertSourceStamps(stamps);report.mainQualified=Object.values(report.unqualifiedSources).every(count=>count===0);
+ report.sourceOnlyDisposition='Original custody retained; no current consumer receiving was established for these kind rows. RPC/old clock outcomes remain historical evidence, not current authority or run state.';
  report.originalsPreserved=true;report.mainSuppliers={oldRoot,newRoot};
  if(report.mainQualified)fs.rmSync(mapRoot,{recursive:true});
  return report;
