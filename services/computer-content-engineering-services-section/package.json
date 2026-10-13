@@ -14,6 +14,8 @@
     "@red-cup-engineering/uri-services-section": "workspace:*"
   },
   "exports": {
+    "./semiotic-content-address": "./src/compat/semiotic-content-address.mjs",
+    "./semantic-content-identity": "./src/compat/semantic-content-identity.mjs",
     "./description": "./src/description.mjs",
     "./typed-resource-classification": "./src/typed-resource-classification.mjs",
     "./catalog": "./src/catalog.mjs",
