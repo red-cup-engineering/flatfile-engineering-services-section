@@ -7,6 +7,9 @@ on:
       - 'lib/metrologic/test/number/oriented-incidence.test.mjs'
       - 'lib/metrologic/test/number/finite-law.test.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/chromatic-lorentzian.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal-mobius.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs'
+      - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
@@ -17,6 +20,9 @@ on:
       - 'lib/metrologic/test/number/oriented-incidence.test.mjs'
       - 'lib/metrologic/test/number/finite-law.test.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/chromatic-lorentzian.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal-mobius.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs'
+      - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
@@ -36,6 +42,11 @@ jobs:
         run: node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/laplacian.mjs
       - name: Verify total-variation extrema and mass-weighted tails
         run: node --test lib/metrologic/test/number/finite-law.test.mjs
+      - name: Verify actual finite causal Möbius coefficients against the exhaustive independent poset oracle
+        run: |
+          node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal-mobius.mjs
+          node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs
+          node --test lib/metrologic/test/causal-mobius.test.mjs
       - name: Verify finite chromatic motion and exact integer guards
         run: |
           node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/chromatic-lorentzian.mjs
