@@ -72,7 +72,7 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
  report.unqualifiedSources??={};report.sourceOnly??={};report.sourceSegments??=[];report.types??={};
  report.referencesRewritten??=0;report.referencesLeft??=0;report.causesDropped??=0;
  report.referenceDispositions={file:'.conversion-reference-dispositions.jsonl',count:0,unresolvedNamedCitations:0};
- const disposition=(item,reference,reason,role)=>{fs.appendFileSync(path.join(output,report.referenceDispositions.file),JSON.stringify({original:item.original,reference,type:item.type,thread:item.thread??null,reason,role})+'\n',{mode:0o600});report.referenceDispositions.count++;};
+ const disposition=(item,reference,reason,role)=>{fs.appendFileSync(path.join(output,report.referenceDispositions.file),JSON.stringify({original:item.original,reference,type:item.type,thread:item.thread??null,originalKind:maps.get('original-kind',maps.get('identity',reference)??reference)??null,reason,role})+'\n',{mode:0o600});report.referenceDispositions.count++;};
  const count=type=>report.types[type]??={read:0,written:0,duplicates:0,heads:0,verified:0};
  const observe=file=>{for(let current=file;current===source||current.startsWith(source+path.sep);current=path.dirname(current)){if(!stamps.has(current))stamps.set(current,sourceStamp(current));if(current===source)break;}};
  const context={source,semanticRecordOf,dataArtifactAddress};
