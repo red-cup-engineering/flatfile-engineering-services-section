@@ -7,6 +7,8 @@ test("calendar admission rejects normalized impossible dates", () => {
   for (const value of [
     "2025-02-29T00:00:00Z", "2026-02-30T00:00:00Z",
     "2026-13-01T00:00:00Z", "yesterday", "2026-10-12",
+    "2026-10-12T24:00:00Z", "2026-10-12T23:60:00Z",
+    "2026-10-12T23:59:60Z", "2026-10-12T23:00:00+24:00",
   ]) assert.equal(isAbsoluteSeavtClock(value), false);
 });
 

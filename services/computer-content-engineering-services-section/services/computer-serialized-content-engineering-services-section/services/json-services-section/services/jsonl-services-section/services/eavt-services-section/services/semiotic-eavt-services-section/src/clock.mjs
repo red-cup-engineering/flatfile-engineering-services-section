@@ -1,8 +1,13 @@
 /** Admit a real absolute observation instant. Date.parse alone can silently
  * normalize impossible calendar dates such as February 30. */
 export const isAbsoluteSeavtClock = value => {
-  if (typeof value !== "string" ||
-      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(value) ||
+  if (typeof value !== "string") return false;
+  const match = /^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:\\.\\d+)?(?:Z|[+-](\\d{2}):(\\d{2}))$/u.exec(value);
+  if (!match) return false;
+  const [, , , , hour, minute, second, offsetHour, offsetMinute] = match;
+  // RFC 3339 does not admit hour 24; Date.parse otherwise rolls it forward.
+  if (Number(hour) > 23 || Number(minute) > 59 || Number(second) > 59 ||
+      (offsetHour !== undefined && (Number(offsetHour) > 23 || Number(offsetMinute) > 59)) ||
       !Number.isFinite(Date.parse(value))) return false;
   const day = value.slice(0, 10);
   const midnight = new Date(day + "T00:00:00Z");
