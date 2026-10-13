@@ -53,6 +53,7 @@ function selection(witness,kind,context){
  if(kind==='agent-session-token-usage')return {...common,type:'token-usage-event',record:plain};
  if(kind==='work-arena-move'&&object(value))return {...common,type:'work-arena-move',record:value,arena:true};
  if(kind==='work-outcome'&&object(value))return {...common,type:'work-outcome',record:value,log:true};
+ if(kind==='561-group.primary-system-health'&&semantic?.category==='primary-system-health'&&object(value))return {...common,type:'primary-system-health',record:{...value,at:semantic.recordedAt,told:semantic.told,clockScope:'historical original pulse issue clock; response availability was not recorded'},log:true,health:true};
  if(kind==='knowing.claims'&&object(value))return {...common,type:'claim',record:{...value,...(semantic.told.for===true&&semantic.told.against===false?{}:{told:semantic.told})}};
  if(kind==='peer-liveness'&&object(value)&&text(value.peer))return {...common,type:'peer-liveness',record:value,thread:value.peer};
  if(kind==='enterprise'&&semantic&&/^(?:contact|order|party|resource|cost|settlement|signature|bid|control)$/u.test(semantic.category))return {...common,type:'enterprise-'+semantic.category,record:value};
@@ -131,7 +132,7 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
     const consumed=new Set(causes.filter(cause=>typeof cause==='string'));store.writeHead(output,item.type,name,{frontier:[...previous.filter(address=>!consumed.has(address)),id]});count(item.type).heads++;
    }
    if(item.thread){const headKey=semanticAddress({type:item.type,name:item.thread}).id,expected=maps.get('thread-count',headKey)??{type:item.type,name:item.thread,count:0};maps.put('thread-count',headKey,{...expected,count:expected.count+1});}
-   if(item.log)store.append(output,item.type,item.type==='claim-session'?{at:item.at,thread:item.thread,of:id}:{at:item.at,of:id,...(record.verdict===undefined?{}:{verdict:record.verdict})});
+   if(item.log)store.append(output,item.type,item.type==='claim-session'?{at:item.at,thread:item.thread,of:id}:{at:item.at,of:id,...(record.verdict===undefined?{}:{verdict:record.verdict}),...(item.health?{system:record.system,charge:record.charge,was:record.was}:{})});
   }
   const result={id,type:item.type};maps.put('done',original,result);if(item.identity&&NI.test(item.identity))maps.put('translated-identity',item.identity,result);
   active.delete(original);return result;
