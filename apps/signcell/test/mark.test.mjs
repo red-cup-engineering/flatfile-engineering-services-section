@@ -5,9 +5,14 @@ import { instantiate, specializeType } from "@red-cup-engineering/computer-data-
 test("Marks preserve opaque payloads and share a specializable admission contract", () => {
     const payload = { evidence: [true, false] };
     const value = new Mark(payload);
-    assert.equal(value.value, payload);
+    assert.deepEqual(value.value, payload);
+    assert.notEqual(value.value, payload);
     assert(Object.isFrozen(value));
+    assert(Object.isFrozen(value.value));
+    assert(Object.isFrozen(value.value.evidence));
     assert(!Object.isFrozen(payload));
+    payload.evidence.push("caller-owned mutation");
+    assert.deepEqual(value.value, { evidence: [true, false] });
     assert.throws(() => new Mark(undefined), /present/);
     const textMark = specializeType([MarkType], {
         id: "TextMark", name: "TextMark", description: "A Mark carrying text.",

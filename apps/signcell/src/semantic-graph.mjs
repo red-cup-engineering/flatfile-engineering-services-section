@@ -73,6 +73,76 @@ export function edgesFrom(graph, subject, pattern = {}) {
   const selected = new Set(queryRelationalField(field, pattern).map(entry => entry.statement));
   return Object.freeze(graph.edges.filter(entry => entry.edge.subject.id === reference.id && selected.has(entry.edge)));
 }
+const throwRefusal = result => {
+  if (result.ok) return result.value;
+  const error = new TypeError(result.refusal.message);
+  error.code = result.refusal.code;
+  throw error;
+};
+function admittedQuery(graph, subject, pattern) {
+  // Reuse graph gluing's complete portable admission: endpoint/witness
+  // membership, declared types and every advertised graph/member address.
+  // A one-graph read cannot introduce a gluing obstruction or invent evidence.
+  const verified = graphFields.has(graph) ? graph : throwRefusal(glueSignGraphs(graph)).graph;
+  const reference = admit(typedMarkReferenceType, subject);
+  if (!reference.ok) throwRefusal(refused("invalid-subject", "query subject must be a typed semantic reference"));
+  const cells = new Map(verified.cells.map(cell => [cell.id, cell]));
+  const selected = throwRefusal(checkedReference(cells, reference.value, verified.cells.map(cell => cell.type), "subject"));
+  return edgesFrom(verified, selected, pattern);
+}
+/** Admission for an external query: throws on the existing upstream refusal,
+ * so an x402 validate binding can refuse the request before a payment challenge.
+ * Carrier admission keeps content types unresolved, as admitTypedMarkCarrier
+ * does; it establishes no external claim's truth or ownership.
+ */
+export function validateSignGraphQuery(graph, subject, pattern = {}) {
+  admittedQuery(graph, subject, pattern);
+}
+/** Pure query of a received SignGraph. Return its original addressed edges,
+ * including every selected witness, through the same admission as validation.
+ * This is an edge read projection, never a new closed graph or a truth verdict.
+ */
+export function querySignGraph(graph, subject, pattern = {}) {
+  return admittedQuery(graph, subject, pattern);
+}
+function admittedPage(graph, subject, pattern, options) {
+  if (!options || typeof options !== "object" || Array.isArray(options) ||
+      Object.keys(options).some(key => !["limit", "cursor"].includes(key)))
+    throwRefusal(refused("invalid-page", "page options permit only limit and cursor"));
+  const limit = options.limit === undefined ? 100 : options.limit;
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 1000)
+    throwRefusal(refused("invalid-page", "page limit must be an integer from 1 through 1000"));
+  const entries = admittedQuery(graph, subject, pattern);
+  const query = semanticId({ subject, pattern });
+  let start = 0;
+  if (options.cursor !== undefined && options.cursor !== null) {
+    const cursor = options.cursor;
+    if (!cursor || typeof cursor !== "object" || Array.isArray(cursor) ||
+        Object.keys(cursor).length !== 3 || !["graph", "query", "after"].every(key => Object.hasOwn(cursor, key) && typeof cursor[key] === "string") ||
+        cursor.graph !== graph.id || cursor.query !== query)
+      throwRefusal(refused("invalid-cursor", "cursor must belong to this graph and query"));
+    const previous = entries.findIndex(entry => entry.id === cursor.after);
+    if (previous < 0) throwRefusal(refused("invalid-cursor", "cursor edge is absent from this query"));
+    start = previous + 1;
+  }
+  const edges = Object.freeze(entries.slice(start, start + limit));
+  const next = start + edges.length < entries.length
+    ? Object.freeze({ graph: graph.id, query, after: edges.at(-1).id }) : null;
+  return Object.freeze({ graph: graph.id, query, edges, next });
+}
+/** Bounded read of the same opaque graph, carrying original EAVT edge identities
+ * and typed references rather than mark payloads. A cursor binds the source cut
+ * and query; changed graphs or selectors must start again. Page boundaries may
+ * separate witnesses, so only next:null establishes that this query is complete.
+ * This projection neither admits a new closed graph nor determines claim truth.
+ */
+export function querySignGraphPage(graph, subject, pattern = {}, options = {}) {
+  return admittedPage(graph, subject, pattern, options);
+}
+/** Same refusal boundary as page computation, usable before an x402 challenge. */
+export function validateSignGraphPage(graph, subject, pattern = {}, options = {}) {
+  admittedPage(graph, subject, pattern, options);
+}
 /** Glue an entire family of graph cuts in one comparison. Identical relation
  * declarations, cells and edges agree by SCA identity; incompatible
  * declarations of the same predicate obstruct gluing on that predicate and
