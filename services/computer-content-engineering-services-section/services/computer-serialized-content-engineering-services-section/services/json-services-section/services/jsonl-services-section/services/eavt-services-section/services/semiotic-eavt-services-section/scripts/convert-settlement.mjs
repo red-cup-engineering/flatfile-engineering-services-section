@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 
+async function main() {
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const args = Object.fromEntries(process.argv.slice(2).reduce((out, value, index, values) => {
   if (value.startsWith('--')) out.push([value.slice(2), values[index + 1]?.startsWith('--') || values[index + 1] === undefined ? true : values[index + 1]]);
@@ -17,7 +18,7 @@ if (source === output || output.startsWith(source + path.sep) || source.startsWi
 if (fs.existsSync(output)) throw new TypeError('output must not exist; originals remain in their original custody');
 const oldRoot = fs.realpathSync(args['old-store']), newRoot = fs.realpathSync(args['new-store']);
 const load = file => import(pathToFileURL(file).href);
-const oldRequire = createRequire(path.join(oldRoot, 'package.json')), newRequire = createRequire(path.join(newRoot, 'package.json'));
+const newRequire = createRequire(path.join(newRoot, 'package.json'));
 const supplier = async (require, specifier) => load(require.resolve(specifier));
 const { parseJournalWitness } = await load(path.join(oldRoot, 'src/journal/event.mjs'));
 const { openSegmentReader } = await load(path.join(oldRoot, 'src/journal/filesystem/segment-bytes.mjs'));
@@ -51,7 +52,7 @@ function* witnesses(file) {
 }
 if (!args.activitypub) {
   const { convertMainWorld } = await import('./conversion-main-world.mjs');
-  await convertMainWorld({source, output, oldRoot, newRoot, store, report});
+  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress});
 } else {
   if (typeof args['old-activitypub'] !== 'string') throw new TypeError('--old-activitypub is required');
   const oldAp = fs.realpathSync(args['old-activitypub']);
@@ -149,3 +150,6 @@ for(const [file,original] of stamps) if(JSON.stringify(stamp(file)) !== JSON.str
 report.qualified = report.missingBodies.length === 0;
 fs.writeFileSync(path.resolve(args.report),JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
 console.log(JSON.stringify({type:report.type,qualified:report.qualified,types:report.types,missingBodies:report.missingBodies.length,originalsPreserved:true,ordersExecuted:false,transportActivated:false}));
+
+}
+main().catch(error => { process.stderr.write(JSON.stringify({type:"OneTimeStoreConversionRefused",code:typeof error?.code === "string" ? error.code : error?.name ?? "Error",originalsPreserved:true})+"\n"); process.exitCode=1; });
