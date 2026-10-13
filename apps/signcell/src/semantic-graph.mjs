@@ -1,4 +1,4 @@
-import { createRelationalField, defineRelation } from "@red-cup-engineering/computer-data-engineering-services-section/type-system/relations";
+import { createRelationalField, defineRelation, queryRelationalField } from "@red-cup-engineering/computer-data-engineering-services-section/type-system/relations";
 import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { admit } from "@red-cup-engineering/computer-data-engineering-services-section/type-system";
 import { semanticGraphType } from "./semantic-carriers.mjs";
@@ -7,6 +7,7 @@ const accepted = (value) => Object.freeze({ ok: true, value });
 const refused = (code, message) => Object.freeze({ ok: false, refusal: Object.freeze({ code, message }) });
 const ordered = values => Object.freeze([...values].sort((left, right) => left.id.localeCompare(right.id)));
 const names = values => Array.isArray(values) && values.length > 0 && values.every(value => typeof value === "string" && value.trim() !== "") && new Set(values).size === values.length;
+const graphFields = new WeakMap();
 function validRelation(relation) { return relation && typeof relation === "object" && typeof relation.id === "string" && relation.id.trim() !== "" && names(relation.subjectTypes) && names(relation.objectTypes) && names(relation.witnessTypes); }
 function checkedReference(cells, reference, allowedTypes, role) {
   if (!reference || typeof reference !== "object") return refused("invalid-edge", `${role} must be a typed semantic reference`);
@@ -57,9 +58,21 @@ export function createSignGraph(input) {
   const content = Object.freeze({ kind: "sign.graph", cells: ordered([...cells.values()]), relations: ordered([...relations.values()]), edges: addressed });
   const graph = Object.freeze({ ...content, id: semanticId(content) });
   const carrier = admit(semanticGraphType, graph);
-  return carrier.ok ? accepted(graph) : refused("invalid-graph", "graph did not satisfy its shipped carrier schema");
+  if (!carrier.ok) return refused("invalid-graph", "graph did not satisfy its shipped carrier schema");
+  graphFields.set(graph, field.value);
+  return accepted(graph);
 }
-export function edgesFrom(graph, subject) { const reference = subject?.kind === "sign.cell" ? referenceOf(subject) : subject; return Object.freeze(graph.edges.filter(entry => entry.edge.subject.id === reference.id)); }
+/** Read outgoing edges, optionally restricting their existing statement positions.
+ * Subject selection retains the established id-only convention. The pattern is
+ * the upstream relational-field query, so scoped reads preserve addressed edges
+ * and every witness rather than requiring a complete graph in agent context.
+ */
+export function edgesFrom(graph, subject, pattern = {}) {
+  const reference = subject?.kind === "sign.cell" ? referenceOf(subject) : subject;
+  const field = graphFields.get(graph) ?? { statements: graph.edges.map(entry => ({ id: entry.id, statement: entry.edge })) };
+  const selected = new Set(queryRelationalField(field, pattern).map(entry => entry.statement));
+  return Object.freeze(graph.edges.filter(entry => entry.edge.subject.id === reference.id && selected.has(entry.edge)));
+}
 /** Glue an entire family of graph cuts in one comparison. Identical relation
  * declarations, cells and edges agree by SCA identity; incompatible
  * declarations of the same predicate obstruct gluing on that predicate and
@@ -123,3 +136,4 @@ export function glueSignGraphs(...graphs) {
   if (!glued.ok) return glued;
   return accepted(Object.freeze({ graph: glued.value, obstructions: Object.freeze(obstructions.sort((left, right) => left.relation.localeCompare(right.relation))) }));
 }
+
