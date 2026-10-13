@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 
+let progress={stage:'source-inputs'};
 async function main() {
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const args = Object.fromEntries(process.argv.slice(2).reduce((out, value, index, values) => {
@@ -17,6 +18,10 @@ const source = fs.realpathSync(args.settlement), output = path.resolve(args.into
 if (source === output || output.startsWith(source + path.sep) || source.startsWith(output + path.sep)) throw new TypeError('conversion requires a separate nonnested output');
 const reportPath = path.resolve(args.report);
 if (reportPath === source || reportPath.startsWith(source + path.sep)) throw new TypeError('report must preserve original custody');
+let parent=path.dirname(output);while(!fs.existsSync(parent))parent=path.dirname(parent);
+const parentReal=fs.realpathSync(parent);
+if(fs.statSync(source).dev!==fs.statSync(parentReal).dev||output==='/tmp'||output.startsWith('/tmp/')||output.startsWith('/var/tmp/'))throw new TypeError('candidate must use original custody volume outside temporary storage');
+if(args.activitypub){const liveParent=path.dirname(source),candidateParent=path.dirname(output);if(candidateParent===liveParent||candidateParent.startsWith(liveParent+path.sep))throw new TypeError('queue candidate must not use the live ActivityPub parent');}
 if (fs.existsSync(output)) throw new TypeError('output must not exist; originals remain in their original custody');
 const oldRoot = fs.realpathSync(args['old-store']), newRoot = fs.realpathSync(args['new-store']);
 const load = file => import(pathToFileURL(file).href);
@@ -71,10 +76,12 @@ if (!args.activitypub) {
   report.apOrigins = [];
   const segments = [...files(path.join(source,'data/journals'))].filter(file => file.endsWith('.witnesses')).sort();
   for (const file of segments) {
+    progress={stage:'original-activitypub-segment',source:path.relative(source,file)};
     const kind = path.basename(file).split('-admit-')[1]?.replace(/\.jsonl\.witnesses$/u, '');
     if (kind !== 'activitypub.custody') { report.sourceOnly[kind] = (report.sourceOnly[kind] ?? 0) + 1; continue; }
     let selected = 0;
     for (const witness of witnesses(file)) {
+      progress={stage:'original-activitypub-custody',original:witness.id};
       const original = semanticRecordOf(witness);
       if (!original || !['inbox','outbox','followers'].includes(original.category) || original.told?.for !== true || original.told?.against !== false) { report.sourceOnly[kind] = (report.sourceOnly[kind] ?? 0) + 1; continue; }
       const at = original.recordedAt;
@@ -142,6 +149,7 @@ if (!args.activitypub) {
   }
 }
 for (const [type, expected] of Object.entries(report.types)) {
+  progress={stage:'current-native-receiving',type};
   let found = 0;
   for (const {address,record} of store.each(output,type)) {
     if (!store.get(output,type,address) || semanticAddress(record).id !== address) throw new TypeError('native record identity receiving failed'); found++;
@@ -155,4 +163,4 @@ fs.writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0
 console.log(JSON.stringify({type:report.type,qualified:report.qualified,types:report.types,missingBodies:report.missingBodies.length,originalsPreserved:true,ordersExecuted:false,transportActivated:false}));
 
 }
-main().catch(error => { process.stderr.write(JSON.stringify({type:"OneTimeStoreConversionRefused",code:typeof error?.code === "string" ? error.code : error?.name ?? "Error",originalsPreserved:true})+"\n"); process.exitCode=1; });
+main().catch(error => { process.stderr.write(JSON.stringify({type:"OneTimeStoreConversionRefused",code:typeof error?.code === "string" ? error.code : error?.name ?? "Error",...progress,originalsPreserved:true})+"\n"); process.exitCode=1; });
