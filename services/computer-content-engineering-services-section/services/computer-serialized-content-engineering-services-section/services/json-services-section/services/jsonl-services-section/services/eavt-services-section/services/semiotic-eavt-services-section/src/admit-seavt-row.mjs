@@ -6,7 +6,8 @@ import {
   inferTy,
   isClosed,
 } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/typing";
-import { jsonToTerm } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
+import { jsonToTerm, termToJson } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec";
+import { admitCell, address as cellAddress } from "@red-cup-engineering/signcell/cell";
 export const inputSchema = {
   type: "object",
   properties: {
@@ -53,6 +54,48 @@ export function seavt(entity, attribute, value, time) {
  * JSON bridge: the form a boundary that receives plain JSON writes. */
 export function seavtOfJson(entity, attribute, value, time) {
   return seavt(jsonToTerm(entity), jsonToTerm(attribute), jsonToTerm(value), time);
+}
+
+/**
+ * The native SignCell -> SCA -> SEN -> SEAVT projection.
+ *
+ * SignCell owns the semantic triple and both evidence sides; its SCA address
+ * names the TRIPLE, so that address remains stable as witnesses accumulate.
+ * SEN is the admitted typed-JSON expression of that same cell; SEAVT places
+ * its presentation at the original observed/received time.
+ *
+ * This is a pure VIEW over an already-owned SignCell. It does not create
+ * another truth judgment, database, journal, signer or economic fact.
+ * Raw source bytes remain retained in their original custody: never convert
+ * bytes or a provider's JSON claim into authenticated truth by projection.
+ */
+const instant = value => typeof value === "string" &&
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(value) &&
+  Number.isFinite(Date.parse(value));
+
+export function seavtOfSignCell(input, observedAt) {
+  if (!instant(observedAt))
+    throw new TypeError("SignCell SEAVT observation requires an absolute source/receiver clock");
+  const admitted = admitCell(input);
+  // The carrier and evidence are kept ENTIRE: not a hand-picked parallel
+  // schema that could quietly drop opposing evidence, epistemic valuation,
+  // source identity, or exact financial units.
+  return seavtOfJson(cellAddress(admitted), "signcell:cell", admitted, observedAt);
+}
+
+/** Recover the exact original SignCell (and FOUR evidence) from its SEN/SEAVT
+ * presentation, rejecting an invented or mismatched SCA subject. */
+export function signCellOfSeavt(input) {
+  const row = seavtRow(input);
+  if (!instant(row.t) || termToJson(row.a) !== "signcell:cell")
+    throw new TypeError("native SignCell SEAVT coordinate and source clock required");
+  const identity = termToJson(row.e);
+  if (typeof identity !== "string")
+    throw new TypeError("SCA SignCell address coordinate required");
+  const admitted = admitCell(termToJson(row.v));
+  if (cellAddress(admitted) !== identity)
+    throw new RangeError("SCA SignCell address differs from the SEN/SEAVT subject");
+  return admitted;
 }
 
 if (import.meta.main)

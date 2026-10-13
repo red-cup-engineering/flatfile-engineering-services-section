@@ -44,6 +44,7 @@
     "@red-cup-engineering/eavt-services-section": "workspace:*",
     "@red-cup-engineering/json-schema-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
-    "@red-cup-engineering/uri-services-section": "workspace:*"
+    "@red-cup-engineering/uri-services-section": "workspace:*",
+    "@red-cup-engineering/signcell": "workspace:*"
   }
 }
