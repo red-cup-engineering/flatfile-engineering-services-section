@@ -5,6 +5,7 @@ import { createTypedMark, admitTypedMark, referenceOf } from "../src/typed-mark.
 import { createSignClaim, conflateClaims } from "../src/semantic-claim.mjs";
 import { knowledgeReading } from "../src/cell.mjs";
 import { createSignGraph, glueSignGraphs } from "../src/semantic-graph.mjs";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 const defined = defineType({ id: "test.semantic.source@1", name: "Semantic source", description: "A source used to prove carrier admission.", schema: { type: "object", required: ["text"], properties: { text: { type: "string", minLength: 1 } }, additionalProperties: false }, parents: [] });
 if (!defined.ok) throw new Error(defined.refusal.message);
 const cell = createTypedMark(defined.value, { text: "retained evidence" });
@@ -117,4 +118,25 @@ test("a projected SignGraph after obstruction must not be re-glued as a lossless
   assert.equal(improperlyAccumulated.ok, true);
   assert.equal(improperlyAccumulated.value.graph.relations.length, 1);
   assert.deepEqual(improperlyAccumulated.value.obstructions, []);
+});
+
+test("SignGraph gluing respects the EAVT member addresses issued by the relation layer", () => {
+  const source = referenceOf(cell.value), type = defined.value.id;
+  const relation = { id: "supports", subjectTypes: [type], objectTypes: [type], witnessTypes: [type] };
+  const created = createSignGraph({
+    cells: [cell.value], relations: [relation],
+    edges: [{ subject: source, predicate: "supports", object: source, witness: source }],
+  });
+  assert.equal(created.ok, true);
+  if (!created.ok) return;
+  // Regression: field statement IDs address {e,a,v,t}, not the source edge object.
+  assert.notEqual(created.value.edges[0].id, semanticId(created.value.edges[0].edge));
+  assert.equal(glueSignGraphs(created.value).ok, true);
+  const forgedEdges = created.value.edges.map(entry => ({ ...entry, id: semanticId(entry.edge) }));
+  const forgedContent = { kind: created.value.kind, cells: created.value.cells,
+    relations: created.value.relations, edges: forgedEdges };
+  const forged = { ...forgedContent, id: semanticId(forgedContent) };
+  const refused = glueSignGraphs(forged);
+  assert.equal(refused.ok, false);
+  assert.equal(refused.refusal.code, "identity-mismatch");
 });
