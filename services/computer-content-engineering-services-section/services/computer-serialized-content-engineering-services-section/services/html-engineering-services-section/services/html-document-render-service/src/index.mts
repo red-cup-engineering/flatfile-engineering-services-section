@@ -21,16 +21,10 @@ import {
   type CssClassFactorMap,
   type CssSettleWitness,
 } from "@red-cup-engineering/css-services-section/css-style-resolution";
-import type { FormatRegime } from "@lenticule-science/articulating/predicating/positing/settling/analysis/formats-four";
 import {
-  html_is_carrier_not_document,
-  type Document,
-  type DocumentAddress,
-  type DocumentOrder,
-  type DocumentReference,
-  type DocumentValuationSite,
-  type HtmlIsCarrierNotDocumentWitness,
-} from "@lenticule-science/articulating/predicating/positing/settling/document";
+  isClosureRegimeName,
+  type ClosureRegimeName,
+} from "@red-cup-engineering/computer-data-engineering-services-section/closure-regime";
 import { canonical } from "@red-cup-engineering/json-services-section";
 
 /** A JSON value; the type json-services-section's canonical serialization admits. */
@@ -95,15 +89,50 @@ export interface HtmlCarrierNode {
   readonly children?: readonly string[];
 }
 
-export interface HtmlCarrierOf<D extends Document = Document> {
+/**
+ * Renderer input: the addressed structural spine of an already settled
+ * document. The Science/knowledge owner warrants fixed-point provenance;
+ * rendering neither recomputes nor fabricates that mathematical witness.
+ * This boundary reads only the addresses and relations it actually preserves.
+ */
+export interface SettledDocumentSpine {
+  readonly kind: "settledDocument.fixedPoint";
+  readonly addresses: readonly { readonly key: string }[];
+  readonly order: readonly { readonly before: string; readonly after: string }[];
+  readonly references: readonly { readonly from: string; readonly to: string }[];
+  readonly valuationSites: readonly { readonly address: string }[];
+}
+
+/** HTML is a distinct presentation carrier, never the settled document itself. */
+export interface HtmlCarrierNotDocumentWitness {
+  readonly kind: "settledDocument.html_is_carrier_not_document:witness";
+  readonly documentKind: SettledDocumentSpine["kind"];
+  readonly carrierKind: "rendering.htmlCarrier";
+  readonly distinct: true;
+}
+
+function structurallySettled(document: unknown): document is SettledDocumentSpine {
+  if (document === null || typeof document !== "object") return false;
+  const record = document as Record<string, unknown>;
+  const entries = (field: string, keys: readonly string[]): boolean =>
+    Array.isArray(record[field]) && record[field].every((row: unknown) =>
+      row !== null && typeof row === "object" &&
+      keys.every((key) => typeof (row as Record<string, unknown>)[key] === "string"
+        && ((row as Record<string, string>)[key]).length > 0));
+  return record.kind === "settledDocument.fixedPoint" &&
+    entries("addresses", ["key"]) && entries("order", ["before", "after"]) &&
+    entries("references", ["from", "to"]) && entries("valuationSites", ["address"]);
+}
+
+export interface HtmlCarrierOf<D extends SettledDocumentSpine = SettledDocumentSpine> {
   readonly kind: "rendering.htmlCarrier";
   readonly document: D;
   readonly nodes: readonly HtmlCarrierNode[];
-  readonly carriedAddresses: readonly DocumentAddress[];
-  readonly carriedOrder: readonly DocumentOrder[];
-  readonly carriedReferences: readonly DocumentReference[];
-  readonly carriedValuationSites: readonly DocumentValuationSite[];
-  readonly carrierNotDocument: HtmlIsCarrierNotDocumentWitness;
+  readonly carriedAddresses: D["addresses"];
+  readonly carriedOrder: D["order"];
+  readonly carriedReferences: D["references"];
+  readonly carriedValuationSites: D["valuationSites"];
+  readonly carrierNotDocument: HtmlCarrierNotDocumentWitness;
 }
 
 export interface HtmlCarrierObstruction {
@@ -113,11 +142,12 @@ export interface HtmlCarrierObstruction {
     | "missing-order"
     | "missing-reference"
     | "missing-valuation-site"
-    | "duplicate-node";
+    | "duplicate-node"
+    | "invalid-document-spine";
   readonly key: string;
 }
 
-export type HtmlCarrierJudgment<D extends Document = Document> = HtmlCarrierOf<D> | HtmlCarrierObstruction;
+export type HtmlCarrierJudgment<D extends SettledDocumentSpine = SettledDocumentSpine> = HtmlCarrierOf<D> | HtmlCarrierObstruction;
 
 const addressSet = (nodes: readonly HtmlCarrierNode[]): Set<string> => new Set(nodes.map((node) => node.semanticAddress));
 
@@ -125,10 +155,11 @@ const carrierObstruction = (reason: HtmlCarrierObstruction["reason"], key: strin
   Object.freeze({ kind: "rendering.htmlCarrier-obstruction" as const, reason, key });
 
 /** Admit HTML only as a semantic carrier of the settled document spine. */
-export function htmlCarrierOf<D extends Document>(
+export function htmlCarrierOf<D extends SettledDocumentSpine>(
   document: D,
   nodes: readonly HtmlCarrierNode[],
 ): HtmlCarrierJudgment<D> {
+  if (!structurallySettled(document)) return carrierObstruction("invalid-document-spine", "settled-document-structure");
   const duplicate = firstDuplicate(nodes.map((node) => node.nodeId));
   if (duplicate !== undefined) return carrierObstruction("duplicate-node", duplicate);
   const addresses = addressSet(nodes);
@@ -157,7 +188,12 @@ export function htmlCarrierOf<D extends Document>(
     carriedOrder: document.order,
     carriedReferences: document.references,
     carriedValuationSites: document.valuationSites,
-    carrierNotDocument: html_is_carrier_not_document(document, "rendering.htmlCarrier"),
+    carrierNotDocument: Object.freeze({
+      kind: "settledDocument.html_is_carrier_not_document:witness" as const,
+      documentKind: document.kind,
+      carrierKind: "rendering.htmlCarrier" as const,
+      distinct: true as const,
+    }),
   });
 }
 
@@ -177,7 +213,7 @@ export interface RenderProfile {
   readonly name: string;
   readonly allowedElements: readonly string[];
   readonly allowedStyleBehavior: readonly StyleBehavior[];
-  readonly allowedCompletionRegimes: readonly FormatRegime[];
+  readonly allowedCompletionRegimes: readonly ClosureRegimeName[];
   readonly obligations: readonly string[];
   readonly preservationLaws: readonly PreservationLaw[];
 }
@@ -243,9 +279,6 @@ export function buildHtmlDocumentPlan<H extends HtmlCarrierOf>(
   if (!profile.allowedStyleBehavior.includes(styleBehavior)) {
     return renderFiberObstruction("style-behavior-not-allowed", styleBehavior);
   }
-  if (!profile.allowedCompletionRegimes.includes(system.completionRegime)) {
-    return renderFiberObstruction("completion-regime-not-allowed", system.completionRegime);
-  }
   for (const law of requiredLaws) {
     if (!profile.preservationLaws.includes(law)) return renderFiberObstruction("missing-preservation-law", law);
   }
@@ -259,7 +292,15 @@ export function buildHtmlDocumentPlan<H extends HtmlCarrierOf>(
       return renderFiberObstruction("class-factor-map-obstructed", factor.reason);
     }
   }
+  // Admission reads the real CSS closure witness, never a caller-authored
+  // completionRegime label. Every supported regime comes from the shared
+  // Obsmetrologia closure vocabulary and the CSS owner's settling algorithm.
   const cssSettled = checkStyleResolutionSettled(system);
+  if (!isClosureRegimeName(cssSettled.completionRegime) ||
+      profile.allowedCompletionRegimes.some((regime) => !isClosureRegimeName(regime)) ||
+      !profile.allowedCompletionRegimes.includes(cssSettled.completionRegime)) {
+    return renderFiberObstruction("completion-regime-not-allowed", cssSettled.completionRegime);
+  }
   return Object.freeze({
     kind: "rendering.profile_forms_render_fiber:witness" as const,
     fiber: Object.freeze({

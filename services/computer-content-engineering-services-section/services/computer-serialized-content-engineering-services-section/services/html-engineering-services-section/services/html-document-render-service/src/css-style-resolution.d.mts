@@ -25,7 +25,6 @@ declare module "@red-cup-engineering/css-services-section/css-style-resolution" 
     readonly kind: "rendering.css.system";
     readonly carrier: H;
     readonly declarations: readonly CssDeclaration[];
-    readonly completionRegime: import("@lenticule-science/articulating/predicating/positing/settling/analysis/formats-four").FormatRegime;
     readonly classFactorMap?: CssClassFactorMap;
   }
   export interface CssVisualSite {
@@ -46,7 +45,7 @@ declare module "@red-cup-engineering/css-services-section/css-style-resolution" 
     readonly valuation: CssVisualValuation<H>;
     readonly cascadeClosed: true;
     readonly idempotent: true;
-    readonly completionRegime: string;
+    readonly completionRegime: import("@red-cup-engineering/computer-data-engineering-services-section/closure-regime").ClosureRegimeName;
   }
   export interface CssClassFactorMapWitness {
     readonly kind: "rendering.css_classes_are_factor_maps:witness";

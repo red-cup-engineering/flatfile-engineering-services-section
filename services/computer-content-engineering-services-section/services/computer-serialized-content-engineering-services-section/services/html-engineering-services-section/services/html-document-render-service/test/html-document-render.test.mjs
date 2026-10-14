@@ -8,7 +8,7 @@ import {
 import {
   intZero,
   intOne,
-} from "@lenticule-science/articulating/predicating/positing/settling/analysis/exact-number";
+} from "@red-cup-engineering/exact-number-data-service/exact-number";
 
 // A minimal but structurally-complete settled Document fixture, in the same
 // shape the house test suite for html-file-codec-service (the package this
@@ -37,7 +37,7 @@ const PROFILE = Object.freeze({
   name: "fixture-profile",
   allowedElements: ["div", "p", "span", "a"],
   allowedStyleBehavior: ["static"],
-  allowedCompletionRegimes: ["ordinal.closure.regime.finite"],
+  allowedCompletionRegimes: ["strict"],
   obligations: [],
   preservationLaws: [
     "preserve-addresses", "preserve-order", "preserve-references",
@@ -82,7 +82,7 @@ test("renders a complete HTML document string containing the carrier tree's own 
   const system = Object.freeze({
     kind: "rendering.css.system",
     carrier,
-    completionRegime: "ordinal.closure.regime.finite",
+   
     declarations: [
       { kind: "rendering.css.declaration", nodeId: "root", property: "display", value: "block" },
       { kind: "rendering.css.declaration", nodeId: "child1", property: "color", value: "crimson" },
@@ -115,7 +115,7 @@ test("escapes text content but passes through the trusted html field raw", () =>
   const carrier = htmlCarrierOf(document, nodes);
   const system = Object.freeze({
     kind: "rendering.css.system", carrier,
-    completionRegime: "ordinal.closure.regime.finite", declarations: [],
+    declarations: [],
   });
   const fiber = buildHtmlDocumentPlan(PROFILE, carrier, system, "static");
   const html = renderHtmlDocument(fiber).html;
@@ -132,7 +132,7 @@ test("class-factor-map assignment shows up both on the rendered node's class att
   const carrier = htmlCarrierOf(document, nodes);
   const system = Object.freeze({
     kind: "rendering.css.system", carrier,
-    completionRegime: "ordinal.closure.regime.finite",
+   
     declarations: [{ kind: "rendering.css.declaration", nodeId: "child1", property: "font-weight", value: "bold" }],
     classFactorMap: {
       kind: "rendering.css.classFactorMap",
@@ -158,7 +158,7 @@ test("root inference renders only nodes that are nobody's child when options.roo
   const carrier = htmlCarrierOf(document, nodes);
   const system = Object.freeze({
     kind: "rendering.css.system", carrier,
-    completionRegime: "ordinal.closure.regime.finite", declarations: [],
+    declarations: [],
   });
   const fiber = buildHtmlDocumentPlan(PROFILE, carrier, system, "static");
   const html = renderHtmlDocument(fiber).html;
@@ -176,7 +176,7 @@ test("explicit options.roots overrides inference and can render a subset of the 
   const carrier = htmlCarrierOf(document, nodes);
   const system = Object.freeze({
     kind: "rendering.css.system", carrier,
-    completionRegime: "ordinal.closure.regime.finite", declarations: [],
+    declarations: [],
   });
   const fiber = buildHtmlDocumentPlan(PROFILE, carrier, system, "static");
   const html = renderHtmlDocument(fiber, { roots: ["child1"] }).html;
@@ -197,6 +197,11 @@ test("htmlCarrierOf obstructs a duplicate nodeId and a document address missing 
   assert.equal(missing.kind, "rendering.htmlCarrier-obstruction");
   assert.equal(missing.reason, "missing-address");
   assert.equal(missing.key, "root");
+
+  const unsourced = htmlCarrierOf({ ...document, kind: "unsourced" }, []);
+  assert.equal(unsourced.reason, "invalid-document-spine");
+  const malformed = htmlCarrierOf({ ...document, references: [{from: "root"}] }, []);
+  assert.equal(malformed.reason, "invalid-document-spine");
 });
 
 test("buildHtmlDocumentPlan obstructs an element the profile does not allow", () => {
@@ -206,7 +211,7 @@ test("buildHtmlDocumentPlan obstructs an element the profile does not allow", ()
   ]);
   const system = Object.freeze({
     kind: "rendering.css.system", carrier,
-    completionRegime: "ordinal.closure.regime.finite", declarations: [],
+    declarations: [],
   });
   const judgment = buildHtmlDocumentPlan(PROFILE, carrier, system, "static");
   assert.equal(judgment.kind, "rendering.profile_forms_render_fiber-obstruction");
@@ -229,8 +234,32 @@ test("renderCarrierNode throws on a cyclic carrier (a descendant referencing bac
   const carrier = htmlCarrierOf(document, nodes);
   const system = Object.freeze({
     kind: "rendering.css.system", carrier,
-    completionRegime: "ordinal.closure.regime.finite", declarations: [],
+    declarations: [],
   });
   const fiber = buildHtmlDocumentPlan(PROFILE, carrier, system, "static");
   assert.throws(() => renderHtmlDocument(fiber), /cyclic carrier node/);
+});
+
+// The CSS producer computes the actual closure; a supplied label is not evidence.
+test("render-plan admission uses witnessed CSS closure rather than a forged regime", () => {
+  const document = fixtureDocument(["root"]);
+  const carrier = htmlCarrierOf(document, [{
+    kind: "rendering.htmlCarrier.node", nodeId: "root", element: "div", semanticAddress: "root",
+  }]);
+  const system = Object.freeze({
+    kind: "rendering.css.system", carrier,
+    completionRegime: "aperiodic", // intentionally forged; CSS computes strict
+    declarations: [],
+  });
+  const allowed = buildHtmlDocumentPlan(PROFILE, carrier, system, "static");
+  assert.equal(allowed.kind, "rendering.profile_forms_render_fiber:witness");
+  assert.equal(allowed.cssSettled.completionRegime, "strict");
+  for (const regimes of [["aperiodic"], ["ordinal.closure.regime.finite"]]) {
+    const blocked = buildHtmlDocumentPlan({
+      ...PROFILE, allowedCompletionRegimes: regimes,
+    }, carrier, system, "static");
+    assert.equal(blocked.kind, "rendering.profile_forms_render_fiber-obstruction");
+    assert.equal(blocked.reason, "completion-regime-not-allowed");
+    assert.equal(blocked.key, "strict");
+  }
 });

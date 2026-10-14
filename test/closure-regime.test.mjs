@@ -43,7 +43,8 @@ test("costlierRegime returns the higher original stratum for every pair", () => 
 });
 
 test("closure regime exports refuse names outside the original vocabulary", () => {
-  for (const name of [undefined, null, "", "identity", "non-monotone", 42]) {
+  for (const name of [undefined, null, "", "identity", "non-monotone",
+    "ordinal.closure.regime.finite", "ordinal.closure.regime.scott", 42]) {
     assert.equal(isClosureRegimeName(name), false);
     assert.throws(() => regimeCost(name), TypeError);
     assert.throws(() => regimeDecidable(name), TypeError);
