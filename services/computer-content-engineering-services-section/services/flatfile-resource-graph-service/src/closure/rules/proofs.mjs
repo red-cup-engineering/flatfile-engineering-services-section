@@ -4,13 +4,10 @@ import { makeDiagnostic } from "./diagnostic.mjs";
 
 const PROOF_END_RE = /\$\\square\$/;
 
-// Theorem-like notes carry a status; proved ones have a Proof section
-// ending with a $\square$ marker. Three distinct rule names — matching
-// pyfars.closure.rule.proofs's three Diagnostic codes verbatim, for
-// cross-language conformance (design spec section 11, vector #4) —
-// rather than one collapsed "proofs" name, since the three conditions
-// are semantically distinct problems (no status at all, a proved claim
-// missing its proof, an in-progress proof).
+// A source-format/claim audit, never a proof checker. A Proof heading, terminal
+// square and "status: proved" are authored tokens. None checks a Lean
+// declaration, its hypotheses, a source revision or an independent receiver.
+// The mathematical owner must independently establish proof acceptance.
 export function check(notes) {
   const diagnostics = [];
   for (const note of notes) {
@@ -41,6 +38,12 @@ export function check(notes) {
           message: "status: proved — no $\\square$ marker",
         }));
       }
+      diagnostics.push(makeDiagnostic({
+        rule: "unverified-proof",
+        path: note.path,
+        slug: note.slug,
+        message: "status: proved is an authored claim, not an independently checked derivation at its source revision",
+      }));
     } else if (status === "sketch" || status === "draft") {
       diagnostics.push(makeDiagnostic({
         rule: "wip-theorem",
