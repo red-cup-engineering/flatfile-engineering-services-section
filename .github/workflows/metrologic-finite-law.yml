@@ -11,6 +11,8 @@ on:
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs'
       - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
+      - 'lib/metrologic/src/obstruction/capacity-flow.mjs'
+      - 'lib/metrologic/test/capacity-flow.test.mjs'
       - 'lib/metrologic/package.json'
       - 'services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs'
       - 'services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs'
@@ -27,6 +29,8 @@ on:
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs'
       - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
+      - 'lib/metrologic/src/obstruction/capacity-flow.mjs'
+      - 'lib/metrologic/test/capacity-flow.test.mjs'
       - 'lib/metrologic/package.json'
       - 'services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs'
       - 'services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs'
@@ -48,6 +52,10 @@ jobs:
         run: node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/laplacian.mjs
       - name: Verify total-variation extrema and mass-weighted tails
         run: node --test lib/metrologic/test/number/finite-law.test.mjs
+      - name: Verify exact capacity-flow/min-cut and source-graph conservation
+        run: |
+          node --check lib/metrologic/src/obstruction/capacity-flow.mjs
+          node --test lib/metrologic/test/capacity-flow.test.mjs
       - name: Verify actual finite causal Möbius coefficients against the exhaustive independent poset oracle
         run: |
           node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal-mobius.mjs

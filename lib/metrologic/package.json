@@ -395,6 +395,9 @@
     "./models/order/quantale": "./src/models/order/quantale.mjs",
     "./number/finite-law": {
       "import": "./src/number/finite-law.mjs"
+    },
+    "./obstruction/capacity-flow": {
+      "default": "./src/obstruction/capacity-flow.mjs"
     }
   },
   "files": [
