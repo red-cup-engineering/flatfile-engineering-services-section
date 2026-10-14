@@ -4,7 +4,7 @@ import { createSemioticConceptUniverse, differentiateSemioticConceptUniverses, s
 
 test("concept universes preserve aliases, provenance, unresolved references, and publication selection", () => {
   const result = createSemioticConceptUniverse({ concepts: [
-    { id: "beta", title: "Beta", body: "# Beta", tags: ["b"], sameAs: ["alpha"], publication: { channels: ["web"], status: "draft" }, annotations: [{ kind: "reference", target: "missing", provenance: { carrier: "beta.md" } }] },
+    { id: "beta", title: "Beta", body: "# Beta", tags: ["b"], sameAs: ["alpha"], publication: { enabled: true, channels: ["web"], status: "draft" }, annotations: [{ kind: "reference", target: "missing", provenance: { carrier: "beta.md" } }] },
     { id: "gamma", title: "Gamma", body: "# Gamma", tags: ["g"], annotations: [{ kind: "reference", target: "beta" }] },
   ] });
   assert.equal(result.ok, true);
