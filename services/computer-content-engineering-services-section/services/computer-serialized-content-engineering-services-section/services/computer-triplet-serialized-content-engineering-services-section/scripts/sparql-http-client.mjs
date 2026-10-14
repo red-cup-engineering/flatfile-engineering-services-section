@@ -48,8 +48,11 @@ async function perform(url, options, fetchImpl) {
   return response;
 }
 
-function graphSelection(url, { defaultGraphs = [], namedGraphs = [] } = {}) {
-  for (const [name, values] of [["default-graph-uri", defaultGraphs], ["named-graph-uri", namedGraphs]]) {
+function graphSelection(url, { defaultGraphs = [], namedGraphs = [], operation = "query" } = {}) {
+  const names = operation === "update"
+    ? ["using-graph-uri", "using-named-graph-uri"]
+    : ["default-graph-uri", "named-graph-uri"];
+  for (const [name, values] of [[names[0], defaultGraphs], [names[1], namedGraphs]]) {
     if (!Array.isArray(values)) throw new TypeError(name + " must be an array");
     for (const iri of values) url.searchParams.append(name, graphIri(iri) ?? (() => {
       throw new TypeError(name + " must contain graph IRIs");
@@ -77,7 +80,7 @@ export async function sparqlProtocol(endpoint, text, {
     throw new TypeError("invalid SPARQL headers or content negotiation");
   }
   const url = serviceUrl(endpoint);
-  graphSelection(url, {defaultGraphs, namedGraphs});
+  graphSelection(url, {defaultGraphs, namedGraphs, operation});
   const outgoing = new Headers(headers);
   outgoing.set("accept", accept);
   const options = {method, headers: outgoing};
