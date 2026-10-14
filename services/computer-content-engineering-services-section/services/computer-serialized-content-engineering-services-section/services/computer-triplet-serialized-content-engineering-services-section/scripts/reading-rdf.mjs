@@ -8,6 +8,7 @@
  */
 import { iriRef, predicateIri, predicateNamespace, subjectIri, turtleLiteral, vocabularyNamespace } from "@red-cup-engineering/turtle-services-section/turtle";
 import { graphStoreProtocol } from "./sparql-http-client.mjs";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 
 const NS = Object.freeze({
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -22,6 +23,16 @@ const isUrl = (value) => /^[a-z][a-z0-9+.-]*:\/\//iu.test(value);
 function sides(cell) {
   const [forWitnesses = [], againstWitnesses = []] = cell.value?.evidence ?? [];
   return { for: forWitnesses.map(String), against: againstWitnesses.map(String) };
+}
+
+/** One evidence-independent, source-local typed claim position (not a proof or grant). */
+export function readingClaimId(entity, cell) {
+  if (typeof entity !== "string" || entity.trim() === "" || !cell ||
+      typeof cell.predicate !== "string" || cell.predicate.trim() === "" || !Object.hasOwn(cell, "object")) {
+    throw new TypeError("an addressed documentary claim requires a source subject, predicate, and object");
+  }
+  return semanticId({ kind: "rdf.documentary-claim-position", subject: entity,
+    predicate: cell.predicate, object: cell.object });
 }
 
 function objectTerm(base, object, subjects) {
@@ -66,14 +77,15 @@ export function readingTurtle(folded, opts = {}) {
     const told = sides(cell);
     const predicate = iriRef(predicateIri(base, cell.predicate));
     const object = objectTerm(base, cell.object, subjects);
+    const claim = iriRef(readingClaimId(folded.entity, cell));
     if (told.for.length > 0 && told.against.length === 0) {
-      out.push("[] a rdf:Statement, ws:AffirmedClaim ;", `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`, `  prov:wasDerivedFrom ${provTurtle(told.for)} .`);
+      out.push(`${claim} a rdf:Statement, ws:AffirmedClaim ;`, `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`, `  prov:wasDerivedFrom ${provTurtle(told.for)} .`);
     } else if (told.against.length > 0 && told.for.length === 0) {
-      out.push("[] a rdf:Statement, ws:OpposedClaim ;",
+      out.push(`${claim} a rdf:Statement, ws:OpposedClaim ;`,
         `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`,
         `  ws:contraryClaimedBy ${provTurtle(told.against)} .`);
     } else if (told.for.length > 0) {
-      out.push("[] a ws:ContestedClaim ;", `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`,
+      out.push(`${claim} a ws:ContestedClaim ;`, `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`,
         `  ws:claimedBy ${provTurtle(told.for)} ; ws:contraryClaimedBy ${provTurtle(told.against)} .`);
     }
   }
@@ -95,14 +107,15 @@ export function readingJsonLd(folded, opts = {}) {
     const told = sides(cell);
     const predicate = { "@id": predicateIri(base, cell.predicate) };
     const object = objectTerm(base, cell.object, subjects);
+    const claim = readingClaimId(folded.entity, cell);
     if (told.for.length > 0 && told.against.length === 0) {
-      graph.push({ "@type": ["rdf:Statement", "ws:AffirmedClaim"], "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object), "prov:wasDerivedFrom": provJsonLd(told.for) });
+      graph.push({ "@id": claim, "@type": ["rdf:Statement", "ws:AffirmedClaim"], "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object), "prov:wasDerivedFrom": provJsonLd(told.for) });
     } else if (told.against.length > 0 && told.for.length === 0) {
-      graph.push({ "@type": ["rdf:Statement", "ws:OpposedClaim"], "rdf:subject": { "@id": id },
+      graph.push({ "@id": claim, "@type": ["rdf:Statement", "ws:OpposedClaim"], "rdf:subject": { "@id": id },
         "rdf:predicate": predicate, "rdf:object": jsonObject(object),
         "ws:contraryClaimedBy": provJsonLd(told.against) });
     } else if (told.for.length > 0) {
-      graph.push({ "@type": "ws:ContestedClaim", "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object),
+      graph.push({ "@id": claim, "@type": "ws:ContestedClaim", "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object),
         "ws:claimedBy": provJsonLd(told.for), "ws:contraryClaimedBy": provJsonLd(told.against) });
     }
   }
