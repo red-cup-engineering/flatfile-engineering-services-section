@@ -12,6 +12,9 @@ on:
       - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/package.json'
+      - 'services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
   pull_request:
     paths:
@@ -25,6 +28,9 @@ on:
       - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/package.json'
+      - 'services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
 permissions:
   contents: read
@@ -51,3 +57,24 @@ jobs:
         run: |
           node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/chromatic-lorentzian.mjs
           node --test lib/metrologic/test/chromatic-lorentzian.test.mjs
+
+  graded-resource-law:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify existing graded number and dimensioned resource admission
+        run: |
+          node --check services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs
+          node --test services/number-services-section/services/exact-number-data-service/test/commodity-carrier.test.mjs services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs
+      - name: Verify canonical exact-number package interface
+        run: |
+          node --input-type=module - <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          const p=JSON.parse(readFileSync('services/number-services-section/services/exact-number-data-service/package.json','utf8'));
+          assert.equal(p.exports['./resource-measurement'],'./src/resource-measurement.mjs');
+          assert.equal(p.exports['./graded'],'./src/graded.mjs');
+          NODE
