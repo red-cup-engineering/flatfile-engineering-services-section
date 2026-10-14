@@ -240,6 +240,35 @@ export function cellSet(cells = [], join = merge) {
 /** Join two cell sets: every cell of either, same cells merged. */
 export const mergeCellSets = (left, right) => cellSet([...left, ...right]);
 
+/** A functional section's sole, positively valued and unopposed object.
+ *  Repeated tellings are one cell; distinct objects or a contested value refuse
+ *  a definite reading. Witness presence and the settled value remain distinct. */
+export function certainObject(cells) {
+  const section = cellSet(cells);
+  if (section.length !== 1) return null;
+  const [positive, negative] = sidesOf(section[0]);
+  return positive && !negative ? section[0].object : null;
+}
+
+/** A section's separate FOUR readings, native identities, presence and witness
+ *  counts. Never join unrelated predicates into one alleged truth value. */
+export function sectionReading(cells = []) {
+  const readings = { unknown: 0, held: 0, denied: 0, contested: 0 };
+  const predicates = new Map();
+  const entries = cellSet(cells).map((cell) => {
+    const reading = readingAs("extremal", valueOf(cell));
+    readings[reading]++;
+    const key = coincidenceKey([cell.subject, cell.predicate]);
+    const group = predicates.get(key) ?? { predicate: cell.predicate, count: 0 };
+    group.count++;
+    predicates.set(key, group);
+    return Object.freeze({ cell, address: address(cell), reading,
+      presence: readingAs("extremal", presence(cell)), witnesses: recordOf(cell) });
+  });
+  return Object.freeze({ readings: Object.freeze(readings), entries: Object.freeze(entries),
+    alternatives: Object.freeze([...predicates.values()].filter(({ count }) => count > 1).map(({ predicate }) => predicate)) });
+}
+
 /** The cell of a set at an address (or at another cell's address), if any. */
 export function cellAt(set, at) {
   const key = typeof at === "string" ? at : address(at);
