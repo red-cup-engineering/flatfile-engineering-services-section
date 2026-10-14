@@ -159,6 +159,14 @@ test("NI and URN evidence witnesses remain dereferenceable in both RDF serializa
   assert.ok(sources.some(node=>node["@id"]===witness));
   assert.ok(sources.some(node=>node["@id"]==="urn:561:events:message-1"));
   assert.ok(sources.some(node=>node["rdfs:label"]==="source:handwritten"));
+  const noncanonical = "ni:///sha-256;" + "A".repeat(42) + "B";
+  const suspicious = {entity:"source@rev",fiber:[{predicate:"reports",object:"task-X",
+    value:{evidence:[[noncanonical],[]]}}]};
+  const evidence = readingJsonLd(suspicious,{base})["@graph"][1]["prov:wasDerivedFrom"];
+  assert.equal(evidence["@id"],undefined,"noncanonical last SHA-256 bits cannot become a witness IRI");
+  assert.equal(evidence["rdfs:label"],noncanonical);
+  assert.ok(!readingTurtle(suspicious,{base}).includes("<"+noncanonical+">"));
+
 });
 
 test("witness identity and polarity cannot be fabricated by coercing malformed evidence", () => {
