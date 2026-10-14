@@ -42,7 +42,6 @@
     },
     "./cli/derive-markdown-vault-graph": "./scripts/derive-markdown-vault-graph.mjs",
     "./observe-markdown-document-index": "./src/observe-markdown-document-index.mjs",
-    "./project-markdown-language-lightcone": "./src/project-markdown-language-lightcone.mjs",
     "./admit-markdown-date-path": "./src/admit-markdown-date-path.mjs",
     "./project-markdown-date-path": "./src/project-markdown-date-path.mjs",
     "./measure-markdown-date-evidence": "./src/measure-markdown-date-evidence.mjs",
