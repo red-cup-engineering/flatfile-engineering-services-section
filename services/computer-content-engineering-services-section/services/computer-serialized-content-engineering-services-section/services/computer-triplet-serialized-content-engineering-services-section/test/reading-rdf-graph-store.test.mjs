@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readingTurtle, putReadingRdfGraph } from "../scripts/reading-rdf.mjs";
+import { readingTurtle, readingJsonLd, putReadingRdfGraph } from "../scripts/reading-rdf.mjs";
 
 const base="https://knowledge.example.test/";
 const storeEndpoint="https://rdf.example.test/data";
@@ -56,5 +56,51 @@ test("remote graph refusal is not reported as an admitted write",async()=>{
  await assert.rejects(()=>putReadingRdfGraph({
   folded:{entity:"l-space",fiber:[]},base,graph,storeEndpoint,fetchImpl:f.fetchImpl
  }),e=>e.name==="RdfServiceHttpError"&&e.status===403);
+ assert.equal(f.calls.length,1);
+});
+
+test("claimOnly reification: alleged agency/work assertions remain queryable without RDF-level promotion",()=>{
+ const folded={entity:"task-17",fiber:[
+   {predicate:"incumbent",object:"character-X",value:{evidence:[["source:frontmatter"],[]]}},
+   {predicate:"completed",object:true,value:{evidence:[["source:message"],["source:receiver-denial"]]}},
+   {predicate:"not-authorized",object:true,value:{evidence:[[],["source:office-refusal"]]}},
+   {predicate:"unobserved",object:"unknown",value:{evidence:[[],[]]}}
+ ]};
+ const ordinary=readingTurtle(folded,{base});
+ const documentClaims=readingTurtle(folded,{base,claimOnly:true});
+ // Existing consumers explicitly choosing plain triples retain that contract.
+ assert.match(ordinary,/^<[^>]+> <[^>]+> "character-X" \\.$/mu);
+ // A reified RDF statement does not entail the underlying asserted triple.
+ assert.doesNotMatch(documentClaims,/^<[^>]+> <[^>]+> "character-X" \\.$/mu);
+ assert.match(documentClaims,/a rdf:Statement, ws:PotentialClaim/u);
+ assert.match(documentClaims,/prov:wasDerivedFrom/u);
+ assert.match(documentClaims,/rdf:object "character-X"/u);
+ assert.match(documentClaims,/ws:StableClaim/u);
+ assert.match(documentClaims,/owl:NegativePropertyAssertion/u);
+ assert.doesNotMatch(documentClaims,/unknown/u);
+
+ const jsonLd=readingJsonLd(folded,{base,claimOnly:true});
+ const ordinaryJson=readingJsonLd(folded,{base});
+ assert.equal(Object.hasOwn(ordinaryJson["@graph"][0],"prop:incumbent"),true);
+ assert.equal(Object.hasOwn(jsonLd["@graph"][0],"prop:incumbent"),false);
+ assert.equal(jsonLd["@graph"].some(n=>Array.isArray(n["@type"]) &&
+   n["@type"].includes("ws:PotentialClaim") && n["rdf:object"]==="character-X"),true);
+ assert.equal(jsonLd["@graph"].some(n=>n["@type"]==="ws:StableClaim"),true);
+ assert.equal(jsonLd["@graph"].some(n=>n["@type"]==="owl:NegativePropertyAssertion"),true);
+});
+
+test("claimOnly Graph Store preserves named graph and refuses invalid claim-only policy before transport",async()=>{
+ const folded={entity:"task-17",fiber:[
+  {predicate:"incumbent",object:"character-X",value:{evidence:[["source:frontmatter"],[]]}}
+ ]};
+ const f=captured();
+ const response=await putReadingRdfGraph({folded,base,graph,storeEndpoint,claimOnly:true,fetchImpl:f.fetchImpl});
+ assert.equal(response.status,204);
+ assert.equal(f.calls.length,1);
+ assert.equal(f.calls[0].url.searchParams.get("graph"),graph);
+ assert.equal(f.calls[0].options.body,readingTurtle(folded,{base,claimOnly:true}));
+ assert.doesNotMatch(f.calls[0].options.body,/^<[^>]+> <[^>]+> "character-X" \\.$/mu);
+ await assert.rejects(()=>putReadingRdfGraph({folded,base,graph,storeEndpoint,
+   claimOnly:"true",fetchImpl:f.fetchImpl}),/claimOnly must be a boolean/u);
  assert.equal(f.calls.length,1);
 });
