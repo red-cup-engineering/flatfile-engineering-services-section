@@ -27,7 +27,8 @@
     "./jupyter/codec": "./src/jupyter/codec.mjs",
     "./jupyter/schema": "./src/jupyter/schema.mjs",
     "./dataset-store": "./src/dataset-store.mjs",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./module-parameterization-schema": "./src/module-parameterization.schema.json"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs"
