@@ -18,6 +18,9 @@ import {
   readingOfWire,
   residuationHolds,
   sidesOfReading,
+  symmetricEvidenceDifferenceReading,
+  negateReading,
+  samePoint,
   truthBottom,
   truthLeqReading,
   truthTop,
@@ -111,4 +114,36 @@ test("natural evidence tallies refuse lossy IEEE-754 integer arithmetic", async 
   assert.throws(() => recordAdd(record(limit, 0), record(1, 0)), TypeError);
   assert.throws(() => attestationRecord([limit + 1]), TypeError);
   assert.throws(() => attestationRecord([limit, 2]), TypeError);
+});
+
+test("FOUR symmetric evidence difference is exactly the pinned Chu defect zero test", () => {
+  const vals=readingFamilies.knowledge;
+  for(const a of vals)for(const b of vals){
+    const defect=symmetricEvidenceDifferenceReading(a,b);
+    assert.equal(defect===knowledgeBottom(),samePoint(a,b),
+      "zero evidence defect iff the two FOUR points agree");
+    assert.equal(defect,symmetricEvidenceDifferenceReading(b,a),
+      "a disagreement has no arbitrary scalar direction");
+    assert.equal(symmetricEvidenceDifferenceReading(negateReading(a),negateReading(b)),
+      negateReading(defect), "FOUR negation transports the two evidence slots");
+  }
+  assert.equal(symmetricEvidenceDifferenceReading("absurd","potential"),"potential");
+  assert.equal(symmetricEvidenceDifferenceReading("absurd","active"),"active");
+  assert.equal(symmetricEvidenceDifferenceReading("potential","active"),"stable");
+  assert.equal(symmetricEvidenceDifferenceReading("stable","stable"),"absurd");
+  assert.throws(()=>symmetricEvidenceDifferenceReading("true","potential"),/different families/u);
+});
+
+test("a finite ChuCandidate pairing is lawful exactly when all FOUR defects vanish", () => {
+  const points=["alice","bob"],states=["reads","writes"];
+  const C={alice:{reads:"potential",writes:"absurd"},
+           bob:{reads:"active",writes:"stable"}};
+  const D={alice:{...C.alice},bob:{...C.bob}};
+  const fwd=a=>a,bwd=y=>y;
+  const observed=(a,y)=>symmetricEvidenceDifferenceReading(D[fwd(a)][y],C[a][bwd(y)]);
+  assert.ok(points.every(a=>states.every(y=>observed(a,y)===knowledgeBottom())));
+  D.bob.writes="potential";
+  const failures=points.flatMap(a=>states.filter(y=>observed(a,y)!==knowledgeBottom()).map(y=>[a,y,observed(a,y)]));
+  assert.deepEqual(failures,[["bob","writes","active"]],
+    "positive/negative mismatch stays a typed FOUR defect, not an invented distance");
 });
