@@ -8,11 +8,17 @@ test("concept universes preserve aliases, provenance, unresolved references, and
     { id: "gamma", title: "Gamma", body: "# Gamma", tags: ["g"], annotations: [{ kind: "reference", target: "beta" }] },
   ] });
   assert.equal(result.ok, true);
-  assert.equal(result.value.content.equivalenceClasses[0].representative, "alpha");
-  assert.equal(result.value.content.references.find(({ requestedTarget }) => requestedTarget === "beta").target, "alpha");
-  assert.equal(result.value.content.diagnostics[0].code, "unresolved-reference");
+  assert.equal(result.value.content.version,2);
+  assert.equal(Object.hasOwn(result.value.content,"equivalenceClasses"),false);
+  const identity = result.value.content.references.find(ref => ref.relation === "claimed-identity");
+  assert.deepEqual([identity.source,identity.target,identity.status],
+    ["beta","alpha","unresolved-identity"]);
+  assert.equal(result.value.content.references.find(({ requestedTarget }) => requestedTarget === "beta").target, "beta");
+  assert.ok(result.value.content.diagnostics.some(({code})=>code==="unresolved-identity"));
+  assert.ok(result.value.content.diagnostics.some(({code})=>code==="unresolved-reference"));
   const published = selectSemioticConceptPublication(result.value, { channels: ["web"] });
-  assert.deepEqual(published.map(({ id }) => id), ["alpha"]);
+  assert.deepEqual(published.map(({ id }) => id), ["beta"]);
+  assert.deepEqual(published[0].claimedAliases,["alpha"]);
   assert.equal(published[0].concepts[0].annotations[0].provenance.carrier, "beta.md");
 });
 
