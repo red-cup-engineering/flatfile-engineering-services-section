@@ -1,13 +1,10 @@
 import { assertKeywordValues } from "../src/assert-keyword-values.mjs";
 import { createHash } from "node:crypto";
 import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
-import {
-  canonical,
-  isJsonRecord,
-  requireJsonValue,
-  type JsonRecord,
-  type JsonValue,
-} from "@red-cup-engineering/json-file-codec-service";
+import { canonicalJson as canonical } from "@red-cup-engineering/json-services-section/canonical-json";
+import { isJsonRecord } from "@red-cup-engineering/json-services-section/is-json-record";
+import { requireJsonValue } from "@red-cup-engineering/json-services-section/require-json-value";
+import type { JsonRecord, JsonValue } from "@red-cup-engineering/json-services-section/types";
 
 export const DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema" as const;
 
@@ -310,7 +307,7 @@ function validateNode(
   if (Array.isArray(value)) {
     if (typeof schema.minItems === "number" && value.length < schema.minItems) add("minItems", "array too short");
     if (typeof schema.maxItems === "number" && value.length > schema.maxItems) add("maxItems", "array too long");
-    if (schema.uniqueItems === true && new Set(value.map(canonical)).size !== value.length) add("uniqueItems", "array items are not unique");
+    if (schema.uniqueItems === true && new Set(value.map((item) => canonical(item))).size !== value.length) add("uniqueItems", "array items are not unique");
     if (schema.items !== undefined && (typeof schema.items === "boolean" || isJsonRecord(schema.items))) {
       const child = schemaNode(schema.items, "items");
       value.forEach((item, index) => validateNode(item, child, root, corpus, errors, [...at, index], new Set(stack)));
@@ -388,9 +385,12 @@ export function validateInstance(instance: unknown, schema: SchemaNode, corpus?:
 }
 
 /** Pure policy inspection recovered from the node-local schema writer. */
-export function inspectSchema(schema: unknown, poolIds: ReadonlySet<string> = new Set()): Validation {
+export function inspectSchema(input: unknown, poolIds: ReadonlySet<string> = new Set()): Validation {
   const errors: Violation[] = [];
   const add = (pointer: string, keyword: string, message: string): void => { errors.push(immutable({ pointer, keyword, message })); };
+  let schema: JsonValue;
+  try { schema = requireJsonValue(input, "schema"); }
+  catch (error) { return immutable({ ok: false, errors: Object.freeze([immutable({ pointer: "", keyword: "schema", message: error instanceof Error ? error.message : String(error) })]) }); }
   if (!isJsonRecord(schema)) return immutable({ ok: false, errors: Object.freeze([immutable({ pointer: "", keyword: "schema", message: "schema must be a JSON object" })]) });
   if (schema["$schema"] !== DRAFT_2020_12) add("", "$schema", `dialect must be ${DRAFT_2020_12}`);
   if (typeof schema["$id"] !== "string" || schema["$id"] === "") add("", "$id", "schema requires a non-empty $id");
