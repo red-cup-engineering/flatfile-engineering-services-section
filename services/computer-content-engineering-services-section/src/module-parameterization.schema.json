@@ -131,7 +131,7 @@
         },
         "module": {
           "type": "string",
-          "pattern": "^@[^/]+/[^/]+(?:/[A-Za-z0-9._-]+)*$"
+          "pattern": "^@red-cup-engineering/[^/]+(?:/[A-Za-z0-9._-]+)*$"
         },
         "export": {
           "type": "string",
@@ -150,7 +150,7 @@
           "type": "object",
           "maxProperties": 40,
           "additionalProperties": {
-            "$ref": "#/$defs/dataRef"
+            "$ref": "#/$defs/modelRef"
           },
           "propertyNames": {
             "pattern": "^(?!__proto__$|constructor$|prototype$)[A-Za-z][A-Za-z0-9._-]*$"
@@ -160,6 +160,22 @@
           "type": "object"
         }
       }
+    },
+    "modelRef": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/dataRef"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "module": {
+              "type": "string",
+              "pattern": "^@red-cup-engineering/[^/]+(?:/[A-Za-z0-9._-]+)*$"
+            }
+          }
+        }
+      ]
     }
   },
   "oneOf": [
