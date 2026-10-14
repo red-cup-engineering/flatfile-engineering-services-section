@@ -51,6 +51,10 @@ function normalizedConcept(input) {
   if (!Array.isArray(input.annotations ?? [])) throw new TypeError(`concept ${id}.annotations must be an array`);
   const attributes = input.attributes === undefined ? {} : json(input.attributes, `concept ${id}.attributes`);
   const source = input.source === undefined ? null : json(input.source, `concept ${id}.source`);
+  // A source declaration or channel hint is never a publication grant.
+  // In particular, absence of explicit authorization must not default open.
+  if (input.publication?.enabled !== undefined && typeof input.publication.enabled !== "boolean")
+    throw new TypeError(`concept ${id}.publication.enabled must be a boolean`);
   return freeze({
     id,
     title: text(input.title, `concept ${id}.title`),
@@ -58,7 +62,7 @@ function normalizedConcept(input) {
     tags: freeze(strings(input.tags, `concept ${id}.tags`)),
     sameAs: freeze(strings(input.sameAs, `concept ${id}.sameAs`)),
     publication: freeze({
-      enabled: input.publication?.enabled !== false,
+      enabled: input.publication?.enabled === true,
       channels: freeze(strings(input.publication?.channels, `concept ${id}.publication.channels`)),
       status: input.publication?.status === undefined || input.publication?.status === null ? null : text(input.publication.status, `concept ${id}.publication.status`),
     }),
