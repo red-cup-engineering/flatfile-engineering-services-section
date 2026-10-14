@@ -152,9 +152,6 @@ test("existing professional repertoire catalog selects office, duty and work sou
   ]) assert.throws(()=>selectCatalogJsonSources(catalog,invalid),TypeError);
   assert.throws(()=>selectCatalogJsonSources({...catalog,duties:[catalog.offices[0]]},
     ["offices","duties"]), /duplicate JSON source path/u);
-  assert.throws(()=>selectCatalogJsonSources({...catalog,works:[{
-    ...catalog.works[0],digest:"sha256:"+"0".repeat(64)
-  }]},["works"]).length,1);
   const mismatched=selectCatalogJsonSources({...catalog,works:[{
     ...catalog.works[0],digest:"sha256:"+"0".repeat(64)
   }]},["works"]);
