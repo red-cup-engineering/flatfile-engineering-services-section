@@ -55,6 +55,25 @@ const turtle=await (await graphStoreProtocol("https://example.org/data",
   {graph:"urn:my-authorized-graph"})).text();
 ```
 
+An existing **folded, attributed SignCell/EAVT subject reading** can be
+projected into this standard interface without changing its source:
+`reading-rdf` exports `putReadingRdfGraph({folded,base,graph,storeEndpoint,
+fetchImpl,headers})`. It reuses `readingTurtle` and sends a named-graph
+`PUT` through the same Graph Store transport, retaining affirmative
+`prov:wasDerivedFrom`, opposing `owl:NegativePropertyAssertion`,
+and simultaneous evidence in `ws:StableClaim`. The source and
+permissions remain with the owner: this operation must be invoked only
+on a source-qualified reading whose named graph the caller controls.
+It returns the actual HTTP response and **does not** mint an ontology,
+create a database, infer truth, or claim delivery.
+
+Tests: `node --test test/sparql-http-client.test.mjs
+test/reading-rdf-graph-store.test.mjs`. For a real consumer,
+compare the stored named graph read back from the provider with the
+source witness and separately check graph-store write authorization.
+A successful synthetic HTTP test does not establish a live Semioverse
+graph-store installation.
+
 Use `node --test test/sparql-http-client.test.mjs` to exercise the
 query/update/graph-store transport, negative inputs and HTTP refusals.
 The existing `./sparql-text` is explicitly a **limited BGP profile**,
