@@ -5,6 +5,8 @@
   "description": "Holds RDF triplet terms and named graphs together with their serialization, canonicalization, query, and ontology-projection services.",
   "exports": {
     "./sparql-over-eavt": "./scripts/sparql-over-eavt.mjs",
+    "./sparql-text": "./scripts/sparql-text.mjs",
+    "./sparql-results-json": "./scripts/sparql-results-json.mjs",
     "./n-quads": "./scripts/n-quads.mjs",
     "./rdf-canonicalization": "./scripts/rdf-canonicalization.mjs",
     "./rdf-named-graph": "./scripts/rdf-named-graph.mjs",
