@@ -47,6 +47,7 @@ computer-proofing-system.
 
 ## Other surfaces
 
+- `@red-cup-engineering/metrologic/sheaf/topology/d-frame` - pure subset/frame operations and **bounded exhaustive** four-valued d-frame/sheaf receipts. Binary join/bottom and distribution induction replace the former `2^(2^n)` enumeration of subset families. Exhaustive receipts admit at most **five distinct marks**, with refusal beyond that scope; this is not a checked theorem about arbitrary sites or permission to charge for unbounded proof search. Source test `test/sheaf/d-frame.test.mjs` also checks the three-mark exhaustive-family equivalence and zero-/one-mark frames. An effectful x402 server must separately admit input size, deliver results, meter cost and retain any charged-failure evidence.
 - `@red-cup-engineering/metrologic/obstruction` - temporal firing cohomology of settlings.
 - `@red-cup-engineering/metrologic/number` - the number tower and exact integer matrices.
 - `@red-cup-engineering/metrologic/number/wire-ratio` - BigInt ratios for host pricing.
