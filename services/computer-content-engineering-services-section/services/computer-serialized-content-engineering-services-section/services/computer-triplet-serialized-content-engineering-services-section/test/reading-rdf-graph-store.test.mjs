@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readingTurtle, readingJsonLd, putReadingRdfGraph } from "../scripts/reading-rdf.mjs";
+import { readingTurtle, readingJsonLd, readingVocabulary, putReadingRdfGraph } from "../scripts/reading-rdf.mjs";
 
 const base="https://knowledge.example.test/";
 const storeEndpoint="https://rdf.example.test/data";
@@ -76,7 +76,9 @@ test("claimOnly reification: alleged agency/work assertions remain queryable wit
  assert.match(documentClaims,/prov:wasDerivedFrom/u);
  assert.match(documentClaims,/rdf:object "character-X"/u);
  assert.match(documentClaims,/ws:StableClaim/u);
- assert.match(documentClaims,/owl:NegativePropertyAssertion/u);
+ assert.match(ordinary,/owl:NegativePropertyAssertion/u);
+ assert.doesNotMatch(documentClaims,/owl:NegativePropertyAssertion/u);
+ assert.match(documentClaims,/ws:OpposedClaim/u);
  assert.doesNotMatch(documentClaims,/unknown/u);
 
  // Invalid mode settings cannot accidentally promote documentary claims to facts.
@@ -89,7 +91,12 @@ test("claimOnly reification: alleged agency/work assertions remain queryable wit
  assert.equal(jsonLd["@graph"].some(n=>Array.isArray(n["@type"]) &&
    n["@type"].includes("ws:PotentialClaim") && n["rdf:object"]==="character-X"),true);
  assert.equal(jsonLd["@graph"].some(n=>n["@type"]==="ws:StableClaim"),true);
- assert.equal(jsonLd["@graph"].some(n=>n["@type"]==="owl:NegativePropertyAssertion"),true);
+ assert.equal(ordinaryJson["@graph"].some(n=>n["@type"]==="owl:NegativePropertyAssertion"),true);
+ assert.equal(jsonLd["@graph"].some(n=>n["@type"]==="owl:NegativePropertyAssertion"),false);
+ assert.equal(jsonLd["@graph"].some(n=>Array.isArray(n["@type"]) &&
+   n["@type"].includes("ws:OpposedClaim")),true);
+ assert.match(readingVocabulary(base),/ws:OpposedClaim a owl:Class/u);
+ assert.match(readingVocabulary(base),/ws:contraryClaimedBy a owl:ObjectProperty ; rdfs:domain rdf:Statement/u);
 });
 
 test("claimOnly Graph Store preserves named graph and refuses invalid claim-only policy before transport",async()=>{
