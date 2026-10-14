@@ -79,6 +79,9 @@ test("claimOnly reification: alleged agency/work assertions remain queryable wit
  assert.match(documentClaims,/owl:NegativePropertyAssertion/u);
  assert.doesNotMatch(documentClaims,/unknown/u);
 
+ // Invalid mode settings cannot accidentally promote documentary claims to facts.
+ assert.throws(()=>readingTurtle(folded,{base,claimOnly:"true"}),/claimOnly must be a boolean/u);
+ assert.throws(()=>readingJsonLd(folded,{base,claimOnly:1}),/claimOnly must be a boolean/u);
  const jsonLd=readingJsonLd(folded,{base,claimOnly:true});
  const ordinaryJson=readingJsonLd(folded,{base});
  assert.equal(Object.hasOwn(ordinaryJson["@graph"][0],"prop:incumbent"),true);
