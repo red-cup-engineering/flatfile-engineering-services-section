@@ -20,7 +20,8 @@
     "./predicate-vocabulary": "./src/predicate-vocabulary.mjs",
     "./semiotic-concept-universe": "./src/semiotic-concept-universe.mjs",
     "./articulating": "./src/articulating.mjs",
-    "./cell": "./src/cell.mjs"
+    "./cell": "./src/cell.mjs",
+    "./document-spine": "./src/document-spine.mjs"
   },
   "dependencies": {
     "@red-cup-engineering/computer-content-address-engineering-services-section": "workspace:*",
