@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readingTurtle, readingJsonLd, readingVocabulary, putReadingRdfGraph } from "../scripts/reading-rdf.mjs";
+import { readingTurtle, readingJsonLd, readingVocabulary, readingClaimId, putReadingRdfGraph } from "../scripts/reading-rdf.mjs";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 
 const base = "https://knowledge.example.test/";
 const storeEndpoint = "https://rdf.example.test/data";
@@ -90,4 +91,45 @@ test("remote graph refusal never becomes a successful receipt", async () => {
     folded, base, graph, storeEndpoint, fetchImpl: f.fetchImpl,
   }), error => error.name === "RdfServiceHttpError" && error.status === 403);
   assert.equal(f.calls.length, 1);
+});
+
+test("source-local SCA addresses stable claim positions through Turtle, JSON-LD and independent witnesses", () => {
+  const position = { predicate: "incumbent", object: "character-X" };
+  const expected = semanticId({ kind: "rdf.documentary-claim-position",
+    subject: "source@revision-A", ...position });
+  assert.equal(readingClaimId("source@revision-A", position), expected);
+  assert.match(expected, /^ni:\/\/\/sha-256;/u);
+  assert.notEqual(readingClaimId("source@revision-B", position), expected,
+    "identical tokens under a different source revision must be addressably distinct");
+  assert.notEqual(readingClaimId("source@revision-A", { ...position, object: "character-Y" }), expected);
+
+  const first = { entity: "source@revision-A", fiber: [
+    { ...position, value: { evidence: [["source-witness-A"], []] } },
+  ] };
+  const opposed = { entity: first.entity, fiber: [
+    { ...position, value: { evidence: [["source-witness-A"], ["office-counter-witness"]] } },
+  ] };
+  const ttl = readingTurtle(first, {base});
+  const contested = readingTurtle(opposed, {base});
+  const json = readingJsonLd(first, {base});
+  const contestedJson = readingJsonLd(opposed, {base});
+  assert.ok(ttl.includes(`<${expected}> a rdf:Statement, ws:AffirmedClaim ;`));
+  assert.ok(contested.includes(`<${expected}> a ws:ContestedClaim ;`));
+  assert.equal(json["@graph"][1]["@id"], expected);
+  assert.equal(contestedJson["@graph"][1]["@id"], expected);
+  assert.deepEqual(json["@graph"][1]["prov:wasDerivedFrom"]["rdfs:label"], "source-witness-A");
+  assert.equal(contestedJson["@graph"][1]["ws:contraryClaimedBy"]["rdfs:label"], "office-counter-witness");
+  assert.doesNotMatch(ttl, /<https:\/\/knowledge\.example\.test\/source%40revision-A> <[^>]+> "character-X"/u);
+  assert.deepEqual(first.fiber[0].value.evidence, [["source-witness-A"], []],
+    "a read does not mutate the existing signed witnesses");
+});
+
+test("source-local claim positions cannot be minted from malformed subject, predicate or missing value", () => {
+  for (const [entity, cell] of [
+    ["", {predicate:"incumbent",object:"X"}],
+    ["source", {object:"X"}],
+    ["source", {predicate:"",object:"X"}],
+    ["source", {predicate:"incumbent"}],
+    ["source", null],
+  ]) assert.throws(() => readingClaimId(entity, cell), /addressed documentary claim/u);
 });
