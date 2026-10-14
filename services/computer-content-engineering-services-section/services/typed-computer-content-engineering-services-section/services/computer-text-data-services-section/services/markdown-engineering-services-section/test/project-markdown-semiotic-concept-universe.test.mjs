@@ -46,21 +46,21 @@ test("Markdown source-revision address survives into independently authored Sign
     [["duty","obligation","unverified-identity"],["obligation","duty","unverified-identity"]]);
 });
 
-test("only an explicitly public Markdown source enters the canonical publication selection",()=>{
+test("only an explicitly public Markdown source enters the canonical publication selection",async()=>{
   const cases=[
-    {id:"private-by-default",body:"---\\nid: private-by-default\\nstatus: published\\npublish_to: public\\n---\\nSecret claim."},
-    {id:"channel-only",body:"---\\nid: channel-only\\npublish: [site]\\npublish_to: public\\n---\\nChannel choice is not rights."},
-    {id:"public",body:"---\\nid: public\\nvisibility: public\\npublish_to: site\\n---\\nLicensed public source."},
-    {id:"revoked",body:"---\\nid: revoked\\nvisibility: public\\npublish: false\\npublish_to: site\\n---\\nOwner withdrew publication."},
-    {id:"claimed-officer",body:"---\\nid: claimed-officer\\nincumbent: chatgpt-web\\nstatus: completed\\n---\\nNot an appointment."},
+    {id:"private-by-default",body:"---\nid: private-by-default\nstatus: published\npublish_to: public\n---\nSecret claim."},
+    {id:"channel-only",body:"---\nid: channel-only\npublish: [site]\npublish_to: public\n---\nChannel choice is not rights."},
+    {id:"public",body:"---\nid: public\nvisibility: public\npublish_to: site\n---\nLicensed public source."},
+    {id:"revoked",body:"---\nid: revoked\nvisibility: public\npublish: false\npublish_to: site\n---\nOwner withdrew publication."},
+    {id:"claimed-officer",body:"---\nid: claimed-officer\nincumbent: chatgpt-web\nstatus: completed\n---\nNot an appointment."},
   ];
-  const parsed=cases.map(({id,body})=>({path:`science/${id}.md`,text:body+"\\n"}));
+  const parsed=cases.map(({id,body})=>({path:`science/${id}.md`,text:body+"\n"}));
   const result=projectMarkdownSemioticConceptUniverse({documents:parsed});
   assert.equal(result.ok,true);
   const {selectSemioticConceptPublication}=await import("@red-cup-engineering/signcell/semiotic-concept-universe");
   const selected=selectSemioticConceptPublication(result.value,{channels:["site"]});
   assert.deepEqual(selected.map(record=>record.id),["public"]);
-  const declarations=cases.map(({id,body})=>projectMarkdownSemioticConceptDeclaration({path:`science/${id}.md`,text:body+"\\n"}));
+  const declarations=cases.map(({id,body})=>projectMarkdownSemioticConceptDeclaration({path:`science/${id}.md`,text:body+"\n"}));
   for(const d of declarations.filter(d=>d.id!=="public"))assert.equal(d.publication.enabled,false,d.id);
   assert.equal(declarations.find(d=>d.id==="public").publication.enabled,true);
   assert.equal(declarations.find(d=>d.id==="claimed-officer").attributes.frontmatter.incumbent,"chatgpt-web");
