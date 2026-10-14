@@ -40,5 +40,7 @@ test("missing proof structure is reported separately from missing independent ve
 
 test("a work-in-progress theorem and a missing status are never silently proved", () => {
   assert.deepEqual(check([theorem({status: "sketch"})]).map(x => x.rule), ["wip-theorem"]);
-  assert.deepEqual(check([theorem({status: undefined})]).map(x => x.rule), ["missing-status"]);
+  const original = theorem();
+  const missingStatus = makeFlatfile({...original, fm: {title: "A theorem"}});
+  assert.deepEqual(check([missingStatus]).map(x => x.rule), ["missing-status"]);
 });
