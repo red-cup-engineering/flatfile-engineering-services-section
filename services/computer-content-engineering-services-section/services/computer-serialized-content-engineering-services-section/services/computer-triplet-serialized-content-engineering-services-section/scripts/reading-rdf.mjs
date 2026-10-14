@@ -73,8 +73,15 @@ export function readingTurtle(folded, opts = {}) {
       if (opts.claimOnly !== true) out.push(`${subject} ${predicate} ${turtleTerm(object)} .`);
       out.push("[] a rdf:Statement, ws:PotentialClaim ;", `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`, `  prov:wasDerivedFrom ${provTurtle(told.for)} .`);
     } else if (told.against.length > 0 && told.for.length === 0) {
-      out.push("[] a owl:NegativePropertyAssertion ;", `  owl:sourceIndividual ${subject} ; owl:assertionProperty ${predicate} ;`,
-        `  ${"iri" in object ? `owl:targetIndividual ${iriRef(object.iri)}` : `owl:targetValue ${turtleTerm(object)}`} ;`, `  prov:wasDerivedFrom ${provTurtle(told.against)} .`);
+      if (opts.claimOnly === true) {
+        // Documentary denial is not an OWL negative fact or an authorized refusal.
+        out.push("[] a rdf:Statement, ws:OpposedClaim ;",
+          `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`,
+          `  ws:contraryClaimedBy ${provTurtle(told.against)} .`);
+      } else {
+        out.push("[] a owl:NegativePropertyAssertion ;", `  owl:sourceIndividual ${subject} ; owl:assertionProperty ${predicate} ;`,
+          `  ${"iri" in object ? `owl:targetIndividual ${iriRef(object.iri)}` : `owl:targetValue ${turtleTerm(object)}`} ;`, `  prov:wasDerivedFrom ${provTurtle(told.against)} .`);
+      }
     } else if (told.for.length > 0) {
       out.push("[] a ws:StableClaim ;", `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`,
         `  ws:claimedBy ${provTurtle(told.for)} ; ws:contraryClaimedBy ${provTurtle(told.against)} .`);
@@ -102,8 +109,14 @@ export function readingJsonLd(folded, opts = {}) {
       if (opts.claimOnly !== true) node[`prop:${cell.predicate}`] = jsonObject(object);
       graph.push({ "@type": ["rdf:Statement", "ws:PotentialClaim"], "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object), "prov:wasDerivedFrom": provJsonLd(told.for) });
     } else if (told.against.length > 0 && told.for.length === 0) {
-      graph.push({ "@type": "owl:NegativePropertyAssertion", "owl:sourceIndividual": { "@id": id }, "owl:assertionProperty": predicate,
-        ...("iri" in object ? { "owl:targetIndividual": { "@id": object.iri } } : { "owl:targetValue": object.literal }), "prov:wasDerivedFrom": provJsonLd(told.against) });
+      if (opts.claimOnly === true) {
+        graph.push({ "@type": ["rdf:Statement", "ws:OpposedClaim"], "rdf:subject": { "@id": id },
+          "rdf:predicate": predicate, "rdf:object": jsonObject(object),
+          "ws:contraryClaimedBy": provJsonLd(told.against) });
+      } else {
+        graph.push({ "@type": "owl:NegativePropertyAssertion", "owl:sourceIndividual": { "@id": id }, "owl:assertionProperty": predicate,
+          ...("iri" in object ? { "owl:targetIndividual": { "@id": object.iri } } : { "owl:targetValue": object.literal }), "prov:wasDerivedFrom": provJsonLd(told.against) });
+      }
     } else if (told.for.length > 0) {
       graph.push({ "@type": "ws:StableClaim", "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object),
         "ws:claimedBy": provJsonLd(told.for), "ws:contraryClaimedBy": provJsonLd(told.against) });
@@ -112,7 +125,7 @@ export function readingJsonLd(folded, opts = {}) {
   return { "@context": { ...NS, ws: vocabularyNamespace(base), prop: predicateNamespace(base), label: "rdfs:label" }, "@graph": graph };
 }
 
-/** The ws: vocabulary as Turtle: Subject, PotentialClaim, StableClaim, claimedBy and contraryClaimedBy. */
+/** The ws: vocabulary as Turtle: Subject, PotentialClaim, OpposedClaim, StableClaim and evidence properties. */
 export function readingVocabulary(base = "/") {
   const vocab = vocabularyNamespace(base);
   return `${prefixes(base)}
@@ -129,9 +142,12 @@ ws:PotentialClaim a owl:Class ; rdfs:subClassOf rdf:Statement ; rdfs:label "Pote
 ws:StableClaim a owl:Class ; rdfs:subClassOf rdf:Statement ; rdfs:label "Stable claim" ;
   rdfs:comment "A claim told both for and against: a held contradiction." .
 
+ws:OpposedClaim a owl:Class ; rdfs:subClassOf rdf:Statement ; rdfs:label "Opposed claim" ;
+  rdfs:comment "A source-attributed negative-only testimony, not an OWL negative property assertion." .
+
 ws:claimedBy a owl:ObjectProperty ; rdfs:domain ws:StableClaim ; rdfs:range prov:Entity ; rdfs:subPropertyOf prov:wasDerivedFrom ; rdfs:label "claimed by" .
 
-ws:contraryClaimedBy a owl:ObjectProperty ; rdfs:domain ws:StableClaim ; rdfs:range prov:Entity ; rdfs:subPropertyOf prov:wasDerivedFrom ; rdfs:label "contrary claimed by" .
+ws:contraryClaimedBy a owl:ObjectProperty ; rdfs:domain rdf:Statement ; rdfs:range prov:Entity ; rdfs:subPropertyOf prov:wasDerivedFrom ; rdfs:label "contrary claimed by" .
 `;
 }
 
@@ -142,8 +158,8 @@ ws:contraryClaimedBy a owl:ObjectProperty ; rdfs:domain ws:StableClaim ; rdfs:ra
  * authorization and receiver; neither projection nor HTTP 2xx proves truth.
  * PUT *replaces* that named graph; caller must use an identity it owns.
  * claimOnly=true is the source-claim view for frontmatter/agency assertions:
- * reified documentary witnesses remain queryable without promoting them to
- * unqualified domain triples. False/contested claims keep their own forms.
+ * documentary positive, negative and contested witnesses remain queryable
+ * as reified claims without promoting them to positive or negative OWL facts.
  */
 export async function putReadingRdfGraph({
   folded, base, subjects = [], graph, storeEndpoint, fetchImpl, headers, claimOnly = false,
