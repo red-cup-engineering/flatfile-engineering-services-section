@@ -36,7 +36,10 @@ function selection(witness,kind,context){
   const thread=claimSubject({...context,kind,row,witness});if(thread===undefined)return {unqualified:'claim-thread-subject-unresolved'};
   // Current claim-session consumers address this exact name; hashing would invent a new subject.
   if(thread.length>200)return {...common,originalOnly:'legacy-subject-exceeds-current-name-law'};
-  return {...common,type:'claim-session',thread,claim:true,log:true,record:{...plain,thread,...(witness.observation.seat===undefined?{}:{seat:witness.observation.seat})}};
+  // Current FeltOS dispatch and governance readers fold native thread heads.
+  // Their t may be a source/item coordinate, not an instant. Preserve it as
+  // the row says it; no current consumer requires a dated claim-session log.
+  return {...common,type:'claim-session',thread,claim:true,record:{...plain,thread,...(witness.observation.seat===undefined?{}:{seat:witness.observation.seat})}};
  }
  if(kind==='capability-assertions'&&v?.kind==='capability.assertion')return {...common,type:'capability-assertion',thread:'capability-assertions',record:v};
  if(kind==='office-incumbency')return {...common,type:'office-incumbency',record:object(value)?value:v};
@@ -105,7 +108,8 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
     report.originalOnlyDispositions.count++;report.originalOnlyDispositions.reasons[item.originalOnly]=(report.originalOnlyDispositions.reasons[item.originalOnly]??0)+1;continue;}
    if(item?.unqualified){report.unqualifiedSources[item.unqualified]=(report.unqualifiedSources[item.unqualified]??0)+1;continue;}
    if(!item){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;}
-   if(!object(item.record)||!instant(item.at))throw new TypeError('selected original is not a dated object record');
+   if(!object(item.record))throw new TypeError('selected original is not an object record');
+   if(item.log&&!instant(item.at))throw new TypeError('selected temporal consumer lacks an original instant');
    count(item.type).read++;selected++;
    if(maps.get('source',item.original)===undefined)maps.put('source',item.original,{file,offset:line.offset,length:line.length,kind,original:item.original});
    if(item.identity&&NI.test(item.identity)&&maps.get('identity',item.identity)===undefined)maps.put('identity',item.identity,item.original);
