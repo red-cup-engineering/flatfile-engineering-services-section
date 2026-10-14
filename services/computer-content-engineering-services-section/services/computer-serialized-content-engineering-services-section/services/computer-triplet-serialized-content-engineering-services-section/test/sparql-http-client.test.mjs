@@ -43,11 +43,14 @@ test("POST CONSTRUCT sends actual SPARQL text, preserving Turtle negotiation",as
 test("SPARQL UPDATE is a distinct POST operation and caller-provided authorization stays with HTTP",async()=>{
   const f=fake("",204);
   await sparqlProtocol(endpoint,"INSERT DATA { <urn:s> <urn:p> <urn:o> }",{
-    operation:"update",fetchImpl:f.fetchImpl,headers:{authorization:"Bearer test-only"},
+    operation:"update",fetchImpl:f.fetchImpl,defaultGraphs:["urn:source"],namedGraphs:["urn:named"],headers:{authorization:"Bearer test-only"},
   });
   assert.equal(f.calls[0].init.method,"POST");
   assert.equal(f.calls[0].init.headers.get("content-type"),"application/sparql-update");
   assert.equal(f.calls[0].init.headers.get("authorization"),"Bearer test-only");
+  assert.deepEqual(f.calls[0].url.searchParams.getAll("using-graph-uri"),["urn:source"]);
+  assert.deepEqual(f.calls[0].url.searchParams.getAll("using-named-graph-uri"),["urn:named"]);
+  assert.equal(f.calls[0].url.searchParams.has("default-graph-uri"),false);
   await assert.rejects(()=>sparqlProtocol(endpoint,"DELETE WHERE { ?s ?p ?o }",{
     operation:"update",method:"GET",fetchImpl:f.fetchImpl,
   }),/updates require POST/);
