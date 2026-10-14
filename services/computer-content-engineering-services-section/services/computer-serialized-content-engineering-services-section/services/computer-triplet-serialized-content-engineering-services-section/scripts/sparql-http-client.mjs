@@ -22,7 +22,7 @@ function serviceUrl(value) {
 function graphIri(value) {
   if (value === undefined || value === null) return null;
   if (typeof value !== "string" || !/^[A-Za-z][A-Za-z0-9+.-]*:/u.test(value) ||
-      /[\\x00-\\x20<>"{}|^\\\\]/u.test(value)) {
+      /[\x00-\x20<>"{}|^\\]/u.test(value)) {
     throw new TypeError("graph must be an absolute RDF graph IRI");
   }
   return value;
