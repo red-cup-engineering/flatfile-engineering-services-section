@@ -327,7 +327,9 @@ ${body}
 </body>
 </html>
 `;
-  const received = documentSpineOfHtml(html);
+  const parsed = readHtmlDocument(html);
+  receiveCarrierGeometry(parsed, fiber.fiber.carrier, roots, rendered);
+  const received = spineOfParsedDocument(parsed);
   if (canonical(received) !== spineText) throw new TypeError("renderHtmlDocument: document spine changed during HTML projection");
   return Object.freeze({
     kind: "rendering.htmlFiber.document",
@@ -340,7 +342,10 @@ ${body}
  * Geometry and cells are data; settlement and issuer authority remain separate.
  */
 export function documentSpineOfHtml(html, limits = {}) {
-  const parsed = readHtmlDocument(String(html), limits);
+  return spineOfParsedDocument(readHtmlDocument(String(html), limits));
+}
+
+function spineOfParsedDocument(parsed) {
   const templates = [];
   const pending = [parsed];
   while (pending.length) {
@@ -367,4 +372,42 @@ export function documentSpineOfHtml(html, limits = {}) {
   if (canonical(raw) !== canonical(admitted.value))
     throw new TypeError("documentSpineOfHtml: raw typed coordinates differ from their reconstruction");
   return admitted.value;
+}
+
+/** Verify the actual parsed carrier, allowing unmarked browser-implied wrappers. */
+function receiveCarrierGeometry(parsed, carrier, roots, emitted) {
+  const byId = new Map(carrier.nodes.map((node) => [node.nodeId, node]));
+  const rootIds = new Set(roots);
+  const received = [];
+  const pending = [{ node: parsed, parent: undefined }];
+  const foldedName = (value) => value.replace(/[A-Z]/g, (letter) => letter.toLowerCase());
+  while (pending.length) {
+    const { node, parent } = pending.pop();
+    const attrs = Object.fromEntries((node.attrs ?? []).map(({ name, value }) => [name, value]));
+    let at = parent;
+    if (Object.hasOwn(attrs, "data-render-node")) {
+      const expected = byId.get(attrs["data-render-node"]);
+      if (expected === undefined || typeof node.tagName !== "string" ||
+          foldedName(node.tagName) !== foldedName(expected.element) ||
+          attrs["data-semantic-address"] !== expected.semanticAddress ||
+          attrs["data-valuation-site"] !== expected.valuationSite)
+        throw new TypeError("renderHtmlDocument: parsed carrier coordinates differ from their declared node");
+      if (parent === undefined ? !rootIds.has(expected.nodeId) : !(parent.children ?? []).includes(expected.nodeId))
+        throw new TypeError("renderHtmlDocument: parsed carrier parent differs from its declared geometry");
+      received.push(expected);
+      at = expected;
+    }
+    // Template content is an inert document fragment, not rendered children.
+    const children = node.childNodes ?? [];
+    for (let index = children.length - 1; index >= 0; index -= 1)
+      pending.push({ node: children[index], parent: at });
+  }
+  if (canonical(received.map(({ nodeId }) => nodeId)) !== canonical(emitted.map(({ nodeId }) => nodeId)))
+    throw new TypeError("renderHtmlDocument: browser parsing changed carrier traversal or root membership");
+  const positions = new Map();
+  received.forEach((node, index) => { if (!positions.has(node.semanticAddress)) positions.set(node.semanticAddress, index); });
+  for (const { before, after } of carrier.document.order)
+    if (positions.get(before) >= positions.get(after))
+      throw new TypeError("renderHtmlDocument: parsed carrier violates explicit document order");
+  return received;
 }
