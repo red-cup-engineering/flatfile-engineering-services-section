@@ -55,6 +55,9 @@ function prefixes(base) {
  * claimOnly=true retains source-qualified reified claims but omits bare positive
  * domain triples. It does not independently authenticate the witnesses. */
 export function readingTurtle(folded, opts = {}) {
+  if (opts.claimOnly !== undefined && typeof opts.claimOnly !== "boolean") {
+    throw new TypeError("claimOnly must be a boolean source-assertion policy");
+  }
   const base = opts.base ?? "/";
   const subjects = new Set(opts.subjects ?? []);
   const subject = iriRef(subjectIri(base, folded.entity));
@@ -82,6 +85,9 @@ export function readingTurtle(folded, opts = {}) {
 
 /** A subject's folded evidence as JSON-LD; claimOnly avoids naked positive properties. */
 export function readingJsonLd(folded, opts = {}) {
+  if (opts.claimOnly !== undefined && typeof opts.claimOnly !== "boolean") {
+    throw new TypeError("claimOnly must be a boolean source-assertion policy");
+  }
   const base = opts.base ?? "/";
   const subjects = new Set(opts.subjects ?? []);
   const id = subjectIri(base, folded.entity);
