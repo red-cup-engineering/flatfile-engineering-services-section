@@ -19,7 +19,11 @@ const NS = Object.freeze({
 });
 
 /** Explicitly admitted witness-address syntaxes; text labels are not inferred to be IRIs. */
-const isWitnessIri = value => /^(?:https?:\/\/[^\\s<>"{}|^\\\\]+|urn:[a-z0-9][a-z0-9:._~-]*|ni:\/\/\/sha-256;[A-Za-z0-9_-]{43})$/u.test(value);
+function isWitnessIri(value) {
+  if (/^ni:\/\/\/sha-256;[A-Za-z0-9_-]{43}$/u.test(value)) return true;
+  if (/^urn:[A-Za-z0-9][A-Za-z0-9:._~-]*$/u.test(value)) return true;
+  return /^https?:\/\//u.test(value) && !/[\s<>"{}|^\\]/u.test(value);
+}
 
 /** Preserve the two independent evidence families, refusing untyped witnesses. */
 function sides(cell) {
