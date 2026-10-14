@@ -1,0 +1,104 @@
+import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import test from "node:test";
+import { jsonSourcesProvider } from "../src/adapters/json-sources.mjs";
+import { attributePredicate, decodeJsonGraphValue } from "../src/provider/attribute-projection.mjs";
+import { composeProviders, queryRelations } from "../src/provider/compositor.mjs";
+
+const groups = ["https://github.com/561-group/561-group-services-section",
+  "https://github.com/coesite-operations/operations-services-section"];
+const sourcePath = "lib/agency/duties/observing-language-space.json";
+const observedAt = "2026-10-14T20:00:00.000Z";
+
+async function fixture(t, record = {
+  name: "observing-language-space",
+  authority: "board-charter",
+  claim: "receiving-office",
+  skills: ["inspect-corpus", "qualify-language-claims"],
+  delegation: false,
+}) {
+  const root = await mkdtemp(join(tmpdir(), "fars-source-json-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const path = join(root, sourcePath);
+  await mkdir(dirname(path), { recursive: true });
+  const bytes = Buffer.from(JSON.stringify(record, null, 2) + "\n", "utf8");
+  await writeFile(path, bytes);
+  return { root, path, bytes };
+}
+
+function provider(root, namespace = groups[0], paths = [sourcePath]) {
+  return jsonSourcesProvider({ id: "agency-source", root, namespace, paths });
+}
+
+test("real source-owned agency JSON files enter the same typed FARS graph without conferring incumbency", async t => {
+  const { root, bytes } = await fixture(t);
+  const p = provider(root);
+  const observed = await p.observe({ observedAt });
+  assert.equal(observed.resources.length, 1);
+  const record = observed.resources[0];
+  assert.equal(record.observedAt, observedAt);
+  assert.equal(record.focus.includes(encodeURIComponent(groups[0])), true);
+  assert.notEqual(record.resource, record.focus, "resource is revision-scoped");
+  const hash = createHash("sha256").update(bytes).digest("hex");
+  const revision = record.cells.find(x => x.predicate === "urn:fars:source-revision");
+  assert.equal(revision.object, `sha256:${hash}`);
+  const dutyName = record.cells.find(x => x.predicate === attributePredicate("name"));
+  assert.equal(dutyName.subject, record.resource, "the JSON file makes this statement, not an actual office");
+  assert.equal(decodeJsonGraphValue(dutyName.object), "observing-language-space");
+  const delegated = record.cells.find(x => x.predicate === attributePredicate("delegation"));
+  assert.equal(decodeJsonGraphValue(delegated.object), false);
+  const skills = record.cells.filter(x => x.predicate === attributePredicate("skills"));
+  assert.deepEqual(skills.map(x => decodeJsonGraphValue(x.object)), ["inspect-corpus","qualify-language-claims"]);
+  assert.equal(record.cells.some(x => x.predicate === "urn:fars:authorized-incumbent"), false);
+  const actual = await composeProviders([p], { context: { observedAt } });
+  assert.equal(actual.providers[0].status, "observed");
+  assert.equal(queryRelations(actual, { predicate: attributePredicate("name") }).length, 1);
+});
+
+test("source revision and source owner prevent unchanged words from inheriting prior witness authority", async t => {
+  const { root, path } = await fixture(t);
+  const first = (await provider(root).observe({ observedAt })).resources[0];
+  const second = (await provider(root, groups[1]).observe({ observedAt })).resources[0];
+  assert.notEqual(first.resource, second.resource, "different lawful owners never alias");
+  const edited = JSON.parse((await readFile(path)).toString("utf8"));
+  edited.skills.push("observe-receiver");
+  await writeFile(path, JSON.stringify(edited, null, 2) + "\n");
+  const changed = (await provider(root).observe({ observedAt })).resources[0];
+  assert.notEqual(first.resource, changed.resource, "different exact source bytes have different revision identity");
+  const witnesses = value => value.cells.filter(x=>x.predicate==="urn:fars:attribute-witness").map(x=>x.object);
+  assert.notDeepEqual(witnesses(first), witnesses(changed),
+    "same name value in a revised document must not retain the old source witness");
+  assert.equal(changed.focus, first.focus, "logical source path stays identifiable");
+});
+
+test("source admission is explicit, finite, atomic and closed against paths outside the owner", async t => {
+  const { root } = await fixture(t);
+  for (const paths of [[], ["../owned.json"], ["/etc/passwd.json"],
+    ["sub/../owned.json"], [sourcePath, sourcePath], [".git/config.json"],
+    ["lib/agency/secrets.txt"]]) {
+    assert.throws(() => provider(root, groups[0], paths), TypeError, JSON.stringify(paths));
+  }
+  assert.throws(() => provider(root, "http://untrusted.example.test"), TypeError);
+  assert.throws(() => provider(root, groups[0], Array.from({length:4097}, (_,i)=>`x/${i}.json`)), TypeError);
+  const absent = provider(root, groups[0], [sourcePath, "lib/agency/duties/missing.json"]);
+  await assert.rejects(() => absent.observe({observedAt}));
+  const other = await mkdtemp(join(tmpdir(), "fars-foreign-"));
+  t.after(() => rm(other, { recursive: true, force: true }));
+  await writeFile(join(other, "private.json"), '{"authority":"not-admitted"}\n');
+  await symlink(join(other, "private.json"), join(root, "lib/agency/duties/alias.json"));
+  await assert.rejects(() => provider(root, groups[0], ["lib/agency/duties/alias.json"]).observe({observedAt}),
+    /source changes its selected path/u);
+});
+
+test("bad JSON or a non-object cannot silently become a qualified source claim", async t => {
+  const { root, path } = await fixture(t);
+  await writeFile(path, '{"name":');
+  await assert.rejects(() => provider(root).observe({observedAt}),/not an admitted UTF-8 JSON/u);
+  await writeFile(path, '[{"name":"not an office record"}]');
+  await assert.rejects(() => provider(root).observe({observedAt}),/object record/u);
+  await writeFile(path, JSON.stringify({big:"x".repeat(1_048_580)}));
+  await assert.rejects(() => provider(root).observe({observedAt}),/bounded regular file/u);
+});
