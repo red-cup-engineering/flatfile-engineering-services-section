@@ -25,7 +25,7 @@
       },
       "module": {
         "type": "string",
-        "pattern": "^@[^/]+/[^/]+(?:/[A-Za-z0-9._-]+)*$"
+        "pattern": "^@red-cup-engineering/[^/]+(?:/[A-Za-z0-9._-]+)*$"
       },
       "export": {
         "type": "string",
