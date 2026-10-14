@@ -143,3 +143,42 @@ test("source-local claim positions cannot be minted from malformed subject, pred
       /RDF object must be an admitted scalar/u);
   }
 });
+
+test("NI and URN evidence witnesses remain dereferenceable in both RDF serializations", () => {
+  const witness = semanticId({source:"science",revision:"2026-10-14",span:[13,20]});
+  const message = {entity:"source@rev",fiber:[{predicate:"reports",object:"task-X",
+    value:{evidence:[[witness,"urn:561:events:message-1","source:handwritten"],[]]}}]};
+  const ttl = readingTurtle(message,{base});
+  const json = readingJsonLd(message,{base});
+  assert.ok(ttl.includes("<" + witness + ">"));
+  assert.match(ttl,/<urn:561:events:message-1>/u);
+  assert.match(ttl,/rdfs:label "source:handwritten"/u);
+  const sources = json["@graph"][1]["prov:wasDerivedFrom"];
+  assert.ok(Array.isArray(sources));
+  assert.ok(sources.some(node=>node["@id"]===witness));
+  assert.ok(sources.some(node=>node["@id"]==="urn:561:events:message-1"));
+  assert.ok(sources.some(node=>node["rdfs:label"]==="source:handwritten"));
+});
+
+test("witness identity and polarity cannot be fabricated by coercing malformed evidence", () => {
+  const invalid = [
+    [[{fake:"signed"}],[]],
+    [[""],[]],
+    [["real"]],
+    [[],[],["extra"]],
+    [["real"],"against-not-an-array"],
+    "testimony",
+  ];
+  for (const evidence of invalid) {
+    const reading = {entity:"source@rev",fiber:[{predicate:"incumbent",object:"character-X",
+      value:{evidence}}]};
+    assert.throws(()=>readingTurtle(reading,{base}),/two arrays of nonempty witness identities/u);
+    assert.throws(()=>readingJsonLd(reading,{base}),/two arrays of nonempty witness identities/u);
+  }
+  const reading={entity:"source@rev",fiber:[{predicate:"incumbent",object:"character-X",
+    value:{evidence:[["witness-A","witness-A","witness-B"],["denial-Z","denial-Z"]]}}]};
+  const reversed={entity:"source@rev",fiber:[{predicate:"incumbent",object:"character-X",
+    value:{evidence:[["witness-B","witness-A"],["denial-Z"]]}}]};
+  assert.equal(readingTurtle(reading,{base}),readingTurtle(reversed,{base}));
+  assert.deepEqual(readingJsonLd(reading,{base}),readingJsonLd(reversed,{base}));
+});
