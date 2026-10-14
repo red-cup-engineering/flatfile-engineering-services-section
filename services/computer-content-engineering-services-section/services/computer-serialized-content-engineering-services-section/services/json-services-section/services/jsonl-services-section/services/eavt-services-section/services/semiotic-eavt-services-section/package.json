@@ -27,7 +27,8 @@
     "./store": "./src/store.mjs",
     "./layout": "./src/layout.mjs",
     "./exchange": "./src/exchange.mjs",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./causal-resource-head": "./src/causal-resource-head.mjs"
   },
   "files": [
     "src",

@@ -7,6 +7,8 @@ on:
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/src/clock.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/clock.test.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/signcell-seavt.test.mjs'
+      - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/src/causal-resource-head.mjs'
+      - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/causal-resource-head.test.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/package.json'
       - '.github/workflows/signcell-sen-seavt.yml'
   pull_request:
@@ -15,6 +17,8 @@ on:
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/src/clock.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/clock.test.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/signcell-seavt.test.mjs'
+      - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/src/causal-resource-head.mjs'
+      - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/causal-resource-head.test.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/package.json'
       - '.github/workflows/signcell-sen-seavt.yml'
   workflow_dispatch:
@@ -34,6 +38,8 @@ jobs:
         run: |
           node --check services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/src/admit-seavt-row.mjs
           node --check services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/signcell-seavt.test.mjs
+          node --check services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/src/causal-resource-head.mjs
+          node --check services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/causal-resource-head.test.mjs
       - name: Require native workspace consumer and supplier in the dependency contract
         run: |
           node --input-type=module -e '
@@ -41,6 +47,8 @@ jobs:
             const p=JSON.parse(fs.readFileSync("services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/package.json"));
             if (p.dependencies["@red-cup-engineering/signcell"]!=="workspace:*")
               throw new Error("SEAVT must consume the actual SignCell supplier");
+            if (p.exports["./causal-resource-head"]!=="./src/causal-resource-head.mjs")
+              throw new Error("canonical SEAVT causal resource-head export missing");
             if (p.exports["./admit-seavt-row"]!=="./src/admit-seavt-row.mjs")
               throw new Error("canonical SEN-SEAVT provider export missing");
           '
