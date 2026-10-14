@@ -6,6 +6,7 @@
  * witnesses. The ws: vocabulary names these classes.
  */
 import { iriRef, predicateIri, predicateNamespace, subjectIri, turtleLiteral, vocabularyNamespace } from "@red-cup-engineering/turtle-services-section/turtle";
+import { graphStoreProtocol } from "./sparql-http-client.mjs";
 
 const NS = Object.freeze({
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -121,4 +122,29 @@ ws:claimedBy a owl:ObjectProperty ; rdfs:domain ws:StableClaim ; rdfs:range prov
 
 ws:contraryClaimedBy a owl:ObjectProperty ; rdfs:domain ws:StableClaim ; rdfs:range prov:Entity ; rdfs:subPropertyOf prov:wasDerivedFrom ; rdfs:label "contrary claimed by" .
 `;
+}
+
+/**
+ * Publish one already-qualified folded subject reading as a named RDF graph
+ * through the W3C Graph Store HTTP Protocol. This reuses readingTurtle and
+ * the shared SPARQL HTTP transport. Caller owns the source, graph IRI,
+ * authorization and receiver; neither projection nor HTTP 2xx proves truth.
+ * PUT *replaces* that named graph; caller must use an identity it owns.
+ */
+export async function putReadingRdfGraph({
+  folded, base, subjects = [], graph, storeEndpoint, fetchImpl, headers,
+} = {}) {
+  if (typeof base !== "string" || !base.startsWith("https://")) {
+    throw new TypeError("RDF reading base must be an absolute HTTPS namespace");
+  }
+  if (!folded || typeof folded.entity !== "string" || !Array.isArray(folded.fiber)) {
+    throw new TypeError("RDF reading requires an admitted subject and evidence fiber");
+  }
+  if (typeof graph !== "string" || !graph) {
+    throw new TypeError("RDF export needs a named graph assigned by the receiving owner");
+  }
+  const body = readingTurtle(folded, {base,subjects});
+  return graphStoreProtocol(storeEndpoint,{
+    graph, method:"PUT", body, contentType:"text/turtle", fetchImpl, headers,
+  });
 }
