@@ -47,6 +47,41 @@ function sourceSelections(sources) {
 }
 
 /**
+ * Select existing JSON source records from a source-owned catalog. This is a
+ * pure projection of the catalog's own canonicalPath and SHA-256 pins; it
+ * creates no shadow catalog, authority, or synthetic work record.
+ *
+ * Group names are exact, explicit selections (e.g. a professional repertoire's
+ * offices, duties, works). Skill directories and executable scripts are not
+ * JSON records and must use their distinct source-qualified provider.
+ * The caller remains responsible for authenticating the catalog itself and
+ * for the right to read every selected source. Nothing here confers appointment.
+ */
+export function selectCatalogJsonSources(catalog, groups) {
+  if (!catalog || typeof catalog !== "object" || Array.isArray(catalog) ||
+      !Array.isArray(groups) || groups.length < 1 || groups.length > 128 ||
+      new Set(groups).size !== groups.length) {
+    throw new TypeError("catalog selection requires unique explicit source groups");
+  }
+  const selections = [];
+  for (const group of groups) {
+    if (typeof group !== "string" || !/^[A-Za-z][A-Za-z0-9_-]*$/u.test(group) ||
+        !Object.hasOwn(catalog, group) || !Array.isArray(catalog[group])) {
+      throw new TypeError("requested catalog group does not contain source records");
+    }
+    for (const entry of catalog[group]) {
+      if (!entry || typeof entry !== "object" || Array.isArray(entry) ||
+          typeof entry.id !== "string" || !entry.id.trim() ||
+          typeof entry.canonicalPath !== "string") {
+        throw new TypeError("catalog entries must identify source-owned JSON files");
+      }
+      selections.push({ path: entry.canonicalPath, digest: entry.digest });
+    }
+  }
+  return sourceSelections(selections);
+}
+
+/**
  * Observe source-owned JSON records as documentary *content*, not as enterprise
  * authority, accepted work or OWL domain facts. Files are explicitly selected
  * by their lawful consumer. This adapter uses the existing FARS provider,
