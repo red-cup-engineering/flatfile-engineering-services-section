@@ -85,7 +85,7 @@ const store = await load(path.join(newRoot, 'src/store.mjs'));
 const { semanticAddress } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address');
 const { niBucketPath } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/ni-path');
 const { canonicalJson } = await supplier(newRequire, '@red-cup-engineering/json-services-section/canonical-json');
-const { originalJournalFiles, streamJsonLines, hashSource } = await import('./conversion-buckets.mjs');
+const { originalJournalFiles, createBucketMap, streamJsonLines, hashSource } = await import('./conversion-buckets.mjs');
 fs.mkdirSync(output, { mode: 0o700, recursive: true });
 process.umask(0o077);
 const report = { type: 'OneTimeStoreConversion', version: 1, source, output, originalsPreserved: true, ordersExecuted: false, transportActivated: false,
@@ -129,6 +129,9 @@ if (!args.activitypub) {
   report.suppliers.oldActivitypub = oldAp;
   report.suppliers.oldBodyReader = sha(fs.readFileSync(path.join(oldAp,'src/receiving/custody-bytes.mjs')));
   report.apOrigins = [];
+  const followerOrderRoot = path.join(output, '.conversion-activitypub');
+  const followerEvents = createBucketMap(followerOrderRoot, niBucketPath);
+  let followerSequence = 0;
   // Both historical journal owners are real inputs. The kind-layout migration
   // retained witness custody under data/logs; no current runtime legacy reader.
   const historicalFiles = [...originalJournalFiles(source,{observe})];
@@ -142,14 +145,26 @@ if (!args.activitypub) {
     for (const witness of witnesses(file)) {
       progress={stage:'original-activitypub-custody',original:witness.id};
       const original = semanticRecordOf(witness, kind);
-      if (!original || !['inbox','outbox','followers'].includes(original.category) || original.told?.for !== true || original.told?.against !== false) { report.sourceOnly[kind] = (report.sourceOnly[kind] ?? 0) + 1; continue; }
+      if (!original || !['inbox','outbox','followers'].includes(original.category)) { report.sourceOnly[kind] = (report.sourceOnly[kind] ?? 0) + 1; continue; }
+      const following = original.told?.for === true && original.told?.against === false;
+      if (original.category !== 'followers' && !following) { report.sourceOnly[kind] = (report.sourceOnly[kind] ?? 0) + 1; continue; }
       const at = original.recordedAt;
       if (typeof at !== 'string' || !Number.isFinite(Date.parse(at))) throw new TypeError('original ActivityPub clock is unavailable');
       const type = 'activitypub-' + ({inbox:'inbox',outbox:'outbox',followers:'follower'}[original.category]);
       const count = counts(type); count.read++; selected++;
       const { bodyReference, ...rest } = original.record;
       let record;
-      if (original.category === 'followers') record = {...rest, following:true, at};
+      if (original.category === 'followers') {
+        // The original follower reader removes every non-held row. This is
+        // specific to that carrier's fold, not a general interpretation of denial.
+        // Its query deduplicates witness ids before retaining append order at
+        // equal instants. Carry that actual order into the native record; no
+        // timestamp, authorization receipt or runtime legacy reader is invented.
+        if (followerEvents.get('follower-events', witness.id) !== undefined) { count.duplicates++; continue; }
+        if (!Number.isSafeInteger(followerSequence)) throw new RangeError('original follower order exceeds its exact integer representation');
+        record = {...rest, following, at, sourceOrder: followerSequence};
+        followerEvents.put('follower-events', witness.id, followerSequence++);
+      }
       else {
         let bytes;
         try { bytes = receiveCutoverBytes(oldBodies, bodyReference); }
@@ -171,12 +186,16 @@ if (!args.activitypub) {
         if (canonicalJson({...existing,at:record.at}) !== canonicalJson(record)) throw new TypeError('original identity names conflicting activity custody');
         count.duplicates++; continue;
       }
-      const id = store.put(output,type,record); count.written++;
+      const id = semanticAddress(record).id;
+      if (store.get(output,type,id) !== undefined) { count.duplicates++; continue; }
+      if (store.put(output,type,record) !== id) throw new TypeError('native record identity differs from selected content');
+      count.written++;
       if (headName !== undefined) { store.writeHead(output,type,headName,{frontier:[id]}); count.heads++; }
       report.apOrigins.push({original:witness.id, oldIdentity:original.id, current:id, type, ...(record.activityNi === undefined ? {} : {bodyNi:record.activityNi})});
     }
     report.sourceSegments.push({path:path.relative(source,file),bytes:fs.statSync(file).size,sha256:hashSource(file,{openReader:openSegmentReader}),selected});
   }
+  fs.rmSync(followerOrderRoot, {recursive:true, force:true});
   if (args.queue) {
     if (typeof args.queue !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('queue receiving requires exact original queue and current ActivityPub provider');
     const queue = originalQueue;

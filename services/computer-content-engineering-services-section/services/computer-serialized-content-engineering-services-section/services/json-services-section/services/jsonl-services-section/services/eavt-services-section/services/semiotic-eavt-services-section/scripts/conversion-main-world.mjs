@@ -56,7 +56,10 @@ function selection(witness,kind,context,semantic=context.semanticRecordOf(witnes
  if(kind==='metroplat.clock.schedule'&&text(value?.id))return {...common,type:'clock-schedule',record:value,thread:value.id,closed:value.retired===true};
  if(kind==='encounter'&&text(e))return {...common,type:'encounter-result',record:plain,thread:e};
  if(kind==='agent-session-token-usage')return {...common,type:'token-usage-event',record:plain};
- if(kind==='work-arena-move'&&object(value))return {...common,type:'work-arena-move',record:value,arena:true};
+ if(kind==='work-arena-move'&&object(value)){
+  if(!text(value.thread??value.id))return {unqualified:'work-arena-thread-unresolved'};
+  return {...common,type:'work-arena-move',record:value,arena:true};
+ }
  if(kind==='work-outcome'&&object(value))return {...common,type:'work-outcome',record:value,log:true};
  if(kind==='561-group.primary-system-health'&&semantic?.category==='primary-system-health'&&object(value))return {...common,type:'primary-system-health',record:{...value,at:semantic.recordedAt,told:semantic.told,clockScope:'historical original pulse issue clock; response availability was not recorded'},log:true,health:true};
  if(kind==='knowing.claims'&&object(value))return {...common,type:'claim',record:{...value,...(semantic.told.for===true&&semantic.told.against===false?{}:{told:semantic.told})}};
@@ -132,7 +135,10 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   if(active.has(original))throw new TypeError('original references contain a causal/content cycle');active.add(original);
   const position=maps.get('source',original);if(!position)throw new TypeError('selected original witness unavailable');
   const item=load(position);if(!item||item.unqualified)throw new TypeError('selected original changed meaning between passes');
-  let record=rewrite(item.record,item);const named=[],unresolvedCites=[];
+  // Arena ids, thread relations, editions and evidence locators belong to the
+  // move's domain content. The native arena writer preserves that content;
+  // only the observation's separately typed witness causes change custody.
+  let record=item.arena?item.record:rewrite(item.record,item);const named=[],unresolvedCites=[];
   for(const cause of item.namedCauses){const old=lookup(cause),prior=maps.get('source',old);if(!prior){report.causesDropped++;const originalKind=maps.get('original-kind',old);disposition(item,cause,originalKind?'original-kind-not-converted':'original-cause-unavailable',item.claim?'named-claim-citation':'cause');
     if(item.claim){unresolvedCites.push(cause);report.referenceDispositions.unresolvedNamedCitations++;if(!originalKind)report.unqualifiedSources['named-claim-citation-unavailable']=(report.unqualifiedSources['named-claim-citation-unavailable']??0)+1;}continue;}
    const held=convert(old);named.push(held.type===item.type?held.id:{type:held.type,id:held.id});}
@@ -147,8 +153,9 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
    const writtenKey=semanticAddress({type:item.type,id}).id;
    if(maps.get('written',writtenKey)!==undefined)count(item.type).duplicates++;else{count(item.type).written++;maps.put('written',writtenKey,item.type);}
    maps.put('content',content,id);
-   if(item.arena){const thread=record.thread??id,name=NI.test(thread)?store.threadName(thread):String(thread);const previous=store.readHead(output,item.type,name)?.frontier??[];
+   if(item.arena){const thread=record.thread??record.id,name=NI.test(thread)?store.threadName(thread):String(thread);const previous=store.readHead(output,item.type,name)?.frontier??[];
     const consumed=new Set(causes.filter(cause=>typeof cause==='string'));store.writeHead(output,item.type,name,{frontier:[...previous.filter(address=>!consumed.has(address)),id]});count(item.type).heads++;
+    const headKey=semanticAddress({type:item.type,name}).id,expected=maps.get('thread-count',headKey)??{type:item.type,name,thread,count:0};maps.put('thread-count',headKey,{...expected,count:expected.count+1});
    }
    if(item.thread){const headKey=semanticAddress({type:item.type,name:item.thread}).id,expected=maps.get('thread-count',headKey)??{type:item.type,name:item.thread,count:0};maps.put('thread-count',headKey,{...expected,count:expected.count+1});}
    if(item.log)store.append(output,item.type,item.type==='claim-session'?{at:item.at,thread:item.thread,of:id}:{at:item.at,of:id,...(record.verdict===undefined?{}:{verdict:record.verdict}),...(item.health?{system:record.system,charge:record.charge,was:record.was}:{})});
@@ -175,7 +182,10 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   // The table is append-only; only its final count for this thread is authoritative.
   const headKey=semanticAddress({type:expected.type,name:expected.name}).id;if(maps.get('thread-count',headKey).count!==expected.count)continue;
   const head=store.readHead(output,expected.type,expected.name);let reached=0;
-  for(const step of store.walk(output,expected.type,head?.frontier??[],{limit:100_000}))if(step.record!==undefined&&step.type===expected.type&&(expected.type!=='claim-session'||step.record.thread===expected.name))reached++;
+  for(const step of store.walk(output,expected.type,head?.frontier??[],{limit:100_000})){
+   if(step.missing||step.truncated)throw new TypeError('converted thread is incomplete under current reader');
+   if(step.record!==undefined&&step.type===expected.type&&(expected.type==='claim-session'?step.record.thread===expected.name:expected.type==='work-arena-move'?(step.record.thread??step.record.id)===expected.thread:true))reached++;
+  }
   if(reached<expected.count)throw new TypeError('converted thread lost distinct original rows');
  }
  assertSourceStamps(stamps);report.mainQualified=Object.values(report.unqualifiedSources).every(count=>count===0);
