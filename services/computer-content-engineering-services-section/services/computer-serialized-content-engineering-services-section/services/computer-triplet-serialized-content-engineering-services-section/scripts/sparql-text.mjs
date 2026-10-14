@@ -56,7 +56,7 @@ export function parseSparqlText(text){
   while(peek()!=="}"){
    if(peek()===undefined||patterns.length>=64)refuse("unclosed or oversized graph");
    patterns.push(triplePattern(term(),term(),term()));
-   if(peek()===".")pop();else if(peek()!=="}")refuse("missing dot separator");
+   if(peek()===".")pop();else if(peek()===undefined)refuse("unclosed graph");else if(peek()!=="}")refuse("missing dot separator");
   }
   pop();if(!patterns.length)refuse("empty BGP unsupported");return patterns;
  };
