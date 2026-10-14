@@ -1,19 +1,19 @@
-name: Proof-path addressing and language source conformance
+name: Proof-path addressing native source
 
 on:
   push:
     paths:
-      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/scripts/proof-path-structuration.mjs'
       - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/**'
-      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/test/structuration.test.mjs'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/lib/identity.mjs'
       - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/test/identity.test.mjs'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/package.json'
       - '.github/workflows/proof-path-addressing.yml'
   pull_request:
     paths:
-      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/scripts/proof-path-structuration.mjs'
       - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/**'
-      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/test/structuration.test.mjs'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/lib/identity.mjs'
       - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/test/identity.test.mjs'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/package.json'
       - '.github/workflows/proof-path-addressing.yml'
   workflow_dispatch:
 
@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 jobs:
-  canonical-coordinate:
+  native-proof-coordinate:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -29,25 +29,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Check the actual canonical RMN source and legacy public entry point
+      - name: Check canonical implementation syntax
         run: |
           node --check 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/src/index.mts'
-          node --check 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/scripts/proof-path-structuration.mjs'
-          node --check 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/test/structuration.test.mjs'
-      - name: Exercise both public entries, malformed/unauthorized routes and source-scoped utterances
-        run: |
-          node --test \
-            'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/test/structuration.test.mjs' \
-            'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/test/structuration.test.mjs'
-      - name: Require one RMN coordinate authority across schema and file boundary
+          node --check 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/test/structuration.test.mjs'
+      - name: Execute the actual canonical proof-coordinate tests
+        run: node --test 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/test/structuration.test.mjs'
+      - name: Cross-check canonical wire identity and JSON Schema
         run: |
           node --input-type=module <<'NODE'
           import assert from 'node:assert/strict';
           import {readFileSync} from 'node:fs';
-          import {settleProofCoordinate} from './services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/src/index.mts';
+          import {settleProofCoordinate, renderProofCoordinate, parseProofCoordinate} from './services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/src/index.mts';
           const schema=JSON.parse(readFileSync('services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/content/rmn-proof-coordinate/proof-coordinate.schema.json','utf8'));
           assert.equal(schema.$defs.proofCoordinate.properties.type.const,'rmn-proof-coordinate');
-          assert.equal(schema.$defs.proofEnvelope.properties.type.const,'rmn-proof-envelope');
-          assert.equal(settleProofCoordinate({resourceType:'claim',root:'a',target:'b',
-            witnesses:[{domain:'a',generator:'specialization',codomain:'b'}]}).coordinate.type,'rmn-proof-coordinate');
+          const admitted=settleProofCoordinate({resourceType:'claim',root:'a',target:'b',
+            witnesses:[{domain:'a',generator:'specialization',codomain:'b'}]});
+          assert.equal(admitted.ok,true);
+          assert.deepEqual(parseProofCoordinate(renderProofCoordinate(admitted.coordinate)).coordinate,admitted.coordinate);
           NODE
