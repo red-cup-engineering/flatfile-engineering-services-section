@@ -1,7 +1,7 @@
 /**
  * reading-rdf — one subject's folded evidence (an EAVT fold: its entity and fiber of cells, each
  * with the witnesses told for and against it) as RDF, in Turtle or JSON-LD. A cell told only for
- * is a plain triple, reified with prov:wasDerivedFrom its witnesses; one told only against is an
+ * is normally a plain triple, reified with prov:wasDerivedFrom its witnesses; one told only against is an
  * owl:NegativePropertyAssertion; one told both ways is a ws:StableClaim carrying both sides'
  * witnesses. The ws: vocabulary names these classes.
  */
@@ -51,7 +51,9 @@ function prefixes(base) {
     `@prefix ws: <${vocabularyNamespace(base)}> .`, `@prefix prop: <${predicateNamespace(base)}> .`].join("\n");
 }
 
-/** A subject's folded evidence as Turtle. `subjects` are the other subjects whose names are IRIs here. */
+/** A subject's folded evidence as Turtle. `subjects` are entity-IRI names.
+ * claimOnly=true retains source-qualified reified claims but omits bare positive
+ * domain triples. It does not independently authenticate the witnesses. */
 export function readingTurtle(folded, opts = {}) {
   const base = opts.base ?? "/";
   const subjects = new Set(opts.subjects ?? []);
@@ -62,7 +64,10 @@ export function readingTurtle(folded, opts = {}) {
     const predicate = iriRef(predicateIri(base, cell.predicate));
     const object = objectTerm(base, cell.object, subjects);
     if (told.for.length > 0 && told.against.length === 0) {
-      out.push(`${subject} ${predicate} ${turtleTerm(object)} .`);
+      // Reification does not entail the underlying triple. This optional
+      // reading keeps self-attributed source claims visible without turning
+      // frontmatter, hearsay or an alleged incumbency into OWL-level facts.
+      if (opts.claimOnly !== true) out.push(`${subject} ${predicate} ${turtleTerm(object)} .`);
       out.push("[] a rdf:Statement, ws:PotentialClaim ;", `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`, `  prov:wasDerivedFrom ${provTurtle(told.for)} .`);
     } else if (told.against.length > 0 && told.for.length === 0) {
       out.push("[] a owl:NegativePropertyAssertion ;", `  owl:sourceIndividual ${subject} ; owl:assertionProperty ${predicate} ;`,
@@ -75,7 +80,7 @@ export function readingTurtle(folded, opts = {}) {
   return `${out.join("\n")}\n`;
 }
 
-/** A subject's folded evidence as a JSON-LD document. */
+/** A subject's folded evidence as JSON-LD; claimOnly avoids naked positive properties. */
 export function readingJsonLd(folded, opts = {}) {
   const base = opts.base ?? "/";
   const subjects = new Set(opts.subjects ?? []);
@@ -88,7 +93,7 @@ export function readingJsonLd(folded, opts = {}) {
     const predicate = { "@id": predicateIri(base, cell.predicate) };
     const object = objectTerm(base, cell.object, subjects);
     if (told.for.length > 0 && told.against.length === 0) {
-      node[`prop:${cell.predicate}`] = jsonObject(object);
+      if (opts.claimOnly !== true) node[`prop:${cell.predicate}`] = jsonObject(object);
       graph.push({ "@type": ["rdf:Statement", "ws:PotentialClaim"], "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object), "prov:wasDerivedFrom": provJsonLd(told.for) });
     } else if (told.against.length > 0 && told.for.length === 0) {
       graph.push({ "@type": "owl:NegativePropertyAssertion", "owl:sourceIndividual": { "@id": id }, "owl:assertionProperty": predicate,
@@ -130,9 +135,12 @@ ws:contraryClaimedBy a owl:ObjectProperty ; rdfs:domain ws:StableClaim ; rdfs:ra
  * the shared SPARQL HTTP transport. Caller owns the source, graph IRI,
  * authorization and receiver; neither projection nor HTTP 2xx proves truth.
  * PUT *replaces* that named graph; caller must use an identity it owns.
+ * claimOnly=true is the source-claim view for frontmatter/agency assertions:
+ * reified documentary witnesses remain queryable without promoting them to
+ * unqualified domain triples. False/contested claims keep their own forms.
  */
 export async function putReadingRdfGraph({
-  folded, base, subjects = [], graph, storeEndpoint, fetchImpl, headers,
+  folded, base, subjects = [], graph, storeEndpoint, fetchImpl, headers, claimOnly = false,
 } = {}) {
   if (typeof base !== "string" || !base.startsWith("https://")) {
     throw new TypeError("RDF reading base must be an absolute HTTPS namespace");
@@ -143,7 +151,8 @@ export async function putReadingRdfGraph({
   if (typeof graph !== "string" || !graph) {
     throw new TypeError("RDF export needs a named graph assigned by the receiving owner");
   }
-  const body = readingTurtle(folded, {base,subjects});
+  if (typeof claimOnly !== "boolean") throw new TypeError("claimOnly must be a boolean source-assertion policy");
+  const body = readingTurtle(folded, {base,subjects,claimOnly});
   return graphStoreProtocol(storeEndpoint,{
     graph, method:"PUT", body, contentType:"text/turtle", fetchImpl, headers,
   });
