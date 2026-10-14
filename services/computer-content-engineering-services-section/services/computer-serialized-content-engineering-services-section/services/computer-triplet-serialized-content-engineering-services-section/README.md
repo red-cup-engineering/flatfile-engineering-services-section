@@ -56,16 +56,33 @@ const turtle=await (await graphStoreProtocol("https://example.org/data",
 ```
 
 An existing **folded, attributed SignCell/EAVT subject reading** can be
-projected into this standard interface without changing its source:
-`reading-rdf` exports `putReadingRdfGraph({folded,base,graph,storeEndpoint,
-fetchImpl,headers})`. It reuses `readingTurtle` and sends a named-graph
-`PUT` through the same Graph Store transport, retaining affirmative
-`prov:wasDerivedFrom`, opposing `owl:NegativePropertyAssertion`,
-and simultaneous evidence in `ws:StableClaim`. The source and
-permissions remain with the owner: this operation must be invoked only
-on a source-qualified reading whose named graph the caller controls.
-It returns the actual HTTP response and **does not** mint an ontology,
-create a database, infer truth, or claim delivery.
+projected into standard RDF without treating its text as a fact.
+`reading-rdf` exports `readingClaimId(entity, cell, {base,subjects})`,
+`readingTurtle`, `readingJsonLd` and
+`putReadingRdfGraph({folded,base,graph,storeEndpoint,fetchImpl,headers})`.
+The canonical SCA/NI identity of a **documentary claim position** commits
+to its resolved subject/predicate IRIs and **typed RDF object term**,
+not to the evidence currently for or against it. Changing the source
+revision, predicate or literal-versus-IRI interpretation changes its
+identity. New witnesses change evidence, not the position's address.
+Canonical NI and URN evidence identities remain navigable RDF references;
+plain untyped source labels remain attributable labels, not inferred IRIs.
+
+The RDF reading never emits an unqualified domain assertion from source
+frontmatter. `ws:AffirmedClaim`, `ws:OpposedClaim` and
+`ws:ContestedClaim` are individually **reified `rdf:Statement`** nodes
+with separate for/against provenance; absent evidence supplies no statement.
+This is **not** `owl:NegativePropertyAssertion` and not a verified fact.
+The retired `claimOnly` toggle is refused, not silently permitted.
+Malformed typed objects or witness polarity arrays refuse before graph
+submission. Domain assertions, real authority and institutional settlement
+must come from the rightful independently checked provider.
+
+`putReadingRdfGraph` sends this projection to the caller's designated
+named graph by W3C Graph Store PUT. The source and access rights remain
+with the owner: only a caller authorized for that source and graph can
+invoke the external mutation. An HTTP success is not independent receiving,
+an OWL inference, a proof of a claim or delivery to a buyer.
 
 Tests: `node --test test/sparql-http-client.test.mjs
 test/reading-rdf-graph-store.test.mjs`. For a real consumer,
