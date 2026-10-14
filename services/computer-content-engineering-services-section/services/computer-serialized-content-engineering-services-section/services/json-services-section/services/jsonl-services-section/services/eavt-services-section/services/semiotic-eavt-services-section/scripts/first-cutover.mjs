@@ -116,6 +116,25 @@ function provider(directory) {
   assert.ok(under(actual, '/gnu/store'), 'provider must be an existing immutable Guix input');
   return actual;
 }
+/** Bind only historical readers to the caller's configured immutable artifact.
+ * LAGOON obtains it from the actual unit before stopping writers and retains it
+ * for recovery. The token uses the existing artifact's authored package layout;
+ * it neither discovers a provider nor proves historical representation coverage.
+ */
+export function bindOriginalArtifact(plan, originalArtifact) {
+  assert.ok(typeof originalArtifact === 'string' && /^\/gnu\/store\/[0123456789abcdfghijklmnpqrsvwxyz]{32}-[^/]+$/u.test(originalArtifact),
+    'original artifact must be one immutable Guix output');
+  const bound = {...plan};
+  for (const key of ['oldStore', 'oldActivitypub']) {
+    const value = plan[key];
+    if (typeof value !== 'string' || !value.startsWith('@ORIGINAL_RELEASE@/')) continue;
+    const relative = value.slice('@ORIGINAL_RELEASE@/'.length);
+    assert.ok(relative && !path.isAbsolute(relative) && path.normalize(relative) === relative
+      && relative !== '..' && !relative.startsWith('../'), 'original provider escapes its artifact');
+    bound[key] = path.join(originalArtifact, relative);
+  }
+  return bound;
+}
 async function receiveNative(root, newStore, report) {
   const store = await import(pathToFileURL(path.join(newStore, 'src/store.mjs')).href);
   const require = createRequire(path.join(newStore, 'package.json'));
@@ -257,10 +276,11 @@ export function restore(plan, work) {
 }
 if (process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    const [operation, planFile, work, stopped, ...extra] = process.argv.slice(2);
-    assert.ok(['prepare', 'bind', 'restore'].includes(operation) && stopped === '--writers-stopped' && extra.length === 0,
-      'usage: first-cutover.mjs prepare|bind|restore PLAN_JSON WORK_DIRECTORY --writers-stopped');
-    const plan = JSON.parse(fs.readFileSync(planFile, 'utf8'));
+    const [operation, planFile, work, stopped, originalFlag, originalArtifact, ...extra] = process.argv.slice(2);
+    assert.ok(['prepare', 'bind', 'restore'].includes(operation) && stopped === '--writers-stopped'
+      && originalFlag === '--original-artifact' && typeof originalArtifact === 'string' && extra.length === 0,
+      'usage: first-cutover.mjs prepare|bind|restore PLAN_JSON WORK_DIRECTORY --writers-stopped --original-artifact CONFIGURED_GUIX_OUTPUT');
+    const plan = bindOriginalArtifact(JSON.parse(fs.readFileSync(planFile, 'utf8')), provider(originalArtifact));
     const result = await ({prepare, bind, restore})[operation](plan, work); console.log(JSON.stringify(result));
   } catch (error) { console.error(JSON.stringify({error: error.message, writersMustRemainStopped: true})); process.exitCode = 1; }
 }

@@ -3,7 +3,27 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {bind, restore, treeDigest} from '../scripts/first-cutover.mjs';
+import {bind, restore, treeDigest, bindOriginalArtifact} from '../scripts/first-cutover.mjs';
+
+test('historical readers bind to the configured artifact, not the retained receipt', () => {
+  const original = '/gnu/store/11111111111111111111111111111111-configured-deployment';
+  const plan = {version: 1,
+    oldStore: '@ORIGINAL_RELEASE@/packages/@red-cup-engineering__semiotic-eavt-services-section',
+    oldActivitypub: '@ORIGINAL_RELEASE@/packages/@red-cup-engineering__activitypub-services-section',
+    newStore: '/gnu/store/22222222222222222222222222222222-candidate/node_modules/current', bindings: []};
+  const bound = bindOriginalArtifact(plan, original);
+  assert.equal(bound.oldStore, original + '/packages/@red-cup-engineering__semiotic-eavt-services-section');
+  assert.equal(bound.oldActivitypub, original + '/packages/@red-cup-engineering__activitypub-services-section');
+  assert.equal(bound.newStore, plan.newStore);
+  assert.equal(plan.oldStore.startsWith('@ORIGINAL_RELEASE@/'), true);
+  assert.deepEqual(bindOriginalArtifact(plan, original), bound, 'recovery uses the same saved original');
+  assert.throws(() => bindOriginalArtifact(plan, original + '/bin/node'), /one immutable Guix output/);
+  assert.throws(() => bindOriginalArtifact(plan, original.replace('1111', 'eeee')), /one immutable Guix output/);
+  assert.throws(() => bindOriginalArtifact({...plan, oldStore: '@ORIGINAL_RELEASE@/../another-reader'}, original), /escapes/);
+  const historical = {...plan, oldStore: '/gnu/store/33333333333333333333333333333333-historical-world/packages/reader'};
+  assert.equal(bindOriginalArtifact(historical, original).oldStore, historical.oldStore,
+    'a separately declared historical source is not silently rebound');
+});
 
 function fixture(t, {count = 2, absent = false, queue = false} = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'first-cutover-test-'));
@@ -26,6 +46,18 @@ function fixture(t, {count = 2, absent = false, queue = false} = {}) {
   const save = () => fs.writeFileSync(path.join(work, 'operation.json'), JSON.stringify(journal), {mode: 0o600}); save();
   return {root, plan, work, journal, save};
 }
+test('recovery refuses a different original artifact before moving state', t => {
+  const f = fixture(t);
+  const template = {...f.plan, oldStore: '@ORIGINAL_RELEASE@/packages/original-reader'};
+  const first = bindOriginalArtifact(template, '/gnu/store/11111111111111111111111111111111-first');
+  Object.assign(f.plan, first); f.save(); bind(f.plan, f.work);
+  const other = bindOriginalArtifact(template, '/gnu/store/22222222222222222222222222222222-other');
+  assert.throws(() => restore(other, f.work), /deep-equal/);
+  for (const [i, row] of f.journal.bindings.entries()) {
+    assert.equal(fs.readFileSync(path.join(row.target, 'record'), 'utf8'), 'native-' + i);
+    assert.equal(fs.readFileSync(path.join(row.retained, 'record'), 'utf8'), 'original-' + i);
+  }
+});
 test('bind and restore retain both actual state generations', t => {
   const f = fixture(t); assert.equal(bind(f.plan, f.work).phase, 'bound');
   assert.equal(restore(f.plan, f.work).phase, 'restored');
