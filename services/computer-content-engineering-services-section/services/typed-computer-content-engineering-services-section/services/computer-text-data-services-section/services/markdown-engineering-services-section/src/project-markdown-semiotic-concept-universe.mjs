@@ -65,7 +65,7 @@ export function projectMarkdownSemioticConceptDeclaration({ path, text } = {}) {
     sameAs: strings(frontmatter.same_as),
     // Match the native L-Space reader: public is an explicit source opt-in, not a channel hint.
     // Final publication authority remains with the receiving owner; this is eligibility only.
-    publication: freeze({ enabled: frontmatter.visibility === "public" && publish !== false, channels, status: typeof frontmatter.status === "string" ? frontmatter.status : null }),
+    publication: freeze({ enabled: frontmatter.visibility === "public" && !Object.hasOwn(frontmatter, "consent-status") && publish !== false, channels, status: typeof frontmatter.status === "string" ? frontmatter.status : null }),
     annotations: freeze(values(frontmatter.ann).map(annotation)),
     attributes: freeze({ frontmatter, assertions: document.assertions }),
     source: freeze({ path, revision, format: document.format, diagnostics: document.diagnostics }),
