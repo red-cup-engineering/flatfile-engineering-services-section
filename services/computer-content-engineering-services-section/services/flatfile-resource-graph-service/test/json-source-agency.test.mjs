@@ -162,10 +162,29 @@ test("existing professional repertoire catalog selects office, duty and work sou
 
 test("bad JSON or a non-object cannot silently become a qualified source claim", async t => {
   const { root, path } = await fixture(t);
-  await writeFile(path, '{"name":');
-  await assert.rejects(() => provider(root).observe({observedAt}),/not an admitted UTF-8 JSON/u);
-  await writeFile(path, '[{"name":"not an office record"}]');
-  await assert.rejects(() => provider(root).observe({observedAt}),/object record/u);
-  await writeFile(path, JSON.stringify({big:"x".repeat(1_048_580)}));
-  await assert.rejects(() => provider(root).observe({observedAt}),/bounded regular file/u);
+  const exercise = async (bytes, refusal) => {
+    await writeFile(path, bytes);
+    const pinned = provider(root, groups[0], [selection(sourcePath, digestOf(Buffer.from(bytes)))]);
+    await assert.rejects(() => pinned.observe({observedAt}), refusal);
+  };
+  await exercise('{"name":', /not an admitted UTF-8 JSON/u);
+  await exercise('[{"name":"not an office record"}]', /object record/u);
+  await exercise(JSON.stringify({big:"x".repeat(1_048_580)}),/bounded regular file/u);
+});
+
+test("a source batch exceeding its finite byte budget refuses before partially producing a graph", async t => {
+  const {root} = await fixture(t);
+  const sources = [];
+  for (let i=0;i<17;i++) {
+    const path = `content/professional-repertoire/works/work-${i}.json`;
+    const bytes = Buffer.from(JSON.stringify({id:`work-${i}`,description:"x".repeat(990_000)})+"\\n");
+    const file=join(root,path);
+    await mkdir(dirname(file),{recursive:true});
+    await writeFile(file,bytes);
+    sources.push(selection(path,digestOf(bytes)));
+  }
+  await assert.rejects(
+    ()=>provider(root,groups[1],sources).observe({observedAt}),
+    /batch exceeds its 16 MiB bounded observation budget/u,
+  );
 });
