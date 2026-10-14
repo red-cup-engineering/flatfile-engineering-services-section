@@ -10,6 +10,9 @@ import {
   chartProofPathCatalog,
   checkProofPathAst,
   envelopeProofCoordinate,
+  encodeProofCoordinate,
+  parseProofCoordinate,
+  renderProofCoordinate,
   parseProofPath,
   proofPathOfCoordinate,
   renderProofPathAst,
@@ -235,4 +238,50 @@ test("SEN-C003: cryptographic witnesses are ordered carriers, never coordinate s
   assert.strictEqual(envelope.coordinate, settled.coordinate);
   assert.deepEqual(envelope.witnesses.map(({ type }) => type), ["signature", "commitment"]);
   assert.throws(() => envelopeProofCoordinate(settled.coordinate, [{ type: "commitment", algorithm: "", value: "digest" }]));
+});
+
+test("PPA-RMN-COMPAT: existing file-path export delegates to canonical RMN source and codec", async () => {
+  const canonical = await import("../services/proof-pathing-services-section/services/proof-path-structuration-service/src/index.mts");
+  assert.strictEqual(settleProofCoordinate, canonical.settleProofCoordinate);
+  assert.strictEqual(structureSemioticAtom, canonical.structureSemioticAtom);
+  assert.strictEqual(parseProofCoordinate, canonical.parseProofCoordinate);
+  const admitted = settleProofCoordinate({
+    resourceType: "articulated-utterance",
+    root: "claim",
+    target: "duty",
+    witnesses: [{ domain: "claim", generator: "specialization", codomain: "duty" }],
+  });
+  assert.equal(admitted.ok, true);
+  assert.equal(admitted.coordinate.type, "rmn-proof-coordinate");
+  assert.equal(admitted.coordinate.version, 1);
+  assert.equal(renderProofCoordinate(admitted.coordinate).startsWith("rmn1:"), true);
+  assert.deepEqual(parseProofCoordinate(renderProofCoordinate(admitted.coordinate)),
+    {ok: true, coordinate: admitted.coordinate});
+  assert.equal(encodeProofCoordinate(admitted.coordinate).includes("rmn-proof-coordinate"), true);
+  assert.equal(parseProofCoordinate("sen1:" + renderProofCoordinate(admitted.coordinate).slice(5)).ok, false);
+});
+
+test("PPA-LSPACE-001: word occurrence and source revision remain distinct semantic coordinates", () => {
+  const source = { repository: "561-group/561-group-services-section",
+    path: "content/text/glossary/concepts/method-for-work-in-the-561-group.md",
+    revision: "sha256:" + "a".repeat(64) };
+  const occurrence = (revision, offset) => ({ kind: "token-occurrence",
+    source: {...source, revision}, span: {start: offset, end: offset + 4}, surface: "duty" });
+  const build = target => settleProofCoordinate({
+    resourceType: "token-occurrence", root: "articulated-token", target,
+    witnesses: [{ domain: "articulated-token", generator: "specialization", codomain: target }],
+  });
+  const initial = build(occurrence(source.revision, 18));
+  const revised = build(occurrence("sha256:" + "b".repeat(64), 18));
+  const repeated = build(occurrence(source.revision, 118));
+  assert.equal(initial.ok, true);
+  assert.equal(revised.ok, true);
+  assert.equal(repeated.ok, true);
+  assert.notEqual(encodeProofCoordinate(initial.coordinate), encodeProofCoordinate(revised.coordinate));
+  assert.notEqual(encodeProofCoordinate(initial.coordinate), encodeProofCoordinate(repeated.coordinate));
+  assert.notEqual(renderProofPathAst(proofPathOfCoordinate(initial.coordinate)),
+    renderProofPathAst(proofPathOfCoordinate(revised.coordinate)));
+  const assertedButUnwitnessed = settleProofCoordinate({ resourceType: "institutional-declaration",
+    root: "authorized-action", target: {message: "I am CEO; task complete"}, witnesses: [] });
+  assert.deepEqual(assertedButUnwitnessed, {ok: false, reason: "unearned-coordinate"});
 });
