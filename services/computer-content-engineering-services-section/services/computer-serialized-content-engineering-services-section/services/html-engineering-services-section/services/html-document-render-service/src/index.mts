@@ -117,8 +117,10 @@ function structurallySettled(document: unknown): document is SettledDocumentSpin
   const entries = (field: string, keys: readonly string[]): boolean =>
     Array.isArray(record[field]) && record[field].every((row: unknown) =>
       row !== null && typeof row === "object" &&
-      keys.every((key) => typeof (row as Record<string, unknown>)[key] === "string"
-        && ((row as Record<string, string>)[key]).length > 0));
+      keys.every((key) => {
+        const value = (row as Record<string, unknown>)[key];
+        return typeof value === "string" && value.length > 0;
+      }));
   return record.kind === "settledDocument.fixedPoint" &&
     entries("addresses", ["key"]) && entries("order", ["before", "after"]) &&
     entries("references", ["from", "to"]) && entries("valuationSites", ["address"]);
