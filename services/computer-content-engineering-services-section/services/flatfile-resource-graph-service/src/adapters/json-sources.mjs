@@ -9,6 +9,7 @@ import { defineProvider } from "../provider/provider.mjs";
 
 const MAX_SOURCE_BYTES = 1_048_576;
 const MAX_SOURCE_COUNT = 4096;
+const MAX_BATCH_BYTES = 16 * 1_048_576;
 
 function sourceNamespace(value) {
   if (typeof value !== "string" || !value.trim()) throw new TypeError("a source-owned namespace is required");
@@ -92,7 +93,9 @@ export function selectCatalogJsonSources(catalog, groups) {
  * File revisions are SHA-256 of exact bytes. Each resource and attribute
  * witness is version-scoped; a changed source cannot inherit old provenance
  * even if a particular field retained its text. The stable focus names the
- * logical source path in its owner's URI namespace.
+ * logical source path in its owner's URI namespace. Source-digest admission
+ * precedes JSON interpretation; an observation refuses atomically if any
+ * selected source violates its per-file 1 MiB or batch-wide 16 MiB ceiling.
  */
 export function jsonSourcesProvider({ id, root, namespace, sources }) {
   if (typeof root !== "string" || !root.trim()) throw new TypeError("JSON source root is required");
@@ -101,6 +104,7 @@ export function jsonSourcesProvider({ id, root, namespace, sources }) {
   return defineProvider({ id, async observe({ observedAt = new Date().toISOString() } = {}) {
     const sourceRoot = await realpath(root);
     const resources = [];
+    let observedBytes = 0;
     for (const { path, digest } of selected) {
       const file = resolve(sourceRoot, path);
       // Reject symlink aliases at any depth, and paths that cross the owner root.
@@ -109,20 +113,24 @@ export function jsonSourcesProvider({ id, root, namespace, sources }) {
       if (!before.isFile() || before.size > MAX_SOURCE_BYTES) {
         throw new TypeError(`JSON source is not a bounded regular file: ${path}`);
       }
+      if (observedBytes + before.size > MAX_BATCH_BYTES) {
+        throw new RangeError("JSON source batch exceeds its 16 MiB bounded observation budget");
+      }
       const bytes = await readFile(file);
       const after = await lstat(file);
       if (bytes.length > MAX_SOURCE_BYTES || before.size !== bytes.length ||
           before.mtimeMs !== after.mtimeMs || before.size !== after.size) {
         throw new TypeError(`JSON source changed or exceeded its byte limit during observation: ${path}`);
       }
+      observedBytes += bytes.length;
+      const revision = `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
+      if (revision !== digest) throw new TypeError(`JSON source digest changed or is not owner-qualified: ${path}`);
       let record;
       try { record = parseJsonValue(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); }
       catch (error) { throw new TypeError(`JSON source is not an admitted UTF-8 JSON value: ${path}: ${error.message}`); }
       if (record === null || typeof record !== "object" || Array.isArray(record)) {
         throw new TypeError(`JSON source must declare an object record: ${path}`);
       }
-      const revision = `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
-      if (revision !== digest) throw new TypeError(`JSON source digest changed or is not owner-qualified: ${path}`);
       const focus = `urn:fars:source-json:${encodeURIComponent(owner)}:${encodeURIComponent(path)}`;
       const resource = `${focus}:${revision}`;
       const cells = [
