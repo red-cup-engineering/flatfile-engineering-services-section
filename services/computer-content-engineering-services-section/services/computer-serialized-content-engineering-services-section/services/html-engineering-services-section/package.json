@@ -14,6 +14,7 @@
     "@red-cup-engineering/computer-content-address-engineering-services-section": "workspace:*",
     "@red-cup-engineering/html-structural-projection-service": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/xml-document-rendering-service": "workspace:*",
     "@red-cup-engineering/markdown-engineering-services-section": "workspace:*",
     "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section": "workspace:*"
   },

@@ -22,6 +22,7 @@ import { canonical, parse } from "@red-cup-engineering/json-services-section";
 import { admitDocumentSpine } from "@red-cup-engineering/signcell/document-spine";
 import { retainedCarrier } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { readHtmlDocument } from "@red-cup-engineering/html-structural-projection-service/scan";
+import { isXmlName } from "@red-cup-engineering/xml-document-rendering-service/core";
 
 import { escapeHtmlTextValue as escapeXmlText, escapeHtmlAttributeValue as escapeXmlAttr } from "@red-cup-engineering/html-structural-projection-service/lexical";
 
@@ -53,6 +54,63 @@ function escapeAttr(value) { return escapeXmlAttr(htmlText(value)); }
 const addressSet = (nodes) => new Set(nodes.map((node) => node.semanticAddress));
 const admittedCarriers = new WeakSet();
 
+const nodeFields = new Set(["kind", "nodeId", "element", "semanticAddress", "valuationSite", "attributes", "text", "html", "children"]);
+/** Own a finite carrier graph whose typed coordinates and child endpoints resolve. */
+function ownCarrierNodes(input, document) {
+  if (!Array.isArray(input)) throw new TypeError("carrier nodes must be an array");
+  const nodes = retainedCarrier(input);
+  canonical(nodes);
+  const addresses = new Set(document.addresses.map(({ key }) => key));
+  const sites = new Set(document.valuationSites.map(({ address }) => address));
+  const byId = new Map();
+  for (const node of nodes) {
+    if (node === null || typeof node !== "object" || Array.isArray(node) ||
+        Object.keys(node).some((key) => !nodeFields.has(key)) ||
+        node.kind !== "rendering.htmlCarrier.node" ||
+        typeof node.nodeId !== "string" || node.nodeId.length === 0 ||
+        typeof node.element !== "string" || !/^[A-Za-z]/u.test(node.element) || !isXmlName(node.element) ||
+        typeof node.semanticAddress !== "string" || !addresses.has(node.semanticAddress))
+      throw new TypeError("carrier node requires its kind, non-empty identity, element name and native document address");
+    if (byId.has(node.nodeId)) throw new TypeError(`duplicate carrier node ${node.nodeId}`);
+    byId.set(node.nodeId, node);
+    if (node.valuationSite !== undefined && (typeof node.valuationSite !== "string" || !sites.has(node.valuationSite)))
+      throw new TypeError(`carrier node ${node.nodeId} names an absent valuation site`);
+    if (node.html !== undefined && typeof node.html !== "string") throw new TypeError("trusted carrier HTML must be a string");
+    if (node.children !== undefined && (!Array.isArray(node.children) || node.children.some((id) => typeof id !== "string")))
+      throw new TypeError("carrier children must be node identities");
+    if (node.attributes !== undefined) {
+      if (node.attributes === null || typeof node.attributes !== "object" || Array.isArray(node.attributes))
+        throw new TypeError("carrier attributes must be a record");
+      const names = new Set();
+      for (const key of Object.keys(node.attributes)) {
+        const folded = key.toLowerCase();
+        if (!isXmlName(key) || names.has(folded) ||
+            ["data-render-node", "data-semantic-address", "data-valuation-site"].includes(folded))
+          throw new TypeError(`invalid, duplicate or reserved carrier attribute ${key}`);
+        names.add(folded);
+      }
+    }
+  }
+  const incoming = new Map(nodes.map(({ nodeId }) => [nodeId, 0]));
+  for (const node of nodes) for (const child of node.children ?? []) {
+    if (!byId.has(child)) throw new TypeError(`carrier child ${child} is absent`);
+    incoming.set(child, incoming.get(child) + 1);
+  }
+  const ready = nodes.filter(({ nodeId }) => incoming.get(nodeId) === 0).map(({ nodeId }) => nodeId);
+  let visited = 0;
+  for (let next = 0; next < ready.length; next += 1) {
+    visited += 1;
+    for (const child of byId.get(ready[next]).children ?? []) {
+      const left = incoming.get(child) - 1;
+      incoming.set(child, left);
+      if (left === 0) ready.push(child);
+    }
+  }
+  if (visited !== nodes.length) throw new TypeError("carrier child geometry is cyclic");
+  return nodes;
+}
+
+
 const carrierObstruction = (reason, key) =>
   Object.freeze({ kind: "rendering.htmlCarrier-obstruction", reason, key });
 
@@ -64,7 +122,7 @@ export function htmlCarrierOf(
   const admission = admitDocumentSpine(document);
   if (!admission.ok) return carrierObstruction("invalid-document-spine", admission.refusal.message);
   document = admission.value;
-  try { nodes = retainedCarrier(nodes); canonical(document); }
+  try { nodes = ownCarrierNodes(nodes, document); canonical(document); }
   catch (error) { return carrierObstruction("unprojectable-content", error.message); }
   const duplicate = firstDuplicate(nodes.map((node) => node.nodeId));
   if (duplicate !== undefined) return carrierObstruction("duplicate-node", duplicate);
@@ -127,7 +185,14 @@ export function buildHtmlDocumentPlan(
   styleBehavior,
 ) {
   if (!admittedCarriers.has(carrier)) return renderFiberObstruction("unadmitted-carrier", carrier?.kind ?? "missing");
-  if (system.carrier !== carrier) return renderFiberObstruction("carrier-system-mismatch", system.carrier.kind);
+  if (system?.carrier !== carrier) return renderFiberObstruction("carrier-system-mismatch", system?.carrier?.kind ?? "missing");
+  try {
+    profile = retainedCarrier(profile);
+    const { carrier: suppliedCarrier, ...source } = system;
+    system = Object.freeze({ ...retainedCarrier(source), carrier });
+  } catch (error) {
+    return renderFiberObstruction("unprojectable-plan-source", error.message);
+  }
   const allowedElements = new Set(profile.allowedElements);
   for (const node of carrier.nodes) {
     if (!allowedElements.has(node.element)) return renderFiberObstruction("element-not-allowed", node.element);
@@ -295,8 +360,11 @@ export function documentSpineOfHtml(html, limits = {}) {
   const children = node.content?.childNodes ?? [];
   if (children.some((child) => child.nodeName !== "#text"))
     throw new TypeError("documentSpineOfHtml: spine content must be inert JSON text");
-  const admitted = admitDocumentSpine(parse(children.map(({ value }) => value).join("")));
+  const raw = parse(children.map(({ value }) => value).join(""));
+  const admitted = admitDocumentSpine(raw);
   if (!admitted.ok) throw new TypeError(admitted.refusal.message);
   if (admitted.value.identity !== identity) throw new TypeError("documentSpineOfHtml: carrier identity differs from its content");
+  if (canonical(raw) !== canonical(admitted.value))
+    throw new TypeError("documentSpineOfHtml: raw typed coordinates differ from their reconstruction");
   return admitted.value;
 }
