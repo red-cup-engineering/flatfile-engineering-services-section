@@ -1,0 +1,53 @@
+name: Proof-path addressing and language source conformance
+
+on:
+  push:
+    paths:
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/scripts/proof-path-structuration.mjs'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/**'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/test/structuration.test.mjs'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/test/identity.test.mjs'
+      - '.github/workflows/proof-path-addressing.yml'
+  pull_request:
+    paths:
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/scripts/proof-path-structuration.mjs'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/**'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/test/structuration.test.mjs'
+      - 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/test/identity.test.mjs'
+      - '.github/workflows/proof-path-addressing.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-coordinate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Check the actual canonical RMN source and legacy public entry point
+        run: |
+          node --check 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/src/index.mts'
+          node --check 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/scripts/proof-path-structuration.mjs'
+          node --check 'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/test/structuration.test.mjs'
+      - name: Exercise both public entries, malformed/unauthorized routes and source-scoped utterances
+        run: |
+          node --test \
+            'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/test/structuration.test.mjs' \
+            'services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/test/structuration.test.mjs'
+      - name: Require one RMN coordinate authority across schema and file boundary
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          import {settleProofCoordinate} from './services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/src/index.mts';
+          const schema=JSON.parse(readFileSync('services/computer-file-engineering-services-section/services/computer-filepath-engineering-services-section/services/proof-pathing-services-section/services/proof-path-structuration-service/content/rmn-proof-coordinate/proof-coordinate.schema.json','utf8'));
+          assert.equal(schema.$defs.proofCoordinate.properties.type.const,'rmn-proof-coordinate');
+          assert.equal(schema.$defs.proofEnvelope.properties.type.const,'rmn-proof-envelope');
+          assert.equal(settleProofCoordinate({resourceType:'claim',root:'a',target:'b',
+            witnesses:[{domain:'a',generator:'specialization',codomain:'b'}]}).coordinate.type,'rmn-proof-coordinate');
+          NODE
