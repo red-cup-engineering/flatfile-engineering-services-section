@@ -104,6 +104,21 @@ export const truthLeqReading = (left, right) => samePoint(truthJoinReading(left,
 export const knowledgeImplyReading = onReadings((lf, la, rf, ra) => [!lf || rf, !la || ra]);
 export const truthImplyReading = onReadings((lf, la, rf, ra) => [!lf || rf, !la && ra]);
 
+/** The FOUR-valued symmetric difference of evidence, not a scalar score.
+ * This is the existing Obsmetrologia.Charge.symmetricEvidenceDifference,
+ * pinned in Obsmetrologia/Calculus/Logic/ChuComparison.lean:
+ * (for₁ XOR for₂, against₁ XOR against₂). It is knowledge-bottom iff
+ * both slots agree, and is exactly the pointwise ChuCandidate.defect when
+ * comparing the two sides of a candidate Chu pairing.
+ *
+ * This function compares admitted readings IN ONE NAMED FAMILY. Callers
+ * must explicitly normalize families before comparing; comparing two
+ * different words or rights claims is not a semantic-equality inference.
+ */
+export const symmetricEvidenceDifferenceReading = onReadings(
+  (lf, la, rf, ra) => [lf !== rf, la !== ra],
+);
+
 /** Negation swaps told-for and told-against. */
 export const negateReading = (name) => { const [f, a] = sidesOfReading(name); return readingOfSides(familyOf(name), a, f); };
 
