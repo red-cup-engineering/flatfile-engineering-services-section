@@ -4,6 +4,7 @@
   "type": "module",
   "description": "Holds RDF triplet terms and named graphs together with their serialization, canonicalization, query, and ontology-projection services.",
   "exports": {
+    "./sparql-http-client": "./scripts/sparql-http-client.mjs",
     "./sparql-over-eavt": "./scripts/sparql-over-eavt.mjs",
     "./sparql-text": "./scripts/sparql-text.mjs",
     "./sparql-results-json": "./scripts/sparql-results-json.mjs",
