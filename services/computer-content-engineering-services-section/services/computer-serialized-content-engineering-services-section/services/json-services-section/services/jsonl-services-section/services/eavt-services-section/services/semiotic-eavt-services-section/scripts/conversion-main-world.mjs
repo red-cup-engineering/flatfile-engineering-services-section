@@ -3,7 +3,7 @@
  * See store-conversion.md and store-migration-map.md; no runtime legacy bridge. */
 import fs from 'node:fs';
 import path from 'node:path';
-import {createBucketMap,streamJsonLines,sourceFiles,sourceStamp,assertSourceStamps,hashSource,witnessAt} from './conversion-buckets.mjs';
+import {originalJournalFiles,createBucketMap,streamJsonLines,sourceFiles,sourceStamp,assertSourceStamps,hashSource,witnessAt} from './conversion-buckets.mjs';
 
 const NI=/^ni:\/\/\/sha-256;[A-Za-z0-9_-]{43}$/u;
 const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
@@ -89,8 +89,7 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
  // and descriptions remain part of the original provider's source.
  // The original provider used both layouts during its lifetime. They are
  // one-time inputs only; neither layout becomes a current runtime reader.
- const originalRoots=['data/journals','data/logs'].map(relative=>path.join(source,relative));
- function* originalFiles(){for(const root of originalRoots)yield* sourceFiles(root);}
+ function* originalFiles(){yield* originalJournalFiles(source,{observe});}
  for(const file of originalFiles())observe(file);
  for(const file of originalFiles()){if(!file.endsWith('.witnesses'))continue;
   const kind=path.basename(file).split('-admit-')[1]?.replace(/\.jsonl\.witnesses$/u,'');if(!kind)throw new TypeError('original segment kind unavailable');

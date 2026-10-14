@@ -14,19 +14,46 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((out, value, index,
   return out;
 }, []));
 for (const key of ['settlement', 'into', 'old-store', 'new-store', 'report']) if (typeof args[key] !== 'string') throw new TypeError(`required --${key}`);
-const source = fs.realpathSync(args.settlement), output = path.resolve(args.into);
+// Resolve the existing ancestor before comparing paths: aliases cannot turn a
+// separate-looking candidate or report into a write inside retained custody.
+const destinationPath = value => {
+  let ancestor = path.resolve(value); const tail = [];
+  for (;;) {
+    try { fs.lstatSync(ancestor); break; }
+    catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      const parent = path.dirname(ancestor); if (parent === ancestor) throw error;
+      tail.unshift(path.basename(ancestor)); ancestor = parent;
+    }
+  }
+  return path.join(fs.realpathSync(ancestor), ...tail);
+};
+const under = (file, root) => file === root || file.startsWith(root + path.sep);
+const overlaps = (left, right) => under(left, right) || under(right, left);
+const source = fs.realpathSync(args.settlement), output = destinationPath(args.into);
 if (source === output || output.startsWith(source + path.sep) || source.startsWith(output + path.sep)) throw new TypeError('conversion requires a separate nonnested output');
-const reportPath = path.resolve(args.report);
+const reportPath = destinationPath(args.report);
 if (reportPath === source || reportPath.startsWith(source + path.sep)) throw new TypeError('report must preserve original custody');
 let parent=path.dirname(output);while(!fs.existsSync(parent))parent=path.dirname(parent);
 const parentReal=fs.realpathSync(parent);
 if(fs.statSync(source).dev!==fs.statSync(parentReal).dev||output==='/tmp'||output.startsWith('/tmp/')||output.startsWith('/var/tmp/'))throw new TypeError('candidate must use original custody volume outside temporary storage');
-if(args.activitypub){const liveParent=path.dirname(source),candidateParent=path.dirname(output);if(candidateParent===liveParent||candidateParent.startsWith(liveParent+path.sep))throw new TypeError('queue candidate must not use the live ActivityPub parent');}
+let originalQueue;
+if(args.activitypub){
+  if(typeof args.queue !== 'string')throw new TypeError('ActivityPub qualification requires explicit original queue custody');
+  originalQueue=fs.realpathSync(args.queue);
+  if(!fs.lstatSync(originalQueue).isDirectory())throw new TypeError('original queue custody must be a directory');
+  for(const part of ['ready','claimed'])if(!fs.lstatSync(path.join(originalQueue,part)).isDirectory())throw new TypeError('original queue needs ordinary ready and claimed directories');
+  const liveParent=path.dirname(source),candidateParent=path.dirname(output),candidateQueue=destinationPath(path.join(candidateParent,'queue'));
+  if(under(candidateParent,liveParent))throw new TypeError('queue candidate must not use the live ActivityPub parent');
+  if(overlaps(output,originalQueue)||under(reportPath,originalQueue)||overlaps(candidateQueue,originalQueue)||overlaps(candidateQueue,source))throw new TypeError('candidate paths overlap original queue or journal custody');
+  if(fs.statSync(originalQueue).dev!==fs.statSync(source).dev)throw new TypeError('original queue must use the custody volume');
+  if(fs.existsSync(candidateQueue))throw new TypeError('candidate queue custody must not exist');
+}
 if (fs.existsSync(output)) throw new TypeError('output must not exist; originals remain in their original custody');
 const oldRoot = fs.realpathSync(args['old-store']), newRoot = fs.realpathSync(args['new-store']);
 if (args['clock-last'] !== undefined && (args.activitypub || typeof args['clock-last'] !== 'string')) throw new TypeError('an explicit last-run source belongs to a world conversion');
 const clockLastSource = args['clock-last'] === undefined ? undefined : fs.realpathSync(args['clock-last']);
-if (clockLastSource !== undefined && (!fs.statSync(clockLastSource).isDirectory() || fs.statSync(clockLastSource).dev !== fs.statSync(source).dev || output === clockLastSource || output.startsWith(clockLastSource + path.sep) || clockLastSource.startsWith(output + path.sep))) throw new TypeError('last-run originals require separate same-volume directory custody');
+if (clockLastSource !== undefined && (under(reportPath,clockLastSource) || !fs.statSync(clockLastSource).isDirectory() || fs.statSync(clockLastSource).dev !== fs.statSync(source).dev || output === clockLastSource || output.startsWith(clockLastSource + path.sep) || clockLastSource.startsWith(output + path.sep))) throw new TypeError('last-run originals require separate same-volume directory custody');
 const load = file => import(pathToFileURL(file).href);
 const oldRequire = createRequire(path.join(oldRoot, 'package.json'));
 const newRequire = createRequire(path.join(newRoot, 'package.json'));
@@ -58,7 +85,7 @@ const store = await load(path.join(newRoot, 'src/store.mjs'));
 const { semanticAddress } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address');
 const { niBucketPath } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/ni-path');
 const { canonicalJson } = await supplier(newRequire, '@red-cup-engineering/json-services-section/canonical-json');
-const { streamJsonLines, hashSource } = await import('./conversion-buckets.mjs');
+const { originalJournalFiles, streamJsonLines, hashSource } = await import('./conversion-buckets.mjs');
 fs.mkdirSync(output, { mode: 0o700, recursive: true });
 process.umask(0o077);
 const report = { type: 'OneTimeStoreConversion', version: 1, source, output, originalsPreserved: true, ordersExecuted: false, transportActivated: false,
@@ -102,7 +129,11 @@ if (!args.activitypub) {
   report.suppliers.oldActivitypub = oldAp;
   report.suppliers.oldBodyReader = sha(fs.readFileSync(path.join(oldAp,'src/receiving/custody-bytes.mjs')));
   report.apOrigins = [];
-  const segments = [...files(path.join(source,'data/journals'))].filter(file => file.endsWith('.witnesses')).sort();
+  // Both historical journal owners are real inputs. The kind-layout migration
+  // retained witness custody under data/logs; no current runtime legacy reader.
+  const historicalFiles = [...originalJournalFiles(source,{observe})];
+  for(const file of historicalFiles)observe(file);
+  const segments = historicalFiles.filter(file => file.endsWith('.witnesses')).sort();
   for (const file of segments) {
     progress={stage:'original-activitypub-segment',source:path.relative(source,file)};
     const kind = path.basename(file).split('-admit-')[1]?.replace(/\.jsonl\.witnesses$/u, '');
@@ -148,12 +179,13 @@ if (!args.activitypub) {
   }
   if (args.queue) {
     if (typeof args.queue !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('queue receiving requires exact original queue and current ActivityPub provider');
-    const queue = fs.realpathSync(args.queue);
+    const queue = originalQueue;
     const { extractSenActivity } = await load(path.join(currentAp,'src/sen-activity.mjs'));
     report.suppliers.currentActivitypub = currentAp;
     report.suppliers.currentQueueReader = sha(fs.readFileSync(path.join(currentAp,'src/flatfile-queue.mjs')));
-    report.queue = { activated:0, retained:0, originalOnly:[], archivedOriginalOnly:0 };
+    report.queue = { activated:0, retained:0, originalOnly:[], archivedOriginalOnly:0, archivedReadyOriginalOnly:0, archivedClaimedOriginalOnly:0 };
     const claimed = path.join(queue,'claimed');
+    observe(queue);observe(claimed);
     if (fs.existsSync(claimed) && fs.readdirSync(claimed).length) throw new TypeError('an actual claimed delivery requires outcome receiving before queue conversion');
     const ready = path.join(queue,'ready'), target = path.join(path.dirname(output),'queue','ready');
     for (const file of files(ready)) {
@@ -173,7 +205,15 @@ if (!args.activitypub) {
       const destination = path.join(target,path.basename(file));fs.writeFileSync(destination,bytes,{flag:'wx',mode:0o600});
       if (!fs.readFileSync(destination).equals(bytes)) throw new TypeError('pending queue bytes changed during receiving');report.queue.retained++;
     }
-    for (const entry of fs.readdirSync(queue,{withFileTypes:true})) if (entry.isDirectory() && entry.name.startsWith('ready.')) report.queue.archivedOriginalOnly += fs.readdirSync(path.join(queue,entry.name)).length;
+    observe(queue);
+    for (const entry of fs.readdirSync(queue,{withFileTypes:true})) {
+      if (!entry.name.startsWith('ready.') && !entry.name.startsWith('claimed.')) continue;
+      if (!entry.isDirectory()) throw new TypeError('archived pending custody is not an ordinary directory');
+      const archive=path.join(queue,entry.name);observe(archive);
+      const count=fs.readdirSync(archive).length;
+      report.queue.archivedOriginalOnly += count;
+      report.queue[entry.name.startsWith('ready.')?'archivedReadyOriginalOnly':'archivedClaimedOriginalOnly'] += count;
+    }
   }
 }
 for (const [type, expected] of Object.entries(report.types)) {
@@ -186,7 +226,9 @@ for (const [type, expected] of Object.entries(report.types)) {
   for (const {head} of store.heads(output,type)) for (const step of store.walk(output,type,head.frontier,{limit:100000})) if(step.missing || step.truncated) throw new TypeError('native head receiving is incomplete');
 }
 for(const [file,original] of stamps) if(JSON.stringify(stamp(file)) !== JSON.stringify(original)) throw new TypeError('original custody changed during conversion; candidate is unqualified');
-report.qualified = report.missingBodies.length === 0 && report.mainQualified !== false;
+report.qualified = report.missingBodies.length === 0 && report.mainQualified !== false
+  && (report.queue.originalOnly?.length ?? 0) === 0
+  && (report.queue.archivedOriginalOnly ?? 0) === 0;
 fs.writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
 console.log(JSON.stringify({type:report.type,qualified:report.qualified,types:report.types,missingBodies:report.missingBodies.length,originalsPreserved:true,ordersExecuted:false,transportActivated:false}));
 

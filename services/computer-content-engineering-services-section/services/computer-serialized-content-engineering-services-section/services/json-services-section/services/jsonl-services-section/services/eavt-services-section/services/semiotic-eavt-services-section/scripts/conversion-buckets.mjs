@@ -3,6 +3,30 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 
+// Both retained historical layouts are inputs to the one-time conversion.
+export const ORIGINAL_JOURNAL_ROOTS = Object.freeze(['data/journals','data/logs']);
+const journalGuard = /^This settlement's journal is filed by kind under data\/logs since (\d{4}-\d{2}-\d{2}) \(semiotic-eavt-services-section scripts\/file-journal-store-by-kind\.mjs\)\.\nA release that still writes here runs the dated layout and must be rebuilt\.\n$/u;
+const originalStat = file => {try{return fs.lstatSync(file);}catch(error){if(error.code==='ENOENT')return;throw error;}};
+/** Admit the exact historical filing guard, never arbitrary files or redirected
+ * journal roots. The bounded supported layout keeps logs inside this custody. */
+export function* originalJournalFiles(source,{observe=()=>{}}={}){
+  observe(source);
+  const data=path.join(source,'data'),dataStat=originalStat(data);
+  if(dataStat!==undefined){if(!dataStat.isDirectory())throw new TypeError('original data custody is not an ordinary directory');observe(data);}
+  for(const relative of ORIGINAL_JOURNAL_ROOTS){
+    const root=path.join(source,relative),stat=originalStat(root);if(stat===undefined)continue;
+    if(stat.isDirectory()){observe(root);yield* sourceFiles(root,{observe});continue;}
+    if(relative==='data/journals'&&stat.isFile()){
+      const match=journalGuard.exec(fs.readFileSync(root,'utf8'));
+      const date=match&&new Date(match[1]+'T00:00:00.000Z');
+      if(match&&Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===match[1]&&originalStat(path.join(source,'data/logs'))?.isDirectory()){
+        observe(root);yield root;continue;
+      }
+    }
+    throw new TypeError('original journal root is neither an ordinary directory nor the exact historical filing guard');
+  }
+}
+
 export const SOURCE_LINE_BYTES_MAX=1_048_576; // the original witness provider envelope
 export const sourceStamp=file=>{const s=fs.statSync(file);return [s.dev,s.ino,s.size,s.mtimeMs,s.ctimeMs];};
 export function assertSourceStamps(stamps){for(const [file,stamp]of stamps)if(JSON.stringify(sourceStamp(file))!==JSON.stringify(stamp))throw new TypeError('original conversion source changed');}
@@ -28,9 +52,9 @@ export function hashSource(file,{openReader=plainReader}={}){
  try{while(position<end){const count=reader.read(buffer,0,Math.min(buffer.length,end-position),position);if(!count)break;hash.update(buffer.subarray(0,count));position+=count;}return hash.digest('hex');}finally{reader.close();}
 }
 
-export function* sourceFiles(root){if(!fs.existsSync(root))return;for(const entry of fs.readdirSync(root,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){
+export function* sourceFiles(root,{observe=()=>{}}={}){if(!fs.existsSync(root))return;observe(root);for(const entry of fs.readdirSync(root,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){
  const file=path.join(root,entry.name);if(entry.isSymbolicLink())throw new TypeError('source custody contains a symlink');
- if(entry.isDirectory())yield* sourceFiles(file);else if(entry.isFile())yield file;
+ if(entry.isDirectory())yield* sourceFiles(file,{observe});else if(entry.isFile())yield file;
 }}
 
 /** ni-path-v1 determines one bucket. Lookup streams it, retaining one matching value. */

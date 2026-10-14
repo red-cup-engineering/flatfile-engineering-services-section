@@ -2,7 +2,8 @@
 /**
  * File a settlement's journal store by kind, once (store-root.mjs): the store that lived under
  * `data/journals/<YYYY>/<MM>/<DD>/` moves to `data/logs/<kind>-logs/`, and the plain EAVT feeds a
- * settlement kept under `data/logs/<YYYY>/<MM>/<DD>/<feed>.jsonl` move to the same law.
+ * settlement kept under `data/logs/<YYYY>/<MM>/<DD>/<feed>.jsonl` move to the same law,
+ * together with their retained statement/index directories, daily heads and SHA-256 packets.
  *
  * For each settlement root, in this order:
  *   1. the old store's `index/` becomes the store's state where it stands, and every v2
@@ -110,6 +111,84 @@ function mover(report, dryRun) {
   };
 }
 
+/** Stage a packed payload and all dependent files before retiring any source.
+ * A collision anywhere in the group leaves its complete source representation readable. */
+function transferPackedGroup(pairs, report, dryRun) {
+  const destinations = new Map();
+  const aliases = [];
+  for (const pair of pairs) {
+    const prior = destinations.get(pair.to);
+    if (prior !== undefined && prior.from !== pair.from) aliases.push({ from: pair.from, to: pair.to });
+    else destinations.set(pair.to, pair);
+  }
+  if (aliases.length > 0) {
+    report.conflicts.push(...aliases);
+    return false;
+  }
+  const unique = [...destinations.values()];
+  const conflicts = unique.filter(({ from, to }) => lstat(to) !== undefined && !sameBytes(from, to));
+  if (conflicts.length > 0) {
+    report.conflicts.push(...conflicts.map(({ from, to }) => ({ from, to })));
+    return false;
+  }
+  const counts = unique.filter((pair) => !pair.payload).map((pair) => ({
+    ...pair, duplicate: lstat(pair.to) !== undefined,
+  }));
+  if (dryRun) {
+    for (const pair of counts) report[pair.duplicate ? "duplicates" : "moved"] += 1;
+    return true;
+  }
+  const created = [];
+  const rollback = () => {
+    for (const { file, dev, ino } of created.toReversed()) {
+      const held = lstat(file);
+      if (held?.dev === dev && held.ino === ino) fs.unlinkSync(file);
+    }
+  };
+  try {
+    for (const { from, to } of unique) {
+      if (lstat(to) === undefined) {
+        fs.mkdirSync(path.dirname(to), { recursive: true });
+        const source = fs.lstatSync(from);
+        try { fs.linkSync(from, to); created.push({ file: to, dev: source.dev, ino: source.ino }); }
+        catch (error) { if (error.code !== "EEXIST") throw error; }
+      }
+      if (!sameBytes(from, to)) {
+        report.conflicts.push({ from, to });
+        rollback();
+        return false;
+      }
+    }
+    // All destinations must still reproduce their sources before the first source is retired.
+    for (const { from, to } of unique) {
+      if (!sameBytes(from, to)) {
+        report.conflicts.push({ from, to });
+        rollback();
+        return false;
+      }
+    }
+  } catch (error) {
+    rollback();
+    throw error;
+  }
+  for (const from of new Set(counts.map((pair) => pair.from))) fs.unlinkSync(from);
+  for (const pair of counts) report[pair.duplicate ? "duplicates" : "moved"] += 1;
+  return true;
+}
+
+/** An untransferred or unreadable packing description cannot release its source payload. */
+function stillReferencesPackedData(directory, data) {
+  for (const entry of entries(directory)) {
+    if (!entry.isFile() || !entry.name.endsWith(".packed.json")) continue;
+    try {
+      const packing = JSON.parse(fs.readFileSync(path.join(directory, entry.name), "utf8"));
+      if (packing?.version !== 1 || !Number.isSafeInteger(packing.packed) || !Array.isArray(packing.frames) || typeof packing.data !== "string") return true;
+      if (packing.data === data) return true;
+    } catch { return true; }
+  }
+  return false;
+}
+
 /** Remove empty directories below and including `directory`. */
 function pruneEmpty(directory) {
   for (const entry of entries(directory)) if (entry.isDirectory()) pruneEmpty(path.join(directory, entry.name));
@@ -148,6 +227,75 @@ function filesBelow(directory) {
   return found;
 }
 
+/** Discover complete packed groups without changing their source store. */
+function packedDayPlan(date, directory, store) {
+  const groups = new Map(), segments = new Set(), unavailable = [];
+  for (const entry of entries(directory)) {
+    if (!entry.isFile() || entry.name.startsWith(".packing-") || entry.name.startsWith(".packed-")) continue;
+    const relative = kindRelativeOf(date, entry.name);
+    if (relative === undefined) continue;
+    const from = path.join(directory, entry.name);
+    const description = path.join(directory, `.packing-${createHash("sha256").update(entry.name, "utf8").digest("hex")}.packed.json`);
+    if (!lstat(description)?.isFile()) continue;
+    segments.add(entry.name);
+    const data = JSON.parse(fs.readFileSync(description, "utf8")).data;
+    if (typeof data !== "string" || !lstat(path.join(directory, data))?.isFile()) {
+      unavailable.push(from, description);
+      continue;
+    }
+    const target = path.dirname(path.join(store, relative));
+    const targetDescription = `.packing-${createHash("sha256").update(path.basename(relative), "utf8").digest("hex")}.packed.json`;
+    const group = groups.get(data) ?? [];
+    group.push(
+      { from: path.join(directory, data), to: path.join(target, data), payload: true },
+      { from: description, to: path.join(target, targetDescription) },
+      { from, to: path.join(store, relative) },
+    );
+    groups.set(data, group);
+  }
+  return { groups, segments, unavailable };
+}
+
+/** Refuse known packed conflicts before carrying indexes or retiring the old store route.
+ * Distinct dated names must not converge, even across payload groups or packing states. */
+function preflightPackedStore(oldStore, store, report) {
+  const targets = new Map(), plans = [];
+  const seen = new Set();
+  const conflict = (from, to) => {
+    const key = JSON.stringify([from, to]);
+    if (!seen.has(key)) { report.conflicts.push({ from, to }); seen.add(key); }
+  };
+  const register = ({ from, to, payload = false }) => {
+    const prior = targets.get(to);
+    if (prior !== undefined && prior.from !== from) {
+      // Addressed payloads from different days may share a representation;
+      // punched segment bytes cannot establish that their logical histories agree.
+      if (!prior.payload || !payload || !sameBytes(prior.from, from)) conflict(from, to);
+    } else targets.set(to, { from, payload });
+  };
+  for (const { date, directory } of dayDirectories(oldStore)) {
+    const plan = packedDayPlan(date, directory, store);
+    plans.push(plan);
+    report.leftInPlace.push(...plan.unavailable);
+    for (const entry of entries(directory)) {
+      if (!entry.isFile() || entry.name.startsWith(".packing-") || entry.name.startsWith(".packed-")) continue;
+      const relative = kindRelativeOf(date, entry.name);
+      if (relative !== undefined) register({ from: path.join(directory, entry.name), to: path.join(store, relative) });
+    }
+    for (const pairs of plan.groups.values()) for (const pair of pairs) register(pair);
+  }
+  for (const plan of plans) {
+    for (const pairs of plan.groups.values()) {
+      const preview = { moved: 0, duplicates: 0, conflicts: [] };
+      transferPackedGroup(pairs, preview, true);
+      for (const { from, to } of preview.conflicts) conflict(from, to);
+    }
+  }
+  if (report.conflicts.length === 0 && report.leftInPlace.length === 0) return true;
+  for (const plan of plans) for (const pairs of plan.groups.values()) report.leftInPlace.push(...new Set(pairs.map((pair) => pair.from)));
+  return false;
+}
+
 /** File one settlement's journal store and plain dated feeds by kind. */
 export function fileJournalStoreByKind(settlementRoot, { dryRun = false } = {}) {
   const root = path.resolve(settlementRoot);
@@ -167,6 +315,7 @@ export function fileJournalStoreByKind(settlementRoot, { dryRun = false } = {}) 
     : oldStat?.isSymbolicLink() ? path.join(path.dirname(oldTarget), ...journalSegment.split("/"))
       : logsPath;
   report.store = store;
+  if (oldStore !== undefined && !preflightPackedStore(oldStore, store, report)) return report;
   if (!dryRun) fs.mkdirSync(store, { recursive: true });
 
   if (oldStore !== undefined) {
@@ -181,29 +330,23 @@ export function fileJournalStoreByKind(settlementRoot, { dryRun = false } = {}) 
     }
     // 2. Day directories to kind directories; the store's own areas to theirs.
     for (const { date, directory } of dayDirectories(oldStore)) {
-      const packed = new Map();
+      const { groups: packed, segments: packedSegments } = packedDayPlan(date, directory, store);
+      for (const [data, pairs] of packed) {
+        if (!transferPackedGroup(pairs, report, dryRun)) {
+          report.leftInPlace.push(...new Set(pairs.map((pair) => pair.from)));
+          continue;
+        }
+        if (!dryRun && !stillReferencesPackedData(directory, data)) fs.unlinkSync(path.join(directory, data));
+      }
       for (const entry of entries(directory)) {
         const from = path.join(directory, entry.name);
-        if (entry.isFile() && (entry.name.startsWith(".packing-") || entry.name.startsWith(".packed-"))) continue;
+        if (packedSegments.has(entry.name) || (entry.isFile() && (entry.name.startsWith(".packing-") || entry.name.startsWith(".packed-")))) continue;
         if (entry.isDirectory() && entry.name === "packets") { move(path.join(from, "sha256"), path.join(store, STORE_AREAS.packets, "sha256")); continue; }
         if (entry.isDirectory() && entry.name === "index") { move(from, path.join(journalIndexDirectory(store), "heads", date)); continue; }
         const relative = kindRelativeOf(date, entry.name);
         if (relative === undefined) { report.leftInPlace.push(from); continue; }
-        // A packed segment's description (named from its basename) and the data it names (by a name in
-        // its own directory) go with it; data two segments share is linked into each one's directory.
-        const description = path.join(directory, `.packing-${createHash("sha256").update(entry.name, "utf8").digest("hex")}.packed.json`);
-        if (entry.isFile() && lstat(description)?.isFile()) {
-          const data = JSON.parse(fs.readFileSync(description, "utf8")).data;
-          const target = path.dirname(path.join(store, relative));
-          if (typeof data === "string" && lstat(path.join(directory, data))?.isFile()) {
-            if (!dryRun) { fs.mkdirSync(target, { recursive: true }); if (lstat(path.join(target, data)) === undefined) fs.linkSync(path.join(directory, data), path.join(target, data)); }
-            packed.set(data, true);
-          }
-          move(description, path.join(target, path.basename(description)));
-        }
         move(from, path.join(store, relative));
       }
-      for (const data of packed.keys()) if (!dryRun) fs.rmSync(path.join(directory, data), { force: true });
       for (const entry of entries(directory)) if (entry.name.startsWith(".packing-") || entry.name.startsWith(".packed-")) report.leftInPlace.push(path.join(directory, entry.name));
     }
     for (const [from, to] of [["index", journalIndexDirectory(store)], [SUPERSEDED_INDEX_AREA, journalIndexDirectory(store)],
@@ -227,7 +370,19 @@ export function fileJournalStoreByKind(settlementRoot, { dryRun = false } = {}) 
           move(from, projectDataArtifactPath(journalPath({ root, feed: entry.name.slice(0, -".record.jsonl".length), at: date }), "record", "jsonl"));
           continue;
         }
-        const relative = entry.isFile() ? kindRelativeOf(date, entry.name) : undefined;
+        // Plain dated journals also retained source statements, feed indexes, heads and packets.
+        // These are the same directory representations the older data/journals branch files above.
+        if (entry.isDirectory() && entry.name === "packets") {
+          const sha256 = path.join(from, "sha256");
+          if (lstat(sha256)?.isDirectory()) {
+            move(sha256, path.join(store, STORE_AREAS.packets, "sha256"));
+            for (const other of entries(from)) if (other.name !== "sha256") report.leftInPlace.push(path.join(from, other.name));
+          } else report.leftInPlace.push(from);
+          continue;
+        }
+        if (entry.isDirectory() && entry.name === "index") { move(from, path.join(journalIndexDirectory(store), "heads", date)); continue; }
+        const retainedFeedDirectory = entry.isDirectory() && (entry.name.endsWith(".jsonl.statements") || entry.name.endsWith(".jsonl.index"));
+        const relative = entry.isFile() || retainedFeedDirectory ? kindRelativeOf(date, entry.name) : undefined;
         if (relative === undefined) { report.leftInPlace.push(from); continue; }
         move(from, path.join(store, relative));
       }
