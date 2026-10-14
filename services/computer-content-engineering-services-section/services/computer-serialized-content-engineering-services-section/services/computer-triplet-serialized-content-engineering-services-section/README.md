@@ -25,3 +25,42 @@ separate concern.
   section's own term/named-graph/Turtle primitives above, so a consuming
   section's schema stays its one authored source and the `.ttl` is
   generated, never a second hand-written artifact.
+
+## W3C RDF interoperability over existing owners
+
+The exported `./sparql-http-client` uses **standard HTTP** with a real RDF
+service. `sparqlProtocol(endpoint, text, options)` sends SPARQL 1.1 GET or
+POST queries (`application/sparql-query`) and separately authorized POST
+updates (`application/sparql-update`). `graphStoreProtocol(endpoint,
+options)` reads, replaces, appends or deletes a default or named RDF graph
+using the W3C Graph Store HTTP Protocol. It exchanges Turtle, JSON-LD,
+N-Triples or RDF/XML representations as the external service supports them.
+
+These functions **do not create a triplestore, reinterpret OWL, parse arbitrary
+SPARQL, invent graph identity, acquire rights or bypass a receiver's
+authentication**. The caller binds the real query/update or graph-store
+endpoint and its authorized HTTP credentials; operations return the actual
+HTTP response. Redirects are refused so secrets cannot be forwarded to a
+different endpoint. GET is never accepted for an update.
+
+For example, with an *existing, authorized* SPARQL service:
+
+```js
+import {sparqlProtocol,graphStoreProtocol} from
+  "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section/sparql-http-client";
+const response=await sparqlProtocol("https://example.org/sparql",
+  "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 20");
+const results=await response.json(); // W3C SPARQL Results JSON as issued by the server
+const turtle=await (await graphStoreProtocol("https://example.org/data",
+  {graph:"urn:my-authorized-graph"})).text();
+```
+
+Use `node --test test/sparql-http-client.test.mjs` to exercise the
+query/update/graph-store transport, negative inputs and HTTP refusals.
+The existing `./sparql-text` is explicitly a **limited BGP profile**,
+not a full W3C SPARQL 1.1 engine. For arbitrary SPARQL, OWL reasoning,
+SHACL validation and large-scale RDF storage, use an existing conforming
+RDF service and this standard transport rather than extending a local
+handwritten BGP parser. An L-Space document-index route is not automatically
+a semantic graph: qualified RDF graph contents must be sourced from admitted
+Science/SignCell/SEAVT data by the owning consumer.
