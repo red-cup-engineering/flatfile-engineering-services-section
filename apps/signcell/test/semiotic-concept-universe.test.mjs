@@ -38,8 +38,8 @@ test("two authors' same_as declarations are claims, not a license to merge conce
 
 test("publication retains separate authored identities and treats aliases as unverified",()=>{
   const universe=createSemioticConceptUniverse({concepts:[
-    concept("relation",{sameAs:["relationing"]}),
-    concept("relationing",{publication:{channels:["Site"],status:"Draft"}}),
+    concept("relation",{sameAs:["relationing"],publication:{enabled:true}}),
+    concept("relationing",{publication:{enabled:true,channels:["Site"],status:"Draft"}}),
     concept("hidden",{publication:{enabled:false,channels:["site"]}}),
   ]}).value;
   const all=selectSemioticConceptPublication(universe);
@@ -58,7 +58,7 @@ test("undeclared alias cannot become a phantom canonical subject",()=>{
   assert.deepEqual(universe.content.concepts.map(item=>item.id),["duty"]);
   assert.equal(universe.content.references[0].status,"unresolved-identity");
   assert.equal(universe.content.diagnostics[0].code,"unresolved-identity");
-  assert.deepEqual(selectSemioticConceptPublication(universe).map(record=>record.id),["duty"]);
+  assert.deepEqual(selectSemioticConceptPublication(universe).map(record=>record.id),[]);
 });
 
 test("publication must be explicit and source-normalized in the canonical SignCell concept universe",()=>{
@@ -66,7 +66,6 @@ test("publication must be explicit and source-normalized in the canonical SignCe
     concept("ordinary",{sameAs:["publishable"]}),
     concept("publishable",{publication:{enabled:true,channels:["site"],status:"published"}}),
     concept("channel-only",{publication:{channels:["site"],status:"published"}}),
-    concept("claimed-officer",{publication:{enabled:"true",channels:["site"]}}),
     concept("blocked",{publication:{enabled:false,channels:["site"]}}),
   ]});
   assert.equal(admitted.ok,true);
@@ -74,9 +73,9 @@ test("publication must be explicit and source-normalized in the canonical SignCe
   assert.deepEqual(selectSemioticConceptPublication(admitted.value,{channels:["site"]}).map(record=>record.id),["publishable"]);
   assert.equal(admitted.value.content.concepts.find(c=>c.id==="ordinary").publication.enabled,false);
   assert.equal(admitted.value.content.concepts.find(c=>c.id==="channel-only").publication.enabled,false);
-  assert.equal(admitted.value.content.concepts.find(c=>c.id==="claimed-officer").publication.enabled,false);
   assert.equal(admitted.value.content.concepts.find(c=>c.id==="publishable").publication.enabled,true);
   assert.equal(admitted.value.content.references.some(r=>r.relation==="claimed-identity"&&r.status==="unverified-identity"),true);
+  assert.throws(()=>createSemioticConceptUniverse({concepts:[concept("claimed-officer",{publication:{enabled:"true",channels:["site"]}})]}),/publication.enabled must be a boolean/u);
 });
 
 test("differentiation names added, removed and changed independently authored concepts",()=>{
