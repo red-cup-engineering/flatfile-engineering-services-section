@@ -28,9 +28,9 @@ function claimSubject({kind,row,witness,file,source,dataArtifactAddress}){
  return matches.length===1?matches[0]:undefined;
 }
 
-function selection(witness,kind,context){
+function selection(witness,kind,context,semantic=context.semanticRecordOf(witness,kind)){
  const row=witness.observation.payload;if(!Array.isArray(row)||row.length!==4)return;
- const semantic=context.semanticRecordOf(witness,kind),[e,a,v,t]=row,plain={e,a,v,t},value=semantic?.record;
+ const [e,a,v,t]=row,plain={e,a,v,t},value=semantic?.record;
  const common={original:witness.id,identity:semantic?.id,at:semantic?.recordedAt??witness.observation.time,namedCauses:witness.observation.causes??[]};
  if((object(e)&&e.kind==='metroplat.claim-session')||kind.startsWith('structured-work-intent-')||kind.startsWith('actor-')||kind.startsWith('ni-sha-256-')){
   const thread=claimSubject({...context,kind,row,witness});if(thread===undefined)return {unqualified:'claim-thread-subject-unresolved'};
@@ -103,7 +103,9 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
    // The identity is witnessed even when its original kind is not a current consumer.
    if(semantic?.id&&NI.test(semantic.id)&&maps.get('identity',semantic.id)===undefined)maps.put('identity',semantic.id,witness.id);
    if(['rpc','metroplat.clock','settlement-signal'].includes(kind)){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;}
-   const item=selection(witness,kind,{...context,file});
+   // Pass one already received the original projection for identity mapping.
+   // Pass two still reopens and re-admits its exact original witness.
+   const item=selection(witness,kind,{...context,file},semantic??null);
    if(item?.originalOnly){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;
     fs.appendFileSync(path.join(output,report.originalOnlyDispositions.file),JSON.stringify({original:witness.id,kind,reason:item.originalOnly})+'\n',{mode:0o600});
     report.originalOnlyDispositions.count++;report.originalOnlyDispositions.reasons[item.originalOnly]=(report.originalOnlyDispositions.reasons[item.originalOnly]??0)+1;continue;}
