@@ -17,7 +17,6 @@
     "./posix": {
       "import": "./lib/posix.mjs"
     },
-    "./proof-path-structuration": "./scripts/proof-path-structuration.mjs",
     "./filepath": "./lib/filepath.mjs",
     "./search-filepath": "./scripts/search-filepath.mjs",
     "./admit-relative-posix-filepath": "./scripts/admit-relative-posix-filepath.mjs",
