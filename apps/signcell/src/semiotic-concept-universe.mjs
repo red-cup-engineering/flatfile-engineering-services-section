@@ -18,17 +18,16 @@ const json = (value, label) => {
 };
 
 export const semioticConceptUniverseType = defineSchemaType({
-  $id: "https://schemas.561.group/computer/semiotic-concept-universe.schema.json",
+  $id: "https://schemas.561.group/computer/semiotic-concept-universe-v2.schema.json",
   title: "Semiotic concept universe",
-  description: "A closed, content-addressed cut of declared concepts, their identity classes, annotations, references, and diagnostics.",
+  description: "A content-addressed cut of independently sourced concepts, unverified identity claims, references and diagnostics; authored same_as never merges identities.",
   type: "object",
-  required: ["kind", "version", "concepts", "equivalenceClasses", "references", "diagnostics"],
+  required: ["kind", "version", "concepts", "references", "diagnostics"],
   additionalProperties: false,
   properties: {
     kind: { const: "semiotic-concept-universe" },
-    version: { const: 1 },
+    version: { const: 2 },
     concepts: { type: "array", items: { type: "object" } },
-    equivalenceClasses: { type: "array", items: { type: "object" } },
     references: { type: "array", items: { type: "object" } },
     diagnostics: { type: "array", items: { type: "object" } },
   },
@@ -69,69 +68,41 @@ function normalizedConcept(input) {
   });
 }
 
-function identityClasses(concepts) {
-  const parent = new Map();
-  const find = (value) => {
-    if (!parent.has(value)) parent.set(value, value);
-    const direct = parent.get(value);
-    if (direct === value) return value;
-    const representative = find(direct);
-    parent.set(value, representative);
-    return representative;
-  };
-  const unite = (left, right) => {
-    const a = find(left), b = find(right);
-    if (a === b) return;
-    if (a.localeCompare(b) < 0) parent.set(b, a);
-    else parent.set(a, b);
-  };
-  for (const concept of concepts) {
-    find(concept.id);
-    for (const alias of concept.sameAs) unite(concept.id, alias);
-  }
-  const members = new Map();
-  for (const id of parent.keys()) {
-    const representative = find(id);
-    const group = members.get(representative) ?? [];
-    group.push(id);
-    members.set(representative, group);
-  }
-  const representativeOf = new Map([...parent.keys()].map((id) => [id, find(id)]));
-  return {
-    representativeOf,
-    classes: freeze([...members].map(([representative, memberIds]) => freeze({ representative, members: freeze(memberIds.sort((a, b) => a.localeCompare(b))) })).sort((a, b) => a.representative.localeCompare(b.representative))),
-  };
-}
-
-/**
- * Admit concept declarations as one immutable SignCell. Identity equivalence never
- * discards competing source records: it merely supplies a deterministic class key.
- */
+/** Author assertions of sameness remain disputed identity claims until independently qualified. */
 export function createSemioticConceptUniverse({ concepts } = {}) {
   if (!Array.isArray(concepts)) throw new TypeError("concepts must be an array");
   const normalized = concepts.map(normalizedConcept).sort((left, right) => left.id.localeCompare(right.id));
-  if (new Set(normalized.map(({ id }) => id)).size !== normalized.length) throw new TypeError("concept ids must be unique");
-  const identity = identityClasses(normalized);
-  const knownRepresentatives = new Set(normalized.map(({ id }) => identity.representativeOf.get(id)));
+  const known = new Set(normalized.map(({id}) => id));
+  if (known.size !== normalized.length) throw new TypeError("concept ids must be unique");
   const references = [];
   const diagnostics = [];
   for (const concept of normalized) {
-    const source = identity.representativeOf.get(concept.id);
+    for (const alias of concept.sameAs) {
+      const status = known.has(alias) ? "unverified-identity" : "unresolved-identity";
+      references.push(freeze({source:concept.id, sourceConcept:concept.id, target:alias,
+        requestedTarget:alias, relation:"claimed-identity", status, annotation:null}));
+      diagnostics.push(freeze({code:status, concept:concept.id, target:alias}));
+    }
     for (const [index, annotation] of concept.annotations.entries()) {
-      if (annotation.kind === "failure") diagnostics.push(freeze({ code: "annotation-failure", concept: concept.id, annotation: index, reason: annotation.reason }));
+      if (annotation.kind === "failure") diagnostics.push(freeze({code:"annotation-failure",
+        concept:concept.id, annotation:index, reason:annotation.reason}));
       if (annotation.kind !== "reference") continue;
-      const target = identity.representativeOf.get(annotation.target) ?? annotation.target;
-      const status = knownRepresentatives.has(target) ? "resolved" : "unresolved";
-      references.push(freeze({ source, sourceConcept: concept.id, target, requestedTarget: annotation.target, status, annotation: index }));
-      if (status === "unresolved") diagnostics.push(freeze({ code: "unresolved-reference", concept: concept.id, target: annotation.target, representative: target, annotation: index }));
+      const status = known.has(annotation.target) ? "resolved" : "unresolved";
+      references.push(freeze({source:concept.id,sourceConcept:concept.id,target:annotation.target,
+        requestedTarget:annotation.target,relation:"reference",status,annotation:index}));
+      if (status === "unresolved") diagnostics.push(freeze({code:"unresolved-reference",
+        concept:concept.id,target:annotation.target,annotation:index}));
     }
   }
   const content = freeze({
-    kind: "semiotic-concept-universe", version: 1, concepts: freeze(normalized), equivalenceClasses: identity.classes,
-    references: freeze(references.sort((left, right) => left.source.localeCompare(right.source) || left.target.localeCompare(right.target) || left.annotation - right.annotation)),
-    diagnostics: freeze(diagnostics.sort((left, right) => left.code.localeCompare(right.code) || left.concept.localeCompare(right.concept) || (left.annotation ?? -1) - (right.annotation ?? -1))),
+    kind:"semiotic-concept-universe",version:2,concepts:freeze(normalized),
+    references:freeze(references.sort((a,b) => a.source.localeCompare(b.source) ||
+      a.target.localeCompare(b.target) || a.relation.localeCompare(b.relation) ||
+      (a.annotation ?? -1) - (b.annotation ?? -1))),
+    diagnostics:freeze(diagnostics.sort((a,b) => a.code.localeCompare(b.code) ||
+      a.concept.localeCompare(b.concept) || (a.annotation ?? -1) - (b.annotation ?? -1))),
   });
-  return createTypedMark(semioticConceptUniverseType, content);
+  return createTypedMark(semioticConceptUniverseType,content);
 }
 
 function universeContent(universe) {
@@ -140,32 +111,28 @@ function universeContent(universe) {
 }
 
 /** Select canonical publication records without giving publication ownership of the source universe. */
+/** Publish independently named concepts, never merge two authored subjects on a same_as claim. */
 export function selectSemioticConceptPublication(universe, { channels, statuses } = {}) {
   const content = universeContent(universe);
-  const wantedChannels = new Set(strings(channels, "channels").map((value) => value.toLowerCase()));
-  const wantedStatuses = new Set(strings(statuses, "statuses").map((value) => value.toLowerCase()));
-  const byRepresentative = new Map();
-  for (const concept of content.concepts) {
-    const group = content.equivalenceClasses.find((entry) => entry.members.includes(concept.id));
-    const representative = group?.representative ?? concept.id;
-    const members = byRepresentative.get(representative) ?? [];
-    members.push(concept);
-    byRepresentative.set(representative, members);
-  }
+  const wantedChannels = new Set(strings(channels,"channels").map(value=>value.toLowerCase()));
+  const wantedStatuses = new Set(strings(statuses,"statuses").map(value=>value.toLowerCase()));
   const records = [];
-  for (const [id, members] of byRepresentative) {
-    const ordered = [...members].sort((left, right) => (left.id !== id) - (right.id !== id) || left.id.localeCompare(right.id));
-    const primary = ordered[0];
-    const channelsForClass = new Set(ordered.flatMap((concept) => concept.publication.channels.map((channel) => channel.toLowerCase())));
-    const statusesForClass = new Set(ordered.map((concept) => concept.publication.status?.toLowerCase()).filter(Boolean));
-    const enabled = ordered.some((concept) => concept.publication.enabled);
-    if (!enabled || (wantedChannels.size > 0 && ![...wantedChannels].some((channel) => channelsForClass.has(channel))) || (wantedStatuses.size > 0 && ![...wantedStatuses].some((status) => statusesForClass.has(status))) ) continue;
-    records.push(freeze({ id, title: primary.title, body: primary.body, tags: freeze([...new Set(ordered.flatMap((concept) => concept.tags))].sort((a, b) => a.localeCompare(b))), status: primary.publication.status,
-      channels: freeze([...channelsForClass].sort((a, b) => a.localeCompare(b))), aliases: freeze(content.equivalenceClasses.find((entry) => entry.representative === id)?.members.filter((member) => member !== id) ?? []),
-      concepts: freeze(ordered), references: freeze(content.references.filter((reference) => reference.source === id)), diagnostics: freeze(content.diagnostics.filter((diagnostic) => ordered.some((concept) => concept.id === diagnostic.concept))),
+  for (const concept of content.concepts) {
+    const channelsForConcept = new Set(concept.publication.channels.map(value=>value.toLowerCase()));
+    const status = concept.publication.status?.toLowerCase();
+    if (!concept.publication.enabled ||
+        (wantedChannels.size > 0 && ![...wantedChannels].some(channel=>channelsForConcept.has(channel))) ||
+        (wantedStatuses.size > 0 && !wantedStatuses.has(status))) continue;
+    records.push(freeze({
+      id:concept.id, title:concept.title, body:concept.body,
+      tags:concept.tags, status:concept.publication.status,
+      channels:freeze([...channelsForConcept].sort()),
+      claimedAliases:concept.sameAs, concepts:freeze([concept]),
+      references:freeze(content.references.filter(ref=>ref.source===concept.id)),
+      diagnostics:freeze(content.diagnostics.filter(diagnostic=>diagnostic.concept===concept.id)),
     }));
   }
-  return freeze(records.sort((left, right) => left.id.localeCompare(right.id)));
+  return freeze(records.sort((a,b)=>a.id.localeCompare(b.id)));
 }
 
 /** Compare the user-visible semantic cut: source concepts, references, and diagnostics. */
