@@ -61,6 +61,24 @@ test("undeclared alias cannot become a phantom canonical subject",()=>{
   assert.deepEqual(selectSemioticConceptPublication(universe).map(record=>record.id),["duty"]);
 });
 
+test("publication must be explicit and source-normalized in the canonical SignCell concept universe",()=>{
+  const admitted=createSemioticConceptUniverse({concepts:[
+    concept("ordinary",{sameAs:["publishable"]}),
+    concept("publishable",{publication:{enabled:true,channels:["site"],status:"published"}}),
+    concept("channel-only",{publication:{channels:["site"],status:"published"}}),
+    concept("claimed-officer",{publication:{enabled:"true",channels:["site"]}}),
+    concept("blocked",{publication:{enabled:false,channels:["site"]}}),
+  ]});
+  assert.equal(admitted.ok,true);
+  assert.deepEqual(selectSemioticConceptPublication(admitted.value).map(record=>record.id),["publishable"]);
+  assert.deepEqual(selectSemioticConceptPublication(admitted.value,{channels:["site"]}).map(record=>record.id),["publishable"]);
+  assert.equal(admitted.value.content.concepts.find(c=>c.id==="ordinary").publication.enabled,false);
+  assert.equal(admitted.value.content.concepts.find(c=>c.id==="channel-only").publication.enabled,false);
+  assert.equal(admitted.value.content.concepts.find(c=>c.id==="claimed-officer").publication.enabled,false);
+  assert.equal(admitted.value.content.concepts.find(c=>c.id==="publishable").publication.enabled,true);
+  assert.equal(admitted.value.content.references.some(r=>r.relation==="claimed-identity"&&r.status==="unverified-identity"),true);
+});
+
 test("differentiation names added, removed and changed independently authored concepts",()=>{
   const before=createSemioticConceptUniverse({concepts:[concept("a"),concept("b")]}).value;
   const after=createSemioticConceptUniverse({concepts:[concept("a",{body:"revised"}),concept("c")]}).value;
