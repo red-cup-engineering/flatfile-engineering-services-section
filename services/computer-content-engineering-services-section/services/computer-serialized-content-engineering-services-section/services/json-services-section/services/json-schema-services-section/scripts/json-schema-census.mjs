@@ -108,7 +108,7 @@ async function main(args) {
     if (out) { mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, text); }
     process.stdout.write(out ? `${JSON.stringify({ out, commit: head, totals: result.totals, readingCounts: result.readingCounts })}\n` : text);
   } else {
-    const { canonical } = await import("@red-cup-engineering/json-file-codec-service");
+    const { canonicalJson: canonical } = await import("@red-cup-engineering/json-services-section/canonical-json");
     const result = censusClassified(classifyTree(root, { exclude: out })), bytes = `${canonical(result)}\n`;
     if (verify && existsSync(out) && readFileSync(out, "utf8") !== bytes) throw new Error(`census artifact differs: ${out}`);
     if (!verify) { mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, bytes); }

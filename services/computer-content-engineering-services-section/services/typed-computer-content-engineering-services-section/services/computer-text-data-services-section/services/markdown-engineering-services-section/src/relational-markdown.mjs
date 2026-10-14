@@ -320,7 +320,10 @@ const SAFE_SCHEMES = new Set(['http:', 'https:', 'mailto:', 'tel:']);
 const DOCUMENT_HREF = /\.md(#.*)?$/iu;
 export function safeHref(href) {
   if (typeof href !== 'string' || href === '') return null;
-  const scheme = href.match(/^([a-z][a-z0-9+.-]*):/iu);
+  // Classify as the URL consumer does without rewriting the authored href.
+  // Schemes are ASCII, so Unicode case folding must not admit or deny one.
+  const urlInput = href.replace(/^[\u0000-\u0020]+|[\u0000-\u0020]+$/g, '').replace(/[\t\n\r]/g, '');
+  const scheme = urlInput.match(/^([a-z][a-z0-9+.-]*):/i);
   if (!scheme) return href;
   return SAFE_SCHEMES.has(`${scheme[1].toLowerCase()}:`) ? href : null;
 }
@@ -393,7 +396,7 @@ function renderInlines(inlines, resolve, notes) {
         // A Markdown document reference that no catalog rewrote to a route is a
         // dangling internal link; it renders as a potential link, like an
         // unresolved wikilink, rather than as a broken anchor.
-        if (href === null || (DOCUMENT_HREF.test(href) && !/^[a-z][a-z0-9+.-]*:/iu.test(href))) {
+        if (href === null || (DOCUMENT_HREF.test(href) && !/^[a-z][a-z0-9+.-]*:/i.test(href))) {
           return `<span class="potential-link">${escapeHtml(t.label)}<sup class="potential-mark" aria-hidden="true">?</sup></span>`;
         }
         return `<a href="${escapeHtml(href)}">${escapeHtml(t.label)}</a>`;

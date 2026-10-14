@@ -12,14 +12,24 @@
     "./validate-cloudevent": "./scripts/validate-cloudevent.mjs",
     "./package.json": "./package.json",
     "./schema": "./src/json.schema.json",
-    "./canonical-json": "./scripts/canonical-json.mjs",
+    "./canonical-json": {
+      "types": "./scripts/canonical-json.d.mts",
+      "import": "./scripts/canonical-json.mjs"
+    },
+    "./types": { "types": "./src/json-value.d.mts" },
     "./assert-canonical-json": "./scripts/assert-canonical-json.mjs",
     "./is-canonical-json": "./scripts/is-canonical-json.mjs",
     "./parse-json-value": "./scripts/parse-json-value.mjs",
     "./is-json-value": "./scripts/is-json-value.mjs",
-    "./require-json-value": "./scripts/require-json-value.mjs",
+    "./require-json-value": {
+      "types": "./scripts/require-json-value.d.mts",
+      "import": "./scripts/require-json-value.mjs"
+    },
     "./assert-nonempty-string": "./scripts/assert-nonempty-string.mjs",
-    "./is-json-record": "./scripts/is-json-record.mjs",
+    "./is-json-record": {
+      "types": "./scripts/is-json-record.d.mts",
+      "import": "./scripts/is-json-record.mjs"
+    },
     "./freeze-json": "./scripts/freeze-json.mjs",
     "./admit-json-type": "./scripts/admit-json-type.mjs",
     "./read-json-field": "./scripts/read-json-field.mjs",

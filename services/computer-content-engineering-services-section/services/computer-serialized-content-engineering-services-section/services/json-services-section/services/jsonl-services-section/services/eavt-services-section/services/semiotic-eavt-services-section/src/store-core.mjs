@@ -4,6 +4,7 @@
  * Every function is synchronous and keeps nothing between calls: no map, set, cache, buffer pool,
  * descriptor, watcher or timer survives a call, and nothing is read at import. A call holds at most
  * one 64 KiB read chunk, one record and, for `walk`, the visited addresses (at most `limit`).
+ * Discovery holds a 512-byte presence bitmap for the formula's 4096 buckets, never record contents.
  */
 import { closeSync, constants, fstatSync, fsyncSync, mkdirSync, openSync, opendirSync, readFileSync, readSync, renameSync, statSync, unlinkSync, writeSync } from "node:fs";
 import { dirname } from "node:path";
@@ -142,10 +143,24 @@ export function get(root, type, address) { return find(root, type, address, true
 /** Whether a verified line for the address exists. */
 export function has(root, type, address) { return find(root, type, address, true) !== undefined; }
 
-// The first bucket name of every bucket file, in name order, built through the formula itself.
 const NAME_ALPHABET = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
-function* bucketPaths() {
-  for (const a of NAME_ALPHABET) for (const b of NAME_ALPHABET) yield niBucketPath(`ni:///sha-256;${a}${b}${"A".repeat(41)}`, NI_PATH_VERSION);
+/** Discover existing buckets once; an ephemeral 512-byte bitmap preserves formula order.
+ * The NI owner computes every candidate path. No record/address index survives the call. */
+function* bucketPaths(directory, { strict }) {
+  const algorithm = dirname(niBucketPath(`ni:///sha-256;${"A".repeat(43)}`, NI_PATH_VERSION));
+  const present = new Uint32Array(128);
+  for (const name of directoryNames(`${directory}/${algorithm}`, { strict })) {
+    const first = NAME_ALPHABET.indexOf(name[0]), second = NAME_ALPHABET.indexOf(name[1]);
+    if (first < 0 || second < 0) continue;
+    const bucket = niBucketPath(`ni:///sha-256;${name.slice(0, 2)}${"A".repeat(41)}`, NI_PATH_VERSION);
+    if (bucket !== `${algorithm}/${name}`) continue;
+    const index = first * 64 + second;
+    present[index >>> 5] |= 1 << (index & 31);
+  }
+  for (let index = 0; index < 4096; index += 1) {
+    if ((present[index >>> 5] & (1 << (index & 31))) === 0) continue;
+    yield niBucketPath(`ni:///sha-256;${NAME_ALPHABET[index >>> 6]}${NAME_ALPHABET[index & 63]}${"A".repeat(41)}`, NI_PATH_VERSION);
+  }
 }
 
 /** Every record of a type, bucket by bucket in name order and line by line in file order.
@@ -156,7 +171,7 @@ function* bucketPaths() {
 export function* each(root, type, { strict = false } = {}) {
   checkRoot(root);
   const directory = recordsDirectory(root, type);
-  for (const bucket of bucketPaths()) {
+  for (const bucket of bucketPaths(directory, { strict })) {
     const file = `${directory}/${bucket}`;
     for (const { text } of scanLines(file, { strict })) {
       let line;

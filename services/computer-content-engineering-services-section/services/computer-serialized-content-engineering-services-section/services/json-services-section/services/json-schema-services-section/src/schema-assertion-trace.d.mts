@@ -1,4 +1,4 @@
-import type { JsonRecord, JsonValue } from "@red-cup-engineering/json-file-codec-service";
+import type { JsonRecord, JsonValue } from "@red-cup-engineering/json-services-section/types";
 
 export type SchemaAssertion = Readonly<{ e: string; a: string; v: JsonValue; t: string }>;
 export type SchemaContradiction = Readonly<{
