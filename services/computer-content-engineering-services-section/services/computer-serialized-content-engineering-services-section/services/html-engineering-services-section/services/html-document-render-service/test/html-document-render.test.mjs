@@ -204,6 +204,29 @@ test("htmlCarrierOf obstructs a duplicate nodeId and a document address missing 
   assert.equal(malformed.reason, "invalid-document-spine");
 });
 
+test("htmlCarrierOf refuses missing, empty, and non-string structural fields", () => {
+  const document = fixtureDocument(["root"], {
+    order: [["root", "root"]], references: [["root", "root"]],
+  });
+  const nodes = [{
+    kind: "rendering.htmlCarrier.node", nodeId: "root", element: "div", semanticAddress: "root",
+  }];
+  assert.equal(htmlCarrierOf(document, nodes).kind, "rendering.htmlCarrier");
+  const fields = [
+    ["addresses", "key"], ["order", "before"], ["order", "after"],
+    ["references", "from"], ["references", "to"], ["valuationSites", "address"],
+  ];
+  for (const [field, key] of fields) {
+    for (const value of [undefined, "", null, 0, false, {}]) {
+      const row = { ...document[field][0], [key]: value };
+      if (value === undefined) delete row[key];
+      const result = htmlCarrierOf({ ...document, [field]: [row] }, nodes);
+      assert.equal(result.kind, "rendering.htmlCarrier-obstruction", `${field}.${key}`);
+      assert.equal(result.reason, "invalid-document-spine", `${field}.${key}`);
+    }
+  }
+});
+
 test("buildHtmlDocumentPlan obstructs an element the profile does not allow", () => {
   const document = fixtureDocument(["root"]);
   const carrier = htmlCarrierOf(document, [
