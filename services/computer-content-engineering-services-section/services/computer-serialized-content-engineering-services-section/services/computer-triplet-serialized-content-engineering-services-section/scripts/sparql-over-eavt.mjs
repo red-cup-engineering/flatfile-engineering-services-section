@@ -100,16 +100,20 @@ function variablesFor(query) {
   return variablesOf(source);
 }
 
-/** Bindings projected onto `variables`, deduplicated and sorted by their canonical tuple. */
-function project(bindings, variables) {
-  const byKey = new Map();
-  for (const binding of bindings) {
-    const tuple = variables.map((name) => binding[name] ?? null);
-    byKey.set(canonical(tuple), tuple);
-  }
-  return [...byKey.entries()]
-    .sort(([left], [right]) => left.localeCompare(right))
-    .map(([, tuple]) => Object.freeze(Object.fromEntries(variables.map((name, index) => [name, tuple[index]]))));
+/** Project solution mappings without fabricating NULL for an unbound variable.
+ * SPARQL SELECT has bag semantics unless DISTINCT is requested. RDF graph
+ * triples themselves are sets, so duplicate EAVT witness rows are collapsed
+ * before evaluation without erasing distinct joins or witness history. */
+function project(bindings, variables, distinct = false) {
+  const tuples = bindings.map(binding => {
+    const record = Object.fromEntries(variables
+      .filter(name => Object.hasOwn(binding, name))
+      .map(name => [name, binding[name]]));
+    return { key: canonical(record), record: Object.freeze(record) };
+  });
+  tuples.sort((a,b) => a.key.localeCompare(b.key));
+  return (distinct ? tuples.filter((row,i) => i===0 || row.key!==tuples[i-1].key) : tuples)
+    .map(row => row.record);
 }
 
 function valueOf(term, binding) {
@@ -133,7 +137,9 @@ function constructTriples(template, bindings) {
 function requireQuery(query) {
   if (query === null || typeof query !== "object" || Array.isArray(query)) throw new TypeError("sparql query must be an object");
   if (!["select", "ask", "construct"].includes(query.type)) throw new TypeError("sparql query type must be select, ask, or construct");
-  if (!Array.isArray(query.where) || query.where.length === 0) throw new TypeError("sparql query where must be a non-empty array of triple patterns");
+  if (!Array.isArray(query.where) || query.where.length === 0 || query.where.length > 64 || query.where.some(p => !p || !["s","p","o"].every(k => Object.hasOwn(p,k)))) throw new TypeError("sparql where must contain 1–64 valid triple patterns");
+  if (query.select !== undefined && (!Array.isArray(query.select) || query.select.some(x => typeof x !== "string" || !/^[A-Za-z][A-Za-z0-9_]*$/u.test(x)))) throw new TypeError("sparql select must contain variable names");
+  if (query.distinct !== undefined && typeof query.distinct !== "boolean") throw new TypeError("sparql distinct must be boolean");
 }
 
 /**
@@ -145,9 +151,16 @@ function requireQuery(query) {
  */
 export function evaluateSparql(rows, query) {
   requireQuery(query);
+  // RDF graphs contain distinct triples; repeated witness events are a
+  // separate EAVT concern and cannot multiply one RDF statement.
+  const distinctRows = [...new Map(rows.map(row => {
+    const triple = {e:row.e,a:row.a,v:row.v};
+    return [canonical(triple),triple];
+  })).values()];
+  const solutions = evaluateWhere(distinctRows, query.where);
   const variables = variablesFor(query);
-  const bindings = project(evaluateWhere(rows, query.where), variables);
-  const triples = query.type === "construct" ? constructTriples(query.construct ?? query.where, bindings) : [];
+  const bindings = project(solutions, variables, query.type === "ask" || query.distinct === true);
+  const triples = query.type === "construct" ? constructTriples(query.construct ?? query.where, solutions) : [];
   return Object.freeze({
     kind: "knowing.sparql.result",
     type: query.type,
