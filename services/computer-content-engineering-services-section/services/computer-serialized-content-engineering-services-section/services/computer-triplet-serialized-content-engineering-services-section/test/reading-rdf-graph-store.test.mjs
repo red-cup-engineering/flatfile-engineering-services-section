@@ -39,7 +39,7 @@ test("single native source-claim RDF projection cannot silently assert office au
     node["@type"].includes("ws:AffirmedClaim") && node["rdf:object"] === "character-X"), true);
   assert.equal(json["@graph"].some(node => Array.isArray(node["@type"]) &&
     node["@type"].includes("ws:OpposedClaim")), true);
-  assert.equal(json["@graph"].some(node => node["@type"] === "ws:ContestedClaim"), true);
+  assert.equal(json["@graph"].some(node => Array.isArray(node["@type"]) && node["@type"].includes("ws:ContestedClaim") && node["@type"].includes("rdf:Statement")), true);
   assert.equal(json["@graph"].some(node => node["@type"] === "owl:NegativePropertyAssertion"), false);
   const ontology = readingVocabulary(base);
   for (const className of ["AffirmedClaim", "OpposedClaim", "ContestedClaim"]) {
@@ -120,9 +120,10 @@ test("source-local SCA addresses stable claim positions through Turtle, JSON-LD 
   const json = readingJsonLd(first, {base});
   const contestedJson = readingJsonLd(opposed, {base});
   assert.ok(ttl.includes(`<${expected}> a rdf:Statement, ws:AffirmedClaim ;`));
-  assert.ok(contested.includes(`<${expected}> a ws:ContestedClaim ;`));
+  assert.ok(contested.includes(`<${expected}> a rdf:Statement, ws:ContestedClaim ;`));
   assert.equal(json["@graph"][1]["@id"], expected);
   assert.equal(contestedJson["@graph"][1]["@id"], expected);
+  assert.deepEqual(contestedJson["@graph"][1]["@type"], ["rdf:Statement", "ws:ContestedClaim"]);
   assert.deepEqual(json["@graph"][1]["prov:wasDerivedFrom"]["rdfs:label"], "source-witness-A");
   assert.equal(contestedJson["@graph"][1]["ws:contraryClaimedBy"]["rdfs:label"], "office-counter-witness");
   assert.doesNotMatch(ttl, /<https:\/\/knowledge\.example\.test\/source%40revision-A> <[^>]+> "character-X"/u);
