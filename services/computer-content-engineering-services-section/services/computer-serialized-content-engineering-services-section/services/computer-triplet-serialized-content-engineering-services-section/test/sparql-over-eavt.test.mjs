@@ -99,3 +99,40 @@ test("triplesFromEavt reads EAVT rows directly as s/p/o triples, dropping t", ()
 test("triplesToTurtle writes an empty graph as an empty string", () => {
   assert.equal(triplesToTurtle([]), "");
 });
+
+test("SPARQL SELECT preserves repeated projected solutions unless DISTINCT is requested", () => {
+  const s = sparqlVariable("s"), target = sparqlVariable("target");
+  const graph = [
+    {e:"urn:a",a:"urn:p",v:"urn:b",t:"first"},
+    {e:"urn:a",a:"urn:p",v:"urn:c",t:"second"},
+    {e:"urn:a",a:"urn:p",v:"urn:b",t:"third-witness-of-same-RDF-triple"},
+  ];
+  const query={type:"select",select:["s"],where:[triplePattern(s,"urn:p",target)]};
+  assert.deepEqual(evaluateSparql(graph,query).bindings,[{s:"urn:a"},{s:"urn:a"}],
+    "two RDF triples sharing s yield two SPARQL solution mappings, not three witness rows");
+  assert.deepEqual(evaluateSparql(graph,{...query,distinct:true}).bindings,[{s:"urn:a"}]);
+});
+
+test("an unbound projected variable stays unbound, never turns into RDF null", () => {
+  const result=evaluateSparql([{e:"urn:a",a:"urn:p",v:"urn:b",t:"t"}],{
+    type:"select",select:["o","missing"],where:[triplePattern("urn:a","urn:p",sparqlVariable("o"))],
+  });
+  assert.deepEqual(result.bindings,[{o:"urn:b"}]);
+});
+
+test("CONSTRUCT refuses truly unbound template variables and keeps complete graph data", () => {
+  assert.throws(()=>evaluateSparql([{e:"urn:a",a:"urn:p",v:"urn:b",t:"t"}],{
+    type:"construct",where:[triplePattern(s,"urn:p",o)],
+    construct:[triplePattern(s,"urn:derived",sparqlVariable("absent"))],
+  }),/unbound variable absent/);
+  const value=evaluateSparql([{e:"urn:a",a:"urn:p",v:"urn:b",t:"t"}],{
+    type:"construct",where:[triplePattern(s,"urn:p",o)],
+    construct:[triplePattern(s,"urn:derived",o)],
+  });
+  assert.deepEqual(value.triples,[{s:"urn:a",p:"urn:derived",o:"urn:b"}]);
+});
+
+test("query refuses malformed triple patterns and invalid DISTINCT flags", () => {
+  assert.throws(()=>evaluateSparql(rows,{type:"select",where:[{}]}),/valid triple patterns/);
+  assert.throws(()=>evaluateSparql(rows,{type:"select",where:[triplePattern(s,"urn:edge",o)],distinct:"yes"}),/distinct must be boolean/);
+});
