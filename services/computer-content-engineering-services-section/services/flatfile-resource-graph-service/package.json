@@ -42,6 +42,7 @@
     "./adapters/host-health": "./src/adapters/host-health.mjs",
     "./adapters/linux-processes": "./src/adapters/linux-processes.mjs",
     "./adapters/markdown-directory": "./src/adapters/markdown-directory.mjs",
+    "./adapters/json-sources": "./src/adapters/json-sources.mjs",
     "./adapters/systemd-inventory": "./src/adapters/systemd-inventory.mjs",
     "./operator/edit": "./src/operator/edit.mjs",
     "./operator/kind": "./src/operator/kind.mjs",
