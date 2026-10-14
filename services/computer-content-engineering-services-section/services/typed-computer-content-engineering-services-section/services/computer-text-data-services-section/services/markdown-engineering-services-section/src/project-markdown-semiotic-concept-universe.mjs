@@ -1,5 +1,7 @@
 import { createSemioticConceptUniverse } from "@red-cup-engineering/signcell/semiotic-concept-universe";
 import { readMarkdownDocument } from "./read-markdown-document.mjs";
+import { sha256Bytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-sha256";
+import { utf8Bytes } from "@red-cup-engineering/cryptographic-computer-data-engineering-services-section/portable-bytes";
 
 const freeze = (value) => Object.freeze(value);
 
@@ -46,6 +48,8 @@ function annotation(value) {
  */
 export function projectMarkdownSemioticConceptDeclaration({ path, text } = {}) {
   if (typeof path !== "string" || path.trim() === "") throw new TypeError("path must be non-empty text");
+  if (typeof text !== "string") throw new TypeError("source text must be original UTF-8 Markdown text");
+  const revision = "sha256:" + sha256Bytes(utf8Bytes(text));
   const document = readMarkdownDocument(text, { coordinate: path, onInvalidFrontmatter: "diagnose" });
   const frontmatter = document.frontmatter ?? {};
   const title = typeof frontmatter.title === "string" && frontmatter.title.trim() !== ""
@@ -62,7 +66,7 @@ export function projectMarkdownSemioticConceptDeclaration({ path, text } = {}) {
     publication: freeze({ enabled: publish !== false, channels, status: typeof frontmatter.status === "string" ? frontmatter.status : null }),
     annotations: freeze(values(frontmatter.ann).map(annotation)),
     attributes: freeze({ frontmatter, assertions: document.assertions }),
-    source: freeze({ path, format: document.format, diagnostics: document.diagnostics }),
+    source: freeze({ path, revision, format: document.format, diagnostics: document.diagnostics }),
   });
 }
 
