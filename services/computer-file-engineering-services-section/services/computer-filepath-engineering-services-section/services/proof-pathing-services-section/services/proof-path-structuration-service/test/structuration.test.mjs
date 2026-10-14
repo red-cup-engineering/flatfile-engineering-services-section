@@ -10,6 +10,9 @@ import {
   chartProofPathCatalog,
   checkProofPathAst,
   envelopeProofCoordinate,
+  encodeProofCoordinate,
+  renderProofCoordinate,
+  parseProofCoordinate,
   parseProofPath,
   proofPathOfCoordinate,
   renderProofPathAst,
@@ -237,4 +240,47 @@ test("RMN-C003: cryptographic witnesses are ordered carriers, never coordinate s
   assert.strictEqual(envelope.coordinate, settled.coordinate);
   assert.deepEqual(envelope.witnesses.map(({ type }) => type), ["signature", "commitment"]);
   assert.throws(() => envelopeProofCoordinate(settled.coordinate, [{ type: "commitment", algorithm: "", value: "digest" }]));
+});
+
+test("RMN-C004: canonical coordinate codec rejects older SEN identity and malformed source", () => {
+  const admitted = settleProofCoordinate({
+    resourceType: "articulated-utterance",
+    root: "claim",
+    target: "duty",
+    witnesses: [{domain: "claim", generator: "specialization", codomain: "duty"}],
+  });
+  assert.equal(admitted.ok, true);
+  assert.equal(admitted.coordinate.type, "rmn-proof-coordinate");
+  const wire = renderProofCoordinate(admitted.coordinate);
+  assert.match(wire, /^rmn1:/u);
+  assert.deepEqual(parseProofCoordinate(wire), {ok: true, coordinate: admitted.coordinate});
+  assert.match(encodeProofCoordinate(admitted.coordinate), /rmn-proof-coordinate/u);
+  assert.equal(parseProofCoordinate("sen1:" + wire.slice(5)).ok, false);
+});
+
+test("PPA-LSPACE-001: source revisions and token occurrences cannot alias", () => {
+  const source = {repository: "561-group/561-group-services-section",
+    path: "content/text/glossary/concepts/method-for-work-in-the-561-group.md",
+    revision: "sha256:" + "a".repeat(64)};
+  const occurrence = (revision, offset) => ({kind: "token-occurrence",
+    source: {...source, revision}, span: {start: offset, end: offset + 4}, surface: "duty"});
+  const build = target => settleProofCoordinate({
+    resourceType: "token-occurrence", root: "articulated-token", target,
+    witnesses: [{domain: "articulated-token", generator: "specialization", codomain: target}],
+  });
+  const first = build(occurrence(source.revision, 18));
+  const revision = build(occurrence("sha256:" + "b".repeat(64), 18));
+  const repeated = build(occurrence(source.revision, 118));
+  assert.equal(first.ok, true);
+  assert.equal(revision.ok, true);
+  assert.equal(repeated.ok, true);
+  assert.notEqual(encodeProofCoordinate(first.coordinate), encodeProofCoordinate(revision.coordinate));
+  assert.notEqual(encodeProofCoordinate(first.coordinate), encodeProofCoordinate(repeated.coordinate));
+  assert.deepEqual(
+    settleProofCoordinate({resourceType: "institutional-declaration", root: "authorized-action",
+      target: {message: "I am CEO; task complete"}, witnesses: []}),
+    {ok: false, reason: "unearned-coordinate"},
+  );
+  // Even supplied structural generator evidence does not authenticate the actor
+  // or independently receive a corporate act: this is only a coordinate fold.
 });
