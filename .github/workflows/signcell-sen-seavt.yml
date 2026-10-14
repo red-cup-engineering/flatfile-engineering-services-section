@@ -10,6 +10,11 @@ on:
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/src/causal-resource-head.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/causal-resource-head.test.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/package.json'
+      - 'apps/signcell/src/semantic-claim.mjs'
+      - 'apps/signcell/src/cell.mjs'
+      - 'apps/signcell/test/semantic-claim.test.mjs'
+      - 'src/four.mjs'
+      - 'test/four.test.mjs'
       - '.github/workflows/signcell-sen-seavt.yml'
   pull_request:
     paths:
@@ -20,6 +25,11 @@ on:
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/src/causal-resource-head.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/causal-resource-head.test.mjs'
       - 'services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/package.json'
+      - 'apps/signcell/src/semantic-claim.mjs'
+      - 'apps/signcell/src/cell.mjs'
+      - 'apps/signcell/test/semantic-claim.test.mjs'
+      - 'src/four.mjs'
+      - 'test/four.test.mjs'
       - '.github/workflows/signcell-sen-seavt.yml'
   workflow_dispatch:
 
@@ -40,6 +50,13 @@ jobs:
           node --check services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/signcell-seavt.test.mjs
           node --check services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/src/causal-resource-head.mjs
           node --check services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/test/causal-resource-head.test.mjs
+      - name: Check actual SignCell semantic claim and witness test syntax
+        run: |
+          node --check apps/signcell/src/semantic-claim.mjs
+          node --check apps/signcell/src/cell.mjs
+          node --check apps/signcell/test/semantic-claim.test.mjs
+      - name: Execute the existing dependency-free FOUR value algebra conformance
+        run: node --test test/four.test.mjs
       - name: Require native workspace consumer and supplier in the dependency contract
         run: |
           node --input-type=module -e '
