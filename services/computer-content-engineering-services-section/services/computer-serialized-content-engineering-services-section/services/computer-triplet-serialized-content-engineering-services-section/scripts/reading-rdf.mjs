@@ -104,7 +104,7 @@ export function readingTurtle(folded, opts = {}) {
         `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`,
         `  ws:contraryClaimedBy ${provTurtle(told.against)} .`);
     } else if (told.for.length > 0) {
-      out.push(`${claim} a ws:ContestedClaim ;`, `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`,
+      out.push(`${claim} a rdf:Statement, ws:ContestedClaim ;`, `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`,
         `  ws:claimedBy ${provTurtle(told.for)} ; ws:contraryClaimedBy ${provTurtle(told.against)} .`);
     }
   }
@@ -134,7 +134,7 @@ export function readingJsonLd(folded, opts = {}) {
         "rdf:predicate": predicate, "rdf:object": jsonObject(object),
         "ws:contraryClaimedBy": provJsonLd(told.against) });
     } else if (told.for.length > 0) {
-      graph.push({ "@id": claim, "@type": "ws:ContestedClaim", "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object),
+      graph.push({ "@id": claim, "@type": ["rdf:Statement", "ws:ContestedClaim"], "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object),
         "ws:claimedBy": provJsonLd(told.for), "ws:contraryClaimedBy": provJsonLd(told.against) });
     }
   }
