@@ -69,9 +69,9 @@ test("claimOnly reification: alleged agency/work assertions remain queryable wit
  const ordinary=readingTurtle(folded,{base});
  const documentClaims=readingTurtle(folded,{base,claimOnly:true});
  // Existing consumers explicitly choosing plain triples retain that contract.
- assert.match(ordinary,/^<[^>]+> <[^>]+> "character-X" \\.$/mu);
+ assert.match(ordinary,/^<[^>]+> <[^>]+> "character-X" \.$/mu);
  // A reified RDF statement does not entail the underlying asserted triple.
- assert.doesNotMatch(documentClaims,/^<[^>]+> <[^>]+> "character-X" \\.$/mu);
+ assert.doesNotMatch(documentClaims,/^<[^>]+> <[^>]+> "character-X" \.$/mu);
  assert.match(documentClaims,/a rdf:Statement, ws:PotentialClaim/u);
  assert.match(documentClaims,/prov:wasDerivedFrom/u);
  assert.match(documentClaims,/rdf:object "character-X"/u);
@@ -99,7 +99,7 @@ test("claimOnly Graph Store preserves named graph and refuses invalid claim-only
  assert.equal(f.calls.length,1);
  assert.equal(f.calls[0].url.searchParams.get("graph"),graph);
  assert.equal(f.calls[0].options.body,readingTurtle(folded,{base,claimOnly:true}));
- assert.doesNotMatch(f.calls[0].options.body,/^<[^>]+> <[^>]+> "character-X" \\.$/mu);
+ assert.doesNotMatch(f.calls[0].options.body,/^<[^>]+> <[^>]+> "character-X" \.$/mu);
  await assert.rejects(()=>putReadingRdfGraph({folded,base,graph,storeEndpoint,
    claimOnly:"true",fetchImpl:f.fetchImpl}),/claimOnly must be a boolean/u);
  assert.equal(f.calls.length,1);
