@@ -15,8 +15,8 @@ export function parseFrontmatter(text) {
   }
 }
 
-export function makeFlatfile({ slug, dir, kind, fm, body, path, mtime }) {
-  return Object.freeze({ slug, dir, kind, fm, body, path, mtime });
+export function makeFlatfile({ slug, dir, kind, fm, body, path, mtime, revision }) {
+  return Object.freeze({ slug, dir, kind, fm, body, path, mtime, ...(revision === undefined ? {} : {revision}) });
 }
 
 
