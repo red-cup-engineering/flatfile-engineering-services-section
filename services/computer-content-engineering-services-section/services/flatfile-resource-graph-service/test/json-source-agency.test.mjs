@@ -177,7 +177,7 @@ test("a source batch exceeding its finite byte budget refuses before partially p
   const sources = [];
   for (let i=0;i<17;i++) {
     const path = `content/professional-repertoire/works/work-${i}.json`;
-    const bytes = Buffer.from(JSON.stringify({id:`work-${i}`,description:"x".repeat(990_000)})+"\\n");
+    const bytes = Buffer.from(JSON.stringify({id:`work-${i}`,description:"x".repeat(990_000)})+"\n");
     const file=join(root,path);
     await mkdir(dirname(file),{recursive:true});
     await writeFile(file,bytes);
