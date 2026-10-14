@@ -26,23 +26,30 @@ function sides(cell) {
 }
 
 /** One evidence-independent, source-local typed claim position (not a proof or grant). */
-export function readingClaimId(entity, cell) {
+export function readingClaimId(entity, cell, {base = "/", subjects = []} = {}) {
   if (typeof entity !== "string" || entity.trim() === "" || !cell ||
       typeof cell.predicate !== "string" || cell.predicate.trim() === "" || !Object.hasOwn(cell, "object")) {
     throw new TypeError("an addressed documentary claim requires a source subject, predicate, and object");
   }
-  return semanticId({ kind: "rdf.documentary-claim-position", subject: entity,
-    predicate: cell.predicate, object: cell.object });
+  const membership = new Set(subjects);
+  return semanticId({ kind: "rdf.documentary-claim-position",
+    subject: subjectIri(base, entity), predicate: predicateIri(base, cell.predicate),
+    object: objectTerm(base, cell.object, membership) });
 }
 
 function objectTerm(base, object, subjects) {
-  return typeof object === "string" && subjects.has(object) ? { iri: subjectIri(base, object) } : { literal: object };
+  if (typeof object === "string" && subjects.has(object)) return { iri: subjectIri(base, object) };
+  if (typeof object !== "string" && typeof object !== "boolean" &&
+      !(typeof object === "number" && Number.isFinite(object))) {
+    throw new TypeError("RDF object must be an admitted scalar or an explicitly referenced subject");
+  }
+  return { literal: object };
 }
 
 function literalValue(value) {
   if (typeof value === "string" || typeof value === "boolean") return value;
   if (typeof value === "number") return Number.isFinite(value) ? value : String(value);
-  return JSON.stringify(value) ?? String(value);
+  throw new TypeError("complex RDF values require a separately admitted addressed term");
 }
 
 function turtleTerm(term) {
@@ -77,7 +84,7 @@ export function readingTurtle(folded, opts = {}) {
     const told = sides(cell);
     const predicate = iriRef(predicateIri(base, cell.predicate));
     const object = objectTerm(base, cell.object, subjects);
-    const claim = iriRef(readingClaimId(folded.entity, cell));
+    const claim = iriRef(readingClaimId(folded.entity, cell, {base, subjects}));
     if (told.for.length > 0 && told.against.length === 0) {
       out.push(`${claim} a rdf:Statement, ws:AffirmedClaim ;`, `  rdf:subject ${subject} ; rdf:predicate ${predicate} ; rdf:object ${turtleTerm(object)} ;`, `  prov:wasDerivedFrom ${provTurtle(told.for)} .`);
     } else if (told.against.length > 0 && told.for.length === 0) {
@@ -107,7 +114,7 @@ export function readingJsonLd(folded, opts = {}) {
     const told = sides(cell);
     const predicate = { "@id": predicateIri(base, cell.predicate) };
     const object = objectTerm(base, cell.object, subjects);
-    const claim = readingClaimId(folded.entity, cell);
+    const claim = readingClaimId(folded.entity, cell, {base, subjects});
     if (told.for.length > 0 && told.against.length === 0) {
       graph.push({ "@id": claim, "@type": ["rdf:Statement", "ws:AffirmedClaim"], "rdf:subject": { "@id": id }, "rdf:predicate": predicate, "rdf:object": jsonObject(object), "prov:wasDerivedFrom": provJsonLd(told.for) });
     } else if (told.against.length > 0 && told.for.length === 0) {
