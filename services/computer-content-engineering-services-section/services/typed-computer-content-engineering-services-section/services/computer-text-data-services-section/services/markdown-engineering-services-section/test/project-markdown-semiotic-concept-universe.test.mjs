@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import {
   projectMarkdownSemioticConceptDeclaration,
@@ -21,4 +22,26 @@ test("an invalid declaration remains an explicit failure rather than becoming pr
   assert.equal(declaration.id, "no-id");
   assert.equal(declaration.annotations[0].kind, "failure");
   assert.equal(declaration.title, "Fallback title");
+});
+
+test("Markdown source-revision address survives into independently authored SignCell concepts",()=>{
+  const textA="---\nid: duty\ntitle: Duty\nsame_as: obligation\n---\nA duty is owed.\n";
+  const textB="---\nid: obligation\ntitle: Obligation\nsame_as: duty\n---\nAn obligation is binding.\n";
+  const a=projectMarkdownSemioticConceptDeclaration({path:"science/duty.md",text:textA});
+  const b=projectMarkdownSemioticConceptDeclaration({path:"operations/obligation.md",text:textB});
+  assert.equal(a.source.revision,"sha256:"+createHash("sha256").update(textA,"utf8").digest("hex"));
+  assert.equal(b.source.revision,"sha256:"+createHash("sha256").update(textB,"utf8").digest("hex"));
+  assert.notEqual(a.source.revision,b.source.revision);
+  assert.notEqual(projectMarkdownSemioticConceptDeclaration({
+    path:"science/duty.md",text:textA+"Additional statement.\n"
+  }).source.revision,a.source.revision);
+  const universe=projectMarkdownSemioticConceptUniverse({documents:[
+    {path:"science/duty.md",text:textA},{path:"operations/obligation.md",text:textB},
+  ]}).value;
+  assert.equal(universe.content.version,2);
+  assert.equal(Object.hasOwn(universe.content,"equivalenceClasses"),false);
+  assert.deepEqual(universe.content.concepts.map(x=>x.id),["duty","obligation"]);
+  assert.deepEqual(universe.content.references.filter(ref=>ref.relation==="claimed-identity")
+    .map(ref=>[ref.source,ref.target,ref.status]),
+    [["duty","obligation","unverified-identity"],["obligation","duty","unverified-identity"]]);
 });
