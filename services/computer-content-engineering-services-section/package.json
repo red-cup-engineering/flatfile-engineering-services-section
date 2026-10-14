@@ -28,7 +28,8 @@
     "./jupyter/schema": "./src/jupyter/schema.mjs",
     "./dataset-store": "./src/dataset-store.mjs",
     "./package.json": "./package.json",
-    "./module-parameterization-schema": "./src/module-parameterization.schema.json"
+    "./module-parameterization-schema": "./src/module-parameterization.schema.json",
+    "./engineering-network-provider-schema": "./src/engineering-network-provider.schema.json"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs"
