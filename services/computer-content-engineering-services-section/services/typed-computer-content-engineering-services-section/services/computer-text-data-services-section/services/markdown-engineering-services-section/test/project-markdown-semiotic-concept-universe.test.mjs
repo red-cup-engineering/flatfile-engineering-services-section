@@ -52,6 +52,7 @@ test("only an explicitly public Markdown source enters the canonical publication
     {id:"channel-only",body:"---\nid: channel-only\npublish: [site]\npublish_to: public\n---\nChannel choice is not rights."},
     {id:"public",body:"---\nid: public\nvisibility: public\npublish_to: site\n---\nLicensed public source."},
     {id:"revoked",body:"---\nid: revoked\nvisibility: public\npublish: false\npublish_to: site\n---\nOwner withdrew publication."},
+    {id:"consent-restricted",body:"---\nid: consent-restricted\nvisibility: public\nconsent-status: pending\npublish_to: site\n---\nThe source is not yet lawfully public."},
     {id:"claimed-officer",body:"---\nid: claimed-officer\nincumbent: chatgpt-web\nstatus: completed\n---\nNot an appointment."},
   ];
   const parsed=cases.map(({id,body})=>({path:`science/${id}.md`,text:body+"\n"}));
