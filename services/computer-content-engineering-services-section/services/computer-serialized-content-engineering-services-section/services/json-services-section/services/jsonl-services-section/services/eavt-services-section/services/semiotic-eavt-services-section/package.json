@@ -33,7 +33,8 @@
   "files": [
     "src",
     "README.md",
-    "scripts/file-journal-store-by-kind.mjs"
+    "scripts/file-journal-store-by-kind.mjs",
+    "scripts/check-current-state.mjs"
   ],
   "sideEffects": false,
   "scripts": {
