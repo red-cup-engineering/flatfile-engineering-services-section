@@ -24,12 +24,36 @@ if(fs.statSync(source).dev!==fs.statSync(parentReal).dev||output==='/tmp'||outpu
 if(args.activitypub){const liveParent=path.dirname(source),candidateParent=path.dirname(output);if(candidateParent===liveParent||candidateParent.startsWith(liveParent+path.sep))throw new TypeError('queue candidate must not use the live ActivityPub parent');}
 if (fs.existsSync(output)) throw new TypeError('output must not exist; originals remain in their original custody');
 const oldRoot = fs.realpathSync(args['old-store']), newRoot = fs.realpathSync(args['new-store']);
+if (args['clock-last'] !== undefined && (args.activitypub || typeof args['clock-last'] !== 'string')) throw new TypeError('an explicit last-run source belongs to a world conversion');
+const clockLastSource = args['clock-last'] === undefined ? undefined : fs.realpathSync(args['clock-last']);
+if (clockLastSource !== undefined && (!fs.statSync(clockLastSource).isDirectory() || fs.statSync(clockLastSource).dev !== fs.statSync(source).dev || output === clockLastSource || output.startsWith(clockLastSource + path.sep) || clockLastSource.startsWith(output + path.sep))) throw new TypeError('last-run originals require separate same-volume directory custody');
 const load = file => import(pathToFileURL(file).href);
+const oldRequire = createRequire(path.join(oldRoot, 'package.json'));
 const newRequire = createRequire(path.join(newRoot, 'package.json'));
 const supplier = async (require, specifier) => load(require.resolve(specifier));
 const { parseJournalWitness } = await load(path.join(oldRoot, 'src/journal/event.mjs'));
 const { openSegmentReader } = await load(path.join(oldRoot, 'src/journal/filesystem/segment-bytes.mjs'));
-const { semanticRecordOf } = await load(path.join(oldRoot, 'src/query-semantic-records.mjs'));
+let projectionFile = 'src/query-semantic-records.mjs';
+let { semanticRecordOf } = await load(path.join(oldRoot, projectionFile));
+if (typeof semanticRecordOf !== 'function') {
+  // The earlier BCF provider keeps its query projection private. Receive the
+  // public original projection, with its original identity and witness laws;
+  // never copy that private implementation or substitute a CRG reader.
+  projectionFile = 'src/semantic-record.mjs';
+  const { projectSemanticRecords } = await load(path.join(oldRoot, projectionFile));
+  const { termToJson } = await supplier(oldRequire, '@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec');
+  const { tm } = await supplier(oldRequire, '@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation');
+  const { canonicalJson: originalCanonicalJson } = await supplier(oldRequire, '@red-cup-engineering/json-services-section');
+  if (typeof projectSemanticRecords !== 'function') throw new TypeError('original public semantic projection unavailable');
+  const claims = new Set(['unknown','held','denied','contested'].map(charge => originalCanonicalJson(tm.mark('semantic-record.' + charge))));
+  semanticRecordOf = (witness, objectKind) => {
+    if (!claims.has(originalCanonicalJson(witness.observation.claim))) return undefined;
+    const category = termToJson(witness.observation.payload[1]);
+    const records = projectSemanticRecords({objectKind, category, witnesses:[witness]}, () => { throw new TypeError('unselected legacy artifact projection'); });
+    if (!Array.isArray(records) || records.length > 1) throw new TypeError('original projection is not one selected record');
+    return records[0];
+  };
+}
 const store = await load(path.join(newRoot, 'src/store.mjs'));
 const { semanticAddress } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address');
 const { niBucketPath } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/ni-path');
@@ -38,7 +62,7 @@ const { streamJsonLines, hashSource } = await import('./conversion-buckets.mjs')
 fs.mkdirSync(output, { mode: 0o700, recursive: true });
 process.umask(0o077);
 const report = { type: 'OneTimeStoreConversion', version: 1, source, output, originalsPreserved: true, ordersExecuted: false, transportActivated: false,
-  suppliers: { oldStore: oldRoot, newStore: newRoot, oldWitnessReader: sha(fs.readFileSync(path.join(oldRoot,'src/journal/event.mjs'))), oldPackedReader:sha(fs.readFileSync(path.join(oldRoot,'src/journal/filesystem/segment-bytes.mjs'))), oldSemanticProjection:sha(fs.readFileSync(path.join(oldRoot,'src/query-semantic-records.mjs'))), newWriter: sha(fs.readFileSync(path.join(newRoot,'src/store-core.mjs'))) },
+  suppliers: { oldStore: oldRoot, newStore: newRoot, oldWitnessReader: sha(fs.readFileSync(path.join(oldRoot,'src/journal/event.mjs'))), oldPackedReader:sha(fs.readFileSync(path.join(oldRoot,'src/journal/filesystem/segment-bytes.mjs'))), oldSemanticProjection:sha(fs.readFileSync(path.join(oldRoot,projectionFile))), oldSemanticProjectionFile:projectionFile, newWriter: sha(fs.readFileSync(path.join(newRoot,'src/store-core.mjs'))) },
   types: {}, sourceOnly: {}, referencesRewritten: 0, referencesLeft: 0, causesDropped: 0, sourceSegments: [], missingBodies: [], queue: { activated: 0 } };
 const counts = type => report.types[type] ??= { read: 0, written: 0, duplicates: 0, heads: 0, verified: 0 };
 const files = function* (root) { if (!fs.existsSync(root)) return; observe(root); for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
@@ -58,8 +82,11 @@ function* witnesses(file) {
 }
 if (!args.activitypub) {
   const { convertMainWorld } = await import('./conversion-main-world.mjs');
-  const { dataArtifactAddress } = await supplier(createRequire(path.join(oldRoot,'package.json')), '@red-cup-engineering/eavt-services-section/data-artifact-address');
-  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress});
+  const originalManifest = JSON.parse(fs.readFileSync(path.join(oldRoot,'package.json'),'utf8'));
+  const eavtProviders = ['@red-cup-engineering/eavt-services-section','@red-cup-engineering/eavt'].filter(name => Object.hasOwn(originalManifest.dependencies ?? {}, name));
+  if (eavtProviders.length !== 1) throw new TypeError('one declared original EAVT path provider required');
+  const { dataArtifactAddress } = await supplier(oldRequire, eavtProviders[0] + '/data-artifact-address');
+  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource});
 } else {
   if (typeof args['old-activitypub'] !== 'string') throw new TypeError('--old-activitypub is required');
   const oldAp = fs.realpathSync(args['old-activitypub']);
@@ -82,7 +109,7 @@ if (!args.activitypub) {
     let selected = 0;
     for (const witness of witnesses(file)) {
       progress={stage:'original-activitypub-custody',original:witness.id};
-      const original = semanticRecordOf(witness);
+      const original = semanticRecordOf(witness, kind);
       if (!original || !['inbox','outbox','followers'].includes(original.category) || original.told?.for !== true || original.told?.against !== false) { report.sourceOnly[kind] = (report.sourceOnly[kind] ?? 0) + 1; continue; }
       const at = original.recordedAt;
       if (typeof at !== 'string' || !Number.isFinite(Date.parse(at))) throw new TypeError('original ActivityPub clock is unavailable');

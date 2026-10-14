@@ -30,7 +30,7 @@ function claimSubject({kind,row,witness,file,source,dataArtifactAddress}){
 
 function selection(witness,kind,context){
  const row=witness.observation.payload;if(!Array.isArray(row)||row.length!==4)return;
- const semantic=context.semanticRecordOf(witness),[e,a,v,t]=row,plain={e,a,v,t},value=semantic?.record;
+ const semantic=context.semanticRecordOf(witness,kind),[e,a,v,t]=row,plain={e,a,v,t},value=semantic?.record;
  const common={original:witness.id,identity:semantic?.id,at:semantic?.recordedAt??witness.observation.time,namedCauses:witness.observation.causes??[]};
  if((object(e)&&e.kind==='metroplat.claim-session')||kind.startsWith('structured-work-intent-')||kind.startsWith('actor-')||kind.startsWith('ni-sha-256-')){
   const thread=claimSubject({...context,kind,row,witness});if(thread===undefined)return {unqualified:'claim-thread-subject-unresolved'};
@@ -70,7 +70,7 @@ function selection(witness,kind,context){
 
 /** All supplier functions come from independently selected, fabricated providers.
  * Temporary maps contain byte positions and addresses, never an in-memory store table. */
-export async function convertMainWorld({source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress}){
+export async function convertMainWorld({source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress,clockLastSource}){
  if(!store||![parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress].every(fn=>typeof fn==='function'))throw new TypeError('exact original readers and current writers required');
  const mapRoot=path.join(output,'.conversion-main'),maps=createBucketMap(mapRoot,niBucketPath),stamps=new Map(),active=new Set();
  fs.mkdirSync(mapRoot,{recursive:true,mode:0o700});
@@ -81,7 +81,8 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
  report.referenceDispositions={file:'.conversion-reference-dispositions.jsonl',count:0,unresolvedNamedCitations:0};
  const disposition=(item,reference,reason,role)=>{fs.appendFileSync(path.join(output,report.referenceDispositions.file),JSON.stringify({original:item.original,reference,type:item.type,thread:item.thread??null,originalKind:maps.get('original-kind',maps.get('identity',reference)??reference)??null,reason,role})+'\n',{mode:0o600});report.referenceDispositions.count++;};
  const count=type=>report.types[type]??={read:0,written:0,duplicates:0,heads:0,verified:0};
- const observe=file=>{for(let current=file;current===source||current.startsWith(source+path.sep);current=path.dirname(current)){if(!stamps.has(current))stamps.set(current,sourceStamp(current));if(current===source)break;}};
+ const clockLastRoot=clockLastSource??path.join(source,'data/state/clock/last');
+ const observe=file=>{const root=[source,clockLastRoot].find(root=>file===root||file.startsWith(root+path.sep));if(root===undefined)throw new TypeError('original observation outside selected custody');for(let current=file;;current=path.dirname(current)){if(!stamps.has(current))stamps.set(current,sourceStamp(current));if(current===root)break;}};
  const context={source,semanticRecordOf,dataArtifactAddress};
  const load=position=>{const witness=witnessAt(position,{openSegmentReader,parseJournalWitness});if(witness.id!==position.original)throw new TypeError('original witness position differs from pass one');return selection(witness,position.kind,{...context,file:position.file});};
  // Snapshot all legacy custody metadata before the stream; packed backing bytes
@@ -98,7 +99,7 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   let selected=0;
   for(const line of streamJsonLines(file,{openReader:openSegmentReader})){
    if(NI.test(line.record.id)&&maps.get('original-kind',line.record.id)===undefined)maps.put('original-kind',line.record.id,kind);
-   const witness=parseJournalWitness(line.record),semantic=semanticRecordOf(witness);
+   const witness=parseJournalWitness(line.record),semantic=semanticRecordOf(witness,kind);
    // The identity is witnessed even when its original kind is not a current consumer.
    if(semantic?.id&&NI.test(semantic.id)&&maps.get('identity',semantic.id)===undefined)maps.put('identity',semantic.id,witness.id);
    if(['rpc','metroplat.clock','settlement-signal'].includes(kind)){report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;}
@@ -155,7 +156,8 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   active.delete(original);return result;
  }
  for(const {id}of maps.entries('source'))convert(id);
- for(const file of sourceFiles(path.join(source,'data/state/clock/last'))){if(!file.endsWith('.json'))continue;observe(file);const row=JSON.parse(fs.readFileSync(file,'utf8'));
+ if(fs.existsSync(clockLastRoot))observe(clockLastRoot);
+ for(const file of sourceFiles(clockLastRoot)){if(!file.endsWith('.json'))continue;observe(file);const row=JSON.parse(fs.readFileSync(file,'utf8'));
   if(!text(row.schedule)||!instant(row.ranAt)||typeof row.ok!=='boolean')throw new TypeError('original last-run record lacks current clock meaning');
   const record={at:row.ranAt,schedule:row.schedule,...(row.occurrence===undefined?{}:{occurrence:row.occurrence}),...(row.attempt===undefined?{}:{attempt:row.attempt}),ok:row.ok};
   const id=store.extend(output,'schedule-run',row.schedule,record),writtenKey=semanticAddress({type:'schedule-run',id}).id;count('schedule-run').read++;if(maps.get('written',writtenKey)!==undefined)count('schedule-run').duplicates++;else{count('schedule-run').written++;maps.put('written',writtenKey,'schedule-run');}count('schedule-run').heads++;
@@ -177,7 +179,7 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
  }
  assertSourceStamps(stamps);report.mainQualified=Object.values(report.unqualifiedSources).every(count=>count===0);
  report.sourceOnlyDisposition='Original custody retained; no current consumer receiving was established for these kind rows. RPC/old clock outcomes remain historical evidence, not current authority or run state.';
- report.originalsPreserved=true;report.mainSuppliers={oldRoot,newRoot};
+ report.originalsPreserved=true;report.mainSuppliers={oldRoot,newRoot,clockLastSource:clockLastRoot};
  if(report.mainQualified)fs.rmSync(mapRoot,{recursive:true});
  return report;
 }
