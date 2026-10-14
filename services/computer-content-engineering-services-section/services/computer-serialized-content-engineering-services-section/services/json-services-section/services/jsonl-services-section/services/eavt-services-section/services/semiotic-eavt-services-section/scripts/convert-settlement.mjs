@@ -88,12 +88,13 @@ if (!args.activitypub) {
   const { dataArtifactAddress } = await supplier(oldRequire, eavtProviders[0] + '/data-artifact-address');
   await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource});
 } else {
-  if (typeof args['old-activitypub'] !== 'string') throw new TypeError('--old-activitypub is required');
-  const oldAp = fs.realpathSync(args['old-activitypub']);
+  if (typeof args['old-activitypub'] !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('exact --old-activitypub and --new-activitypub providers are required');
+  const oldAp = fs.realpathSync(args['old-activitypub']), currentAp = fs.realpathSync(args['new-activitypub']);
+  const currentApRequire = createRequire(path.join(currentAp, 'package.json'));
   const { receiveCutoverBytes } = await load(path.join(oldAp, 'src/receiving/custody-bytes.mjs'));
   const { createFileStoreSync: oldFileStore } = await supplier(createRequire(path.join(oldAp, 'package.json')), '@red-cup-engineering/immutable-content-custody-service/file-store');
-  const { createFileStoreSync: newFileStore } = await supplier(newRequire, '@red-cup-engineering/immutable-content-custody-service/file-store');
-  const { immutableContentKey } = await supplier(newRequire, '@red-cup-engineering/immutable-content-custody-service');
+  const { createFileStoreSync: newFileStore } = await supplier(currentApRequire, '@red-cup-engineering/immutable-content-custody-service/file-store');
+  const { immutableContentKey } = await supplier(currentApRequire, '@red-cup-engineering/immutable-content-custody-service');
   const { makeNiUri } = await supplier(newRequire, '@red-cup-engineering/uri-services-section/ni-uri');
   if (!fs.existsSync(path.join(source,'bodies'))) throw new TypeError('original cited body custody is unavailable');
   const oldBodies = oldFileStore(path.join(source, 'bodies')), bodyStore = newFileStore(path.join(output, 'custody'));
@@ -147,7 +148,7 @@ if (!args.activitypub) {
   }
   if (args.queue) {
     if (typeof args.queue !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('queue receiving requires exact original queue and current ActivityPub provider');
-    const queue = fs.realpathSync(args.queue), currentAp = fs.realpathSync(args['new-activitypub']);
+    const queue = fs.realpathSync(args.queue);
     const { extractSenActivity } = await load(path.join(currentAp,'src/sen-activity.mjs'));
     report.suppliers.currentActivitypub = currentAp;
     report.suppliers.currentQueueReader = sha(fs.readFileSync(path.join(currentAp,'src/flatfile-queue.mjs')));
@@ -191,3 +192,4 @@ console.log(JSON.stringify({type:report.type,qualified:report.qualified,types:re
 
 }
 main().catch(error => { process.stderr.write(JSON.stringify({type:"OneTimeStoreConversionRefused",code:typeof error?.code === "string" ? error.code : error?.name ?? "Error",...progress,originalsPreserved:true})+"\n"); process.exitCode=1; });
+
