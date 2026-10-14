@@ -13,13 +13,19 @@ const groups = ["https://github.com/561-group/561-group-services-section",
 const sourcePath = "lib/agency/duties/observing-language-space.json";
 const observedAt = "2026-10-14T20:00:00.000Z";
 
-async function fixture(t, record = {
+const defaultRecord = Object.freeze({
   name: "observing-language-space",
   authority: "board-charter",
   claim: "receiving-office",
   skills: ["inspect-corpus", "qualify-language-claims"],
   delegation: false,
-}) {
+});
+const digestOf = bytes => `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
+const defaultBytes = Buffer.from(JSON.stringify(defaultRecord, null, 2) + "\n", "utf8");
+const defaultDigest = digestOf(defaultBytes);
+const selection = (path, digest = defaultDigest) => ({ path, digest });
+
+async function fixture(t, record = defaultRecord) {
   const root = await mkdtemp(join(tmpdir(), "fars-source-json-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const path = join(root, sourcePath);
@@ -29,8 +35,8 @@ async function fixture(t, record = {
   return { root, path, bytes };
 }
 
-function provider(root, namespace = groups[0], paths = [sourcePath]) {
-  return jsonSourcesProvider({ id: "agency-source", root, namespace, paths });
+function provider(root, namespace = groups[0], sources = [selection(sourcePath)]) {
+  return jsonSourcesProvider({ id: "agency-source", root, namespace, sources });
 }
 
 test("real source-owned agency JSON files enter the same typed FARS graph without conferring incumbency", async t => {
@@ -65,8 +71,12 @@ test("source revision and source owner prevent unchanged words from inheriting p
   assert.notEqual(first.resource, second.resource, "different lawful owners never alias");
   const edited = JSON.parse((await readFile(path)).toString("utf8"));
   edited.skills.push("observe-receiver");
-  await writeFile(path, JSON.stringify(edited, null, 2) + "\n");
-  const changed = (await provider(root).observe({ observedAt })).resources[0];
+  const revisedBytes = Buffer.from(JSON.stringify(edited, null, 2) + "\n");
+  await writeFile(path, revisedBytes);
+  await assert.rejects(() => provider(root).observe({ observedAt }),
+    /digest changed or is not owner-qualified/u, "stale catalog digest must refuse");
+  const changed = (await provider(root, groups[0],
+    [selection(sourcePath, digestOf(revisedBytes))]).observe({ observedAt })).resources[0];
   assert.notEqual(first.resource, changed.resource, "different exact source bytes have different revision identity");
   const witnesses = value => value.cells.filter(x=>x.predicate==="urn:fars:attribute-witness").map(x=>x.object);
   assert.notDeepEqual(witnesses(first), witnesses(changed),
@@ -79,17 +89,24 @@ test("source admission is explicit, finite, atomic and closed against paths outs
   for (const paths of [[], ["../owned.json"], ["/etc/passwd.json"],
     ["sub/../owned.json"], [sourcePath, sourcePath], [".git/config.json"],
     ["lib/agency/secrets.txt"]]) {
-    assert.throws(() => provider(root, groups[0], paths), TypeError, JSON.stringify(paths));
+    assert.throws(() => provider(root, groups[0], paths.map(path => selection(path))),
+      TypeError, JSON.stringify(paths));
+  }
+  for (const digest of ["", "sha256:ABC", "sha256:" + "F".repeat(64)]) {
+    assert.throws(() => provider(root, groups[0], [selection(sourcePath,digest)]), TypeError);
   }
   assert.throws(() => provider(root, "http://untrusted.example.test"), TypeError);
-  assert.throws(() => provider(root, groups[0], Array.from({length:4097}, (_,i)=>`x/${i}.json`)), TypeError);
-  const absent = provider(root, groups[0], [sourcePath, "lib/agency/duties/missing.json"]);
+  assert.throws(() => provider(root, groups[0],
+    Array.from({length:4097}, (_,i)=>selection(`x/${i}.json`))), TypeError);
+  const absent = provider(root, groups[0],
+    [selection(sourcePath), selection("lib/agency/duties/missing.json")]);
   await assert.rejects(() => absent.observe({observedAt}));
   const other = await mkdtemp(join(tmpdir(), "fars-foreign-"));
   t.after(() => rm(other, { recursive: true, force: true }));
   await writeFile(join(other, "private.json"), '{"authority":"not-admitted"}\n');
   await symlink(join(other, "private.json"), join(root, "lib/agency/duties/alias.json"));
-  await assert.rejects(() => provider(root, groups[0], ["lib/agency/duties/alias.json"]).observe({observedAt}),
+  await assert.rejects(() => provider(root, groups[0],
+    [selection("lib/agency/duties/alias.json")]).observe({observedAt}),
     /source changes its selected path/u);
 });
 
