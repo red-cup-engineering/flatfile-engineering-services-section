@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promis
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
-import { jsonSourcesProvider } from "../src/adapters/json-sources.mjs";
+import { jsonSourcesProvider, selectCatalogJsonSources } from "../src/adapters/json-sources.mjs";
 import { attributePredicate, decodeJsonGraphValue } from "../src/provider/attribute-projection.mjs";
 import { composeProviders, queryRelations } from "../src/provider/compositor.mjs";
 
@@ -108,6 +108,59 @@ test("source admission is explicit, finite, atomic and closed against paths outs
   await assert.rejects(() => provider(root, groups[0],
     [selection("lib/agency/duties/alias.json")]).observe({observedAt}),
     /source changes its selected path/u);
+});
+
+test("existing professional repertoire catalog selects office, duty and work sources for real FARS query", async t => {
+  const {root} = await fixture(t);
+  const officePath = "content/professional-repertoire/offices/cto.json";
+  const workPath = "content/professional-repertoire/works/observing-language-space.json";
+  const officeBytes = Buffer.from(JSON.stringify({
+    id:"cto",kind:"office","bears-duty":["urn:561:duty:language-space"],
+    "appointment-authority":false
+  })+"\n");
+  const workBytes = Buffer.from(JSON.stringify({
+    id:"observing-language-space",name:"observing language space",
+    from:"opaque corporate work",to:"attributed source claims"
+  })+"\n");
+  for (const [path,bytes] of [[officePath,officeBytes],[workPath,workBytes]]) {
+    const file=join(root,path);
+    await mkdir(dirname(file),{recursive:true});
+    await writeFile(file,bytes);
+  }
+  const catalog=Object.freeze({
+    id:"union-professional-repertoire",owner:"union-officer-academy",
+    appointmentAuthority:false,
+    offices:[{id:"cto",canonicalPath:officePath,digest:digestOf(officeBytes)}],
+    duties:[{id:"observing-language-space",canonicalPath:sourcePath,digest:defaultDigest}],
+    works:[{id:"observing-language-space",canonicalPath:workPath,digest:digestOf(workBytes)}],
+    skills:[{id:"unsupported-file-kind",canonicalRoot:"lib/professional-repertoire/skills/demo",
+      digest:defaultDigest}],
+  });
+  const sources=selectCatalogJsonSources(catalog,["offices","duties","works"]);
+  assert.deepEqual(sources.map(x=>x.path),[officePath,workPath,sourcePath].sort());
+  const graph=jsonSourcesProvider({id:"coesite:professional-repertoire",root,namespace:groups[1],sources});
+  const actual=await composeProviders([graph],{context:{observedAt}});
+  assert.equal(actual.providers[0].status,"observed");
+  assert.equal(actual.resources.length,3);
+  assert.equal(queryRelations(actual,{predicate:attributePredicate("id")}).length,2,
+    "two source-owned id fields each name their own record, not one actor or office");
+  assert.equal(queryRelations(actual,{predicate:attributePredicate("name")}).length,2);
+  assert.ok(actual.resources.every(x=>x.resource.includes("sha256:")));
+  assert.equal(queryRelations(actual,{predicate:"urn:fars:authorized-incumbent"}).length,0);
+  for (const invalid of [
+    ["skills"], ["missing"], ["offices","offices"]
+  ]) assert.throws(()=>selectCatalogJsonSources(catalog,invalid),TypeError);
+  assert.throws(()=>selectCatalogJsonSources({...catalog,duties:[catalog.offices[0]]},
+    ["offices","duties"]), /duplicate JSON source path/u);
+  assert.throws(()=>selectCatalogJsonSources({...catalog,works:[{
+    ...catalog.works[0],digest:"sha256:"+"0".repeat(64)
+  }]},["works"]).length,1);
+  const mismatched=selectCatalogJsonSources({...catalog,works:[{
+    ...catalog.works[0],digest:"sha256:"+"0".repeat(64)
+  }]},["works"]);
+  await assert.rejects(()=>jsonSourcesProvider({id:"stale-catalog",root,
+    namespace:groups[1],sources:mismatched}).observe({observedAt}),
+    /digest changed or is not owner-qualified/u);
 });
 
 test("bad JSON or a non-object cannot silently become a qualified source claim", async t => {
