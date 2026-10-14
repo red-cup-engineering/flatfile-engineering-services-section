@@ -147,3 +147,23 @@ test("a finite ChuCandidate pairing is lawful exactly when all FOUR defects vani
   assert.deepEqual(failures,[["bob","writes","active"]],
     "positive/negative mismatch stays a typed FOUR defect, not an invented distance");
 });
+
+test("binary-relation composition is directional even though FOUR fusion is commutative", () => {
+  // The named Obsmetrologia distinction is about TWO DIFFERENT OPERATIONS:
+  // Residuation.comp : (X → X → Prop)² → X → X → Prop
+  // TwistProduct.fuse : Charge² → Charge, a commutative fusion.
+  for(const a of points)for(const b of points) {
+    assert.equal(fusionReading(a,b),fusionReading(b,a));
+  }
+  const R=[["alice","bob"]],S=[["bob","cara"]];
+  const composition=(left,right)=>left.flatMap(([a,m])=>
+    right.filter(([n])=>n===m).map(([,o])=>[a,o]));
+  assert.deepEqual(composition(R,S),[["alice","cara"]]);
+  assert.deepEqual(composition(S,R),[]);
+  assert.notDeepEqual(composition(R,S),composition(S,R));
+  // The two Boolean projections of a FOUR reading may agree while
+  // negative evidence does not: ordinary positive-incidence FCA cannot
+  // independently certify both evidence polarities.
+  assert.equal(sidesOfReading("potential")[0],sidesOfReading("stable")[0]);
+  assert.equal(symmetricEvidenceDifferenceReading("potential","stable"),"active");
+});
