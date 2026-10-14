@@ -18,7 +18,10 @@ import {
   firstDuplicate,
   nodeIdSet,
 } from "@red-cup-engineering/css-services-section/css-style-resolution";
-import { canonical } from "@red-cup-engineering/json-services-section";
+import { canonical, parse } from "@red-cup-engineering/json-services-section";
+import { admitDocumentSpine } from "@red-cup-engineering/signcell/document-spine";
+import { retainedCarrier } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+import { readHtmlDocument } from "@red-cup-engineering/html-structural-projection-service/scan";
 
 import { escapeHtmlTextValue as escapeXmlText, escapeHtmlAttributeValue as escapeXmlAttr } from "@red-cup-engineering/html-structural-projection-service/lexical";
 
@@ -48,6 +51,7 @@ function escapeAttr(value) { return escapeXmlAttr(htmlText(value)); }
 /* ── carrier ────────────────────────────────────────────────────────────── */
 
 const addressSet = (nodes) => new Set(nodes.map((node) => node.semanticAddress));
+const admittedCarriers = new WeakSet();
 
 const carrierObstruction = (reason, key) =>
   Object.freeze({ kind: "rendering.htmlCarrier-obstruction", reason, key });
@@ -57,6 +61,11 @@ export function htmlCarrierOf(
   document,
   nodes,
 ) {
+  const admission = admitDocumentSpine(document);
+  if (!admission.ok) return carrierObstruction("invalid-document-spine", admission.refusal.message);
+  document = admission.value;
+  try { nodes = retainedCarrier(nodes); canonical(document); }
+  catch (error) { return carrierObstruction("unprojectable-content", error.message); }
   const duplicate = firstDuplicate(nodes.map((node) => node.nodeId));
   if (duplicate !== undefined) return carrierObstruction("duplicate-node", duplicate);
   const addresses = addressSet(nodes);
@@ -77,7 +86,7 @@ export function htmlCarrierOf(
   for (const site of document.valuationSites) {
     if (!valuationSites.has(site.address)) return carrierObstruction("missing-valuation-site", site.address);
   }
-  return Object.freeze({
+  const carrier = Object.freeze({
     kind: "rendering.htmlCarrier",
     document,
     nodes: Object.freeze([...nodes]),
@@ -85,13 +94,13 @@ export function htmlCarrierOf(
     carriedOrder: document.order,
     carriedReferences: document.references,
     carriedValuationSites: document.valuationSites,
-    carrierNotDocument: Object.freeze({
-      kind: "settledDocument.html_is_carrier_not_document:witness",
-      documentKind: document.kind,
-      carrierKind: "rendering.htmlCarrier",
-      distinct: true,
+    documentProjection: Object.freeze({
+      kind: "rendering.document-spine-coverage",
+      spineIdentity: document.identity,
     }),
   });
+  admittedCarriers.add(carrier);
+  return carrier;
 }
 
 /* ── render profile / document plan ──────────────────────────────────────── */
@@ -117,6 +126,7 @@ export function buildHtmlDocumentPlan(
   system,
   styleBehavior,
 ) {
+  if (!admittedCarriers.has(carrier)) return renderFiberObstruction("unadmitted-carrier", carrier?.kind ?? "missing");
   if (system.carrier !== carrier) return renderFiberObstruction("carrier-system-mismatch", system.carrier.kind);
   const allowedElements = new Set(profile.allowedElements);
   for (const node of carrier.nodes) {
@@ -169,7 +179,9 @@ function renderCarrierNode(
   byId,
   classNames,
   seen,
+  rendered,
 ) {
+  rendered.push(node);
   if (seen.has(node.nodeId)) throw new TypeError(`renderHtmlDocument: cyclic carrier node ${node.nodeId}`);
   const nextSeen = new Set(seen);
   nextSeen.add(node.nodeId);
@@ -178,6 +190,8 @@ function renderCarrierNode(
   const attributes = {
     ...(node.attributes ?? {}),
     "data-render-node": node.nodeId,
+    "data-semantic-address": node.semanticAddress,
+    ...(node.valuationSite === undefined ? {} : { "data-valuation-site": node.valuationSite }),
     ...(className === undefined
       ? {}
       : { class: ownClass === undefined || ownClass === "" ? className : `${ownClass} ${className}` }),
@@ -185,7 +199,7 @@ function renderCarrierNode(
   const body = `${node.text === undefined ? "" : escapeText(node.text)}${node.html ?? ""}${(node.children ?? []).map((childId) => {
     const child = byId.get(childId);
     if (child === undefined) throw new TypeError(`renderHtmlDocument: missing child carrier node ${childId}`);
-    return renderCarrierNode(child, byId, classNames, nextSeen);
+    return renderCarrierNode(child, byId, classNames, nextSeen, rendered);
   }).join("")}`;
   return `<${node.element}${Object.entries(attributes).map(renderHtmlAttr).join("")}>${body}</${node.element}>`;
 }
@@ -201,6 +215,12 @@ export function renderHtmlDocument(
   fiber,
   options = {},
 ) {
+  const input = fiber?.fiber;
+  fiber = buildHtmlDocumentPlan(input?.profile, input?.carrier, input?.system, input?.styleBehavior);
+  if (fiber.kind !== "rendering.profile_forms_render_fiber:witness")
+    throw new TypeError(`renderHtmlDocument: ${fiber.reason}: ${fiber.key}`);
+  const rendered = [];
+  const spine = fiber.fiber.carrier.document;
   const byId = new Map(fiber.fiber.carrier.nodes.map((node) => [node.nodeId, node]));
   const roots = rootNodeIds(fiber.fiber.carrier.nodes, options.roots);
   const classes = fiber.fiber.system.classFactorMap;
@@ -208,8 +228,18 @@ export function renderHtmlDocument(
   const body = roots.map((rootId) => {
     const root = byId.get(rootId);
     if (root === undefined) throw new TypeError(`renderHtmlDocument: missing root carrier node ${rootId}`);
-    return renderCarrierNode(root, byId, classNames, new Set());
+    return renderCarrierNode(root, byId, classNames, new Set(), rendered);
   }).join("\n");
+  const positions = new Map();
+  rendered.forEach((node, index) => { if (!positions.has(node.semanticAddress)) positions.set(node.semanticAddress, index); });
+  for (const { key } of spine.addresses)
+    if (!positions.has(key)) throw new TypeError(`renderHtmlDocument: roots omit document address ${key}`);
+  const renderedSites = new Set(rendered.map((node) => node.valuationSite ?? node.semanticAddress));
+  for (const { address } of spine.valuationSites)
+    if (!renderedSites.has(address)) throw new TypeError(`renderHtmlDocument: roots omit valuation site ${address}`);
+  for (const { before, after } of spine.order)
+    if (positions.get(before) >= positions.get(after)) throw new TypeError(`renderHtmlDocument: node order differs from explicit document order ${before}->${after}`);
+  const spineText = canonical(spine);
   const metadata = Object.entries(options.metadata ?? {})
     .map(([key, value]) => `    <meta name="${escapeAttr(key)}" content="${escapeAttr(value)}">`)
     .join("\n");
@@ -228,12 +258,45 @@ export function renderHtmlDocument(
 </head>
 <body${bodyAttributes}>
 ${body}
+<template data-document-spine="${escapeAttr(spine.identity)}">${escapeXmlText(spineText)}</template>
 </body>
 </html>
 `;
+  const received = documentSpineOfHtml(html);
+  if (canonical(received) !== spineText) throw new TypeError("renderHtmlDocument: document spine changed during HTML projection");
   return Object.freeze({
     kind: "rendering.htmlFiber.document",
     fiber,
     html,
   });
+}
+
+/** Receive the complete inert document spine through the existing HTML parser.
+ * Geometry and cells are data; settlement and issuer authority remain separate.
+ */
+export function documentSpineOfHtml(html, limits = {}) {
+  const parsed = readHtmlDocument(String(html), limits);
+  const templates = [];
+  const pending = [parsed];
+  while (pending.length) {
+    const node = pending.pop();
+    if (node.tagName === "template") {
+      const identity = node.attrs?.find(({ name }) => name === "data-document-spine")?.value;
+      if (identity !== undefined) {
+        templates.push({ node, identity });
+        continue;
+      }
+    }
+    for (const child of node.childNodes ?? []) pending.push(child);
+    if (node.content) pending.push(node.content);
+  }
+  if (templates.length !== 1) throw new TypeError("documentSpineOfHtml: exactly one spine carrier is required");
+  const { node, identity } = templates[0];
+  const children = node.content?.childNodes ?? [];
+  if (children.some((child) => child.nodeName !== "#text"))
+    throw new TypeError("documentSpineOfHtml: spine content must be inert JSON text");
+  const admitted = admitDocumentSpine(parse(children.map(({ value }) => value).join("")));
+  if (!admitted.ok) throw new TypeError(admitted.refusal.message);
+  if (admitted.value.identity !== identity) throw new TypeError("documentSpineOfHtml: carrier identity differs from its content");
+  return admitted.value;
 }
