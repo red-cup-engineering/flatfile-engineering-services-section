@@ -96,12 +96,18 @@ test("remote graph refusal never becomes a successful receipt", async () => {
 test("source-local SCA addresses stable claim positions through Turtle, JSON-LD and independent witnesses", () => {
   const position = { predicate: "incumbent", object: "character-X" };
   const expected = semanticId({ kind: "rdf.documentary-claim-position",
-    subject: "source@revision-A", ...position });
-  assert.equal(readingClaimId("source@revision-A", position), expected);
+    subject: `${base}source%40revision-A`, predicate: `${base}vocab/predicate#incumbent`,
+    object: {literal: "character-X"} });
+  assert.equal(readingClaimId("source@revision-A", position, {base}), expected);
   assert.match(expected, /^ni:\/\/\/sha-256;/u);
-  assert.notEqual(readingClaimId("source@revision-B", position), expected,
+  assert.notEqual(readingClaimId("source@revision-B", position, {base}), expected,
     "identical tokens under a different source revision must be addressably distinct");
-  assert.notEqual(readingClaimId("source@revision-A", { ...position, object: "character-Y" }), expected);
+  assert.notEqual(readingClaimId("source@revision-A", { ...position, object: "character-Y" }, {base}), expected);
+  const referenced = readingClaimId("source@revision-A", position, {base, subjects:["character-X"]});
+  assert.notEqual(referenced, expected, "typed RDF resource identity differs from an ordinary string literal");
+  assert.equal(referenced, semanticId({kind:"rdf.documentary-claim-position",
+    subject:`${base}source%40revision-A`, predicate:`${base}vocab/predicate#incumbent`,
+    object:{iri:`${base}character-X`}}));
 
   const first = { entity: "source@revision-A", fiber: [
     { ...position, value: { evidence: [["source-witness-A"], []] } },
@@ -132,4 +138,8 @@ test("source-local claim positions cannot be minted from malformed subject, pred
     ["source", {predicate:"incumbent"}],
     ["source", null],
   ]) assert.throws(() => readingClaimId(entity, cell), /addressed documentary claim/u);
+  for (const object of [null, {}, ["character-X"], Number.POSITIVE_INFINITY]) {
+    assert.throws(() => readingClaimId("source", {predicate:"incumbent",object}, {base}),
+      /RDF object must be an admitted scalar/u);
+  }
 });
