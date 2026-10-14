@@ -18,11 +18,19 @@ const NS = Object.freeze({
   prov: "http://www.w3.org/ns/prov#",
 });
 
-const isUrl = (value) => /^[a-z][a-z0-9+.-]*:\/\//iu.test(value);
+/** Explicitly admitted witness-address syntaxes; text labels are not inferred to be IRIs. */
+const isWitnessIri = value => /^(?:https?:\/\/[^\\s<>"{}|^\\\\]+|urn:[a-z0-9][a-z0-9:._~-]*|ni:\/\/\/sha-256;[A-Za-z0-9_-]{43})$/u.test(value);
 
+/** Preserve the two independent evidence families, refusing untyped witnesses. */
 function sides(cell) {
-  const [forWitnesses = [], againstWitnesses = []] = cell.value?.evidence ?? [];
-  return { for: forWitnesses.map(String), against: againstWitnesses.map(String) };
+  const evidence = cell.value?.evidence ?? [[], []];
+  if (!Array.isArray(evidence) || evidence.length !== 2 ||
+      evidence.some(witnesses => !Array.isArray(witnesses) ||
+        witnesses.some(witness => typeof witness !== "string" || witness.trim() === ""))) {
+    throw new TypeError("RDF documentary evidence needs two arrays of nonempty witness identities");
+  }
+  return { for: [...new Set(evidence[0])].sort(),
+    against: [...new Set(evidence[1])].sort() };
 }
 
 /** One evidence-independent, source-local typed claim position (not a proof or grant). */
@@ -57,11 +65,11 @@ function turtleTerm(term) {
 }
 
 function provTurtle(witnesses) {
-  return witnesses.length === 0 ? "[]" : witnesses.map((w) => isUrl(w) ? iriRef(w) : `[ a prov:Entity ; rdfs:label ${turtleLiteral(w)} ]`).join(", ");
+  return witnesses.length === 0 ? "[]" : witnesses.map((w) => isWitnessIri(w) ? iriRef(w) : `[ a prov:Entity ; rdfs:label ${turtleLiteral(w)} ]`).join(", ");
 }
 
 function provJsonLd(witnesses) {
-  const nodes = witnesses.map((w) => isUrl(w) ? { "@id": w } : { "@type": "prov:Entity", "rdfs:label": w });
+  const nodes = witnesses.map((w) => isWitnessIri(w) ? { "@id": w } : { "@type": "prov:Entity", "rdfs:label": w });
   return nodes.length === 0 ? undefined : nodes.length === 1 ? nodes[0] : nodes;
 }
 
