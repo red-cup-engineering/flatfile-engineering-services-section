@@ -17,7 +17,7 @@ import { readMarkdownFeatures } from "./read-markdown-features.mjs";
 import { readMarkdownStructure } from "./read-markdown-structure.mjs";
 import { validateMarkdownDocument } from "./validate-markdown-document.mjs";
 import { readMarkdownWorkbench } from "./read-markdown-workbench.mjs";
-import { unfoldSchema } from "@red-cup-engineering/json-schema-services-section/schema-assertions";
+import { unfoldSchema } from "@red-cup-engineering/json-schema-services-section/schema-assertion-trace";
 import { stringProjector } from "@red-cup-engineering/computer-content-engineering-services-section/text-projector";
 // Type-only: `executing/fact-claims.mjs` sits above `projections/` (`api/catalog.mjs`
 // already imports this very module), so the glue FUNCTION is injected by callers

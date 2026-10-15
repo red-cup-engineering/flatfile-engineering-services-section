@@ -1,6 +1,6 @@
 import { assertKeywordValues } from "../src/assert-keyword-values.mjs";
 import { createHash } from "node:crypto";
-import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-content-address-engineering-services-section/semantic-content-identity";
+import { EMPTY_WITNESS_ROOT, identifyJsonSemanticContent } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/semantic-content-identity";
 import { canonicalJson as canonical } from "@red-cup-engineering/json-services-section/canonical-json";
 import { isJsonRecord } from "@red-cup-engineering/json-services-section/is-json-record";
 import { requireJsonValue } from "@red-cup-engineering/json-services-section/require-json-value";
