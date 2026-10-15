@@ -14,7 +14,7 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((out, value, index,
   return out;
 }, []));
 const deferredKinds = new Set(args['defer-kinds']?.split(',') ?? []);
-if ([...deferredKinds].some(kind => kind !== 'agent-session-token-usage') || (deferredKinds.size && args.activitypub)) throw new TypeError('only historical token telemetry may be explicitly deferred');
+if ([...deferredKinds].some(kind => !['agent-session-token-usage','rpc','metroplat.clock','settlement-signal'].includes(kind)) || (deferredKinds.size && args.activitypub)) throw new TypeError('only historical service telemetry may be explicitly deferred');
 for (const key of ['settlement', 'into', 'old-store', 'new-store', 'report']) if (typeof args[key] !== 'string') throw new TypeError(`required --${key}`);
 // Resolve the existing ancestor before comparing paths: aliases cannot turn a
 // separate-looking candidate or report into a write inside retained custody.

@@ -91,7 +91,7 @@ function validatePlan(plan, work) {
   for (const binding of plan.bindings) {
     assert.ok(/^[a-z][a-z0-9-]{0,63}$/u.test(binding.name) && !names.has(binding.name)); names.add(binding.name);
     assert.ok(['world', 'activitypub', 'kalshi'].includes(binding.conversion));
-    if (binding.deferKinds !== undefined) assert.ok(binding.conversion === 'world' && Array.isArray(binding.deferKinds) && binding.deferKinds.every(kind => kind === 'agent-session-token-usage'), 'only historical token telemetry may be explicitly deferred');
+    if (binding.deferKinds !== undefined) assert.ok(binding.conversion === 'world' && Array.isArray(binding.deferKinds) && binding.deferKinds.every(kind => ['agent-session-token-usage','rpc','metroplat.clock','settlement-signal'].includes(kind)), 'only historical service telemetry may be explicitly deferred');
     for (const file of [binding.source, binding.target, binding.clockLastSource, binding.queue].filter(Boolean)) {
       assert.ok(path.isAbsolute(file) && path.normalize(file) === file && !under(file, work) && !under(work, file));
       ordinary(exists(file) ? file : path.dirname(file));
