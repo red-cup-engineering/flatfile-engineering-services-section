@@ -7,6 +7,8 @@
     "./sparql-http-client": "./scripts/sparql-http-client.mjs",
     "./sparql-over-eavt": "./scripts/sparql-over-eavt.mjs",
     "./sparql-text": "./scripts/sparql-text.mjs",
+    "./sparql-query-tool": "./scripts/sparql-query-tool.mjs",
+    "./ontology-endpoint": "./scripts/ontology-endpoint.mjs",
     "./sparql-results-json": "./scripts/sparql-results-json.mjs",
     "./n-quads": "./scripts/n-quads.mjs",
     "./rdf-canonicalization": "./scripts/rdf-canonicalization.mjs",

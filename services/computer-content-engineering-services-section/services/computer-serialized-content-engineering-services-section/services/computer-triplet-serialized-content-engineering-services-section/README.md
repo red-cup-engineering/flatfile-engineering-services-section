@@ -26,6 +26,28 @@ separate concern.
   section's schema stays its one authored source and the `.ttl` is
   generated, never a second hand-written artifact.
 
+## The Group's ontology over SPARQL 1.1
+
+`ontology-endpoint` pins the glossary's remote schema.org JSON-LD context
+(`pinContext`), loads the glossary's `public.jsonld`
+(`561-group-services-section`, `data/records/knowledge/glossary/skos/`) into an
+Oxigraph store (`loadOntology`) and serves it read-only over the SPARQL 1.1
+Protocol with the union of graphs as the default graph (`serveOntology`).
+`scripts/serve-ontology.mjs` runs both. `sparql-query-tool` is the
+`sparql_query` tool definition (`{name, description, inputSchema, handler}`);
+it queries through this section's own `sparqlProtocol`, and
+`mcp-engineering-services-section` serves it over stdio.
+
+```
+node scripts/serve-ontology.mjs --jsonld <public.jsonld> --location <store dir> --bind 127.0.0.1:7878
+node --test test/ontology-endpoint.test.mjs   # OXIGRAPH_BIN names the oxigraph binary; ONTOLOGY_JSONLD optional
+```
+
+The store and endpoint are Oxigraph's own; this section adds no evaluator.
+The capability was first committed under `agent-organization-engine/lib/knowing`
+in computer-engineering-services-section (PR 425, commit 3da68a5f) and carried
+here, with that commit, to its owning section.
+
 ## W3C RDF interoperability over existing owners
 
 The exported `./sparql-http-client` uses **standard HTTP** with a real RDF

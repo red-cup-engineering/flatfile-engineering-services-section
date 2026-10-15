@@ -3,10 +3,12 @@
 One RFC 8949 codec uses native `cbor2` 2.4.0 wire primitives; there is no
 parallel house float, argument-width or recursive wire decoder. The iterative
 house writer retains deeply nested arrays and existing encoded bytes. Its
-application carrier admits booleans, null, finite numbers, uint64-range BigInts,
+application carrier admits booleans, null, finite numbers, BigInts in the inclusive range [-2^64, 2^64-1],
 well-formed text without normalization, byte strings, arrays and plain objects
 with text keys. Undefined object entries are absent; negative zero becomes zero.
-Small BigInts decode to Numbers. `decodeCanonical` refuses bytes outside this
+Wire integers decode to Numbers exactly within the safe-integer range and to
+BigInts outside it. Wire floats remain Numbers, including unsafe integral
+Numbers; integer and float encodings are not conflated. `decodeCanonical` refuses bytes outside this
 profile or its deterministic encoding. BOM characters and prototype-looking
 keys remain ordinary data. `canonicalEqual` compares encoded bytes;
 `canonicalCborToNiUri` names canonical bytes through the existing NI operation.
