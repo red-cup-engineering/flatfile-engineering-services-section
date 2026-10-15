@@ -38,6 +38,8 @@ let parent=path.dirname(output);while(!fs.existsSync(parent))parent=path.dirname
 const parentReal=fs.realpathSync(parent);
 if(fs.statSync(source).dev!==fs.statSync(parentReal).dev||output==='/tmp'||output.startsWith('/tmp/')||output.startsWith('/var/tmp/'))throw new TypeError('candidate must use original custody volume outside temporary storage');
 let originalQueue;
+// Queue selection and ordinary ready/claimed custody are preflighted before
+// either representation's receiver can write any candidate records or bodies.
 if(args.activitypub){
   if(typeof args.queue !== 'string')throw new TypeError('ActivityPub qualification requires explicit original queue custody');
   originalQueue=fs.realpathSync(args.queue);
@@ -51,6 +53,24 @@ if(args.activitypub){
 }
 if (fs.existsSync(output)) throw new TypeError('output must not exist; originals remain in their original custody');
 const oldRoot = fs.realpathSync(args['old-store']), newRoot = fs.realpathSync(args['new-store']);
+if(args.activitypub){
+ const {activityPubSourceFormat,receiveNativeActivityPub,receiveActivityPubQueue}=await import('./receive-native-activitypub.mjs');
+ if(typeof args['old-activitypub']!=='string'||typeof args['new-activitypub']!=='string')throw new TypeError('exact ActivityPub providers required');
+ const oldAp=fs.realpathSync(args['old-activitypub']),currentAp=fs.realpathSync(args['new-activitypub']);
+ const sourceFormat=activityPubSourceFormat({source,sourceStoreRoot:oldRoot,sourceActivitypubRoot:oldAp});
+ if(sourceFormat==='native-activitypub-13bca0b8'){
+  if(args['clock-last']!==undefined)throw new TypeError('native ActivityPub does not receive a world clock source');
+  const held=await receiveNativeActivityPub({source,output,sourceStoreRoot:oldRoot,targetStoreRoot:newRoot,sourceActivitypubRoot:oldAp,targetActivitypubRoot:currentAp});
+  const queueStamps=new Map(),observe=file=>{const s=fs.statSync(file);if(!queueStamps.has(file))queueStamps.set(file,[s.dev,s.ino,s.size,s.mtimeMs,s.ctimeMs]);};
+  const queue=await receiveActivityPubQueue({queue:originalQueue,output,currentAp,observe});
+  for(const[file,before]of queueStamps){const s=fs.statSync(file);if(JSON.stringify(before)!==JSON.stringify([s.dev,s.ino,s.size,s.mtimeMs,s.ctimeMs]))throw new TypeError('original queue changed during receiving');}
+  const store=await import(pathToFileURL(path.join(newRoot,'src/store.mjs')).href),types={};
+  for(const type of ['activitypub-inbox','activitypub-outbox','activitypub-follower']){let n=0;for(const _ of store.each(output,type,{strict:true}))n++;if(n)types[type]={read:n,written:n,duplicates:0,heads:[...store.heads(output,type,{strict:true})].length,verified:n};}
+  const report={type:'OneTimeStoreConversion',version:1,source,output,sourceFormat,originalsPreserved:true,ordersExecuted:false,transportActivated:false,suppliers:{oldStore:oldRoot,newStore:newRoot,oldActivitypub:oldAp,currentActivitypub:currentAp,currentQueueReader:sha(fs.readFileSync(path.join(currentAp,'src/flatfile-queue.mjs')))},types,missingBodies:[],queue,nativeReceiving:held,qualified:held.qualified&&queue.originalOnly.length===0&&queue.archivedOriginalOnly===0};
+  fs.writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});console.log(JSON.stringify({type:report.type,qualified:report.qualified,types,originalsPreserved:true,ordersExecuted:false,transportActivated:false}));return;
+ }
+}
+
 if (args['clock-last'] !== undefined && (args.activitypub || typeof args['clock-last'] !== 'string')) throw new TypeError('an explicit last-run source belongs to a world conversion');
 const clockLastSource = args['clock-last'] === undefined ? undefined : fs.realpathSync(args['clock-last']);
 if (clockLastSource !== undefined && (under(reportPath,clockLastSource) || !fs.statSync(clockLastSource).isDirectory() || fs.statSync(clockLastSource).dev !== fs.statSync(source).dev || output === clockLastSource || output.startsWith(clockLastSource + path.sep) || clockLastSource.startsWith(output + path.sep))) throw new TypeError('last-run originals require separate same-volume directory custody');
@@ -84,7 +104,7 @@ if (typeof semanticRecordOf !== 'function') {
 const store = await load(path.join(newRoot, 'src/store.mjs'));
 const { semanticAddress } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address');
 const { niBucketPath } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/ni-path');
-const { canonicalJson } = await supplier(newRequire, '@red-cup-engineering/json-services-section/canonical-json');
+const { canonicalJson } = await supplier(newRequire, '@red-cup-engineering/json-services-section/canonical');
 const { originalJournalFiles, createBucketMap, streamJsonLines, hashSource } = await import('./conversion-buckets.mjs');
 fs.mkdirSync(output, { mode: 0o700, recursive: true });
 process.umask(0o077);
@@ -125,17 +145,32 @@ if (!args.activitypub) {
   const { makeNiUri } = await supplier(newRequire, '@red-cup-engineering/uri-services-section/ni-uri');
   if (!fs.existsSync(path.join(source,'bodies'))) throw new TypeError('original cited body custody is unavailable');
   const oldBodies = oldFileStore(path.join(source, 'bodies')), bodyStore = newFileStore(path.join(output, 'custody'));
+  const bytesForInbox=record=>bodyStore.get(immutableContentKey(record.activityNi)).body;
   for(const file of files(path.join(source,'bodies')))observe(file);
   report.suppliers.oldActivitypub = oldAp;
   report.suppliers.oldBodyReader = sha(fs.readFileSync(path.join(oldAp,'src/receiving/custody-bytes.mjs')));
   report.apOrigins = [];
   const followerOrderRoot = path.join(output, '.conversion-activitypub');
   const followerEvents = createBucketMap(followerOrderRoot, niBucketPath);
-  let followerSequence = 0;
+  let followerSequence = 0, inboxSequence = 0;
+  const targetAp=await load(path.join(currentAp,'src/journal-custody.mjs'));
+  if(typeof targetAp.activityPubReplyCoordinates!=='function')throw new TypeError('paired witnessed reply receiver required');
+  // Canonical source clocks have the same lexical/locale ordering. Exceptional
+  // spellings are compared against prior times using only temporary disk maps;
+  // refuse a changed source ordering instead of inventing normalized instants.
+  const inboxClock=at=>{
+    const id=semanticAddress({at}).id;if(followerEvents.get('inbox-times',id)!==undefined)return;
+    const canonical=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u.test(at)&&new Date(at).toISOString()===at;
+    for(const {value:other}of followerEvents.entries(canonical?'inbox-exceptional-times':'inbox-times')){
+      const raw=at<other?-1:at>other?1:0;
+      if(Math.sign(at.localeCompare(other))!==raw)throw new TypeError('witnessed inbox timestamp ordering differs from native receiver');
+    }
+    followerEvents.put('inbox-times',id,at);if(!canonical)followerEvents.put('inbox-exceptional-times',id,at);
+  };
   // Both historical journal owners are real inputs. The kind-layout migration
   // retained witness custody under data/logs; no current runtime legacy reader.
   const historicalFiles = [...originalJournalFiles(source,{observe})];
-  for(const file of historicalFiles)observe(file);
+  for(const file of historicalFiles){observe(file);if(file.endsWith('.jsonl'))throw new TypeError('pre-witness ActivityPub feed needs separate source receiving');}
   const segments = historicalFiles.filter(file => file.endsWith('.witnesses')).sort();
   for (const file of segments) {
     progress={stage:'original-activitypub-segment',source:path.relative(source,file)};
@@ -147,7 +182,8 @@ if (!args.activitypub) {
       const original = semanticRecordOf(witness, kind);
       if (!original || !['inbox','outbox','followers'].includes(original.category)) { report.sourceOnly[kind] = (report.sourceOnly[kind] ?? 0) + 1; continue; }
       const following = original.told?.for === true && original.told?.against === false;
-      if (original.category !== 'followers' && !following) { report.sourceOnly[kind] = (report.sourceOnly[kind] ?? 0) + 1; continue; }
+      if (original.category !== 'followers' && !following) throw new TypeError('unselected non-held ActivityPub custody state');
+      if(original.category==='inbox'&&followerEvents.get('inbox-events',witness.id)!==undefined){counts('activitypub-inbox').duplicates++;continue;}
       const at = original.recordedAt;
       if (typeof at !== 'string' || !Number.isFinite(Date.parse(at))) throw new TypeError('original ActivityPub clock is unavailable');
       const type = 'activitypub-' + ({inbox:'inbox',outbox:'outbox',followers:'follower'}[original.category]);
@@ -175,8 +211,28 @@ if (!args.activitypub) {
         bodyStore.putIfAbsent(key,{body:bytes,mediaType:'application/json'});
         const held = bodyStore.get(key);
         if (held === null || !Buffer.from(held.body).equals(Buffer.from(bytes))) throw new TypeError('current body receiving failed');
-        if (original.category === 'inbox' && (rest.receipt?.type !== 'ActivityPubVerifiedArrivalReceipt' || rest.receipt.version !== 1 || rest.receipt.bodySha256 !== sha(bytes))) throw new TypeError('original arrival receipt does not bind original body');
+        if (original.category === 'inbox' && (rest.receipt?.type !== 'ActivityPubVerifiedArrivalReceipt' || rest.receipt.version !== 1 || rest.receipt.bodySha256 !== sha(bytes)
+          || !(rest.receipt.recipient===null||typeof rest.receipt.recipient==='string') || rest.recipient!==rest.receipt.recipient || rest.key!==sha(canonicalJson(rest.receipt)))) throw new TypeError('original arrival receipt does not bind original body');
         record = {...rest, activityNi, activityBytes:bytes.length, at, ...(original.category === 'outbox' ? {contentNi:semanticAddress(activity).id} : {})};
+      }
+      if(original.category==='inbox'){
+        if(!Number.isSafeInteger(inboxSequence))throw new RangeError('original inbox order exceeds its exact integer representation');
+        if(rest.reply!==undefined||rest.replyOrder!==undefined||rest.sourceOrder!==undefined)throw new TypeError('undeclared witnessed inbox correlation state');
+        inboxClock(at);const reply=targetAp.activityPubReplyCoordinates(JSON.parse(Buffer.from(bytesForInbox(record)).toString('utf8')));
+        record={...record,sourceOrder:inboxSequence,...(reply===null?{}:{reply,replyOrder:inboxSequence})};
+        followerEvents.put('inbox-events',witness.id,inboxSequence++);
+        const name=store.threadName(semanticAddress({type,name:record.key}).id),prior=store.readHead(output,type,name),existing=prior===undefined?undefined:store.get(output,type,prior.frontier[0]);
+        const content=value=>{const{at,sourceOrder,replyOrder,...rest}=value;return canonicalJson(rest);};
+        if(existing!==undefined&&content(existing)!==content(record))throw new TypeError('original receipt identity names conflicting activity custody');
+        const id=store.put(output,type,record);count.written++;
+        if(existing===undefined||record.at>existing.at||(record.at===existing.at&&record.sourceOrder>existing.sourceOrder))store.writeHead(output,type,name,{frontier:[id]});
+        if(prior===undefined)count.heads++;
+        if(reply!==null&&record.recipient!==null){
+          const name=targetAp.activityPubReplyHead({identifier:record.recipient,...reply}),head=store.readHead(output,type,name),held=head===undefined?undefined:{address:head.frontier[0],record:store.get(output,type,head.frontier[0])};
+          if(held===undefined||targetAp.compareActivityPubReplyRows({address:id,record},held)>0)store.writeHead(output,type,name,{frontier:[id]});
+          if(held===undefined)count.heads++;
+        }
+        report.apOrigins.push({original:witness.id,oldIdentity:original.id,current:id,type,bodyNi:record.activityNi});continue;
       }
       const name = original.category === 'inbox' ? record.key : original.category === 'outbox' ? record.activityId : undefined;
       const headName = name === undefined ? undefined : store.threadName(semanticAddress({type,name}).id);
@@ -195,44 +251,20 @@ if (!args.activitypub) {
     }
     report.sourceSegments.push({path:path.relative(source,file),bytes:fs.statSync(file).size,sha256:hashSource(file,{openReader:openSegmentReader}),selected});
   }
+  const received=targetAp.createActivityPubJournalCustody({stateDirectory:path.dirname(output)});
+  if(path.resolve(received.root)!==output)throw new TypeError('ActivityPub candidate must be journal under its state directory');
+  for(const {record}of store.each(output,'activitypub-inbox',{strict:true})){
+    const activity=JSON.parse(Buffer.from(bytesForInbox(record)).toString('utf8'));
+    const held=await received.inbox.get(record.receipt);if(held===null||canonicalJson(held.activity)!==canonicalJson(activity))throw new TypeError('witnessed inbox body was not received');
+    if(canonicalJson(await received.inbox.retain({recipient:record.recipient,jsonLd:activity}))!==canonicalJson(record.receipt))throw new TypeError('witnessed arrival replay changed receipt identity');
+  }
   fs.rmSync(followerOrderRoot, {recursive:true, force:true});
   if (args.queue) {
     if (typeof args.queue !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('queue receiving requires exact original queue and current ActivityPub provider');
-    const queue = originalQueue;
-    const { extractSenActivity } = await load(path.join(currentAp,'src/sen-activity.mjs'));
-    report.suppliers.currentActivitypub = currentAp;
-    report.suppliers.currentQueueReader = sha(fs.readFileSync(path.join(currentAp,'src/flatfile-queue.mjs')));
-    report.queue = { activated:0, retained:0, originalOnly:[], archivedOriginalOnly:0, archivedReadyOriginalOnly:0, archivedClaimedOriginalOnly:0 };
-    const claimed = path.join(queue,'claimed');
-    observe(queue);observe(claimed);
-    if (fs.existsSync(claimed) && fs.readdirSync(claimed).length) throw new TypeError('an actual claimed delivery requires outcome receiving before queue conversion');
-    const ready = path.join(queue,'ready'), target = path.join(path.dirname(output),'queue','ready');
-    for (const file of files(ready)) {
-      observe(file); const bytes = fs.readFileSync(file), item = JSON.parse(bytes.toString('utf8'));
-      const message = item.message, activity = message?.activity;
-      let admissible = false;
-      if (message?.type === 'outbox' && activity && typeof activity === 'object') {
-        const sender = typeof activity.actor === 'string' ? activity.actor : activity.actor?.id;
-        const to = Array.isArray(activity.to) ? activity.to[0] : activity.to;
-        const recipient = typeof to === 'string' ? to : to?.id;
-        try { extractSenActivity(activity,{expectedActor:sender,expectedRecipient:recipient}); admissible = true; } catch { /* No fabricated current witness for an older semantic wire. */ }
-      }
-      if (!admissible) {
-        report.queue.originalOnly.push({name:path.basename(file),sha256:sha(bytes),reason:'pending-wire-not-admitted-by-current-transport'}); continue;
-      }
-      fs.mkdirSync(target,{recursive:true,mode:0o700});
-      const destination = path.join(target,path.basename(file));fs.writeFileSync(destination,bytes,{flag:'wx',mode:0o600});
-      if (!fs.readFileSync(destination).equals(bytes)) throw new TypeError('pending queue bytes changed during receiving');report.queue.retained++;
-    }
-    observe(queue);
-    for (const entry of fs.readdirSync(queue,{withFileTypes:true})) {
-      if (!entry.name.startsWith('ready.') && !entry.name.startsWith('claimed.')) continue;
-      if (!entry.isDirectory()) throw new TypeError('archived pending custody is not an ordinary directory');
-      const archive=path.join(queue,entry.name);observe(archive);
-      const count=fs.readdirSync(archive).length;
-      report.queue.archivedOriginalOnly += count;
-      report.queue[entry.name.startsWith('ready.')?'archivedReadyOriginalOnly':'archivedClaimedOriginalOnly'] += count;
-    }
+    const {receiveActivityPubQueue}=await import('./receive-native-activitypub.mjs');
+    report.suppliers.currentActivitypub=currentAp;
+    report.suppliers.currentQueueReader=sha(fs.readFileSync(path.join(currentAp,'src/flatfile-queue.mjs')));
+    report.queue=await receiveActivityPubQueue({queue:originalQueue,output,currentAp,observe});
   }
 }
 for (const [type, expected] of Object.entries(report.types)) {
@@ -245,6 +277,7 @@ for (const [type, expected] of Object.entries(report.types)) {
   for (const {head} of store.heads(output,type)) for (const step of store.walk(output,type,head.frontier,{limit:100000})) if(step.missing || step.truncated) throw new TypeError('native head receiving is incomplete');
 }
 for(const [file,original] of stamps) if(JSON.stringify(stamp(file)) !== JSON.stringify(original)) throw new TypeError('original custody changed during conversion; candidate is unqualified');
+if(args.activitypub)report.sourceFormat='witnessed-activitypub';
 report.qualified = report.missingBodies.length === 0 && report.mainQualified !== false
   && (report.queue.originalOnly?.length ?? 0) === 0
   && (report.queue.archivedOriginalOnly ?? 0) === 0;

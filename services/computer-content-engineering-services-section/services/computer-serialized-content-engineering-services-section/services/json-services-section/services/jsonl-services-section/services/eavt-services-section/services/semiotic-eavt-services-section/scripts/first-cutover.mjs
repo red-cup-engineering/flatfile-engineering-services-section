@@ -161,7 +161,9 @@ export async function prepare(plan, work) {
   for (const binding of plan.bindings) {
     for (const source of sourceRoots(binding)) if (!journal.sources.some(row => row.path === source)) journal.sources.push({path: source, digest: treeDigest(source)});
     const directory = path.join(work, binding.name); fs.mkdirSync(directory, {mode: 0o700});
-    const candidate = path.join(directory, 'candidate'), reportFile = path.join(directory, 'conversion.json');
+    let nativeActivitypub=false;
+    if(binding.conversion==='activitypub'){const {activityPubSourceFormat}=await import('./receive-native-activitypub.mjs');nativeActivitypub=activityPubSourceFormat({source:binding.source,sourceStoreRoot:oldStore,sourceActivitypubRoot:provider(plan.oldActivitypub)})==='native-activitypub-13bca0b8';}
+    const candidate = path.join(directory, binding.conversion==='activitypub'?'journal':'candidate'), reportFile = path.join(directory, 'conversion.json');
     let args, environment = {HOME: process.env.HOME, PATH: process.env.PATH, LANG: process.env.LANG};
     if (binding.conversion === 'kalshi') {
       const stage = path.join(directory, 'staging'); fs.mkdirSync(stage, {mode: 0o700}); environment.TMPDIR = stage;
@@ -188,6 +190,7 @@ export async function prepare(plan, work) {
     } else {
       assert.equal(report.type, 'OneTimeStoreConversion'); assert.equal(report.version, 1); assert.equal(report.qualified, true);
       assert.equal(report.source, binding.source); assert.equal(report.output, candidate); assert.equal(report.ordersExecuted, false); assert.equal(report.transportActivated, false);
+      if(binding.conversion==='activitypub')assert.equal(report.sourceFormat,nativeActivitypub?'native-activitypub-13bca0b8':'witnessed-activitypub');
       assert.equal(report.suppliers.oldStore, oldStore); assert.equal(report.suppliers.newStore, newStore); assert.deepEqual(report.missingBodies, []);
       // No unknown historical references gain authority during this cutover.
       assert.equal(report.referenceDispositions?.count ?? 0, 0, 'original reference disposition still needs its real consumer');

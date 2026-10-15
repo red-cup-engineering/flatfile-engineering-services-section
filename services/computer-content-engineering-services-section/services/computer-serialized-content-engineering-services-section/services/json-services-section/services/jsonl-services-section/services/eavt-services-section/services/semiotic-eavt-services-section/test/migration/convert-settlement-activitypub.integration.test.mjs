@@ -32,7 +32,8 @@ for(const scenario of ['accepted','unadmitted','archived','claimed-archived','em
  const at='2026-10-01T00:00:00Z',activity={id:'https://fixture.example/activities/1',type:'Create',actor:'https://fixture.example/actors/fixture',to:'https://recipient.example/actors/fixture',object:{type:'Note',content:'synthetic retained message'}};
  const body=Buffer.from(canonicalJson(activity)),ni=makeNiUri(body),originalBodies=createFileStoreSync(path.join(source,'bodies')),custody=createImmutableContentCustody({store:originalBodies}),bodyReference=await custody.put({ni,bytes:body,mediaType:'application/json'});
  const held=(category,record)=>recordSemanticRecord({root:source,objectKind:'activitypub.custody',category,record,recordedAt:at,told:{for:true,against:false}});
- held('inbox',{key:'fixture-inbox',activityId:activity.id,bodyReference,receipt:{type:'ActivityPubVerifiedArrivalReceipt',version:1,bodySha256:sha(body)}});
+ const receipt={type:'ActivityPubVerifiedArrivalReceipt',version:1,bodySha256:sha(body),recipient:'fixture'};
+ held('inbox',{key:sha(canonicalJson(receipt)),recipient:'fixture',bodyReference,receipt});
  held('outbox',{activityId:activity.id,bodyReference});held('followers',{actor:'https://follower.example/actor'});
  const queue=path.join(root,'original','queue'),spool=new FlatfileMessageQueue({directory:queue});
  const pending=projectSenActivity({type:'Create',origin:'https://fixture.example',identifier:'fixture',recipient:'https://recipient.example/actors/fixture',objectBytes:senActivityObjectBytes({objectKind:'fixture-message',value:{text:'preserve pending delivery'}}),agentCard:'https://fixture.example/agent-card.json',eventTime:at});
