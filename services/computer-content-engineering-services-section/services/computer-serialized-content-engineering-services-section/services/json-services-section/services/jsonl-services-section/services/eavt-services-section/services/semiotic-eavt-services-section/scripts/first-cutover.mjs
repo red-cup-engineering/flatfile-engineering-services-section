@@ -186,7 +186,9 @@ export async function prepare(plan, work, {resume=false}={}) {
     if(!reuse)fs.writeFileSync(path.join(directory, 'converter.stderr'), (result.stderr ?? '') + (result.error?.code ?? ''), {flag:'wx',mode:0o600});
     assert.equal(result.status, 0, 'existing owner converter refused; original trees are unchanged');
     let report = binding.conversion === 'kalshi' ? JSON.parse(result.stdout) : JSON.parse(fs.readFileSync(reportFile, 'utf8'));
-    if(reuse&&binding.conversion==='world'&&report.qualified===false){
+    // LAGOON runs one prepare, so a fresh conversion receives its original
+    // subject dispositions here too; the receiver refuses any other refusal class.
+    if(binding.conversion==='world'&&report.qualified===false){
       const {receiveOriginalDispositions}=await import('./receive-original-dispositions.mjs');
       report=await receiveOriginalDispositions({report,reportFile,binding,plan});
     }
