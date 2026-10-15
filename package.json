@@ -35,6 +35,7 @@
     "./semiotic-expression-notation": "./src/semiotic-expression-notation/notation.mjs",
     "./semiotic-expression-notation/typing": "./src/semiotic-expression-notation/typing.mjs",
     "./semiotic-expression-notation/json-codec": "./src/semiotic-expression-notation/json-codec.mjs",
+    "./semiotic-expression-notation/semantic-content-identity": "./src/semiotic-expression-notation/semantic-content-identity.mjs",
     "./tally": "./src/tally.mjs",
     "./number/exact-number": "./src/number/exact-number.mjs",
     "./number/exact-number-host": "./src/number/exact-number-host.mjs",
