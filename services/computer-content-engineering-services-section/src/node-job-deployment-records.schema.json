@@ -56,7 +56,7 @@
               },
               "artifact": {
                 "type": "string",
-                "pattern": "^(?:\\{release\\}|/gnu/store/[^/\\u0000]+)$"
+                "pattern": "^(?:\\{release\\}|/[^\\u0000]*)$"
               },
               "jobsDirectory": {
                 "type": "string",
