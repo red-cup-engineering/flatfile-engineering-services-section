@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/json-schema-services-section",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": false,
   "type": "module",
   "description": "Canonical Red Cup JSON Schema semantics: admission, bounded reference lookup, instance judgment, policy inspection, schema-assertion pointer cells, path-addressed reading, writing and searching, native-engine evaluation, and artifact census.",
