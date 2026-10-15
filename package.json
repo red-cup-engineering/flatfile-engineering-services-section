@@ -11,8 +11,6 @@
   "dependencies": {
     "@red-cup-engineering/cbor-services-section": "workspace:*",
     "@red-cup-engineering/computer-content-address-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/json-schema-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/uri-services-section": "workspace:*",
     "@red-cup-engineering/exact-number-data-service": "workspace:*"
@@ -23,13 +21,7 @@
     "./randomization/hash-seed": "./src/randomization/hash-seed.mjs",
     "./randomization/mulberry32": "./src/randomization/mulberry32.mjs",
     "./randomization/stream": "./src/randomization/stream.mjs",
-    "./type-system": "./src/type-system/type-system.mjs",
-    "./type-system/document": "./src/type-system/document.mjs",
-    "./type-system/schema-type": "./src/type-system/schema-type.mjs",
-    "./type-system/relations": "./src/type-system/relations.mjs",
-    "./type-system/thing": "./src/type-system/thing.mjs",
     "./operation-refusal-schema": "./src/operation-refusal-schema.mjs",
-    "./typed-operation-message": "./src/typed-operation-message.mjs",
     "./four": "./src/four.mjs",
     "./closure-regime": "./src/closure-regime.mjs",
     "./semiotic-expression-notation": "./src/semiotic-expression-notation/notation.mjs",
@@ -54,9 +46,6 @@
     "src"
   ],
   "scripts": {
-    "test": "node --test test/*.test.mjs test/type-system/*.test.mjs"
-  },
-  "devDependencies": {
-    "@red-cup-engineering/signcell": "workspace:*"
+    "test": "node --test test/*.test.mjs"
   }
 }
