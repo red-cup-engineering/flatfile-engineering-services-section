@@ -1,8 +1,0 @@
-{
-  "input": {
-    "type": ["object", "boolean"]
-  },
-  "output": {
-    "type": "array"
-  }
-}

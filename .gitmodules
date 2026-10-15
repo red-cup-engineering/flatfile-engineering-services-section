@@ -26,3 +26,7 @@
 	path = services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/computer-triplet-serialized-content-engineering-services-section
 	url = https://github.com/red-cup-engineering/computer-triplet-serialized-content-engineering-services-section.git
 	branch = main
+[submodule "json-services-section"]
+	path = services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section
+	url = https://github.com/red-cup-engineering/json-services-section.git
+	branch = main
