@@ -100,12 +100,15 @@ export function decodeCanonical(source) {
   let value;
   try {
     value = decodeNative(bytes, { maxDepth: Infinity, ignoreGlobalTags: true,
-      rejectStreaming: true, requirePreferred: true, rejectUndefined: true,
+      rejectStreaming: true, requirePreferred: true, rejectUndefined: true, preferBigInt: true,
       rejectSimple: true, createObject: textMap });
+    // Decode wire integers as BigInt before selecting the public scalar type.
+    // This preserves -2^53 as an integer without coercing actual wire floats.
     // The house carrier exposes byte strings as owned byte copies, including nested ones.
     const stack = [{ value, set: member => { value = member; } }];
     while (stack.length) {
       const item = stack.pop(), member = item.value;
+      if (typeof member === "bigint" && member >= -9007199254740991n && member <= 9007199254740991n) { item.set(Number(member)); continue; }
       if (member instanceof Uint8Array) { item.set(ownedBytes(member)); continue; }
       if (Array.isArray(member) || (member && Object.getPrototypeOf(member) === Object.prototype)) {
         for (const key of Object.keys(member)) stack.push({ value: member[key], set: child => Object.defineProperty(member, key, { value: child, enumerable: true, configurable: true, writable: true }) });
