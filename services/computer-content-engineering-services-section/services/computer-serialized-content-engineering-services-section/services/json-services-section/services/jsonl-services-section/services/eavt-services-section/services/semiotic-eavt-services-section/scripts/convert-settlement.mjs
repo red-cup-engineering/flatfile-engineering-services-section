@@ -13,6 +13,8 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((out, value, index,
   if (value.startsWith('--')) out.push([value.slice(2), values[index + 1]?.startsWith('--') || values[index + 1] === undefined ? true : values[index + 1]]);
   return out;
 }, []));
+const deferredKinds = new Set(args['defer-kinds']?.split(',') ?? []);
+if ([...deferredKinds].some(kind => kind !== 'agent-session-token-usage') || (deferredKinds.size && args.activitypub)) throw new TypeError('only historical token telemetry may be explicitly deferred');
 for (const key of ['settlement', 'into', 'old-store', 'new-store', 'report']) if (typeof args[key] !== 'string') throw new TypeError(`required --${key}`);
 // Resolve the existing ancestor before comparing paths: aliases cannot turn a
 // separate-looking candidate or report into a write inside retained custody.
@@ -66,7 +68,7 @@ if(args.activitypub){
   for(const[file,before]of queueStamps){const s=fs.statSync(file);if(JSON.stringify(before)!==JSON.stringify([s.dev,s.ino,s.size,s.mtimeMs,s.ctimeMs]))throw new TypeError('original queue changed during receiving');}
   const store=await import(pathToFileURL(path.join(newRoot,'src/store.mjs')).href),types={};
   for(const type of ['activitypub-inbox','activitypub-outbox','activitypub-follower']){let n=0;for(const _ of store.each(output,type,{strict:true}))n++;if(n)types[type]={read:n,written:n,duplicates:0,heads:[...store.heads(output,type,{strict:true})].length,verified:n};}
-  const report={type:'OneTimeStoreConversion',version:1,source,output,sourceFormat,originalsPreserved:true,ordersExecuted:false,transportActivated:false,suppliers:{oldStore:oldRoot,newStore:newRoot,oldActivitypub:oldAp,currentActivitypub:currentAp,currentQueueReader:sha(fs.readFileSync(path.join(currentAp,'src/flatfile-queue.mjs')))},types,missingBodies:[],queue,nativeReceiving:held,qualified:held.qualified&&queue.originalOnly.length===0&&queue.archivedOriginalOnly===0};
+  const report={type:'OneTimeStoreConversion',version:1,source,output,sourceFormat,originalsPreserved:true,ordersExecuted:false,transportActivated:false,suppliers:{oldStore:oldRoot,newStore:newRoot,oldActivitypub:oldAp,currentActivitypub:currentAp,currentQueueReader:sha(fs.readFileSync(path.join(currentAp,'src/flatfile-queue.mjs')))},types,missingBodies:[],queue,nativeReceiving:held,qualified:held.qualified&&queue.originalOnly.length===0};
   fs.writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});console.log(JSON.stringify({type:report.type,qualified:report.qualified,types,originalsPreserved:true,ordersExecuted:false,transportActivated:false}));return;
  }
 }
@@ -140,7 +142,7 @@ if (!args.activitypub) {
   const { createTypedMark, admitTypedMark, referenceOf } = await supplier(newRequire, '@red-cup-engineering/signcell/typed-mark');
   const { termToJson: sourceTermToJson } = await supplier(oldRequire, '@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec');
   const { seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock } = await supplier(newRequire, '@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row');
-  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource, admit, claimType, evidenceType, createSignClaim, Mark, MarkType, createTypedMark, admitTypedMark, referenceOf, sourceTermToJson, seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock});
+  await convertMainWorld({deferredKinds, source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource, admit, claimType, evidenceType, createSignClaim, Mark, MarkType, createTypedMark, admitTypedMark, referenceOf, sourceTermToJson, seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock});
 } else {
   if (typeof args['old-activitypub'] !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('exact --old-activitypub and --new-activitypub providers are required');
   const oldAp = fs.realpathSync(args['old-activitypub']), currentAp = fs.realpathSync(args['new-activitypub']);

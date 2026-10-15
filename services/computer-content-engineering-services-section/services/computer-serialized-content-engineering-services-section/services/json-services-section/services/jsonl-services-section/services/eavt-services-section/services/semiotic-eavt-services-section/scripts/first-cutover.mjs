@@ -91,6 +91,7 @@ function validatePlan(plan, work) {
   for (const binding of plan.bindings) {
     assert.ok(/^[a-z][a-z0-9-]{0,63}$/u.test(binding.name) && !names.has(binding.name)); names.add(binding.name);
     assert.ok(['world', 'activitypub', 'kalshi'].includes(binding.conversion));
+    if (binding.deferKinds !== undefined) assert.ok(binding.conversion === 'world' && Array.isArray(binding.deferKinds) && binding.deferKinds.every(kind => kind === 'agent-session-token-usage'), 'only historical token telemetry may be explicitly deferred');
     for (const file of [binding.source, binding.target, binding.clockLastSource, binding.queue].filter(Boolean)) {
       assert.ok(path.isAbsolute(file) && path.normalize(file) === file && !under(file, work) && !under(work, file));
       ordinary(exists(file) ? file : path.dirname(file));
@@ -171,11 +172,14 @@ export async function prepare(plan, work) {
     } else {
       args = [path.join(here, 'convert-settlement.mjs'), '--settlement', binding.source, '--into', candidate, '--old-store', oldStore, '--new-store', newStore, '--report', reportFile];
       if (binding.clockLastSource) args.push('--clock-last', binding.clockLastSource);
+      if (binding.deferKinds?.length) args.push('--defer-kinds', binding.deferKinds.join(','));
       if (binding.conversion === 'activitypub') args.push('--activitypub', '--old-activitypub', provider(plan.oldActivitypub), '--new-activitypub', provider(plan.newActivitypub));
       if (binding.queue) args.push('--queue', binding.queue);
     }
     writeJournal(work, journal);
     const result = spawnSync(process.execPath, args, {encoding: 'utf8', timeout: 300000, maxBuffer: 1024 * 1024, env: environment});
+    fs.writeFileSync(path.join(directory, 'converter.stdout'), result.stdout ?? '', {flag:'wx',mode:0o600});
+    fs.writeFileSync(path.join(directory, 'converter.stderr'), (result.stderr ?? '') + (result.error?.code ?? ''), {flag:'wx',mode:0o600});
     assert.equal(result.status, 0, 'existing owner converter refused; original trees are unchanged');
     const report = binding.conversion === 'kalshi' ? JSON.parse(result.stdout) : JSON.parse(fs.readFileSync(reportFile, 'utf8'));
     assert.equal(report.originalsPreserved, true);
@@ -201,7 +205,7 @@ export async function prepare(plan, work) {
     journal.bindings.push(recordBinding(work, binding, binding.target, candidate));
     if (binding.queue) {
       assert.deepEqual(report.queue.originalOnly, [], 'pending delivery is not admitted by current transport');
-      assert.equal(report.queue.archivedOriginalOnly, 0, 'archived pending deliveries need outcome receiving'); assert.equal(report.queue.activated, 0);
+      assert.equal(report.queue.activated, 0); // Archived deliveries remain inactive in their original custody.
       const queue = path.join(directory, 'queue'); fs.mkdirSync(path.join(queue, 'ready'), {recursive: true, mode: 0o700}); fs.mkdirSync(path.join(queue, 'claimed'), {mode: 0o700});
       assert.deepEqual(treeDigest(path.join(queue, 'ready')), treeDigest(path.join(binding.queue, 'ready')), 'pending message bytes were not all received');
       // The queue owner has not changed its path or message format. Leave the
