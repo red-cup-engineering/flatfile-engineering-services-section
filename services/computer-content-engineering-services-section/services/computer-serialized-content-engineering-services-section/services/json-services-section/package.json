@@ -16,7 +16,9 @@
       "types": "./scripts/canonical-json.d.mts",
       "import": "./scripts/canonical-json.mjs"
     },
-    "./types": { "types": "./src/json-value.d.mts" },
+    "./types": {
+      "types": "./src/json-value.d.mts"
+    },
     "./assert-canonical-json": "./scripts/assert-canonical-json.mjs",
     "./is-canonical-json": "./scripts/is-canonical-json.mjs",
     "./parse-json-value": "./scripts/parse-json-value.mjs",
@@ -47,8 +49,6 @@
     "./json-equality": "./scripts/json-equality.mjs",
     "./json-resource": "./scripts/json-resource.mjs",
     "./resolve-json-pointer": "./scripts/resolve-json-pointer.mjs",
-    "./cloudevent-identity": "./scripts/cloudevent-identity.mjs",
-    "./cloudevent-schema": "./scripts/cloudevent-schema.mjs",
     "./json-transformations": "./scripts/json-transformations.mjs",
     "./json-patch": "./scripts/json-patch.mjs"
   },
@@ -59,11 +59,6 @@
     "package.json",
     "schemas"
   ],
-  "dependencies": {
-    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/json-schema-services-section": "workspace:*",
-    "@red-cup-engineering/signcell": "workspace:*"
-  },
   "devDependencies": {},
   "scripts": {
     "test": "node --test test/*.test.mjs",
