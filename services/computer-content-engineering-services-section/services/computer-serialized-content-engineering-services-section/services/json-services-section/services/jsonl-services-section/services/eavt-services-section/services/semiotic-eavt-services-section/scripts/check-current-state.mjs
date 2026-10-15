@@ -11,6 +11,9 @@ import {fileURLToPath, pathToFileURL} from 'node:url';
 import * as store from '../src/store.mjs';
 import {checkRoot} from '../src/layout.mjs';
 import {semanticAddress} from '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address';
+import {MarkType} from '@red-cup-engineering/signcell/mark';
+import {admitTypedMark} from '@red-cup-engineering/signcell/typed-mark';
+import {getTypedMark} from '../src/typed-mark-store.mjs';
 
 function directory(root) {
   assert.ok(typeof root === 'string' && path.isAbsolute(root) && path.normalize(root) === root, 'absolute state root required');
@@ -25,11 +28,22 @@ function directory(root) {
 export function checkNativeTypes(root, types) {
   directory(root); checkRoot(root);
   assert.ok(Array.isArray(types) && types.length > 0 && types.length <= 32);
+  const typeSet = new Set(types);
+  if (typeSet.has('semantic-claim')) assert.ok(typeSet.has('typed-mark'), 'semantic-claim receiving requires its typed-mark endpoint collection');
   const counts = {};
   for (const type of types) {
     let records = 0, heads = 0;
     for (const {address, record} of store.each(root, type, {strict: true})) {
-      assert.equal(semanticAddress(record).id, address); assert.ok(store.get(root, type, address)); records++;
+      assert.equal(semanticAddress(record).id, address); assert.ok(store.get(root, type, address));
+      if (type === 'semantic-claim') {
+        for (const endpoint of [record.subject, record.object]) {
+          if (endpoint?.type === MarkType.id) {
+            const mark = getTypedMark(store, root, endpoint, MarkType, admitTypedMark);
+            assert.equal(mark.id, endpoint.id, 'semantic claim endpoint must resolve at its declared SignCell identity');
+          }
+        }
+      }
+      records++;
     }
     for (const {head} of store.heads(root, type, {strict: true})) {
       heads++;
