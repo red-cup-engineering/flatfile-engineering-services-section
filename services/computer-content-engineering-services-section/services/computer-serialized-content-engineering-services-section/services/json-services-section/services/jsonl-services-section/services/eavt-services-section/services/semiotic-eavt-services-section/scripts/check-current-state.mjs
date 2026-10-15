@@ -1,18 +1,13 @@
 #!/usr/bin/env node
-/** Read current state with this package's actual record/head laws.
- * No historical provider, conversion journal, service operation or write.
- * Usability is not proof of a historical transfer: the first-cutover caller
- * must separately establish that transition from the actual old binding.
+/** Read current state through its actual selected Data and SignCell receivers.
+ * This script may be pinned beside a reviewed cutover source while those
+ * runtime packages remain the current release inputs. It never writes state.
  */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import {createRequire} from 'node:module';
 import {fileURLToPath, pathToFileURL} from 'node:url';
-import * as store from '../src/store.mjs';
-import {checkRoot} from '../src/layout.mjs';
-import {semanticAddress} from '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address';
-import {MarkType} from '@red-cup-engineering/signcell/mark';
-import {admitTypedMark} from '@red-cup-engineering/signcell/typed-mark';
 import {getTypedMark} from '../src/typed-mark-store.mjs';
 
 function directory(root) {
@@ -24,30 +19,47 @@ function directory(root) {
   const stat = fs.lstatSync(root);
   assert.ok(stat.isDirectory() && stat.uid === process.getuid(), 'current state root is absent or not owned');
 }
+async function currentReceiver(newStore) {
+  assert.ok(typeof newStore === 'string' && path.isAbsolute(newStore), 'current Data package root required');
+  const require = createRequire(path.join(newStore, 'package.json'));
+  const moduleOf = name => import(pathToFileURL(require.resolve(name)).href);
+  const [store, layout, address, signcellMark, signcellTypedMark] = await Promise.all([
+    import(pathToFileURL(path.join(newStore, 'src/store.mjs')).href),
+    import(pathToFileURL(path.join(newStore, 'src/layout.mjs')).href),
+    moduleOf('@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address'),
+    moduleOf('@red-cup-engineering/signcell/mark'),
+    moduleOf('@red-cup-engineering/signcell/typed-mark'),
+  ]);
+  return {store, checkRoot: layout.checkRoot, semanticAddress: address.semanticAddress,
+    MarkType: signcellMark.MarkType, admitTypedMark: signcellTypedMark.admitTypedMark};
+}
 /** Native strict discovery must be fully exhausted; a good prefix is insufficient. */
-export function checkNativeTypes(root, types) {
-  directory(root); checkRoot(root);
+export async function checkNativeTypes(root, types, newStore) {
+  directory(root);
+  const receiver = await currentReceiver(newStore);
+  receiver.checkRoot(root);
   assert.ok(Array.isArray(types) && types.length > 0 && types.length <= 32);
   const typeSet = new Set(types);
   if (typeSet.has('semantic-claim')) assert.ok(typeSet.has('typed-mark'), 'semantic-claim receiving requires its typed-mark endpoint collection');
   const counts = {};
   for (const type of types) {
     let records = 0, heads = 0;
-    for (const {address, record} of store.each(root, type, {strict: true})) {
-      assert.equal(semanticAddress(record).id, address); assert.ok(store.get(root, type, address));
+    for (const {address, record} of receiver.store.each(root, type, {strict: true})) {
+      assert.equal(receiver.semanticAddress(record).id, address);
+      assert.ok(receiver.store.get(root, type, address));
       if (type === 'semantic-claim') {
         for (const endpoint of [record.subject, record.object]) {
-          if (endpoint?.type === MarkType.id) {
-            const mark = getTypedMark(store, root, endpoint, MarkType, admitTypedMark);
+          if (endpoint?.type === receiver.MarkType.id) {
+            const mark = getTypedMark(receiver.store, root, endpoint, receiver.MarkType, receiver.admitTypedMark);
             assert.equal(mark.id, endpoint.id, 'semantic claim endpoint must resolve at its declared SignCell identity');
           }
         }
       }
       records++;
     }
-    for (const {head} of store.heads(root, type, {strict: true})) {
+    for (const {head} of receiver.store.heads(root, type, {strict: true})) {
       heads++;
-      for (const step of store.walk(root, type, head.frontier, {limit: 100000})) assert.ok(!step.missing && !step.truncated, 'current causal state is incomplete');
+      for (const step of receiver.store.walk(root, type, head.frontier, {limit: 100000})) assert.ok(!step.missing && !step.truncated, 'current causal state is incomplete');
     }
     // Empty types and absent heads are lawful native states. In particular an
     // ActivityPub actor may have no followers, inbox or outbox history. These
@@ -61,7 +73,7 @@ export async function checkCurrentState(plan) {
   assert.ok(Array.isArray(plan.bindings) && plan.bindings.length > 0 && plan.bindings.length <= 16);
   const bindings = [];
   for (const binding of plan.bindings) {
-    directory(binding.target); checkRoot(binding.target);
+    directory(binding.target);
     if (binding.conversion === 'kalshi') {
       // Read the real desk owner's current path. No client/credential/order API.
       assert.ok(typeof plan.currentKalshi === 'string' && path.isAbsolute(plan.currentKalshi));
@@ -80,7 +92,7 @@ export async function checkCurrentState(plan) {
       bindings.push({name: binding.name, armingPresent: true});
     } else {
       assert.ok(['world', 'activitypub'].includes(binding.conversion));
-      bindings.push({name: binding.name, types: checkNativeTypes(binding.target, binding.types)});
+      bindings.push({name: binding.name, types: await checkNativeTypes(binding.target, binding.types, plan.newStore)});
     }
   }
   return {currentStateUsable: true, historicalTransferProven: false, bindings};
