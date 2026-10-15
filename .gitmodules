@@ -1,7 +1,3 @@
-[submodule "filesystem-custody-services-section-legacy"]
-	path = services/computer-file-engineering-services-section/services/filesystem-custody-services-section/services/filesystem-custody-services-section-legacy
-	url = https://github.com/red-cup-engineering/filesystem-custody-services-section-legacy.git
-	branch = main
 [submodule "computer-content-address-engineering-services-section"]
 	path = services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section
 	url = https://github.com/red-cup-engineering/computer-content-address-engineering-services-section.git
