@@ -22,3 +22,7 @@
 	path = services/computer-content-engineering-services-section/services/computer-text-content-engineering-services-section
 	url = https://github.com/red-cup-engineering/computer-text-content-engineering-services-section.git
 	branch = main
+[submodule "computer-file-engineering-services-section"]
+	path = services/computer-file-engineering-services-section
+	url = https://github.com/red-cup-engineering/computer-file-engineering-services-section.git
+	branch = main
