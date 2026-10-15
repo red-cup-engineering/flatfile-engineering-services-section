@@ -2,7 +2,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { repairYamlPlainScalars } from "@red-cup-engineering/yaml-frontmatter-codec-service";
-import { splitMarkdownFrontmatterFence } from "@red-cup-engineering/markdown-engineering-services-section/split-markdown-frontmatter-fence";
+import { splitMarkdownFrontmatterFence } from "@red-cup-engineering/split-markdown-frontmatter-fence-service";
 import { observeMarkdownVaultDirectory } from "@red-cup-engineering/markdown-engineering-services-section/observe-markdown-vault-directory";
 import { readFlagValue } from "@red-cup-engineering/computer-text-content-engineering-services-section/read-flag-token-values";
 

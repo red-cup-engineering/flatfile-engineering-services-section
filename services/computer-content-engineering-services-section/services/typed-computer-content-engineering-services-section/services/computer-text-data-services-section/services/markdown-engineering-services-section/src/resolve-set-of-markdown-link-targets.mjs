@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 
 import { observeMarkdownVaultDirectory } from "./observe-markdown-vault-directory.mjs";
-import { projectMarkdownFeatures } from "./read-markdown-features.mjs";
-import { readMarkdownSource } from "./read-markdown-structure.mjs";
+import { projectMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
+import { readMarkdownSource } from "@red-cup-engineering/read-markdown-structure-service";
 import { readMarkdownFile } from "./read-markdown-file.mjs";
 
 import { resolveMarkdownLinkTarget } from "./resolve-markdown-link-target.mjs";

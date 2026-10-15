@@ -2,8 +2,8 @@
 
 import { basename, extname } from "node:path";
 import { readMarkdownFile } from "./read-markdown-file.mjs";
-import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
-import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fence.mjs";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
+import { splitMarkdownFrontmatterFence } from "@red-cup-engineering/split-markdown-frontmatter-fence-service";
 import { dumpMarkdownFrontmatter } from "./dump-markdown-frontmatter.mjs";
 import { encodeToml } from "@red-cup-engineering/toml-file-codec-service";
 import { mutateYamlTopLevelMapping } from "@red-cup-engineering/yaml-frontmatter-codec-service";

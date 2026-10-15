@@ -1,4 +1,4 @@
-import { readMarkdownSource, projectMarkdownStructure } from "./read-markdown-structure.mjs";
+import { readMarkdownSource, projectMarkdownStructure } from "@red-cup-engineering/read-markdown-structure-service";
 function split(text) { const trailing = text.endsWith("\n"); const lines = text.split("\n"); if (trailing) lines.pop(); return { lines, trailing }; }
 function join(lines, trailing) { return `${lines.join("\n")}${trailing ? "\n" : ""}`; }
 function bounds(body, heading, level) {

@@ -1,0 +1,17 @@
+{
+  "name": "@red-cup-engineering/read-markdown-features-service",
+  "version": "0.2.0",
+  "type": "module",
+  "private": false,
+  "description": "Project links, references, citations and other features from one source-preserving Markdown reading.",
+  "exports": "./src/read-markdown-features.mjs",
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@red-cup-engineering/read-markdown-structure-service": "0.2.0"
+  }
+}

@@ -5,8 +5,8 @@ import { deleteYamlNestedKey } from "@red-cup-engineering/yaml-frontmatter-codec
 
 import { mutateMarkdownFrontmatter } from "./mutate-markdown-frontmatter.mjs";
 import { readMarkdownFile } from "./read-markdown-file.mjs";
-import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
-import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fence.mjs";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
+import { splitMarkdownFrontmatterFence } from "@red-cup-engineering/split-markdown-frontmatter-fence-service";
 
 function keyPath(value, name) {
   if (!Array.isArray(value) || value.length === 0 || value.some((key) => typeof key !== "string" || key.length === 0)) {

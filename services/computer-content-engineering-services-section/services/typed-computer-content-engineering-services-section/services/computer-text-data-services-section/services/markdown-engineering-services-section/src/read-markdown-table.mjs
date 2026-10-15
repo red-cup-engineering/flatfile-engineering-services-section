@@ -1,4 +1,4 @@
-import { readMarkdownSource, projectMarkdownStructure } from "./read-markdown-structure.mjs";
+import { readMarkdownSource, projectMarkdownStructure } from "@red-cup-engineering/read-markdown-structure-service";
 
 const SEPARATOR_CELL = /^:?-{1,}:?$/u;
 

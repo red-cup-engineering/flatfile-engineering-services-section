@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { splitMarkdownFrontmatterFence as split } from "../src/split-markdown-frontmatter-fence.mjs";
+import { splitMarkdownFrontmatterFence as split } from "@red-cup-engineering/split-markdown-frontmatter-fence-service";
 
 test("splits exact leading fences without changing body bytes", () => {
   assert.deepEqual(split("\uFEFF---\r\ntitle: Example\r\n---\r\nBody\r\n"), {format:"yaml",raw:"title: Example",body:"Body\r\n",source:{rawStart:6,rawEnd:22,bodyStart:27}});

@@ -1,8 +1,8 @@
 import { projectMarkdownAssertions } from "./project-markdown-assertions.mjs";
-import { projectMarkdownFeatures } from "./read-markdown-features.mjs";
-import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
-import { readMarkdownSource, projectMarkdownStructure } from "./read-markdown-structure.mjs";
-import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fence.mjs";
+import { projectMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
+import { readMarkdownSource, projectMarkdownStructure } from "@red-cup-engineering/read-markdown-structure-service";
+import { splitMarkdownFrontmatterFence } from "@red-cup-engineering/split-markdown-frontmatter-fence-service";
 
 /** Read source once into the document used by editing, catalogues and projections.
  * Feature coordinates are relative to the LF-normalized body; heading lines

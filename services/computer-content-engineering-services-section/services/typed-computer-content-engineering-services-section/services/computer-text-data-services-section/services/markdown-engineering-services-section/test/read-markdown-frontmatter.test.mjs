@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { readMarkdownFrontmatter } from "../src/read-markdown-frontmatter.mjs";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
 
 test("reads YAML frontmatter and preserves the Markdown body", () => {
   const result = readMarkdownFrontmatter("---\ntitle: Example\ndate-created: 2026-03-04\n---\nBody.\n");

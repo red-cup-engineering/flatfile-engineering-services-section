@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { basename, dirname, extname, join, resolve } from "node:path";
 import { confineExistingPath } from "@red-cup-engineering/computer-filepath-engineering-services-section/filepath";
-import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
 
 /** @deprecated Relation authority now comes only from scoped glossary-term filenames. */
 export const DEFAULT_MARKDOWN_VAULT_RELATION_KEYS = Object.freeze({});

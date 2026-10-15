@@ -1,5 +1,5 @@
 import { readMarkdownFile } from "./read-markdown-file.mjs";
-import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
 import { enumerateMarkdownPaths } from "./observe-markdown-vaults.mjs";
 
 const DEFAULT_EXCLUDES = Object.freeze([".git", "node_modules"]);

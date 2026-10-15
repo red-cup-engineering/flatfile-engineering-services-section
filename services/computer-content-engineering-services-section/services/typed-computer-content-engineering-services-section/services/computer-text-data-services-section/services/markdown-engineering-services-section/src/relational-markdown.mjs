@@ -9,7 +9,7 @@
 import { escapeHtml } from '@red-cup-engineering/html-structural-projection-service/string-rendering';
 import { headingSlug } from '@red-cup-engineering/computer-text-content-engineering-services-section/slugify-text';
 import { parseCitationItems, formatCitationLabel, formatReferenceEntry } from '@red-cup-engineering/csl-json-services-section/record-formatting';
-import { readMarkdownFrontmatter } from './read-markdown-frontmatter.mjs';
+import { readMarkdownFrontmatter } from '@red-cup-engineering/read-markdown-frontmatter-service';
 import { niUriContentType, niUriName, niWellKnownPath } from '@red-cup-engineering/uri-services-section/ni-uri';
 import { extensionType } from '@red-cup-engineering/computer-serialized-content-engineering-services-section/services/http-data-services-section/src/media-type';
 

@@ -1,4 +1,4 @@
-import { readMarkdownStructure } from "@red-cup-engineering/markdown-engineering-services-section/read-markdown-structure";
+import { readMarkdownStructure } from "@red-cup-engineering/read-markdown-structure-service";
 import { BADGE_KINDS } from "../../convention.mjs";
 import { makeDiagnostic } from "./diagnostic.mjs";
 

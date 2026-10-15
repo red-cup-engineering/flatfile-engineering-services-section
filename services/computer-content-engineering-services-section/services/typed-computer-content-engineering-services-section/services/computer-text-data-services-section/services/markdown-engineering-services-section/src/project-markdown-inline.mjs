@@ -1,6 +1,6 @@
-import { readMarkdownSource } from "./read-markdown-structure.mjs";
+import { readMarkdownSource } from "@red-cup-engineering/read-markdown-structure-service";
 import { admitMarkdownLinkTarget } from "./admit-markdown-link-target.mjs";
-import { projectMarkdownFeatures } from "./read-markdown-features.mjs";
+import { projectMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
 
 function bounded(text, delimiter, start) {
   const close = text.indexOf(delimiter, start + delimiter.length);

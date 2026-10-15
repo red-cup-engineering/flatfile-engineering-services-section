@@ -1,10 +1,10 @@
 import { normalizeLinefeeds } from "@red-cup-engineering/computer-text-content-engineering-services-section/normalize-linefeeds";
 import { applyMarkdownEdit, markdownEditRequestKind } from "./apply-markdown-edit.mjs";
 import { readMarkdownDocument } from "./read-markdown-document.mjs";
-import { readMarkdownFeatures } from "./read-markdown-features.mjs";
-import { readMarkdownStructure } from "./read-markdown-structure.mjs";
+import { readMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
+import { readMarkdownStructure } from "@red-cup-engineering/read-markdown-structure-service";
 import { renderMarkdownBlockHtml } from "./render-markdown-block-html.mjs";
-import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fence.mjs";
+import { splitMarkdownFrontmatterFence } from "@red-cup-engineering/split-markdown-frontmatter-fence-service";
 import { validateMarkdownDocument } from "./validate-markdown-document.mjs";
 
 export const markdownWorkbenchKind = "red-cup-engineering.markdown.workbench";

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { observeMarkdownVaultDirectory } from "./observe-markdown-vault-directory.mjs";
 import { readMarkdownFile } from "./read-markdown-file.mjs";
-import { projectMarkdownFeatures } from "./read-markdown-features.mjs";
-import { readMarkdownSource } from "./read-markdown-structure.mjs";
+import { projectMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
+import { readMarkdownSource } from "@red-cup-engineering/read-markdown-structure-service";
 import { deriveMarkdownVaultGraph } from "./derive-markdown-vault-graph.mjs";
 import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";

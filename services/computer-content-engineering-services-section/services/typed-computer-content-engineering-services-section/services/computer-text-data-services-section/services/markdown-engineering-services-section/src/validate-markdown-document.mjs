@@ -1,7 +1,7 @@
-import { readMarkdownSource, projectMarkdownStructure } from "./read-markdown-structure.mjs";
-import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
+import { readMarkdownSource, projectMarkdownStructure } from "@red-cup-engineering/read-markdown-structure-service";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
 import { normalizeLinefeeds } from "@red-cup-engineering/computer-text-content-engineering-services-section/normalize-linefeeds";
-import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fence.mjs";
+import { splitMarkdownFrontmatterFence } from "@red-cup-engineering/split-markdown-frontmatter-fence-service";
 
 function finding(rule, severity, message, extra = {}) { return Object.freeze({ rule, severity, message, ...extra }); }
 function forbiddenKeyFindings(value, forbidden, path = "") {

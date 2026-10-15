@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readMarkdownStructure, readMarkdownSource } from "../src/read-markdown-structure.mjs";
+import { readMarkdownStructure, readMarkdownSource } from "@red-cup-engineering/read-markdown-structure-service";
 
 test("source offsets and heading section ranges remain aligned after BOM and CRLF frontmatter", () => {
   const text = "\uFEFF---\r\ntitle: Example\r\n---\r\n# Parent\r\nbody\r\n## Child\r\nchild\r\n# Sibling\r\nend\r\n";
@@ -50,7 +50,7 @@ test("rendering and navigation use the same headings and fenced spans", async ()
 
 
 test("whole-carrier feature projection excludes metadata while preserving source offsets", async () => {
-  const { projectMarkdownFeatures, readMarkdownFeatures } = await import("../src/read-markdown-features.mjs");
+  const { projectMarkdownFeatures, readMarkdownFeatures } = await import("@red-cup-engineering/read-markdown-features-service");
   const { replaceMarkdownLinkTarget } = await import("../src/replace-markdown-link-target.mjs");
   const text = '\uFEFF---\r\nexample: "[metadata](old.md)"\r\n---\r\n[body](old.md)\r\n';
   const source = readMarkdownSource(text);

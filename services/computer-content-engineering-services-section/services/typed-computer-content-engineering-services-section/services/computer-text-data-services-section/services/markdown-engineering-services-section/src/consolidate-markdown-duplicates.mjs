@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { posix } from "node:path";
-import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
-import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fence.mjs";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
+import { splitMarkdownFrontmatterFence } from "@red-cup-engineering/split-markdown-frontmatter-fence-service";
 import { relativeLinkPath } from "./relocate-markdown-tree.mjs";
 import { mutateMarkdownFrontmatter } from "./mutate-markdown-frontmatter.mjs";
 import { applyMarkdownLinkEdits } from "./apply-markdown-tree-relocation.mjs";

@@ -4,7 +4,7 @@
  * control room metadata and archival admission.
  */
 import { readFileSync } from 'node:fs';
-import { readMarkdownFeatures } from '../../read-markdown-features.mjs';
+import { readMarkdownFeatures } from '@red-cup-engineering/read-markdown-features-service';
 import { sep } from 'node:path';
 import { walkFiles } from '../walk.mjs';
 import { parseFrontmatter, asList } from '../frontmatter.mjs';

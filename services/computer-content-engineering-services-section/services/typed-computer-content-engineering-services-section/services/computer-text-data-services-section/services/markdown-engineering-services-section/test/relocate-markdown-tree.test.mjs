@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { deriveMarkdownVaultGraph } from "@red-cup-engineering/markdown-engineering-services-section/derive-markdown-vault-graph";
-import { readMarkdownFeatures } from "@red-cup-engineering/markdown-engineering-services-section/read-markdown-features";
+import { readMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
 import {
   countBoundaryBrokenLinks,
   planMarkdownTreeRelocation,

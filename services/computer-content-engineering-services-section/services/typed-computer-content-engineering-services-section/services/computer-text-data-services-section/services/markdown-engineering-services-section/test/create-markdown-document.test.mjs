@@ -30,7 +30,7 @@ test("omits nullish metadata but preserves an explicit empty array", () => {
   assert.doesNotMatch(document, /absent/);
 });
 
-import { readMarkdownFrontmatter } from "../src/read-markdown-frontmatter.mjs";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
 import { markdownProjector } from "../src/markdown-projector.mjs";
 
 for (const value of ["authored", { retained: "authored" }]) test(`retains an own __proto__ ${typeof value} field without changing prototypes`, () => {

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { dumpMarkdownFrontmatter } from "../src/dump-markdown-frontmatter.mjs";
-import { readMarkdownFrontmatter } from "../src/read-markdown-frontmatter.mjs";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
 
 test("dumps a YAML fence that reads back to the same frontmatter and body", () => {
   const frontmatter = { title: "Example", tags: ["a", "b"], "date-created": "2026-03-04" };

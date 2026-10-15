@@ -1,0 +1,17 @@
+{
+  "name": "@red-cup-engineering/read-markdown-structure-service",
+  "version": "0.2.0",
+  "type": "module",
+  "private": false,
+  "description": "Read source positions, code ranges and heading structure from one Markdown source.",
+  "exports": "./src/read-markdown-structure.mjs",
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@red-cup-engineering/split-markdown-frontmatter-fence-service": "0.2.0"
+  }
+}

@@ -1,4 +1,4 @@
-import { readMarkdownFeatures } from "@red-cup-engineering/markdown-engineering-services-section/read-markdown-features";
+import { readMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
 import { classify } from "./link-kind.mjs";
 
 function lineAt(text, offset) {

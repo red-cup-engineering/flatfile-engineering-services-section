@@ -11,7 +11,7 @@
  * schema) and both list styles (`teaches: [ko fighting]` and block `- item` sequences).
  * Nested maps (`references`, `relations`) are then carried through whole beside that projection.
  */
-import { readMarkdownFrontmatter } from '../read-markdown-frontmatter.mjs';
+import { readMarkdownFrontmatter } from '@red-cup-engineering/read-markdown-frontmatter-service';
 
 /**
  * Parse a markdown file's leading `---`-delimited frontmatter block plus the remaining body.

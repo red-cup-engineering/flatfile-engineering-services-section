@@ -4,7 +4,7 @@ import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { derive, render, repairNoteFrontmatter } from '../scripts/migrate-notes.mjs';
-import { readMarkdownFrontmatter } from '@red-cup-engineering/markdown-engineering-services-section/read-markdown-frontmatter';
+import { readMarkdownFrontmatter } from '@red-cup-engineering/read-markdown-frontmatter-service';
 
 test('migration repairs a glued fence explicitly without changing body bytes', () => {
   const source = '---\r\ntitle: "false"---\r\n\r\nBody  \r\n';

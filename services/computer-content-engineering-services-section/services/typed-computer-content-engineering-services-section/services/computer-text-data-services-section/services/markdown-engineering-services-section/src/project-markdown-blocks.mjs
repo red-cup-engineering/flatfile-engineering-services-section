@@ -1,4 +1,4 @@
-import { readMarkdownSource, projectMarkdownStructure } from "./read-markdown-structure.mjs";
+import { readMarkdownSource, projectMarkdownStructure } from "@red-cup-engineering/read-markdown-structure-service";
 import { projectMarkdownTables } from "./read-markdown-table.mjs";
 
 function thematicBreak(line) { return /^ {0,3}((?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,})$/u.test(line); }

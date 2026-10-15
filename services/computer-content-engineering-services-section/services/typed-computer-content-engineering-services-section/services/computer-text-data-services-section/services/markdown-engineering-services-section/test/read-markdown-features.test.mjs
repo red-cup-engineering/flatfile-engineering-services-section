@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readMarkdownFeatures } from "../src/read-markdown-features.mjs";
-import { readMarkdownStructure } from "@red-cup-engineering/markdown-engineering-services-section/read-markdown-structure";
+import { readMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
+import { readMarkdownStructure } from "@red-cup-engineering/read-markdown-structure-service";
 
 test("headings and relations share complete frontmatter and code boundaries", () => {
   const source = [

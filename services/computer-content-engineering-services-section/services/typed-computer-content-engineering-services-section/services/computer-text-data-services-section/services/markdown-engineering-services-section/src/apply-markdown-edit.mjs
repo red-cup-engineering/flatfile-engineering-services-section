@@ -1,6 +1,6 @@
 import { mutateMarkdownFrontmatter } from "./mutate-markdown-frontmatter.mjs";
 import { normalizeMarkdownDocument } from "./normalize-markdown-document.mjs";
-import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
 import { replaceMarkdownLines } from "./replace-markdown-lines.mjs";
 import { replaceMarkdownSection } from "./replace-markdown-section.mjs";
 import { replaceMarkdownText } from "./replace-markdown-text.mjs";

@@ -1,4 +1,4 @@
-import { splitMarkdownFrontmatterFence } from "./split-markdown-frontmatter-fence.mjs";
+import { splitMarkdownFrontmatterFence } from "@red-cup-engineering/split-markdown-frontmatter-fence-service";
 
 function linesOf(text) {
   const normalized = text.replace(/\r\n?/gu, "\n");

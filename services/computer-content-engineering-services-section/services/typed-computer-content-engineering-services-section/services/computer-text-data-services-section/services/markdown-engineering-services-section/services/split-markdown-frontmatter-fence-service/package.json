@@ -1,0 +1,14 @@
+{
+  "name": "@red-cup-engineering/split-markdown-frontmatter-fence-service",
+  "version": "0.2.0",
+  "type": "module",
+  "private": false,
+  "description": "Split a complete leading YAML or TOML fence while preserving source bytes and offsets.",
+  "exports": "./src/split-markdown-frontmatter-fence.mjs",
+  "files": [
+    "src"
+  ],
+  "engines": {
+    "node": ">=22"
+  }
+}

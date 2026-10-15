@@ -1,5 +1,5 @@
-import { projectMarkdownFeatures } from "./read-markdown-features.mjs";
-import { readMarkdownSource } from "./read-markdown-structure.mjs";
+import { projectMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
+import { readMarkdownSource } from "@red-cup-engineering/read-markdown-structure-service";
 
 const LINK_TYPES = new Set(["markdown-link", "wikilink", "transclusion"]);
 

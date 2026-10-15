@@ -1,4 +1,4 @@
-import { readMarkdownSource } from "./read-markdown-structure.mjs";
+import { readMarkdownSource } from "@red-cup-engineering/read-markdown-structure-service";
 
 const wikilink = /(?<!\\)(!?)\[\[([^\]\n]+?)\]\]/dgu;
 const inlineField = /(?<!\\)(\[|\()([^\]\)\n]+?)::[ \t]*([^\]\)\n]+?)(\]|\))/gu;

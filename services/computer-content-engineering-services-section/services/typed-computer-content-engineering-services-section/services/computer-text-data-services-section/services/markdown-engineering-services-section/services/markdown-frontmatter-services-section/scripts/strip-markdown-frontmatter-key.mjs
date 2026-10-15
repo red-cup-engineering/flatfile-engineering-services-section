@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 
 
 
-import { readMarkdownFrontmatter } from "@red-cup-engineering/markdown-engineering-services-section/read-markdown-frontmatter";
+import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
 import { mutateMarkdownFrontmatter } from "@red-cup-engineering/markdown-engineering-services-section/mutate-markdown-frontmatter";
 import { writeFileText } from "@red-cup-engineering/computer-file-engineering-services-section/write-file";
 
