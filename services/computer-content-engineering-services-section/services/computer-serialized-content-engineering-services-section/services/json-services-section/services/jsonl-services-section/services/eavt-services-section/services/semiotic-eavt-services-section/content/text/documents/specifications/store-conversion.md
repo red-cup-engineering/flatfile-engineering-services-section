@@ -73,20 +73,20 @@ Counts and sizes are those of the laptop's copy of the Bare Cedar Fog store, 202
 
 | earlier kind | size | becomes | thread and head |
 |---|---|---|---|
-| `structured-work-intent-<id>-logs` (826 directories) and `actor-<ni>-logs` | 341 MB | records of type `claim-session`: one per distinct row (claim-session rows, withdrawals, declarations) | the thread is the writer's subject (`structured-work-intent-<slug>`); head `data/state/claim-session-state/<subject>.json` with the frontier of the thread's maximal records; a thread whose last record is a withdrawal gets `closed: true`. Plus a log line `{at, thread, of}` per record in `claim-session-logs/<date>.jsonl`, for the dispatch readout that reads the ledger by date. |
+| `structured-work-intent-<id>-logs` (826 directories) and `actor-<ni>-logs` | 341 MB | records of type `claim-session`: one per distinct row (claim-session rows, withdrawals, declarations), with an additional Metrologic claim/evidence and SignCell projection retaining the original told sides and provenance | the thread is the writer's subject (`structured-work-intent-<slug>`); head `data/state/claim-session-state/<subject>.json` with the frontier of the thread's maximal records; a thread whose last record is a withdrawal gets `closed: true`. Plus a log line `{at, thread, of}` per record in `claim-session-logs/<date>.jsonl`, for the dispatch readout that reads the ledger by date. |
 | `work-arena-move-logs` | 83 MB | records of type `work-arena-move`: the move, with `thread`, `edition` and `serves` references rewritten | the thread is the arena thread, named by the new address of its opening move; head `work-arena-move-state/<digest>.json` |
 | `work-outcome-logs` | 17 MB | records of type `work-outcome`; each record's `told` carries the judgment's charge | none; log `work-outcome-logs/<date>.jsonl` lines `{at, of, verdict}` for reads by judged period |
 | `office-incumbency-logs` | 0.1 MB | records of type `office-incumbency`: the claim row | thread is the row's `e` (`office:<office>:recognition:<actor>`); head `office-incumbency-state/<e>.json` |
-| `capability-assertions-logs` | 7 MB | records of type `capability-assertion`: the row | thread is the row's `e` (`capability:<holder>:<grant>`); head `capability-assertion-state/<e>.json` |
+| `capability-assertions-logs` | 7 MB | original source evidence and, only where the EAVT coordinates define a proposition, a Metrologic claim and SignCell projection | source entity/value use content-addressed SignCell `Mark` identities, persisted as their `{kind,type,content}` identity basis in the lowercase `typed-mark` store collection. References retain the SignCell-declared type; the typed-mark collection adapter resolves by address, checks the declared type, reconstructs the `id`, and re-admits against the current type declaration. The exact original `a` term is the predicate. The old assertion and its telling remain epistemic source material; it never enters the current capability-authority thread |
 | `encounter-logs` (and the 67 per-run feeds already filed into it) | 2 MB | records of type `encounter-result`: opened, finished and failed rows | thread is the run (`run.id`); head `encounter-result-state/<digest>.json` |
 | `enterprise-logs` | 0.1 MB | records of types `enterprise-contact`, `enterprise-order`, `enterprise-party`, `enterprise-resource`, `enterprise-cost`, `enterprise-settlement`, `enterprise-signature`, `enterprise-bid`, `enterprise-control`, one per category | none |
 | `character-inbox-logs`, `body-records-logs` | 0.6 MB | records of types `character-inbox-message`, `body-mail` | thread is the character; head `character-inbox-state/<character>.json` |
-| `knowing.claims-logs` | 19 MB | records of type `claim`, with `told` | none |
+| `knowing.claims-logs` | 19 MB | source evidence and, for admitted propositions, a Metrologic claim and SignCell projection | admitted propositions retain their typed subject/object references and predicate. EAVT rows use SignCell `Mark` identities for `e` and `v`, persisted as their `{kind,type,content}` identity basis in the lowercase `typed-mark` store collection. References retain the SignCell-declared type; the typed-mark collection adapter resolves by address, checks the declared type, reconstructs the `id`, and re-admits against the current type declaration. Preserve `termToJson(a)` as the exact predicate. Evidence remains separate from the proposition; its source telling supplies independent `for` and `against` witnesses. An expression without admitted proposition coordinates remains evidence with its original telling and is not assigned a fabricated relation. |
 | `anchored-findings-logs` | 3.4 MB | records of type `anchored-finding` | thread is the finding subject; head `anchored-finding-state/<name>.json` |
 | `codex-tasks-logs` | 5.9 MB | records of type `codex-task` | thread is the task id; head `codex-task-state/<id>.json` |
 | `lean-checks-logs` | 1 MB | records of type `lean-check` | thread is the check id; head `lean-check-state/<id>.json` |
 | `inference-receiving-attempt-logs` | 0.1 MB | records of type `inference-receiving-attempt` | none |
-| `metroplat.clock.schedule-logs` | 23 MB | records of type `clock-schedule`: each distinct definition, caused by the one it replaced | thread is the schedule id; head `clock-schedule-state/<schedule>.json` |
+| `metroplat.clock.schedule-logs` | 23 MB | records of type `clock-schedule`: each distinct definition, caused by the one it replaced, with original source evidence and a SignCell projection only when proposition coordinates are admitted | thread is the schedule id; head `clock-schedule-state/<schedule>.json`; any epistemic cell uses stable typed terms and the original EAVT predicate coordinate |
 
 An enterprise `setting` row is not a record: the newest value for each (enterprise, axis) is state `enterprise-setting-state/<enterprise>-<axis>.json`, and the earlier values, each with the prose the board wrote beside it, are deleted.
 
@@ -94,9 +94,9 @@ An enterprise `setting` row is not a record: the newest value for each (enterpri
 
 | earlier | becomes |
 |---|---|
-| `data/state/clock/last/<schedule>.json` (54 files) | `data/state/schedule-run-state/<schedule>.json` with `{name, ended, ok}`: the time the last run ended and whether it succeeded, which is all that `due` needs with the schedule record |
-| `data/state/clock/reservations/<schedule>/<occurrence>.json` and `.outcome.json` (183 MB) | deleted |
-| `metroplat.clock-logs` (occurrences and outcomes, 271 MB) | deleted; no log is started for it, and the clock logs one line per run from the first run after conversion |
+| `data/state/clock/last/<schedule>.json` (54 files) | `schedule-run` record `{at, schedule, occurrence?, attempt?, ok}` using the original `ranAt` source clock |
+| `data/state/clock/reservations/<schedule>/<occurrence>.json` and `.outcome.json` (183 MB) | not received into the current store by this converter; retained only in original custody, so the one-time conversion remains incomplete for these clock states |
+| `metroplat.clock-logs` (occurrences and outcomes, 271 MB) | Metrologic source evidence and a SignCell projection only for rows with admitted proposition coordinates; no old occurrence or outcome becomes an actionable current `schedule-run` |
 
 ### State folded once
 
