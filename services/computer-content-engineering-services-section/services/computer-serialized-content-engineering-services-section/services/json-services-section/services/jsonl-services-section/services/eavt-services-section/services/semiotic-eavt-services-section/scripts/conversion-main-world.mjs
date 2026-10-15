@@ -113,7 +113,15 @@ export async function convertMainWorld({deferredKinds=new Set(),source,output,ol
   let selected=0;
   for(const line of streamJsonLines(file,{openReader:openSegmentReader})){
    if(NI.test(line.record.id)&&maps.get('original-kind',line.record.id)===undefined)maps.put('original-kind',line.record.id,kind);
-   if(deferredKinds.has(kind)){report.deferredKinds??={};report.deferredKinds[kind]=(report.deferredKinds[kind]??0)+1;report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;}
+   // Select the current consumer before reconstructing an old witness. Unmapped
+   // kinds already remained original-only below; retain their raw identity map
+   // and source digest without spending time re-admitting discarded payloads.
+   const selectedKind = /^(?:structured-work-intent-|actor-|ni-sha-256-)/u.test(kind) || new Set(['knowing.claims','capability-assertions','rpc','metroplat.clock','settlement-signal','office-incumbency','character-masks','harness-carriers','character-inbox','body-records','metroplat.clock.schedule','encounter','agent-session-token-usage','work-arena-move','work-outcome','561-group.primary-system-health','peer-liveness','enterprise','anchored-findings','codex-tasks','lean-checks','inference-receiving-attempt']).has(kind);
+   const implicitClaim = line.record?.observation?.payload?.[0]?.kind === 'metroplat.claim-session';
+   if(deferredKinds.has(kind)||(!selectedKind&&!implicitClaim)){
+    if(deferredKinds.has(kind)){report.deferredKinds??={};report.deferredKinds[kind]=(report.deferredKinds[kind]??0)+1;}
+    report.sourceOnly[kind]=(report.sourceOnly[kind]??0)+1;continue;
+   }
    const witness=parseJournalWitness(line.record),semantic=semanticRecordOf(witness,kind);
    // The identity is witnessed even when its original kind is not a current consumer.
    if(semantic?.id&&NI.test(semantic.id)&&maps.get('identity',semantic.id)===undefined)maps.put('identity',semantic.id,witness.id);
