@@ -217,6 +217,25 @@ function codePointLength(text) {
 const SCHEMA_KEYWORDS = Object.freeze(["additionalProperties", "additionalItems", "propertyNames", "contains", "not", "if", "then", "else", "unevaluatedProperties", "unevaluatedItems", "items"]);
 const SCHEMA_MAP_KEYWORDS = Object.freeze(["properties", "patternProperties", "$defs", "definitions", "dependentSchemas"]);
 const SCHEMA_LIST_KEYWORDS = Object.freeze(["allOf", "anyOf", "oneOf", "prefixItems"]);
+/** Traverse only schema locations in this evaluator's supported dialect.
+ * Annotation values are data, even when they contain $id, $anchor or $ref. */
+function* schemaChildren(schema, dialect) {
+    for (const [key, value] of Object.entries(schema)) {
+        if (SCHEMA_KEYWORDS.includes(key)) {
+            if (key === "items" && Array.isArray(value) && dialect === "draft-07") {
+                for (const child of value) if (isSchema(child)) yield child;
+            }
+            else if (isSchema(value)) yield value;
+        }
+        else if (SCHEMA_MAP_KEYWORDS.includes(key) || (key === "dependencies" && dialect === "draft-07")) {
+            if (isObject(value))
+                for (const child of Object.values(value)) if (isSchema(child)) yield child;
+        }
+        else if (SCHEMA_LIST_KEYWORDS.includes(key) && Array.isArray(value)) {
+            for (const child of value) if (isSchema(child)) yield child;
+        }
+    }
+}
 const NON_NEGATIVE_KEYWORDS = Object.freeze(["minLength", "maxLength", "minItems", "maxItems", "minProperties", "maxProperties", "minContains", "maxContains"]);
 const NUMBER_KEYWORDS = Object.freeze(["minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum"]);
 const STRING_KEYWORDS = Object.freeze(["$ref", "$id", "$anchor", "$dynamicRef", "$dynamicAnchor", "$comment", "format", "pattern", "title", "description", "$schema", "contentMediaType", "contentEncoding"]);
@@ -331,7 +350,7 @@ function splitFragment(uri) {
     return hash === -1 ? [uri, undefined] : [uri.slice(0, hash), uri.slice(hash + 1)];
 }
 /** RFC 3986 reference resolution over a hierarchical base; non-hierarchical bases only take absolute and fragment references. */
-function resolveUri(base, reference) {
+export function resolveSchemaUri(base, reference) {
     if (isAbsoluteUri(reference))
         return reference;
     if (reference.startsWith("#"))
@@ -371,12 +390,17 @@ class SchemaGraph {
     }
     register(uri, resolved) {
         const [document, fragment] = splitFragment(uri);
-        if (fragment === undefined || fragment === "") {
-            if (!this.documents.has(document))
-                this.documents.set(document, resolved);
+        const table = fragment === undefined || fragment === "" ? this.documents : this.anchors;
+        const address = table === this.documents ? document : uri;
+        const prior = table.get(address);
+        // All resource and fragment spellings enter the same identity gate.
+        // First/last-index-wins must never choose a different supplied schema.
+        if (prior !== undefined) {
+            if (prior.base !== resolved.base || !deepEqual(prior.schema, resolved.schema))
+                throw new TypeError(`different schemas share reference address ${address}`);
+            return;
         }
-        else
-            this.anchors.set(uri, resolved);
+        table.set(address, resolved);
     }
     index(schema, parentBase) {
         if (typeof schema === "boolean")
@@ -384,42 +408,30 @@ class SchemaGraph {
         let base = parentBase;
         const id = schema["$id"];
         if (typeof id === "string" && id !== "") {
-            const [document, fragment] = splitFragment(resolveUri(parentBase, id));
+            const [document, fragment] = splitFragment(resolveSchemaUri(parentBase, id));
             if (document !== "" && (fragment === undefined || fragment === "")) {
                 base = document;
                 this.register(document, { schema, base });
             }
             else if (fragment !== undefined && fragment !== "" && !fragment.startsWith("/")) {
-                this.anchors.set(`${splitFragment(parentBase)[0]}#${fragment}`, { schema, base: parentBase });
+                this.register(`${splitFragment(parentBase)[0]}#${fragment}`, { schema, base: parentBase });
             }
         }
         this.bases.set(schema, base);
         for (const key of ["$anchor", "$dynamicAnchor"]) {
             const anchor = schema[key];
             if (typeof anchor === "string")
-                this.anchors.set(`${base}#${anchor}`, { schema, base });
+                this.register(`${base}#${anchor}`, { schema, base });
         }
-        for (const [key, value] of Object.entries(schema)) {
-            if (key === "enum" || key === "const" || key === "default" || key === "examples")
-                continue;
-            if (isSchema(value) && typeof value !== "boolean")
-                this.index(value, base);
-            if (Array.isArray(value))
-                for (const item of value)
-                    if (isObject(item))
-                        this.index(item, base);
-            if (isObject(value) && (SCHEMA_MAP_KEYWORDS.includes(key) || key === "dependencies"))
-                for (const item of Object.values(value))
-                    if (isObject(item))
-                        this.index(item, base);
-        }
+        for (const child of schemaChildren(schema, this.dialect))
+            this.index(child, base);
     }
     baseOf(schema) {
         return typeof schema === "boolean" ? "" : this.bases.get(schema) ?? "";
     }
     resolve(reference, from) {
         const base = this.baseOf(from);
-        const target = resolveUri(base, reference);
+        const target = resolveSchemaUri(base, reference);
         const [document, fragment] = splitFragment(target);
         const anchored = this.anchors.get(target);
         if (anchored !== undefined)
@@ -455,24 +467,13 @@ class SchemaGraph {
         if (typeof schema === "boolean" || seen.has(schema))
             return;
         seen.add(schema);
-        for (const [key, value] of Object.entries(schema)) {
-            if ((key === "$ref" || key === "$dynamicRef") && typeof value === "string")
-                this.checkReferences(this.resolve(value, schema).schema, seen);
-            if (key === "enum" || key === "const" || key === "default" || key === "examples")
-                continue;
-            if (Array.isArray(value)) {
-                for (const item of value)
-                    if (isSchema(item))
-                        this.checkReferences(item, seen);
-            }
-            else if (isObject(value) && (SCHEMA_MAP_KEYWORDS.includes(key) || key === "dependencies")) {
-                for (const item of Object.values(value))
-                    if (isSchema(item))
-                        this.checkReferences(item, seen);
-            }
-            else if (isSchema(value))
-                this.checkReferences(value, seen);
+        for (const keyword of ["$ref", "$dynamicRef"]) {
+            const reference = schema[keyword];
+            if (typeof reference === "string")
+                this.checkReferences(this.resolve(reference, schema).schema, seen);
         }
+        for (const child of schemaChildren(schema, this.dialect))
+            this.checkReferences(child, seen);
     }
 }
 function annotations() {
