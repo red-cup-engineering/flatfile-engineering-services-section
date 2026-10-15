@@ -139,6 +139,7 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   else{countForType.written++;maps.put('written',writtenKey,type);}
   return id;
  };
+ const resolveTypedMark=reference=>getTypedMark(store,output,reference,MarkType,admitTypedMark);
  function receiveSemanticSource(item,original){
   const sides=item.sourceTold&&typeof item.sourceTold.for==='boolean'&&typeof item.sourceTold.against==='boolean'
    ? item.sourceTold : {for:false,against:false};
@@ -159,9 +160,6 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   if(!evidenceAdmitted?.ok)throw new TypeError('original source evidence fails current Metrologic receiving');
   const evidenceId=putCurrent('evidence',evidenceAdmitted.value);
   const witnessRef={id:evidenceId,type:'evidence'};
-  const resolveTypedMark=reference=>{
-   return getTypedMark(store,output,reference,MarkType,admitTypedMark);
-  };
   const putTerm=term=>{
    const typed=createTypedMark(MarkType,Mark(term));
    if(!typed?.ok)throw new TypeError('original EAVT term fails current opaque typed-mark receiving');
