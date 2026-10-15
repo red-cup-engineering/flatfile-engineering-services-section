@@ -171,6 +171,7 @@ export async function prepare(plan, work) {
       args = [provider(plan.kalshiConverter), '--settlement', binding.source, '--output', candidate, '--apply', '--writers-stopped'];
     } else {
       args = [path.join(here, 'convert-settlement.mjs'), '--settlement', binding.source, '--into', candidate, '--old-store', oldStore, '--new-store', newStore, '--report', reportFile];
+      if (binding.conversion === 'world') args.push('--new-organizing', provider(plan.newOrganizing));
       if (binding.clockLastSource) args.push('--clock-last', binding.clockLastSource);
       if (binding.deferKinds?.length) args.push('--defer-kinds', binding.deferKinds.join(','));
       if (binding.conversion === 'activitypub') args.push('--activitypub', '--old-activitypub', provider(plan.oldActivitypub), '--new-activitypub', provider(plan.newActivitypub));

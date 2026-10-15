@@ -21,6 +21,7 @@ function directory(root) {
 }
 async function currentReceiver(newStore) {
   assert.ok(typeof newStore === 'string' && path.isAbsolute(newStore), 'current Data package root required');
+  newStore = fs.realpathSync(newStore);
   const require = createRequire(path.join(newStore, 'package.json'));
   const moduleOf = name => import(pathToFileURL(require.resolve(name)).href);
   const [store, layout, address, signcellMark, signcellTypedMark] = await Promise.all([

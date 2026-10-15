@@ -142,7 +142,24 @@ if (!args.activitypub) {
   const { createTypedMark, admitTypedMark, referenceOf } = await supplier(newRequire, '@red-cup-engineering/signcell/typed-mark');
   const { termToJson: sourceTermToJson } = await supplier(oldRequire, '@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec');
   const { seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock } = await supplier(newRequire, '@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row');
-  await convertMainWorld({deferredKinds, source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource, admit, claimType, evidenceType, createSignClaim, Mark, MarkType, createTypedMark, admitTypedMark, referenceOf, sourceTermToJson, seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock});
+  if(typeof args['new-organizing']!=='string')throw new TypeError('exact current work/evidence receiver required');
+  const organizingRoot=fs.realpathSync(args['new-organizing']),organizingRequire=createRequire(path.join(organizingRoot,'package.json'));
+  const {keepWorkArenaEvidence}=await supplier(organizingRequire,'@red-cup-engineering/organizing/enterprise/outcomes');
+  const {immutableContentKey}=await supplier(organizingRequire,'@red-cup-engineering/immutable-content-custody-service');
+  const {createFileStoreSync}=await supplier(organizingRequire,'@red-cup-engineering/immutable-content-custody-service/file-store');
+  const {makeNiUri}=await supplier(newRequire,'@red-cup-engineering/uri-services-section/ni-uri');
+  const custody=createFileStoreSync(path.join(output,'data','custody'));
+  const keepEvidenceContent=content=>{
+   const bytes=Buffer.from(canonicalJson(content),'utf8');
+   if(bytes.length<=32768)return content;
+   const body=makeNiUri(bytes),key=immutableContentKey(body);
+   custody.putIfAbsent(key,{body:bytes,mediaType:'application/json'});
+   const held=custody.get(key);if(held===null||!Buffer.from(held.body).equals(bytes))throw new TypeError('original evidence body differs from native immutable custody');
+   report.contentBodies??={count:0,bytes:0};report.contentBodies.count++;report.contentBodies.bytes+=bytes.length;
+   return {body,mediaType:'application/json',bytes:bytes.length};
+  };
+  report.suppliers.currentOrganizing=organizingRoot;
+  await convertMainWorld({keepEvidenceContent,keepWorkArenaEvidence,deferredKinds, source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource, admit, claimType, evidenceType, createSignClaim, Mark, MarkType, createTypedMark, admitTypedMark, referenceOf, sourceTermToJson, seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock});
 } else {
   if (typeof args['old-activitypub'] !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('exact --old-activitypub and --new-activitypub providers are required');
   const oldAp = fs.realpathSync(args['old-activitypub']), currentAp = fs.realpathSync(args['new-activitypub']);

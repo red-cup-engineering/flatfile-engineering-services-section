@@ -84,7 +84,7 @@ function selection(witness,kind,context,semantic=context.semanticRecordOf(witnes
 
 /** All supplier functions come from independently selected, fabricated providers.
  * Temporary maps contain byte positions and addresses, never an in-memory store table. */
-export async function convertMainWorld({deferredKinds=new Set(),source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress,clockLastSource,admit,claimType,evidenceType,createSignClaim,Mark,MarkType,createTypedMark,admitTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock}){
+export async function convertMainWorld({keepEvidenceContent,keepWorkArenaEvidence,deferredKinds=new Set(),source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress,clockLastSource,admit,claimType,evidenceType,createSignClaim,Mark,MarkType,createTypedMark,admitTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock}){
  if(!store||![parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress].every(fn=>typeof fn==='function'))throw new TypeError('exact original readers and current writers required');
  if(![admit,createSignClaim,Mark,createTypedMark,admitTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock].every(fn=>typeof fn==='function')||!claimType||!evidenceType||!MarkType)throw new TypeError('current Metrologic and SignCell receivers required');
  const mapRoot=path.join(output,'.conversion-main'),maps=createBucketMap(mapRoot,niBucketPath),stamps=new Map(),active=new Set();
@@ -166,6 +166,7 @@ export async function convertMainWorld({deferredKinds=new Set(),source,output,ol
    content:{sourceKind:item.sourceKind,sourceCategory:item.sourceCategory,sourceRecordedAt:item.sourceRecordedAt,
     sourceEvent:item.sourceEvent,sourceOrigin:item.sourceOrigin,sourceTold:item.sourceTold??null,
     sourceCauses:item.sourceCauses,sourceWitness:item.sourceWitness,sourceRow:item.sourceRow,record:item.record},provenance};
+  evidenceRecord.content=keepEvidenceContent(evidenceRecord.content);
   const evidenceAdmitted=admit(evidenceType,evidenceRecord);
   if(!evidenceAdmitted?.ok)throw new TypeError('original source evidence fails current Metrologic receiving');
   const evidenceId=putCurrent('evidence',evidenceAdmitted.value);
@@ -235,7 +236,7 @@ export async function convertMainWorld({deferredKinds=new Set(),source,output,ol
   // Arena ids, thread relations, editions and evidence locators belong to the
   // move's domain content. The native arena writer preserves that content;
   // only the observation's separately typed witness causes change custody.
-  let record=item.arena?item.record:rewrite(item.record,item);const named=[],unresolvedCites=[];
+  let record=item.arena?keepWorkArenaEvidence(output,item.record):rewrite(item.record,item);const named=[],unresolvedCites=[];
   for(const cause of item.namedCauses){const old=lookup(cause),prior=maps.get('source',old);if(!prior){report.causesDropped++;const originalKind=maps.get('original-kind',old);disposition(item,cause,originalKind?'original-kind-not-converted':'original-cause-unavailable',item.claim?'named-claim-citation':'cause');
     if(item.claim){unresolvedCites.push(cause);report.referenceDispositions.unresolvedNamedCitations++;if(!originalKind)report.unqualifiedSources['named-claim-citation-unavailable']=(report.unqualifiedSources['named-claim-citation-unavailable']??0)+1;}continue;}
    const held=convert(old);named.push(held.type===item.type?held.id:{type:held.type,id:held.id});}
@@ -260,7 +261,9 @@ export async function convertMainWorld({deferredKinds=new Set(),source,output,ol
   const result={id,type:item.type};maps.put('done',original,result);if(item.epistemicSource)receiveSemanticSource(item,original);if(item.identity&&NI.test(item.identity))maps.put('translated-identity',item.identity,result);
   active.delete(original);return result;
  }
- for(const {id}of maps.entries('source'))convert(id);
+ const receivingFailures=[];
+ for(const {id}of maps.entries('source')){try{convert(id);}catch(error){active.clear();if(receivingFailures.length<1000)receivingFailures.push({original:id,kind:maps.get('source',id)?.kind,code:error.code??error.name,message:error.message});}}
+ if(receivingFailures.length){fs.writeFileSync(path.join(output,'.conversion-receiving-failures.json'),JSON.stringify(receivingFailures,null,2)+'\n',{flag:'wx',mode:0o600});throw new TypeError('original records refused by current receivers; inspect private conversion receiving failures');}
  if(fs.existsSync(clockLastRoot))observe(clockLastRoot);
  for(const file of sourceFiles(clockLastRoot)){if(!file.endsWith('.json'))continue;observe(file);const row=JSON.parse(fs.readFileSync(file,'utf8'));
   if(!text(row.schedule)||typeof row.ok!=='boolean')throw new TypeError('original last-run record lacks current clock meaning');
