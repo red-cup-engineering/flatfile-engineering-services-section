@@ -104,7 +104,7 @@ if (typeof semanticRecordOf !== 'function') {
   };
 }
 const store = await load(path.join(newRoot, 'src/store.mjs'));
-const { semanticAddress } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address');
+const { semanticAddress, decodeSemantic } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address');
 const { niBucketPath } = await supplier(newRequire, '@red-cup-engineering/computer-content-address-engineering-services-section/ni-path');
 const { canonicalJson } = await supplier(newRequire, '@red-cup-engineering/json-services-section/canonical');
 const { originalJournalFiles, createBucketMap, streamJsonLines, hashSource } = await import('./conversion-buckets.mjs');
@@ -149,6 +149,17 @@ if (!args.activitypub) {
   const {createFileStoreSync}=await supplier(organizingRequire,'@red-cup-engineering/immutable-content-custody-service/file-store');
   const {makeNiUri}=await supplier(newRequire,'@red-cup-engineering/uri-services-section/ni-uri');
   const custody=createFileStoreSync(path.join(output,'data','custody'));
+  const putMarkContent=(basis,reference)=>{
+   const addressed=semanticAddress(basis);if(addressed.id!==reference.id)throw new TypeError('large Mark basis differs from its declared identity');
+   const key=immutableContentKey(reference.id);custody.putIfAbsent(key,{body:addressed.bytes,mediaType:'application/cbor'});
+   const held=custody.get(key);if(!held||!Buffer.from(held.body).equals(Buffer.from(addressed.bytes)))throw new TypeError('large Mark differs from immutable canonical byte custody');
+   report.largeTypedMarks??=[];report.largeTypedMarks.push(reference);return reference.id;
+  };
+  const getMarkContent=reference=>{
+   const held=custody.get(immutableContentKey(reference.id));if(!held)return undefined;
+   if(held.mediaType!=='application/cbor')throw new TypeError('large typed Mark custody has a different representation');
+   const basis=decodeSemantic(held.body);if(semanticAddress(basis).id!==reference.id)throw new TypeError('large typed Mark canonical bytes fail identity receiving');return basis;
+  };
   const keepEvidenceContent=content=>{
    const bytes=Buffer.from(canonicalJson(content),'utf8');
    if(bytes.length<=32768)return content;
@@ -159,7 +170,7 @@ if (!args.activitypub) {
    return {body,mediaType:'application/json',bytes:bytes.length};
   };
   report.suppliers.currentOrganizing=organizingRoot;
-  await convertMainWorld({keepEvidenceContent,keepWorkArenaEvidence,deferredKinds, source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource, admit, claimType, evidenceType, createSignClaim, Mark, MarkType, createTypedMark, admitTypedMark, referenceOf, sourceTermToJson, seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock});
+  await convertMainWorld({putMarkContent,getMarkContent,keepEvidenceContent,keepWorkArenaEvidence,deferredKinds, source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource, admit, claimType, evidenceType, createSignClaim, Mark, MarkType, createTypedMark, admitTypedMark, referenceOf, sourceTermToJson, seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock});
 } else {
   if (typeof args['old-activitypub'] !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('exact --old-activitypub and --new-activitypub providers are required');
   const oldAp = fs.realpathSync(args['old-activitypub']), currentAp = fs.realpathSync(args['new-activitypub']);

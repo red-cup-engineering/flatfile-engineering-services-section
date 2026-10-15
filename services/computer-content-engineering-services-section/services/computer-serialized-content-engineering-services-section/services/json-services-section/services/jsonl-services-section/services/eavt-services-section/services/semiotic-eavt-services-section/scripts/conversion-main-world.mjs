@@ -84,7 +84,7 @@ function selection(witness,kind,context,semantic=context.semanticRecordOf(witnes
 
 /** All supplier functions come from independently selected, fabricated providers.
  * Temporary maps contain byte positions and addresses, never an in-memory store table. */
-export async function convertMainWorld({keepEvidenceContent,keepWorkArenaEvidence,deferredKinds=new Set(),source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress,clockLastSource,admit,claimType,evidenceType,createSignClaim,Mark,MarkType,createTypedMark,admitTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock}){
+export async function convertMainWorld({putMarkContent,getMarkContent,keepEvidenceContent,keepWorkArenaEvidence,deferredKinds=new Set(),source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress,clockLastSource,admit,claimType,evidenceType,createSignClaim,Mark,MarkType,createTypedMark,admitTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock}){
  if(!store||![parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress].every(fn=>typeof fn==='function'))throw new TypeError('exact original readers and current writers required');
  if(![admit,createSignClaim,Mark,createTypedMark,admitTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock].every(fn=>typeof fn==='function')||!claimType||!evidenceType||!MarkType)throw new TypeError('current Metrologic and SignCell receivers required');
  const mapRoot=path.join(output,'.conversion-main'),maps=createBucketMap(mapRoot,niBucketPath),stamps=new Map(),active=new Set();
@@ -149,7 +149,7 @@ export async function convertMainWorld({keepEvidenceContent,keepWorkArenaEvidenc
   else{countForType.written++;maps.put('written',writtenKey,type);}
   return id;
  };
- const resolveTypedMark=reference=>getTypedMark(store,output,reference,MarkType,admitTypedMark);
+ const resolveTypedMark=reference=>getTypedMark(store,output,reference,MarkType,admitTypedMark,{getContent:getMarkContent});
  function receiveSemanticSource(item,original){
   const sides=item.sourceTold&&typeof item.sourceTold.for==='boolean'&&typeof item.sourceTold.against==='boolean'
    ? item.sourceTold : {for:false,against:false};
@@ -174,7 +174,7 @@ export async function convertMainWorld({keepEvidenceContent,keepWorkArenaEvidenc
   const putTerm=term=>{
    const typed=createTypedMark(MarkType,Mark(term));
    if(!typed?.ok)throw new TypeError('original EAVT term fails current opaque typed-mark receiving');
-   const reference=putTypedMark(putCurrent,typed.value,referenceOf);
+   const reference=putTypedMark(putCurrent,typed.value,referenceOf,{putContent:putMarkContent});
    const recovered=resolveTypedMark(reference);
    if(recovered.id!==typed.value.id)throw new TypeError('stored typed-mark did not re-admit at its SignCell identity');
    return reference;
@@ -238,7 +238,7 @@ export async function convertMainWorld({keepEvidenceContent,keepWorkArenaEvidenc
   // only the observation's separately typed witness causes change custody.
   let record=item.arena?keepWorkArenaEvidence(output,item.record):rewrite(item.record,item);const named=[],unresolvedCites=[];
   for(const cause of item.namedCauses){const old=lookup(cause),prior=maps.get('source',old);if(!prior){report.causesDropped++;const originalKind=maps.get('original-kind',old);disposition(item,cause,originalKind?'original-kind-not-converted':'original-cause-unavailable',item.claim?'named-claim-citation':'cause');
-    if(item.claim){unresolvedCites.push(cause);report.referenceDispositions.unresolvedNamedCitations++;if(!originalKind)report.unqualifiedSources['named-claim-citation-unavailable']=(report.unqualifiedSources['named-claim-citation-unavailable']??0)+1;}continue;}
+    if(item.claim){unresolvedCites.push(cause);report.referenceDispositions.unresolvedNamedCitations++;/* An external named citation stays in record.cites and source provenance; it is not invented as a held causal edge. */}continue;}
    const held=convert(old);named.push(held.type===item.type?held.id:{type:held.type,id:held.id});}
   const causeKey=cause=>typeof cause==='string'?`${item.type} ${cause}`:`${cause.type} ${cause.id}`;
   const causes=[...new Map(named.map(cause=>[causeKey(cause),cause])).entries()].sort(([a],[b])=>a.localeCompare(b)).map(([,cause])=>cause);

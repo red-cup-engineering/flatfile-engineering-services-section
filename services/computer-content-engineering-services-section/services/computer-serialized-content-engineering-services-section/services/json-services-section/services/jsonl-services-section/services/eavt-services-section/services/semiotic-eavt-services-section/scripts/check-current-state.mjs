@@ -19,7 +19,7 @@ function directory(root) {
   const stat = fs.lstatSync(root);
   assert.ok(stat.isDirectory() && stat.uid === process.getuid(), 'current state root is absent or not owned');
 }
-async function currentReceiver(newStore) {
+async function currentReceiver(newStore, newOrganizing) {
   assert.ok(typeof newStore === 'string' && path.isAbsolute(newStore), 'current Data package root required');
   newStore = fs.realpathSync(newStore);
   const require = createRequire(path.join(newStore, 'package.json'));
@@ -31,13 +31,24 @@ async function currentReceiver(newStore) {
     moduleOf('@red-cup-engineering/signcell/mark'),
     moduleOf('@red-cup-engineering/signcell/typed-mark'),
   ]);
-  return {store, checkRoot: layout.checkRoot, semanticAddress: address.semanticAddress,
+  let getMarkContent;
+  if(newOrganizing){
+    const owner=createRequire(path.join(fs.realpathSync(newOrganizing),'package.json'));
+    const {immutableContentKey}=await import(pathToFileURL(owner.resolve('@red-cup-engineering/immutable-content-custody-service')).href);
+    const {createFileStoreSync}=await import(pathToFileURL(owner.resolve('@red-cup-engineering/immutable-content-custody-service/file-store')).href);
+    const {decodeSemantic}=address;
+    getMarkContent=(root,reference)=>{
+      const held=createFileStoreSync(path.join(root,'data','custody')).get(immutableContentKey(reference.id));if(!held)return undefined;
+      assert.equal(held.mediaType,'application/cbor');const basis=decodeSemantic(held.body);assert.equal(address.semanticAddress(basis).id,reference.id);return basis;
+    };
+  }
+  return {store, getMarkContent, checkRoot: layout.checkRoot, semanticAddress: address.semanticAddress,
     MarkType: signcellMark.MarkType, admitTypedMark: signcellTypedMark.admitTypedMark};
 }
 /** Native strict discovery must be fully exhausted; a good prefix is insufficient. */
-export async function checkNativeTypes(root, types, newStore) {
+export async function checkNativeTypes(root, types, newStore, newOrganizing) {
   directory(root);
-  const receiver = await currentReceiver(newStore);
+  const receiver = await currentReceiver(newStore, newOrganizing);
   receiver.checkRoot(root);
   assert.ok(Array.isArray(types) && types.length > 0 && types.length <= 32);
   const typeSet = new Set(types);
@@ -51,7 +62,7 @@ export async function checkNativeTypes(root, types, newStore) {
       if (type === 'semantic-claim') {
         for (const endpoint of [record.subject, record.object]) {
           if (endpoint?.type === receiver.MarkType.id) {
-            const mark = getTypedMark(receiver.store, root, endpoint, receiver.MarkType, receiver.admitTypedMark);
+            const mark = getTypedMark(receiver.store, root, endpoint, receiver.MarkType, receiver.admitTypedMark, {getContent: reference=>receiver.getMarkContent?.(root,reference)});
             assert.equal(mark.id, endpoint.id, 'semantic claim endpoint must resolve at its declared SignCell identity');
           }
         }
@@ -93,7 +104,7 @@ export async function checkCurrentState(plan) {
       bindings.push({name: binding.name, armingPresent: true});
     } else {
       assert.ok(['world', 'activitypub'].includes(binding.conversion));
-      bindings.push({name: binding.name, types: await checkNativeTypes(binding.target, binding.types, plan.newStore)});
+      bindings.push({name: binding.name, types: await checkNativeTypes(binding.target, binding.types, plan.newStore, plan.newOrganizing)});
     }
   }
   return {currentStateUsable: true, historicalTransferProven: false, bindings};

@@ -198,7 +198,15 @@ export async function prepare(plan, work) {
       if(binding.conversion==='activitypub')assert.equal(report.sourceFormat,nativeActivitypub?'native-activitypub-13bca0b8':'witnessed-activitypub');
       assert.equal(report.suppliers.oldStore, oldStore); assert.equal(report.suppliers.newStore, newStore); assert.deepEqual(report.missingBodies, []);
       // No unknown historical references gain authority during this cutover.
-      assert.equal(report.referenceDispositions?.count ?? 0, 0, 'original reference disposition still needs its real consumer');
+      // Domain NIs and explicitly retained external citations are not a closed
+      // local record set. They remain named in their original witness/provenance;
+      // native receiving below still refuses every missing held causal edge.
+      assert.equal(report.types['capability-assertion']?.written ?? 0, 0, 'historical assertions cannot become current node authority');
+      if(report.referenceDispositions?.count){
+        const file=path.join(candidate,report.referenceDispositions.file);let count=0;
+        for(const line of fs.readFileSync(file,'utf8').trim().split('\n')){const row=JSON.parse(line);assert.ok(/^ni:\/\/\/sha-256;[A-Za-z0-9_-]{43}$/u.test(row.reference));assert.ok(['record-reference','cause','named-claim-citation'].includes(row.role));count++;}
+        assert.equal(count,report.referenceDispositions.count);
+      }
       if (binding.clockLastSource) assert.equal(report.mainSuppliers.clockLastSource, binding.clockLastSource);
       await receiveNative(candidate, newStore, report);
     }

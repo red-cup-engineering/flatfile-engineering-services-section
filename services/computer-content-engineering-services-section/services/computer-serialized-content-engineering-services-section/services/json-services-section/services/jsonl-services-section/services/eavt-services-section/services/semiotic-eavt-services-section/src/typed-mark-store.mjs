@@ -7,20 +7,26 @@
 const COLLECTION = "typed-mark";
 
 /** Store the identity basis at the exact SignCell typed-mark address. */
-export function putTypedMark(put, typedMark, referenceOf) {
+export function putTypedMark(put, typedMark, referenceOf, {putContent} = {}) {
   if (typeof put !== "function" || typeof referenceOf !== "function") throw new TypeError("typed-mark writer needs the current store and SignCell reference writers");
   const reference = referenceOf(typedMark);
   const basis = { kind: typedMark.kind, type: typedMark.type, content: typedMark.content };
-  const address = put(COLLECTION, basis);
+  let address;
+  try { address = put(COLLECTION, basis); }
+  catch (error) {
+    if (error.code !== 'record-size' || typeof putContent !== 'function') throw error;
+    // The same canonical CBOR basis has the same NI in native byte custody.
+    address = putContent(basis, reference);
+  }
   if (address !== reference.id) throw new TypeError("typed-mark identity basis does not match its SignCell address");
   return reference;
 }
 
 /** Resolve a semantic reference from the typed-mark collection and re-admit it. */
-export function getTypedMark(store, root, reference, type, admitTypedMark) {
+export function getTypedMark(store, root, reference, type, admitTypedMark, {getContent} = {}) {
   if (typeof store?.get !== "function" || typeof admitTypedMark !== "function" || !type) throw new TypeError("typed-mark reader needs the current store and SignCell receiver");
   if (reference?.type !== type.id || typeof reference.id !== "string") throw new TypeError("typed-mark reference does not name its declared SignCell type");
-  const basis = store.get(root, COLLECTION, reference.id);
+  const basis = store.get(root, COLLECTION, reference.id) ?? getContent?.(reference);
   if (!basis || basis.type !== reference.type) throw new TypeError("typed-mark address is absent or declares a different SignCell type");
   const admitted = admitTypedMark(type, { ...basis, id: reference.id });
   if (!admitted?.ok || admitted.value.id !== reference.id) throw new TypeError("stored typed-mark does not re-admit at its SignCell identity");
