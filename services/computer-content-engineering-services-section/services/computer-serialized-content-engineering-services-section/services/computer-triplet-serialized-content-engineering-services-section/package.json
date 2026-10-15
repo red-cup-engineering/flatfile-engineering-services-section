@@ -11,6 +11,7 @@
     "./ontology-endpoint": "./scripts/ontology-endpoint.mjs",
     "./sparql-results-json": "./scripts/sparql-results-json.mjs",
     "./n-quads": "./scripts/n-quads.mjs",
+    "./infomaterial-topology": "./scripts/infomaterial-topology.mjs",
     "./rdf-canonicalization": "./scripts/rdf-canonicalization.mjs",
     "./rdf-named-graph": "./scripts/rdf-named-graph.mjs",
     "./rdf-terms": "./scripts/rdf-terms.mjs",
