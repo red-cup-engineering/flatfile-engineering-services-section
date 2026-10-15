@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/metrologic",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "description": "Metrologic: the data layer's mathematics, the shared JavaScript implementation of the mathematical operations every layer above it uses.",
   "keywords": [
@@ -17,8 +17,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/red-cup-engineering/bare-cedar-fog.git",
-    "directory": "services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/lib/metrologic"
+    "url": "git+https://github.com/red-cup-engineering/computer-data-engineering-services-section.git",
+    "directory": "lib/metrologic"
   },
   "engines": {
     "node": ">=22"
@@ -303,9 +303,6 @@
     "./closure/src/directed-evidence": "./src/closure/directed-evidence.mjs",
     "./models/physics/models/quantum-contextuality/measurement-scenario": "./src/models/physics/models/quantum-contextuality/measurement-scenario.mjs",
     "./models/physics/models/quantum-contextuality/contextual-obstruction": "./src/models/physics/models/quantum-contextuality/contextual-obstruction.mjs",
-    "./articulation/predicating/positing/independent-evidence": {
-      "import": "./src/articulation/predicating/positing/independent-evidence.mjs"
-    },
     "./articulation/predicating/positing/evidence-record": {
       "import": "./src/articulation/predicating/positing/evidence-record.mjs"
     },
@@ -410,7 +407,6 @@
   "dependencies": {
     "@red-cup-engineering/computer-content-address-engineering-services-section": "0.2.0",
     "@red-cup-engineering/computer-data-engineering-services-section": "0.2.0",
-    "@red-cup-engineering/eavt-services-section": "0.10.4",
     "@red-cup-engineering/exact-number-data-service": "0.1.1",
     "@red-cup-engineering/json-services-section": "0.4.0"
   },
