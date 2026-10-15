@@ -48,8 +48,11 @@ export async function receiveOriginalDispositions({report,reportFile,binding,pla
   const kind=path.basename(file).split('-admit-')[1]?.replace(/\.jsonl\.witnesses$/u,'');if(deferred.has(kind))continue;
   for(const {record}of streamJsonLines(file,{openReader:openSegmentReader})){
    const raw=record.observation?.payload;if(!Array.isArray(raw)||raw.length!==4)continue;
-   const inbox=kind==='character-inbox'&&packetOf(raw[2]);
-   const claim=(raw[0]?.kind==='metroplat.claim-session'||kind?.startsWith('actor-')||kind?.startsWith('ni-sha-256-'))&&!kind?.startsWith('structured-work-intent-');
+   // A current converter may already have accepted filing-date corroboration.
+   // Receive only refusal classes its exact report still declares; recovering
+   // an already accepted claim would enlarge the rejected cohort and duplicate it.
+   const inbox=(expected[allowed[0]]??0)>0&&kind==='character-inbox'&&packetOf(raw[2]);
+   const claim=(expected[allowed[1]]??0)>0&&(raw[0]?.kind==='metroplat.claim-session'||kind?.startsWith('actor-')||kind?.startsWith('ni-sha-256-'))&&!kind?.startsWith('structured-work-intent-');
    if(!inbox&&!claim)continue;
    const witness=parseJournalWitness(record),row=witness.observation.payload;
    if(inbox){assert.ok(validPacket(packetOf(row[2])));rows.push({reason:allowed[0],kind,file,witness,row,packet:packetOf(row[2])});received[allowed[0]]++;}
