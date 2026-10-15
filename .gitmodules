@@ -6,3 +6,7 @@
 	path = services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section
 	url = https://github.com/red-cup-engineering/computer-content-address-engineering-services-section.git
 	branch = main
+[submodule "signcell"]
+	path = apps/signcell
+	url = https://github.com/red-cup-engineering/signcell.git
+	branch = main
