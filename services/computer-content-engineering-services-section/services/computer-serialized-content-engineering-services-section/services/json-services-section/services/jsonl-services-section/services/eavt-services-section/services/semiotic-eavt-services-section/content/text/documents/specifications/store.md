@@ -30,6 +30,46 @@ provenance:
 
 # The store
 
+## Strict durable publication and bounded point heads
+
+put(root, type, record, { durableRoot }), writeHead(..., { expect, durableRoot })
+and extend(..., { causes, closed, durableRoot }) opt into the computer-file
+owner's strict durability contract. Calls omitting durableRoot keep their
+existing behavior. The caller supplies a pre-existing, already-durable anchor;
+it may be a durable ancestor when the settlement root has not yet been created.
+The anchor is a trusted precondition, not a fact inferred from its pathname.
+
+Strict mode reuses file-owner preflight before lookup/mkdir and validates the
+actual no-follow/nonblocking regular bucket/head descriptor on the anchor
+filesystem before reading or appending. It fsyncs the complete file-to-anchor
+directory chain even when all directories already existed. put's matching-record
+fast path reestablishes these barriers without appending. A new bucket line is
+still one O_APPEND write: a short write refuses and retains its fragment.
+
+Strict writeHead uses the existing complete atomic file writer, preserves
+expected-frontier admission, supplied at and closed semantics, and uses the
+original 0644 head creation mode masked by the process umask. extend persists
+the record before publishing the head. No API promises a combined transaction:
+orphan records and uncertain post-rename results remain possible.
+
+A post-publication failure does not prove the head stayed old. A domain that
+destroys another custody after seeing a terminal head must, under its actual
+writer fence, reestablish strict put barriers for the required records and
+republish the exact intended head with its observed at/closed fields and
+expected frontier, then independently read both. Reading an already-visible
+head alone is not sufficient. The current expiring lock is unchanged and does
+not fence a paused old writer.
+
+readHead(root, object, name, { strict, maxBytes }) supports an optional positive
+safe integer maxBytes below Number.MAX_SAFE_INTEGER. Supplying maxBytes implies
+strict regular-file descriptor admission. A bounded max+1 read enforces the
+UTF-8 byte limit despite growth after stat; exact maxBytes needs EOF. Over-budget,
+malformed UTF-8, redirected/FIFO/directory leaves and filesystem failures refuse.
+Missing files remain absent. maxBytes is caller-selected; 8192 is a proposed
+queue policy, not a new limit for unrelated heads. strict alone has no size
+bound. This is a point observation, not a snapshot or fixed-latency bucket index.
+
+
 ## 1. What the store is
 
 The store is the set of files a settlement keeps under `data/records`, `data/state` and `data/logs`, and the one module that writes and reads them. It has three kinds of file and no other:
