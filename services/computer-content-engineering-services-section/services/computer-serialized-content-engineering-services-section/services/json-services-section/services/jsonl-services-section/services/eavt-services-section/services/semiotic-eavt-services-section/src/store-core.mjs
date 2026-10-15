@@ -8,6 +8,7 @@
  */
 import { closeSync, constants, fstatSync, fsyncSync, mkdirSync, openSync, opendirSync, readFileSync, readSync, renameSync, statSync, unlinkSync, writeSync } from "node:fs";
 import { dirname } from "node:path";
+import { assertDurableFilePathSync, openDurableFileSync, syncFileDurablySync, writeFileTextSync } from "@red-cup-engineering/computer-file-engineering-services-section/write-file";
 import { canonicalJson, parseJsonValue } from "@red-cup-engineering/json-services-section";
 import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { niBucketPath } from "@red-cup-engineering/computer-content-address-engineering-services-section/ni-path";
@@ -46,9 +47,9 @@ function openStrictRegular(file) {
   } catch (error) { closeSync(fd); throw error; }
 }
 
-function* scanLines(file, { from = 0, prefix = null, strict = false } = {}) {
+function* scanLines(file, { from = 0, prefix = null, strict = false, durableRoot } = {}) {
   let fd;
-  try { fd = strict ? openStrictRegular(file) : openSync(file, "r"); } catch (error) { if (error.code === "ENOENT" || (!strict && error.code === "ENOTDIR")) return; throw error; }
+  try { fd = durableRoot !== undefined ? openDurableFileSync(file, constants.O_RDONLY, { durableRoot }) : strict ? openStrictRegular(file) : openSync(file, "r"); } catch (error) { if (error.code === "ENOENT" || (!strict && durableRoot === undefined && error.code === "ENOTDIR")) return; throw error; }
   if (fd === undefined) return;
   try {
     const chunk = Buffer.allocUnsafe(CHUNK_BYTES);
@@ -87,9 +88,11 @@ function* scanLines(file, { from = 0, prefix = null, strict = false } = {}) {
 }
 
 /** Open for appending, write `data` (after a newline if the file's last byte is not one) in one write. */
-function appendText(file, data, { durable }) {
-  mkdirSync(dirname(file), { recursive: true });
-  const fd = openSync(file, constants.O_APPEND | constants.O_CREAT | constants.O_RDWR, 0o644);
+function appendText(file, data, { durable, durableRoot }) {
+  const strict = durableRoot !== undefined;
+  if (!strict) mkdirSync(dirname(file), { recursive: true });
+  const flags = constants.O_APPEND | constants.O_CREAT | constants.O_RDWR;
+  const fd = strict ? openDurableFileSync(file, flags, { durableRoot, mode: 0o644, createParents: true }) : openSync(file, flags, 0o644);
   try {
     const size = fstatSync(fd).size;
     let cut = false;
@@ -98,6 +101,7 @@ function appendText(file, data, { durable }) {
     if (writeSync(fd, bytes) !== bytes.length) throw new StoreError("short-write", `short write to ${file}`);
     if (durable) fsyncSync(fd);
   } finally { closeSync(fd); }
+  if (strict) syncFileDurablySync(file, { durableRoot });
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -112,10 +116,10 @@ function verifiedRecord(text, address) {
 }
 
 /** The verified record of an address, or undefined; `strict` throws StoreCorruption when only bad lines name it. */
-function find(root, type, address, strict) {
+function find(root, type, address, strict, durableRoot) {
   const file = recordFile(checkRoot(root), type, address);
   let corrupt = false;
-  for (const { text } of scanLines(file, { prefix: `{"id":"${address}"` })) {
+  for (const { text } of scanLines(file, { prefix: `{"id":"${address}"`, durableRoot })) {
     const record = verifiedRecord(text, address);
     if (record !== undefined) return record;
     corrupt = true;
@@ -125,15 +129,20 @@ function find(root, type, address, strict) {
 }
 
 /** Writes the record once; returns its address. */
-export function put(root, type, record) {
+export function put(root, type, record, { durableRoot } = {}) {
   checkRoot(root); checkTypeName(type);
   if (!isObject(record)) throw new StoreError("record", "a record is a JSON object");
   const text = canonicalJson(record);
   const size = Buffer.byteLength(text, "utf8");
   if (size > RECORD_BYTES_MAX) throw new StoreError("record-size", `a record is at most ${RECORD_BYTES_MAX} bytes of canonical JSON; this is ${size}`);
   const address = semanticId(record);
-  if (find(root, type, address, false) !== undefined) return address;
-  appendText(recordFile(root, type, address), `{"id":"${address}","record":${text}}\n`, { durable: true });
+  const file = recordFile(root, type, address);
+  if (durableRoot !== undefined) assertDurableFilePathSync(file, { durableRoot });
+  if (find(root, type, address, false, durableRoot) !== undefined) {
+    if (durableRoot !== undefined) syncFileDurablySync(file, { durableRoot });
+    return address;
+  }
+  appendText(file, `{"id":"${address}","record":${text}}\n`, { durable: true, durableRoot });
   return address;
 }
 
@@ -321,22 +330,44 @@ export function withFileLock(lock, work) {
   try { return work(); } finally { try { unlinkSync(lock); } catch { /* already gone */ } }
 }
 
-function readHeadFile(file, { strict = false } = {}) {
+function readHeadFile(file, { strict = false, maxBytes, durableRoot } = {}) {
+  if (maxBytes !== undefined && (!Number.isSafeInteger(maxBytes) || maxBytes <= 0 || maxBytes === Number.MAX_SAFE_INTEGER))
+    throw new StoreError("head-size", "maxBytes must be a positive safe integer below MAX_SAFE_INTEGER");
   let text;
-  if (strict) {
-    const fd = openStrictRegular(file);
+  if (strict || maxBytes !== undefined || durableRoot !== undefined) {
+    let fd;
+    try { fd = durableRoot !== undefined ? openDurableFileSync(file, constants.O_RDONLY, { durableRoot }) : openStrictRegular(file); }
+    catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
     if (fd === undefined) return undefined;
-    try { text = readFileSync(fd, "utf8"); } finally { closeSync(fd); }
+    try {
+      if (maxBytes === undefined) text = readFileSync(fd, "utf8");
+      else {
+        if (fstatSync(fd).size > maxBytes) throw new StoreError("head-size", "head exceeds maxBytes");
+        const chunk = Buffer.allocUnsafe(Math.min(CHUNK_BYTES, maxBytes + 1));
+        const parts = [];
+        let total = 0;
+        for (;;) {
+          const count = readSync(fd, chunk, 0, Math.min(chunk.length, maxBytes + 1 - total), null);
+          if (count === 0) break;
+          total += count;
+          if (total > maxBytes) throw new StoreError("head-size", "head exceeds maxBytes");
+          parts.push(Buffer.from(chunk.subarray(0, count)));
+        }
+        // Preserve U+FEFF for the JSON owner's original admission; do not strip a BOM.
+        try { text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(Buffer.concat(parts, total)); }
+        catch { throw new StoreCorruption(file + " is not valid UTF-8 head text"); }
+      }
+    } finally { closeSync(fd); }
   } else {
     try { text = readFileSync(file, "utf8"); } catch (error) { if (error.code === "ENOENT") return undefined; throw error; }
   }
   const head = parseJsonValue(text);
-  if (!isObject(head) || !Array.isArray(head.frontier)) throw new StoreCorruption(`${file} is not a head`);
+  if (!isObject(head) || !Array.isArray(head.frontier)) throw new StoreCorruption(file + " is not a head");
   return head;
 }
 
-/** Reads one head, or undefined. */
-export function readHead(root, object, name) { return readHeadFile(headFile(checkRoot(root), object, name)); }
+/** Optional maxBytes enables strict descriptor admission and a max+1 byte read. */
+export function readHead(root, object, name, options) { return readHeadFile(headFile(checkRoot(root), object, name), options); }
 
 function frontierEntries(frontier, object) {
   if (!Array.isArray(frontier)) throw new StoreError("frontier", "a frontier is a list");
@@ -349,14 +380,19 @@ function frontierEntries(frontier, object) {
 }
 const sameFrontier = (object, left, right) => JSON.stringify(frontierEntries(left, object)) === JSON.stringify(frontierEntries(right, object));
 
-function writeHeadLocked(file, object, name, head, expect) {
-  const current = readHeadFile(file);
+function writeHeadLocked(file, object, name, head, expect, durableRoot) {
+  const current = readHeadFile(file, { durableRoot });
   if (expect !== undefined) {
     const holds = expect === null ? current === undefined : Array.isArray(expect) && sameFrontier(object, current?.frontier ?? [], expect) && (current !== undefined || expect.length === 0);
     if (!holds) throw new HeadConflict(`head ${object}/${name} is not as expected`);
   }
   const body = { name, frontier: frontierEntries(head.frontier, object), at: head.at ?? new Date().toISOString() };
   if (head.closed === true) body.closed = true;
+  if (durableRoot !== undefined) {
+    // Match the original 0644 creation subject to the process umask.
+    writeFileTextSync(file, JSON.stringify(body) + "\n", { durableRoot, mode: 0o644 & ~process.umask() });
+    return;
+  }
   const temporary = `${file}.tmp`;
   const fd = openSync(temporary, "w", 0o644);
   try { writeSync(fd, `${JSON.stringify(body)}\n`); fsyncSync(fd); } finally { closeSync(fd); }
@@ -364,24 +400,32 @@ function writeHeadLocked(file, object, name, head, expect) {
 }
 
 /** Replaces one head atomically. `expect`: absent, no check; null, the head must not exist; a list, the frontier must equal it. */
-export function writeHead(root, object, name, head, { expect } = {}) {
+export function writeHead(root, object, name, head, { expect, durableRoot } = {}) {
   const file = headFile(checkRoot(root), object, name);
   if (!isObject(head)) throw new StoreError("head", "a head is an object with a frontier");
-  withFileLock(`${file}.lock`, () => writeHeadLocked(file, object, name, head, expect));
+  if (durableRoot !== undefined) {
+    assertDurableFilePathSync(file, { durableRoot });
+    assertDurableFilePathSync(`${file}.lock`, { durableRoot });
+  }
+  withFileLock(`${file}.lock`, () => writeHeadLocked(file, object, name, head, expect, durableRoot));
 }
 
 /** Puts the record, with `causes` (default: the head's whole frontier), and advances the head. Returns the address. */
-export function extend(root, object, name, record, { causes, closed } = {}) {
+export function extend(root, object, name, record, { causes, closed, durableRoot } = {}) {
   const file = headFile(checkRoot(root), object, name);
   checkTypeName(object);
   if (!isObject(record)) throw new StoreError("record", "a record is a JSON object");
+  if (durableRoot !== undefined) {
+    assertDurableFilePathSync(file, { durableRoot });
+    assertDurableFilePathSync(`${file}.lock`, { durableRoot });
+  }
   return withFileLock(`${file}.lock`, () => {
-    const frontier = frontierEntries(readHeadFile(file)?.frontier ?? [], object);
+    const frontier = frontierEntries(readHeadFile(file, { durableRoot })?.frontier ?? [], object);
     const named = frontierEntries(causes ?? frontier, object);
-    const address = put(root, object, { ...record, causes: named });
+    const address = put(root, object, { ...record, causes: named }, { durableRoot });
     const dropped = new Set(named.map((entry) => keyOf(referenceOf(entry, object))));
     const next = [...frontier.filter((entry) => !dropped.has(keyOf(referenceOf(entry, object)))), address];
-    writeHeadLocked(file, object, name, { frontier: next, closed }, undefined);
+    writeHeadLocked(file, object, name, { frontier: next, closed }, undefined, durableRoot);
     return address;
   });
 }

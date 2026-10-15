@@ -52,13 +52,16 @@
     "url": "https://github.com/red-cup-engineering/computer-data-services-section.git",
     "directory": "services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section"
   },
-  "private": false,
   "files": [
     "package.json",
-    "README*",
-    "LICENSE*",
+    "README.md",
+    "SOURCE_RECEIVING.md",
+    "src",
     "scripts",
+    "test",
+    "content",
+    "lib/legacy/2026-10-10-base58-copy",
     "services/http-data-services-section/src",
-    "src"
+    "services/http-data-services-section/test"
   ]
 }

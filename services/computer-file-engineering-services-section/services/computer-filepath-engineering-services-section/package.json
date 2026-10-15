@@ -1,7 +1,6 @@
 {
   "name": "@red-cup-engineering/computer-filepath-engineering-services-section",
   "version": "0.1.0",
-  "private": false,
   "type": "module",
   "dependencies": {
     "@red-cup-engineering/computer-text-content-engineering-services-section": "0.1.0",
