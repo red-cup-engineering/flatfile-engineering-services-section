@@ -1,5 +1,13 @@
 # Computer file engineering services section
 
+## Temporary-file custody
+
+All atomic text and byte writers, synchronous and asynchronous, acquire cleanup
+custody only after exclusive creation of their temporary file succeeds. A
+collision at that temporary path refuses with EEXIST and leaves the foreign
+file and destination unchanged. Default writers still clean up their own
+temporary files after failures and retain best-effort directory sync.
+
 ## Opt-in strict durable publication
 
 The existing writeFileText, writeFileBytes and synchronous variants accept
