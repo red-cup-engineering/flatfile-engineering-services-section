@@ -1,4 +1,0 @@
-#+TITLE: Reading
-#+FILETAGS: :books:
-
-Currently reading [[file:atomic-habits.org][Atomic Habits]].

@@ -30,3 +30,7 @@
 	path = services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section
 	url = https://github.com/red-cup-engineering/json-services-section.git
 	branch = main
+[submodule "markdown-engineering-services-section"]
+	path = services/computer-content-engineering-services-section/services/typed-computer-content-engineering-services-section/services/computer-text-data-services-section/services/markdown-engineering-services-section
+	url = https://github.com/red-cup-engineering/markdown-engineering-services-section.git
+	branch = main
