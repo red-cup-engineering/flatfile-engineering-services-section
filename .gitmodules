@@ -22,3 +22,7 @@
 	path = services/computer-file-engineering-services-section
 	url = https://github.com/red-cup-engineering/computer-file-engineering-services-section.git
 	branch = main
+[submodule "computer-triplet-serialized-content-engineering-services-section"]
+	path = services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/computer-triplet-serialized-content-engineering-services-section
+	url = https://github.com/red-cup-engineering/computer-triplet-serialized-content-engineering-services-section.git
+	branch = main
