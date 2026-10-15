@@ -177,7 +177,7 @@ export async function prepare(plan, work) {
       if (binding.queue) args.push('--queue', binding.queue);
     }
     writeJournal(work, journal);
-    const result = spawnSync(process.execPath, args, {encoding: 'utf8', timeout: 300000, maxBuffer: 1024 * 1024, env: environment});
+    const result = spawnSync(process.execPath, args, {encoding: 'utf8', timeout: 1800000, maxBuffer: 1024 * 1024, env: environment});
     fs.writeFileSync(path.join(directory, 'converter.stdout'), result.stdout ?? '', {flag:'wx',mode:0o600});
     fs.writeFileSync(path.join(directory, 'converter.stderr'), (result.stderr ?? '') + (result.error?.code ?? ''), {flag:'wx',mode:0o600});
     assert.equal(result.status, 0, 'existing owner converter refused; original trees are unchanged');

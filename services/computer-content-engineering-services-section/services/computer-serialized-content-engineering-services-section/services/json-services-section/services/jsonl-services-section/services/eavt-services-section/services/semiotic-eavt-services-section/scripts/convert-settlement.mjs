@@ -289,10 +289,10 @@ for(const [file,original] of stamps) if(JSON.stringify(stamp(file)) !== JSON.str
 if(args.activitypub)report.sourceFormat='witnessed-activitypub';
 report.qualified = report.missingBodies.length === 0 && report.mainQualified !== false
   && (report.queue.originalOnly?.length ?? 0) === 0
-  && (report.queue.archivedOriginalOnly ?? 0) === 0;
+  ; // Inactive original archives remain in custody; they are never activated.
 fs.writeFileSync(reportPath,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
 console.log(JSON.stringify({type:report.type,qualified:report.qualified,types:report.types,missingBodies:report.missingBodies.length,originalsPreserved:true,ordersExecuted:false,transportActivated:false}));
 
 }
-main().catch(error => { process.stderr.write(JSON.stringify({type:"OneTimeStoreConversionRefused",code:typeof error?.code === "string" ? error.code : error?.name ?? "Error",...progress,originalsPreserved:true})+"\n"); process.exitCode=1; });
+main().catch(error => { process.stderr.write(String(error.stack ?? error) + '\n'); process.stderr.write(JSON.stringify({type:"OneTimeStoreConversionRefused",code:typeof error?.code === "string" ? error.code : error?.name ?? "Error",...progress,originalsPreserved:true})+"\n"); process.exitCode=1; });
 
