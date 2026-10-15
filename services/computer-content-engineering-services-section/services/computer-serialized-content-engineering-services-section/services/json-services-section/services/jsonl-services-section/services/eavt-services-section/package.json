@@ -22,6 +22,7 @@
     "./cli": "./apps/eavt.mjs",
     "./package.json": "./package.json",
     "./row": "./src/row.mjs",
+    "./schema-assertions": "./src/schema-assertions.mjs",
     "./admit-row": "./scripts/admit-row.mjs",
     "./encode-row": "./scripts/encode-row.mjs",
     "./decode-row": "./scripts/decode-row.mjs",

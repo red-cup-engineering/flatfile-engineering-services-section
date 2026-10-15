@@ -12,7 +12,7 @@ import { restrict,                } from "@red-cup-engineering/computer-content-
 import { canonical, isJsonValue, requireJsonValue } from "@red-cup-engineering/json-services-section";
 import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 import { jsonProjector } from "@red-cup-engineering/computer-content-engineering-services-section/json-projector";
-import { eavtId, eavtRecord, foldJson, mergeEavtLogs, unfoldJson } from "@red-cup-engineering/eavt-services-section/row";
+import { eavtId, eavtRecord, foldJson, mergeEavtLogs, unfoldJson } from "./row.mjs";
 
 const basename = (path        )         => path.split("/").filter(Boolean).at(-1) ?? path;
 
