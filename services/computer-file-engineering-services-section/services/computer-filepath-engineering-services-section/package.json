@@ -1,11 +1,11 @@
 {
   "name": "@red-cup-engineering/computer-filepath-engineering-services-section",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "dependencies": {
-    "@red-cup-engineering/computer-text-content-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/json-services-section": "workspace:*"
+    "@red-cup-engineering/computer-text-content-engineering-services-section": "0.1.0",
+    "@red-cup-engineering/json-services-section": "0.4.0"
   },
   "exports": {
     "./address": {
@@ -31,5 +31,12 @@
   },
   "scripts": {
     "test": "node --test test/*.test.mjs"
-  }
+  },
+  "files": [
+    "package.json",
+    "README*",
+    "LICENSE*",
+    "lib",
+    "scripts"
+  ]
 }

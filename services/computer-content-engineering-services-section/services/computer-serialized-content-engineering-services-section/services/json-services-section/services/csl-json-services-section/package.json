@@ -28,9 +28,9 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@red-cup-engineering/html-structural-projection-service": "workspace:*",
-    "@red-cup-engineering/json-services-section": "workspace:*",
-    "@red-cup-engineering/json-schema-services-section": "workspace:*"
+    "@red-cup-engineering/html-structural-projection-service": "0.3.1",
+    "@red-cup-engineering/json-services-section": "0.4.0",
+    "@red-cup-engineering/json-schema-services-section": "0.5.0"
   },
   "keywords": [
     "csl-json",
@@ -43,5 +43,6 @@
     "type": "git",
     "url": "https://github.com/red-cup-engineering/computer-data-services-section.git",
     "directory": "services/csl-json-services-section"
-  }
+  },
+  "private": false
 }

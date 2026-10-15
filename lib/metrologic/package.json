@@ -408,13 +408,14 @@
   ],
   "sideEffects": false,
   "dependencies": {
-    "@red-cup-engineering/computer-content-address-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/eavt-services-section": "workspace:*",
-    "@red-cup-engineering/exact-number-data-service": "workspace:*",
-    "@red-cup-engineering/json-services-section": "workspace:*"
+    "@red-cup-engineering/computer-content-address-engineering-services-section": "0.2.0",
+    "@red-cup-engineering/computer-data-engineering-services-section": "0.2.0",
+    "@red-cup-engineering/eavt-services-section": "0.10.4",
+    "@red-cup-engineering/exact-number-data-service": "0.1.1",
+    "@red-cup-engineering/json-services-section": "0.4.0"
   },
   "scripts": {
     "test": "node --max-old-space-size=256 --test --test-concurrency=1 --test-timeout=15000"
-  }
+  },
+  "private": false
 }

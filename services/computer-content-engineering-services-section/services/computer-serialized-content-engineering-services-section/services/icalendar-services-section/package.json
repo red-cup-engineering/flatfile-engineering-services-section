@@ -13,5 +13,12 @@
   "scripts": {
     "test": "node --test test/*.test.mjs"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "private": false,
+  "files": [
+    "package.json",
+    "README*",
+    "LICENSE*",
+    "scripts"
+  ]
 }

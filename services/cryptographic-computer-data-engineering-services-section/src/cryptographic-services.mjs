@@ -10,8 +10,9 @@ import {
 import { sha256 } from "./hash.mjs";
 import { keccak256 } from "./keccak256.mjs";
 import { canonicalJson as canonical } from "@red-cup-engineering/json-services-section/canonical-json";
-import { ACTIVITYSTREAMS_CONTEXT } from "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section/activitystreams";
 
+// The ActivityStreams 2.0 JSON-LD context IRI (W3C Recommendation, Activity Streams 2.0, section 2.1).
+const ACTIVITYSTREAMS_CONTEXT = "https://www.w3.org/ns/activitystreams";
 const ACTOR = "urn:ame:cryptographic-services-section";
 
 const OPERATIONS = Object.freeze({

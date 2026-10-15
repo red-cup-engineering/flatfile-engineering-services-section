@@ -12,12 +12,12 @@ import { canonicalJson } from "@red-cup-engineering/json-services-section";
 import { evidence, knowledgeReading } from "@red-cup-engineering/signcell/cell";
 import { decodeReferencesValue, referencesFrontmatterValue } from "@red-cup-engineering/csl-json-services-section/csl-references";
 import { createMarkdownDocument } from "./create-markdown-document.mjs";
-import { readMarkdownFrontmatter } from "@red-cup-engineering/read-markdown-frontmatter-service";
-import { readMarkdownFeatures } from "@red-cup-engineering/read-markdown-features-service";
-import { readMarkdownStructure } from "@red-cup-engineering/read-markdown-structure-service";
+import { readMarkdownFrontmatter } from "./read-markdown-frontmatter.mjs";
+import { readMarkdownFeatures } from "./read-markdown-features.mjs";
+import { readMarkdownStructure } from "./read-markdown-structure.mjs";
 import { validateMarkdownDocument } from "./validate-markdown-document.mjs";
 import { readMarkdownWorkbench } from "./read-markdown-workbench.mjs";
-import { unfoldSchema } from "@red-cup-engineering/json-schema-services-section/schema-assertions";
+import { unfoldSchema } from "@red-cup-engineering/json-schema-services-section/schema-assertion-trace";
 import { stringProjector } from "@red-cup-engineering/computer-content-engineering-services-section/text-projector";
 // Type-only: `executing/fact-claims.mjs` sits above `projections/` (`api/catalog.mjs`
 // already imports this very module), so the glue FUNCTION is injected by callers

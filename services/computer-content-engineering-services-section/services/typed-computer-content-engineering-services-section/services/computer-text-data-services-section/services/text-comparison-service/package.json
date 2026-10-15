@@ -16,5 +16,13 @@
   },
   "engines": {
     "node": ">=22"
-  }
+  },
+  "private": false,
+  "files": [
+    "package.json",
+    "README*",
+    "LICENSE*",
+    "scripts",
+    "src"
+  ]
 }

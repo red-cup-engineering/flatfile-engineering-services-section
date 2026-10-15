@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/json-schema-services-section",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "private": false,
   "type": "module",
   "description": "Canonical Red Cup JSON Schema semantics: admission, bounded reference lookup, instance judgment, policy inspection, schema-assertion pointer cells, path-addressed reading, writing and searching, native-engine evaluation, and artifact census.",
@@ -44,7 +44,6 @@
     "./schema-vocabulary": "./src/schema-vocabulary.mjs",
     "./schema-evaluation": "./src/schema-evaluation.mjs",
     "./schema-registry": "./src/schema-registry.mjs",
-    "./schema-assertions": "./src/schema-assertions.mjs",
     "./schema-assertion-trace": {
       "types": "./src/schema-assertion-trace.d.mts",
       "import": "./src/schema-assertion-trace.mjs"
@@ -94,16 +93,14 @@
   "dependencies": {
     "@hyperjump/browser": "1.5.1",
     "@hyperjump/json-schema": "1.18.0",
-    "@red-cup-engineering/computer-content-address-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/eavt-services-section": "workspace:*",
-    "@red-cup-engineering/json-services-section": "workspace:*",
-    "@red-cup-engineering/uri-services-section": "workspace:*"
+    "@red-cup-engineering/computer-data-engineering-services-section": "0.2.0",
+    "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
+    "@red-cup-engineering/json-services-section": "0.4.0",
+    "@red-cup-engineering/uri-services-section": "0.1.1"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "typescript": "^5.8.0"
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

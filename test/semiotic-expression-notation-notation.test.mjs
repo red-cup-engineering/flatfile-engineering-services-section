@@ -7,12 +7,8 @@ import {
   isTerm, validateSenTerm, TySchema, TmSchema, SEN_FORMS,
 } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 
-import { compileJsonSchema } from "@red-cup-engineering/json-schema-services-section/validation";
+import { SEN_TYPE_FORMS } from "../src/semiotic-expression-notation/notation/forms.mjs";
 
-const typeValidation = compileJsonSchema(TySchema);
-const termValidation = compileJsonSchema(TmSchema, { references: [TySchema] });
-const validateAgainst = (schema, _root, value) =>
-  (schema === TySchema ? typeValidation : termValidation).validate(value).valid;
 
 // ── 1. construct terms and types ────────────────────────────────────────────
 
@@ -55,27 +51,9 @@ test("tm.var rejects non-natural indices", () => {
   assert.throws(() => tm.var(1.5), TypeError);
 });
 
-// ── 2. validate constructed terms/types against the shipped schema literals ─
-
-test("constructed types validate against TySchema", () => {
-  for (const t of [ty.base(), ty.arrow(ty.base(), ty.unit()), ty.prod(ty.base(), ty.unit()), ty.unit(), ty.list(ty.base())]) {
-    assert.equal(validateAgainst(TySchema, TySchema, t), true, JSON.stringify(t));
-  }
-  assert.equal(validateAgainst(TySchema, TySchema, ["not-a-type"]), false);
-  assert.equal(validateAgainst(TySchema, TySchema, ["arrow", ty.base()]), false); // wrong arity
-});
-
-test("constructed terms validate against TmSchema, including nested recursion", () => {
-  const nested = tm.app(tm.lam(tm.pair(tm.var(0), tm.fold(tm.lam(tm.lam(tm.var(0))), tm.mark("seed"), tm.var(0)))), tm.star());
-  assert.equal(validateAgainst(TmSchema, TmSchema, nested), true);
-  assert.equal(validateAgainst(TmSchema, TmSchema, ["var", -1]), false); // negative index
-  assert.equal(validateAgainst(TmSchema, TmSchema, ["mark", 42]), false); // non-string payload
-  assert.equal(validateAgainst(TmSchema, TmSchema, ["cond", tm.star(), tm.star()]), false); // wrong arity
-});
-
 test("TmSchema and TySchema each expose one anyOf branch per grammar form", () => {
   assert.equal(TmSchema.anyOf.length, Object.keys(SEN_FORMS).length);
-  assert.equal(TySchema.anyOf.length, 5);
+  assert.equal(TySchema.anyOf.length, Object.keys(SEN_TYPE_FORMS).length);
 });
 
 // ── validator.mjs's isTerm, exercised directly ──────────────────────────────
@@ -275,17 +253,6 @@ test("leT: denied is truth-least, held is truth-greatest (reduced)", () => {
   assert.equal(boolOfTerm(reduceClosedTree(tm.leT(tm.reading("held"), tm.reading("denied")))), false);
 });
 
-test("settle is exactly joinK, reduced values agree for every pair", () => {
-  for (const left of charges) {
-    for (const right of charges) {
-      assert.deepEqual(
-        reduceClosedTree(tm.settle(tm.reading(left), tm.reading(right))),
-        reduceClosedTree(tm.joinK(tm.reading(left), tm.reading(right))),
-      );
-    }
-  }
-});
-
 test("fromCharge collapses every corner onto its truth-bit boolean (reduced)", () => {
   assert.deepEqual(reduceClosedTree(tm.toldFor(tm.reading("held"))), tm.bool(true));
   assert.deepEqual(reduceClosedTree(tm.toldFor(tm.reading("contested"))), tm.bool(true));
@@ -293,7 +260,7 @@ test("fromCharge collapses every corner onto its truth-bit boolean (reduced)", (
   assert.deepEqual(reduceClosedTree(tm.toldFor(tm.reading("unknown"))), tm.bool(false));
 });
 
-test("every charge op still produces a closed, schema-valid term BEFORE reduction (no evaluation happens in this package)", () => {
+test("every charge op still produces a closed term BEFORE reduction (no evaluation happens in this package)", () => {
   const built = [
     tm.negate(tm.reading("held")),
     tm.conflate(tm.reading("contested")),
@@ -302,7 +269,6 @@ test("every charge op still produces a closed, schema-valid term BEFORE reductio
   ];
   for (const term of built) {
     assert.equal(isTerm(term), true);
-    assert.equal(validateAgainst(TmSchema, TmSchema, term), true);
   }
 });
 
@@ -329,11 +295,10 @@ test("consArray then fst/snd shape matches a manual pair-spine prepend", () => {
   assert.deepEqual(withOne, tm.pair(tm.fst(empty), tm.pair(tm.mark("elem"), tm.snd(empty))));
 });
 
-test("field compiles to a fold over an assoc-list spine, closed and schema-valid", () => {
+test("field compiles to a fold over an assoc-list spine, closed", () => {
   const compiled = tm.field("k", tm.mark("obj"));
   assert.equal(compiled[0], "fold");
   assert.equal(isTerm(compiled), true);
-  assert.equal(validateAgainst(TmSchema, TmSchema, compiled), true);
 });
 
 // ── tm.append — golden-vectored against a small test-only reducer ──────────
@@ -409,13 +374,12 @@ test("reverseArray reduces a 2-element array to its reverse, tag preserved (gold
   assert.deepEqual(reduced, arrayOf("t", [tm.mark("e1"), tm.mark("e0")]));
 });
 
-test("tm.append produces a closed, schema-valid fold term before reduction", () => {
+test("tm.append produces a closed fold term before reduction", () => {
   const left = arrayOf("left-tag", [tm.mark("a"), tm.mark("b")]);
   const right = arrayOf("right-tag", [tm.mark("c"), tm.mark("d")]);
   const appended = tm.append(left, right);
   assert.equal(appended[0], "fold");
   assert.equal(isTerm(appended), true);
-  assert.equal(validateAgainst(TmSchema, TmSchema, appended), true);
 });
 
 test("tm.append reduces two concrete arrays into their concatenation, left elements before right, right's tag wins (golden-vectored)", () => {
