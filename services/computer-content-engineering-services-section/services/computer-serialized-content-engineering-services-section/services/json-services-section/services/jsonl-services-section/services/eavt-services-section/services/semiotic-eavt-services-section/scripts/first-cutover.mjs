@@ -154,14 +154,16 @@ function recordBinding(work, binding, target, candidate, name = binding.name) {
   return {name, target, candidate, retained: path.join(work, name, 'original'), failed: path.join(work, name, 'failed'), before: treeDigest(target), prepared: treeDigest(candidate), phase: 'prepared'};
 }
 /** Prepare every candidate before any live pathname is rebound. */
-export async function prepare(plan, work) {
-  validatePlan(plan, work); assert.ok(!exists(work), 'first cutover requires a new operation directory');
-  fs.mkdirSync(work, {mode: 0o700}); syncDirectory(path.dirname(work));
-  const journal = {version: 1, plan, phase: 'preparing', sources: [], pendingDeliveries: [], bindings: []}; writeJournal(work, journal);
+export async function prepare(plan, work, {resume=false}={}) {
+  validatePlan(plan, work);
+  let journal;
+  if(resume){journal=readJournal(plan,work);assert.equal(journal.phase,'preparing');for(const source of journal.sources)unchanged(source.path,source.digest);}
+  else{assert.ok(!exists(work),'first cutover requires a new operation directory');fs.mkdirSync(work,{mode:0o700});syncDirectory(path.dirname(work));journal={version:1,plan,phase:'preparing',sources:[],pendingDeliveries:[],bindings:[]};writeJournal(work,journal);}
   const newStore = provider(plan.newStore), oldStore = provider(plan.oldStore);
   for (const binding of plan.bindings) {
+    if(resume&&journal.bindings.some(row=>row.name===binding.name)){for(const row of journal.bindings.filter(row=>row.name===binding.name))unchanged(row.candidate,row.prepared);continue;}
     for (const source of sourceRoots(binding)) if (!journal.sources.some(row => row.path === source)) journal.sources.push({path: source, digest: treeDigest(source)});
-    const directory = path.join(work, binding.name); fs.mkdirSync(directory, {mode: 0o700});
+    const directory = path.join(work, binding.name); if(!exists(directory))fs.mkdirSync(directory, {mode:0o700});else assert.ok(resume);
     let nativeActivitypub=false;
     if(binding.conversion==='activitypub'){const {activityPubSourceFormat}=await import('./receive-native-activitypub.mjs');nativeActivitypub=activityPubSourceFormat({source:binding.source,sourceStoreRoot:oldStore,sourceActivitypubRoot:provider(plan.oldActivitypub)})==='native-activitypub-13bca0b8';}
     const candidate = path.join(directory, binding.conversion==='activitypub'?'journal':'candidate'), reportFile = path.join(directory, 'conversion.json');
@@ -178,11 +180,16 @@ export async function prepare(plan, work) {
       if (binding.queue) args.push('--queue', binding.queue);
     }
     writeJournal(work, journal);
-    const result = spawnSync(process.execPath, args, {encoding: 'utf8', timeout: 1800000, maxBuffer: 1024 * 1024, env: environment});
-    fs.writeFileSync(path.join(directory, 'converter.stdout'), result.stdout ?? '', {flag:'wx',mode:0o600});
-    fs.writeFileSync(path.join(directory, 'converter.stderr'), (result.stderr ?? '') + (result.error?.code ?? ''), {flag:'wx',mode:0o600});
+    const reuse = resume && binding.conversion !== 'kalshi' && exists(reportFile) && exists(candidate);
+    const result = reuse ? {status:0,stdout:'',stderr:''} : spawnSync(process.execPath, args, {encoding: 'utf8', timeout: 1800000, maxBuffer: 1024 * 1024, env: environment});
+    if(!reuse)fs.writeFileSync(path.join(directory, 'converter.stdout'), result.stdout ?? '', {flag:'wx',mode:0o600});
+    if(!reuse)fs.writeFileSync(path.join(directory, 'converter.stderr'), (result.stderr ?? '') + (result.error?.code ?? ''), {flag:'wx',mode:0o600});
     assert.equal(result.status, 0, 'existing owner converter refused; original trees are unchanged');
-    const report = binding.conversion === 'kalshi' ? JSON.parse(result.stdout) : JSON.parse(fs.readFileSync(reportFile, 'utf8'));
+    let report = binding.conversion === 'kalshi' ? JSON.parse(result.stdout) : JSON.parse(fs.readFileSync(reportFile, 'utf8'));
+    if(reuse&&binding.conversion==='world'&&report.qualified===false){
+      const {receiveOriginalDispositions}=await import('./receive-original-dispositions.mjs');
+      report=await receiveOriginalDispositions({report,reportFile,binding,plan});
+    }
     assert.equal(report.originalsPreserved, true);
     if (binding.conversion === 'kalshi') {
       assert.equal(report.orderEffect, false); assert.equal(report.dryRun, false); assert.deepEqual(report.conflicts, []);
@@ -293,10 +300,10 @@ export function restore(plan, work) {
 if (process.argv[1] && fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const [operation, planFile, work, stopped, originalFlag, originalArtifact, ...extra] = process.argv.slice(2);
-    assert.ok(['prepare', 'bind', 'restore'].includes(operation) && stopped === '--writers-stopped'
+    assert.ok(['prepare', 'resume-prepare', 'bind', 'restore'].includes(operation) && stopped === '--writers-stopped'
       && originalFlag === '--original-artifact' && typeof originalArtifact === 'string' && extra.length === 0,
       'usage: first-cutover.mjs prepare|bind|restore PLAN_JSON WORK_DIRECTORY --writers-stopped --original-artifact CONFIGURED_GUIX_OUTPUT');
     const plan = bindOriginalArtifact(JSON.parse(fs.readFileSync(planFile, 'utf8')), provider(originalArtifact));
-    const result = await ({prepare, bind, restore})[operation](plan, work); console.log(JSON.stringify(result));
+    const result = operation==='resume-prepare'?await prepare(plan,work,{resume:true}):await ({prepare,bind,restore})[operation](plan,work); console.log(JSON.stringify(result));
   } catch (error) { console.error(JSON.stringify({error: error.message, writersMustRemainStopped: true})); process.exitCode = 1; }
 }
