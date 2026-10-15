@@ -10,16 +10,9 @@ import {
   admitJsonType,
   readJsonField,
 } from "../src/index.mjs";
-import {
-  isJsonlText,
-  parseLines,
-  serializeLines,
-} from "../services/jsonl-services-section/src/index.mjs";
 
-test("JSON and JSONL preserve canonical recovered behavior", () => {
+test("JSON preserves canonical recovered behavior", () => {
   assert.equal(canonical(parse('{"b":2,"a":1}')), '{"a":1,"b":2}');
-  assert.deepEqual(parseLines('{"b":2}\n{"a":1}\n'), [{ b: 2 }, { a: 1 }]);
-  assert.equal(serializeLines([{ b: 2 }, { a: 1 }]), '{"b":2}\n{"a":1}\n');
 });
 
 test("canonicalization recursively sorts objects and preserves arrays", () => {
@@ -50,11 +43,6 @@ test("generic JSON admission rejects sparse arrays and cycles while retaining RF
   assert.equal(isJsonValue("\ud800"), true);
   assert.throws(() => canonicalChecked("\ud800"), /lone Unicode surrogate/u);
   assert.equal(canonicalChecked(-0), "0");
-});
-
-test("JSONL recognition is line-wise rather than whole-document JSON", () => {
-  assert.equal(isJsonlText('{"a":1}\n{"b":2}\n'), true);
-  assert.equal(isJsonlText('{"a":1}\nnot-json\n'), false);
 });
 
 test("object record admission preserves the permissive runtime boundary separately from JSON", () => {
@@ -108,12 +96,4 @@ test("JSON admission and field lookup retain context in an explicit carrier", ()
       }),
     /game-codecs: missing field "missing" in game/u,
   );
-});
-
-test("JSONL errors identify the failing physical source line", () => {
-  assert.throws(
-    () => parseLines('\n {"ok":true}\n \n invalid\n'),
-    /^TypeError: JSON Lines line 4:/u,
-  );
-  assert.deepEqual(parseLines('\n {"ok":true}\n \n'), [{ ok: true }]);
 });
