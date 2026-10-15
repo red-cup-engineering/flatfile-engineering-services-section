@@ -83,9 +83,9 @@ function selection(witness,kind,context,semantic=context.semanticRecordOf(witnes
 
 /** All supplier functions come from independently selected, fabricated providers.
  * Temporary maps contain byte positions and addresses, never an in-memory store table. */
-export async function convertMainWorld({source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress,clockLastSource,admit,claimType,evidenceType,createSignClaim,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock}){
+export async function convertMainWorld({source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress,clockLastSource,admit,claimType,evidenceType,createSignClaim,Mark,MarkType,createTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock}){
  if(!store||![parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress].every(fn=>typeof fn==='function'))throw new TypeError('exact original readers and current writers required');
- if(![admit,createSignClaim,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock].every(fn=>typeof fn==='function')||!claimType||!evidenceType)throw new TypeError('current Metrologic and SignCell receivers required');
+ if(![admit,createSignClaim,Mark,createTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock].every(fn=>typeof fn==='function')||!claimType||!evidenceType||!MarkType)throw new TypeError('current Metrologic and SignCell receivers required');
  const mapRoot=path.join(output,'.conversion-main'),maps=createBucketMap(mapRoot,niBucketPath),stamps=new Map(),active=new Set();
  fs.mkdirSync(mapRoot,{recursive:true,mode:0o700});
  report.mainConsumers={claimSession:'feltos/src/work/claim-session-store.mjs',capabilities:'computer-system-engine/src/rpc/capability-assertions.mjs',offices:'metroplat/src/offices.mjs',bodies:'metroplat/src/bodies.mjs',clock:'organizing/src/work/recurring.mjs',epistemic:'metrologic claim/evidence + SignCell'};
@@ -158,26 +158,30 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   if(!evidenceAdmitted?.ok)throw new TypeError('original source evidence fails current Metrologic receiving');
   const evidenceId=putCurrent('evidence',evidenceAdmitted.value);
   const witnessRef={id:evidenceId,type:'evidence'};
-  const putTerm=(role,term)=>{
-   const record={kind:'evidence',source:item.original,observedAt:item.observedAt,
-    content:{kind:'source-term',role,term,sourceKind:item.sourceKind,sourceWitness:item.original},provenance};
-   const admitted=admit(evidenceType,record);if(!admitted?.ok)throw new TypeError('original typed term fails current Metrologic evidence receiving');
-   const id=putCurrent('evidence',admitted.value);return {id,type:'evidence'};
+  const putTerm=term=>{
+   const typed=createTypedMark(MarkType,Mark(term));
+   if(!typed?.ok)throw new TypeError('original EAVT term fails current opaque typed-mark receiving');
+   putCurrent('typed-mark',typed.value);
+   return referenceOf(typed.value);
   };
   let subjectRef,objectRef;
-  if(claimRecord){subjectRef=putTerm('claim-subject',subjectTerm);objectRef=putTerm('claim-object',objectTerm);}
-  else if(item.sourceRow&&text(item.sourceCategory)){
-   subjectRef=putTerm('source-row-entity',item.sourceRow.e);objectRef=putTerm('source-row-value',item.sourceRow.v);predicate=item.sourceCategory;
+  if(claimRecord){subjectRef=putTerm(subjectTerm);objectRef=putTerm(objectTerm);}
+  else if(item.sourceRow&&Object.hasOwn(item.sourceRow,'e')&&Object.hasOwn(item.sourceRow,'a')&&Object.hasOwn(item.sourceRow,'v')){
+   const [entity,predicateTerm,value]=[item.sourceRow.e,item.sourceRow.a,item.sourceRow.v];
+   subjectRef=putTerm(sourceTermToJson(entity));objectRef=putTerm(sourceTermToJson(value));
+   predicate=sourceTermToJson(predicateTerm);
   }
   if(!claimRecord){
-   if(subjectRef&&objectRef)claimRecord={kind:'claim',subject:subjectRef.id,predicate,object:objectRef,provenance};
-   else{
-    // No valid proposition coordinates exist. Keep the entire source in an
-    // explicitly ambiguous claim; no current authority is inferred from it.
-    claimRecord={kind:'claim',subject:item.original,predicate:'legacy:uninterpreted-source-claim',
-     object:{sourceKind:item.sourceKind,sourceCategory:item.sourceCategory,sourceRecordedAt:item.sourceRecordedAt,record:item.record},provenance};
-    subjectRef=witnessRef;objectRef=putTerm('uninterpreted-source-record',claimRecord.object);predicate=claimRecord.predicate;
+   if(!subjectRef||!objectRef||!text(predicate)){
+    // Preserve the original expression, source charge, and provenance as
+    // evidence. With no admitted proposition coordinates, do not transfer its
+    // charge to a fabricated relation.
+    for(const type of ['evidence'])count(type).read++;
+    const result={id:evidenceId,type:'evidence'};
+    if(item.identity&&NI.test(item.identity))maps.put('translated-identity',item.identity,result);
+    return result;
    }
+   claimRecord={kind:'claim',subject:subjectRef.id,predicate,object:objectRef,provenance};
    const admitted=admit(claimType,claimRecord);if(!admitted?.ok)throw new TypeError('source proposition or explicit ambiguity fails current Metrologic claim receiving');
    claimRecord=admitted.value;
   }
