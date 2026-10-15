@@ -18,3 +18,7 @@
 	path = services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/cbor-services-section
 	url = https://github.com/red-cup-engineering/cbor-services-section.git
 	branch = main
+[submodule "computer-text-content-engineering-services-section"]
+	path = services/computer-content-engineering-services-section/services/computer-text-content-engineering-services-section
+	url = https://github.com/red-cup-engineering/computer-text-content-engineering-services-section.git
+	branch = main
