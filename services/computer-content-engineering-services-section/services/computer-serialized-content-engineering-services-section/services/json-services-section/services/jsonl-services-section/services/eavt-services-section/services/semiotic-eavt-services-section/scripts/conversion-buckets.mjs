@@ -33,13 +33,16 @@ export function assertSourceStamps(stamps){for(const [file,stamp]of stamps)if(JS
 const plainReader=file=>{const fd=fs.openSync(file,'r');return {read:(...args)=>fs.readSync(fd,...args),close:()=>fs.closeSync(fd)};};
 
 /** One original line and its exact logical byte position, including packed segments. */
-export function* streamJsonLines(file,{openReader=plainReader,maxLineBytes=SOURCE_LINE_BYTES_MAX}={}){
+export function* streamJsonLines(file,{openReader=plainReader,maxLineBytes=SOURCE_LINE_BYTES_MAX,onMalformed}={}){
  const reader=openReader(file),buffer=Buffer.alloc(65_536),end=fs.statSync(file).size;let position=0,offset=0,carry=Buffer.alloc(0);
  try{while(position<end){const count=reader.read(buffer,0,Math.min(buffer.length,end-position),position);if(!count)break;position+=count;
   const bytes=carry.length?Buffer.concat([carry,buffer.subarray(0,count)]):Buffer.from(buffer.subarray(0,count));let start=0,index;
   while((index=bytes.indexOf(10,start))>=0){const line=bytes.subarray(start,index);if(line.length>maxLineBytes||line.includes(0))throw new TypeError('original line violates its provider envelope');
    if(!line.length)throw new TypeError('empty conversion table/source line');
-   yield {offset,length:line.length,bytes:line,record:JSON.parse(line.toString('utf8'))};offset+=line.length+1;start=index+1;
+   let record;
+   try{record=JSON.parse(line.toString('utf8'));}
+   catch(error){if(typeof onMalformed!=='function')throw error;onMalformed({offset,length:line.length,sha256:createHash('sha256').update(line).digest('hex')});offset+=line.length+1;start=index+1;continue;}
+   yield {offset,length:line.length,bytes:line,record};offset+=line.length+1;start=index+1;
   }
   carry=Buffer.from(bytes.subarray(start));if(carry.length>maxLineBytes)throw new RangeError('original line violates its provider envelope');
  }if(carry.length&&!carry.every(byte=>byte===0))throw new TypeError('torn original source requires custody judgment');

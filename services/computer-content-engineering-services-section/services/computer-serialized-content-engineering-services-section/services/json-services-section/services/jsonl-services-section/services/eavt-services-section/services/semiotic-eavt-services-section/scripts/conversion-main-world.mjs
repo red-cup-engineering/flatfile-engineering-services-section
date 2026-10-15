@@ -111,7 +111,8 @@ export async function convertMainWorld({deferredKinds=new Set(),source,output,ol
   const ledger=file.replace(/\.witnesses$/u,'.admitted');
   if(fs.existsSync(ledger))for(const {record}of streamJsonLines(ledger))if(!Number.isSafeInteger(record.end)||record.end<0||record.end>fs.statSync(file).size)throw new TypeError('original segment lost admitted custody');
   let selected=0;
-  for(const line of streamJsonLines(file,{openReader:openSegmentReader})){
+  const onMalformed=deferredKinds.has(kind)?position=>{report.deferredMalformedSources??=[];report.deferredMalformedSources.push({kind,path:path.relative(source,file),...position,originalPreserved:true,activated:false});}:undefined;
+  for(const line of streamJsonLines(file,{openReader:openSegmentReader,onMalformed})){
    if(NI.test(line.record.id)&&maps.get('original-kind',line.record.id)===undefined)maps.put('original-kind',line.record.id,kind);
    // Select the current consumer before reconstructing an old witness. Unmapped
    // kinds already remained original-only below; retain their raw identity map
