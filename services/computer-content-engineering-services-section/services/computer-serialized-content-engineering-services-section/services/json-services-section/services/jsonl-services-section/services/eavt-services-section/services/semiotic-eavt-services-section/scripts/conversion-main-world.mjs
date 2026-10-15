@@ -2,6 +2,7 @@
  * Current receiving forms, not old witness wrappers, govern the selected records.
  * See store-conversion.md and store-migration-map.md; no runtime legacy bridge. */
 import { getTypedMark, putTypedMark } from "../src/typed-mark-store.mjs";
+import { originalClaimCandidates } from './original-claim-subject.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import {originalJournalFiles,createBucketMap,streamJsonLines,sourceFiles,sourceStamp,assertSourceStamps,hashSource,witnessAt} from './conversion-buckets.mjs';
@@ -13,19 +14,20 @@ const text=value=>typeof value==='string'&&value.length>0;
 /** Canonical old path computation must corroborate a recovered subject. */
 function claimSubject({kind,row,witness,file,source,dataArtifactAddress}){
  if(kind.startsWith('structured-work-intent-'))return kind;
- const [e,,v]=row;
- const candidates=[e?.session,v?.caller?.surface,v?.boundary?.surface,witness.observation.seat?.subject,typeof e==='string'?e:undefined];
- const niKind=/^ni-sha-256-([A-Za-z0-9_-]{43})$/u.exec(kind),actorKind=/^actor-ni-sha-256-([A-Za-z0-9_-]{43})$/u.exec(kind);
- if(niKind)candidates.push(`ni:///sha-256;${niKind[1]}`);
- if(actorKind)candidates.push(`actor:ni:///sha-256;${actorKind[1]}`);
- const matches=[...new Set(candidates.filter(text))].filter(subject=>{
+ const candidates=originalClaimCandidates(kind,row,witness);
+ const corroborate=at=>candidates.filter(subject=>{
   if(subject===kind)return true;
   if(typeof dataArtifactAddress!=='function')return false;
   // Old journalFeedPath calls the original formula with kind in BOTH coordinates.
-  const described=dataArtifactAddress({root:source,tier:'log',encoding:'jsonl',at:String(row[3]),action:subject,subject});
+  const described=dataArtifactAddress({root:source,tier:'log',encoding:'jsonl',at,action:subject,subject});
   return path.basename(described.path)===path.basename(file).replace(/\.witnesses$/u,'');
  });
- return matches.length===1?matches[0]:undefined;
+ const matches=corroborate(String(row[3]));
+ if(matches.length===1)return matches[0];
+ const filingDate=/^(\d{4}-\d{2}-\d{2})-/u.exec(path.basename(file))?.[1];
+ const filed=filingDate===undefined?[]:corroborate(filingDate);
+ // Filing corroborates the original name; the caller retains row[3] unchanged.
+ return filed.length===1?filed[0]:undefined;
 }
 
 function selection(witness,kind,context,semantic=context.semanticRecordOf(witness,kind)){

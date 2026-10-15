@@ -11,6 +11,7 @@ import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 import {originalJournalFiles,streamJsonLines} from './conversion-buckets.mjs';
 import {checkCurrentState} from './check-current-state.mjs';
+import {originalClaimCandidates} from './original-claim-subject.mjs';
 const NI=/^ni:\/\/\/sha-256;[A-Za-z0-9_-]{43}$/u;
 const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
 const text=value=>typeof value==='string'&&value.length>0;
@@ -39,11 +40,7 @@ export async function receiveOriginalDispositions({report,reportFile,binding,pla
   return {status:'original-packet-retained',...keep(bytes,'application/json')};
  };
  const received=Object.fromEntries(allowed.map(key=>[key,0])),rows=[],unresolved=[];
- const claimCandidates=(kind,row,witness)=>{
-  const [e,,v]=row,candidates=[e?.session,v?.caller?.surface,v?.boundary?.surface,witness.observation.seat?.subject,typeof e==='string'?e:undefined];
-  for(const [pattern,prefix]of [[/^ni-sha-256-([A-Za-z0-9_-]{43})$/u,''],[/^actor-ni-sha-256-([A-Za-z0-9_-]{43})$/u,'actor:']]){const match=pattern.exec(kind);if(match)candidates.push(prefix+'ni:///sha-256;'+match[1]);}
-  return [...new Set(candidates.filter(text))];
- };
+ const claimCandidates=originalClaimCandidates;
  const match=(file,kind,row,witness,at)=>claimCandidates(kind,row,witness).filter(subject=>subject===kind||path.basename(dataArtifactAddress({root:source,tier:'log',encoding:'jsonl',at,action:subject,subject}).path)===path.basename(file).replace(/\.witnesses$/u,''));
  const deferred=new Set(binding.deferKinds??[]);
  for(const file of originalJournalFiles(source)){
