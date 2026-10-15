@@ -34,10 +34,12 @@ async function writeAtomically(path, data, encoding, { flag, mode, durableRoot }
   }
   const finalMode = mode ?? existingMode;
   await mkdir(directory, { recursive: true });
+  let created = false;
   try {
     // Set permissions at creation, before any bytes become visible. Keep the
     // descriptor for syncing, since the requested mode may prohibit reopening.
     const handle = await open(temporary, "wx", finalMode ?? undefined);
+    created = true;
     try {
       await handle.writeFile(data, encoding ? { encoding } : {});
       await handle.sync();
@@ -47,7 +49,8 @@ async function writeAtomically(path, data, encoding, { flag, mode, durableRoot }
     else await rename(temporary, path);
     await syncDirectory(directory);
   } catch (error) {
-    await unlink(temporary).catch(() => {});
+    // A generated path is not ours until exclusive creation succeeds.
+    if (created) await unlink(temporary).catch(() => {});
     throw error;
   }
   return Object.freeze({ path, bytes: Buffer.byteLength(data) });
@@ -66,8 +69,10 @@ function writeAtomicallySync(path, data, encoding, { flag, mode, durableRoot } =
   }
   const finalMode = mode ?? existingMode;
   mkdirSync(directory, { recursive: true });
+  let created = false;
   try {
     const descriptor = openSync(temporary, "wx", finalMode ?? undefined);
+    created = true;
     try {
       writeFileSync(descriptor, data, encoding ? { encoding } : {});
       fsyncSync(descriptor);
@@ -77,7 +82,8 @@ function writeAtomicallySync(path, data, encoding, { flag, mode, durableRoot } =
     else renameSync(temporary, path);
     syncDirectorySync(directory);
   } catch (error) {
-    try { unlinkSync(temporary); } catch {}
+    // A generated path is not ours until exclusive creation succeeds.
+    if (created) { try { unlinkSync(temporary); } catch {} }
     throw error;
   }
   return Object.freeze({ path, bytes: Buffer.byteLength(data) });
