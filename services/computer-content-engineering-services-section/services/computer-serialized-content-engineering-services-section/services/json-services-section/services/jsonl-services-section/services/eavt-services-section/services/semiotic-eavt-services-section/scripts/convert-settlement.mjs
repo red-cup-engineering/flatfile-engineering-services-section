@@ -137,10 +137,10 @@ if (!args.activitypub) {
   const { claimType, evidenceType } = await supplier(newRequire, '@red-cup-engineering/signcell/semantic-carriers');
   const { createSignClaim } = await supplier(newRequire, '@red-cup-engineering/signcell/semantic-claim');
   const { Mark, MarkType } = await supplier(newRequire, '@red-cup-engineering/signcell/mark');
-  const { createTypedMark, referenceOf } = await supplier(newRequire, '@red-cup-engineering/signcell/typed-mark');
+  const { createTypedMark, admitTypedMark } = await supplier(newRequire, '@red-cup-engineering/signcell/typed-mark');
   const { termToJson: sourceTermToJson } = await supplier(oldRequire, '@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation/json-codec');
   const { seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock } = await supplier(newRequire, '@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row');
-  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource, admit, claimType, evidenceType, createSignClaim, Mark, MarkType, createTypedMark, referenceOf, sourceTermToJson, seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock});
+  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource, admit, claimType, evidenceType, createSignClaim, Mark, MarkType, createTypedMark, admitTypedMark, sourceTermToJson, seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock});
 } else {
   if (typeof args['old-activitypub'] !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('exact --old-activitypub and --new-activitypub providers are required');
   const oldAp = fs.realpathSync(args['old-activitypub']), currentAp = fs.realpathSync(args['new-activitypub']);
