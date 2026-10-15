@@ -1,6 +1,7 @@
 {
   "name": "@red-cup-engineering/computer-content-engineering-services-section",
   "version": "0.1.0",
+  "softwareKind": "module",
   "type": "module",
   "description": "Content: data carriers with locator-independent identity and custody, their typed-resource classification and catalog, and descriptions.",
   "dependencies": {
