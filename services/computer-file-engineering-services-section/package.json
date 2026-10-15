@@ -31,7 +31,8 @@
     "./write-dated-state": "./scripts/write-dated-state.mjs",
     "./read-dated-state": "./scripts/read-dated-state.mjs",
     "./publish-staged-directory-at-absent-path": "./scripts/publish-staged-directory-at-absent-path.mjs",
-    "./zip-archive": "./src/zip-archive.mjs"
+    "./zip-archive": "./src/zip-archive.mjs",
+    "./declared-directory-root": "./src/declared-directory-root.mjs"
   },
   "bin": {
     "observe-file-content-witnesses": "./scripts/observe-file-content-witnesses.mjs"
