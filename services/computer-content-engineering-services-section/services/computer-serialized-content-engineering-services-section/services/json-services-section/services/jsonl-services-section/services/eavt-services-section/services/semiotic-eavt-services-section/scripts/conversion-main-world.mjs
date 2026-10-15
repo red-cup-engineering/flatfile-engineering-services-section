@@ -1,6 +1,7 @@
 /** One-time branch-only main-world converter. Original custody is never changed.
  * Current receiving forms, not old witness wrappers, govern the selected records.
  * See store-conversion.md and store-migration-map.md; no runtime legacy bridge. */
+import { getTypedMark, putTypedMark } from "../src/typed-mark-store.mjs";
 import fs from 'node:fs';
 import path from 'node:path';
 import {originalJournalFiles,createBucketMap,streamJsonLines,sourceFiles,sourceStamp,assertSourceStamps,hashSource,witnessAt} from './conversion-buckets.mjs';
@@ -83,9 +84,9 @@ function selection(witness,kind,context,semantic=context.semanticRecordOf(witnes
 
 /** All supplier functions come from independently selected, fabricated providers.
  * Temporary maps contain byte positions and addresses, never an in-memory store table. */
-export async function convertMainWorld({source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress,clockLastSource,admit,claimType,evidenceType,createSignClaim,Mark,MarkType,createTypedMark,admitTypedMark,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock}){
+export async function convertMainWorld({source,output,oldRoot,newRoot,store,report,parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress,dataArtifactAddress,clockLastSource,admit,claimType,evidenceType,createSignClaim,Mark,MarkType,createTypedMark,admitTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock}){
  if(!store||![parseJournalWitness,openSegmentReader,semanticRecordOf,niBucketPath,semanticAddress].every(fn=>typeof fn==='function'))throw new TypeError('exact original readers and current writers required');
- if(![admit,createSignClaim,Mark,createTypedMark,admitTypedMark,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock].every(fn=>typeof fn==='function')||!claimType||!evidenceType||!MarkType)throw new TypeError('current Metrologic and SignCell receivers required');
+ if(![admit,createSignClaim,Mark,createTypedMark,admitTypedMark,referenceOf,sourceTermToJson,seavtOfSignCell,signCellOfSeavt,isAbsoluteSeavtClock].every(fn=>typeof fn==='function')||!claimType||!evidenceType||!MarkType)throw new TypeError('current Metrologic and SignCell receivers required');
  const mapRoot=path.join(output,'.conversion-main'),maps=createBucketMap(mapRoot,niBucketPath),stamps=new Map(),active=new Set();
  fs.mkdirSync(mapRoot,{recursive:true,mode:0o700});
  report.mainConsumers={claimSession:'feltos/src/work/claim-session-store.mjs',capabilities:'computer-system-engine/src/rpc/capability-assertions.mjs',offices:'metroplat/src/offices.mjs',bodies:'metroplat/src/bodies.mjs',clock:'organizing/src/work/recurring.mjs',epistemic:'metrologic claim/evidence + SignCell'};
@@ -159,20 +160,12 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
   const evidenceId=putCurrent('evidence',evidenceAdmitted.value);
   const witnessRef={id:evidenceId,type:'evidence'};
   const resolveTypedMark=reference=>{
-   if(reference?.type!=='typed-mark'||typeof reference.id!=='string')throw new TypeError('SignCell endpoint is not a typed-mark store reference');
-   const basis=store.get(output,reference.type,reference.id);
-   if(!basis)throw new TypeError('SignCell endpoint reference does not resolve in the receiving store');
-   const admitted=admitTypedMark(MarkType,{...basis,id:reference.id});
-   if(!admitted?.ok||admitted.value.id!==reference.id)throw new TypeError('resolved SignCell endpoint fails its declared typed-mark receiver');
-   return admitted.value;
+   return getTypedMark(store,output,reference,MarkType,admitTypedMark);
   };
   const putTerm=term=>{
    const typed=createTypedMark(MarkType,Mark(term));
    if(!typed?.ok)throw new TypeError('original EAVT term fails current opaque typed-mark receiving');
-   const identityBasis={kind:typed.value.kind,type:typed.value.type,content:typed.value.content};
-   const storedId=putCurrent('typed-mark',identityBasis);
-   if(storedId!==typed.value.id)throw new TypeError('typed-mark identity basis differs from the canonical SignCell identity');
-   const reference={id:storedId,type:'typed-mark'};
+   const reference=putTypedMark(putCurrent,typed.value,referenceOf);
    const recovered=resolveTypedMark(reference);
    if(recovered.id!==typed.value.id)throw new TypeError('stored typed-mark did not re-admit at its SignCell identity');
    return reference;
@@ -267,7 +260,7 @@ export async function convertMainWorld({source,output,oldRoot,newRoot,store,repo
  // Every converted record is read with the current writer's law. No payload is printed.
  for(const [type,expected]of Object.entries(report.types)){
   let found=0;for(const {address,record}of store.each(output,type)){if(!store.get(output,type,address)||semanticAddress(record).id!==address)throw new TypeError('converted record identity failed current receiving');found++;}
-  if(type==='typed-mark')for(const {address,record}of store.each(output,type)){const recovered=admitTypedMark(MarkType,{...record,id:address});if(!recovered?.ok||recovered.value.id!==address)throw new TypeError('stored typed-mark identity basis fails its current declared receiver');}
+  if(type==='typed-mark')for(const {address,record}of store.each(output,type)){const recovered=getTypedMark(store,output,{id:address,type:record.type},MarkType,admitTypedMark);if(recovered.id!==address)throw new TypeError('stored typed-mark identity basis fails its current declared receiver');}
   if(type==='semantic-claim')for(const {record}of store.each(output,type)){resolveTypedMark(record.subject);resolveTypedMark(record.object);}
   if(type==='signcell-seavt')for(const {record}of store.each(output,type)){const recovered=signCellOfSeavt(record);if(!store.get(output,'semantic-claim',semanticAddress(recovered).id))throw new TypeError('stored SignCell projection does not bind to its current semantic claim');resolveTypedMark(recovered.subject);resolveTypedMark(recovered.object);}
   if(found!==expected.written)throw new TypeError('converted record count differs from receipt');expected.verified=found;
