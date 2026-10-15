@@ -182,8 +182,11 @@ export async function convertMainWorld({deferredKinds=new Set(),source,output,ol
   if(claimRecord){subjectRef=putTerm(subjectTerm);objectRef=putTerm(objectTerm);}
   else if(item.sourceRow&&Object.hasOwn(item.sourceRow,'e')&&Object.hasOwn(item.sourceRow,'a')&&Object.hasOwn(item.sourceRow,'v')){
    const [entity,predicateTerm,value]=[item.sourceRow.e,item.sourceRow.a,item.sourceRow.v];
-   subjectRef=putTerm(sourceTermToJson(entity));objectRef=putTerm(sourceTermToJson(value));
-   predicate=sourceTermToJson(predicateTerm);
+   // Original semantic-record projections encode SEN terms; ordinary journal
+   // rows already contain JSON coordinates. Preserve each source's own form.
+   const coordinate=item.epistemicSource?sourceTermToJson:value=>value;
+   subjectRef=putTerm(coordinate(entity));objectRef=putTerm(coordinate(value));
+   predicate=coordinate(predicateTerm);
   }
   if(!claimRecord){
    if(!subjectRef||!objectRef||!text(predicate)){
