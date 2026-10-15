@@ -228,7 +228,8 @@ function canonicalValue(value: unknown, ancestors = new Set<object>()): Addressa
   }
   const out: Record<string, AddressableTerm> = {};
   for (const key of Object.keys(value as Record<string, unknown>).sort()) {
-    out[key] = canonicalValue((value as Record<string, unknown>)[key], next);
+    // Defined, not assigned: assigning "__proto__" would call the prototype setter and drop the member.
+    Object.defineProperty(out, key, { value: canonicalValue((value as Record<string, unknown>)[key], next), enumerable: true, writable: true, configurable: true });
   }
   return out;
 }

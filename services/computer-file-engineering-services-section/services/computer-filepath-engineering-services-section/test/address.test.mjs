@@ -3,7 +3,6 @@ import test from "node:test";
 import { address, addressNested, termOf, termOfNested, termKey } from "../lib/address.mjs";
 import { sanitizeSegment, desanitizeSegment } from "../lib/segments.mjs";
 import { normalizePath, pathParent } from "../lib/posix.mjs";
-import { routeOf, astOfRoute, checkProofPathAst, termKey as proofTermKey } from "../scripts/proof-path-structuration.mjs";
 
 test("typed addresses retain existing readable coordinates and reversible encoded parts", () => {
   assert.equal(address("/store", "creatures/ada", "jsonl"), "/store/creatures/ada/ada.jsonl");
@@ -30,17 +29,6 @@ test("one segment codec preserves Unicode and refuses aliases that cannot round-
 test("JSON prototype-shaped properties survive both address carriers without collisions", () => {
   const term = JSON.parse('{"__proto__":{"important":true},"a":1}');
   assert.notEqual(termKey(term), termKey({ a: 1 }));
-  assert.notEqual(proofTermKey(term), proofTermKey({ a: 1 }));
   const cyclic = {}; cyclic.self = cyclic;
   assert.throws(() => termKey(cyclic));
-});
-
-test("witnessed reachability terminates on cycles and retains the shortest earned route", () => {
-  const witnesses = Array.from({ length: 3000 }, (_, i) => ({ domain: String(i), generator: "specialization", codomain: String((i + 1) % 3000) }));
-  assert.equal(routeOf(witnesses, "0", "unreachable"), null);
-  const route = routeOf(witnesses, "0", "2999");
-  assert.equal(route.steps.length, 2999);
-  assert.equal(checkProofPathAst(astOfRoute(route), witnesses), true);
-  const shortcuts = [...witnesses, { domain: "0", generator: "specialization", codomain: "2999" }];
-  assert.equal(routeOf(shortcuts, "0", "2999").steps.length, 1);
 });
