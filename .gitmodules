@@ -14,3 +14,7 @@
 	path = services/cryptographic-computer-data-engineering-services-section
 	url = https://github.com/red-cup-engineering/cryptographic-computer-data-engineering-services-section.git
 	branch = main
+[submodule "cbor-services-section"]
+	path = services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/cbor-services-section
+	url = https://github.com/red-cup-engineering/cbor-services-section.git
+	branch = main
