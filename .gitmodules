@@ -1,7 +1,3 @@
-[submodule "computer-content-address-engineering-services-section"]
-	path = services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section
-	url = https://github.com/red-cup-engineering/computer-content-address-engineering-services-section.git
-	branch = main
 [submodule "signcell"]
 	path = apps/signcell
 	url = https://github.com/red-cup-engineering/signcell.git
@@ -10,27 +6,11 @@
 	path = services/cryptographic-computer-data-engineering-services-section
 	url = https://github.com/red-cup-engineering/cryptographic-computer-data-engineering-services-section.git
 	branch = main
-[submodule "cbor-services-section"]
-	path = services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/cbor-services-section
-	url = https://github.com/red-cup-engineering/cbor-services-section.git
-	branch = main
-[submodule "computer-text-content-engineering-services-section"]
-	path = services/computer-content-engineering-services-section/services/computer-text-content-engineering-services-section
-	url = https://github.com/red-cup-engineering/computer-text-content-engineering-services-section.git
-	branch = main
 [submodule "computer-file-engineering-services-section"]
 	path = services/computer-file-engineering-services-section
 	url = https://github.com/red-cup-engineering/computer-file-engineering-services-section.git
 	branch = main
-[submodule "computer-triplet-serialized-content-engineering-services-section"]
-	path = services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/computer-triplet-serialized-content-engineering-services-section
-	url = https://github.com/red-cup-engineering/computer-triplet-serialized-content-engineering-services-section.git
-	branch = main
-[submodule "json-services-section"]
-	path = services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section
-	url = https://github.com/red-cup-engineering/json-services-section.git
-	branch = main
-[submodule "markdown-engineering-services-section"]
-	path = services/computer-content-engineering-services-section/services/typed-computer-content-engineering-services-section/services/computer-text-data-services-section/services/markdown-engineering-services-section
-	url = https://github.com/red-cup-engineering/markdown-engineering-services-section.git
+[submodule "computer-content-engineering-services-section"]
+	path = services/computer-content-engineering-services-section
+	url = https://github.com/red-cup-engineering/computer-content-engineering-services-section.git
 	branch = main

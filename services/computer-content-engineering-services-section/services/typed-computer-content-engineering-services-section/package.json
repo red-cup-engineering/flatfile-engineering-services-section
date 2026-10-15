@@ -1,9 +1,0 @@
-{
-  "name": "@red-cup-engineering/typed-computer-content-engineering-services-section",
-  "version": "0.2.0",
-  "type": "module",
-  "description": "Groups specialized computer-content type families.",
-  "dependencies": {
-    "@red-cup-engineering/computer-content-engineering-services-section": "workspace:*"
-  }
-}
