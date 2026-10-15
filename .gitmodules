@@ -10,3 +10,7 @@
 	path = apps/signcell
 	url = https://github.com/red-cup-engineering/signcell.git
 	branch = main
+[submodule "cryptographic-computer-data-engineering-services-section"]
+	path = services/cryptographic-computer-data-engineering-services-section
+	url = https://github.com/red-cup-engineering/cryptographic-computer-data-engineering-services-section.git
+	branch = main
