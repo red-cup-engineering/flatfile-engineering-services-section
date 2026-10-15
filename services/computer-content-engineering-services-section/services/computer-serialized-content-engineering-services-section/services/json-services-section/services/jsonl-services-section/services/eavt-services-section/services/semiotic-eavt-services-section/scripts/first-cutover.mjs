@@ -181,11 +181,22 @@ export async function prepare(plan, work, {resume=false}={}) {
     }
     writeJournal(work, journal);
     const reuse = resume && binding.conversion !== 'kalshi' && exists(reportFile) && exists(candidate);
-    const result = reuse ? {status:0,stdout:'',stderr:''} : spawnSync(process.execPath, args, {encoding: 'utf8', timeout: 1800000, maxBuffer: 1024 * 1024, env: environment});
-    if(!reuse)fs.writeFileSync(path.join(directory, 'converter.stdout'), result.stdout ?? '', {flag:'wx',mode:0o600});
-    if(!reuse)fs.writeFileSync(path.join(directory, 'converter.stderr'), (result.stderr ?? '') + (result.error?.code ?? ''), {flag:'wx',mode:0o600});
+    // Owner receipts contain a digest for every received file. Keep their exact
+    // output on disk; a pipe buffer limit must not terminate a valid conversion.
+    const stdoutFile = path.join(directory, 'converter.stdout');
+    const stderrFile = path.join(directory, 'converter.stderr');
+    let result = {status: 0};
+    if (!reuse) {
+      const stdout = fs.openSync(stdoutFile, 'wx', 0o600);
+      const stderr = fs.openSync(stderrFile, 'wx', 0o600);
+      try {
+        result = spawnSync(process.execPath, args, {timeout: 1800000,
+          stdio: ['ignore', stdout, stderr], env: environment});
+        if (result.error) fs.writeSync(stderr, result.error.code ?? result.error.message);
+      } finally { fs.closeSync(stdout); fs.closeSync(stderr); }
+    }
     assert.equal(result.status, 0, 'existing owner converter refused; original trees are unchanged');
-    let report = binding.conversion === 'kalshi' ? JSON.parse(result.stdout) : JSON.parse(fs.readFileSync(reportFile, 'utf8'));
+    let report = JSON.parse(fs.readFileSync(binding.conversion === 'kalshi' ? stdoutFile : reportFile, 'utf8'));
     // LAGOON runs one prepare, so a fresh conversion receives its original
     // subject dispositions here too; the receiver refuses any other refusal class.
     if(binding.conversion==='world'&&report.qualified===false){
