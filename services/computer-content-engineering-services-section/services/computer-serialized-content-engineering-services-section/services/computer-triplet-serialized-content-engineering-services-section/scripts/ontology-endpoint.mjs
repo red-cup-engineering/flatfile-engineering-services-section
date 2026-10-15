@@ -1,5 +1,5 @@
 /**
- * writing/sparql/ontology — the Group's SKOS and JSON-LD glossary as a graph a SPARQL 1.1 Protocol
+ * ontology-endpoint — the Group's SKOS and JSON-LD glossary as a graph a SPARQL 1.1 Protocol
  * endpoint serves.
  *
  * The glossary file (`data/records/knowledge/glossary/skos/public.jsonld` in

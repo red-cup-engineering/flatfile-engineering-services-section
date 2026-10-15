@@ -3,7 +3,7 @@
 import { join } from "node:path";
 //   node scripts/serve-ontology.mjs --jsonld <public.jsonld> --location <store dir> [--bind 127.0.0.1:7878] [--oxigraph <binary>]
 import { existsSync } from "node:fs";
-import { loadOntology, serveOntology } from "../src/writing/sparql/ontology.mjs";
+import { loadOntology, serveOntology } from "./ontology-endpoint.mjs";
 
 const args = process.argv.slice(2);
 const val = (flag, fallback) => (args.includes(flag) ? args[args.indexOf(flag) + 1] : fallback);

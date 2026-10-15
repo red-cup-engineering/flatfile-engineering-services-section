@@ -7,8 +7,11 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { after, before, describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { loadOntology, pinContext, serveOntology } from "../src/writing/sparql/ontology.mjs";
-import { sparqlProtocolQuery, sparqlQueryTool, sparqlRows } from "../src/writing/sparql/endpoint.mjs";
+import { loadOntology, pinContext, serveOntology } from "../scripts/ontology-endpoint.mjs";
+import { sparqlProtocol } from "../scripts/sparql-http-client.mjs";
+import { sparqlQueryTool, sparqlRows } from "../scripts/sparql-query-tool.mjs";
+
+const select = async (endpoint, query) => (await sparqlProtocol(endpoint, query)).json();
 
 const here = dirname(fileURLToPath(import.meta.url));
 const oxigraph = process.env.OXIGRAPH_BIN ?? "oxigraph";
@@ -29,7 +32,7 @@ describe("the ontology endpoint", () => {
   after(() => { served?.child.kill(); rmSync(work, { recursive: true, force: true }); });
 
   test("SELECT returns the preferred label of a known term", async () => {
-    const result = await sparqlProtocolQuery(served.endpoint, `PREFIX skos: <${SKOS}> SELECT ?label WHERE { ?c skos:prefLabel ?label ; skos:notation "17th-century-ce" }`);
+    const result = await select(served.endpoint, `PREFIX skos: <${SKOS}> SELECT ?label WHERE { ?c skos:prefLabel ?label ; skos:notation "17th-century-ce" }`);
     assert.deepEqual(sparqlRows(result), [{ label: "17th Century CE" }]);
   });
 
@@ -47,7 +50,21 @@ test("the full glossary loads and answers when ONTOLOGY_JSONLD is set", { skip: 
   loadOntology({ oxigraph, location: join(work, "store"), jsonld: process.env.ONTOLOGY_JSONLD });
   const served = await serveOntology({ oxigraph, location: join(work, "store"), bind: "127.0.0.1:17879" });
   try {
-    const result = await sparqlProtocolQuery(served.endpoint, `PREFIX skos: <${SKOS}> SELECT (COUNT(?c) AS ?n) WHERE { ?c a skos:Concept }`);
+    const result = await select(served.endpoint, `PREFIX skos: <${SKOS}> SELECT (COUNT(?c) AS ?n) WHERE { ?c a skos:Concept }`);
     assert.ok(Number(sparqlRows(result)[0].n) > 100);
   } finally { served.child.kill(); rmSync(work, { recursive: true, force: true }); }
+});
+
+test("the sparql_query tool posts one query through the section's SPARQL Protocol client and flattens the rows", async () => {
+  const calls = [];
+  const fetchImpl = async (url, init) => {
+    calls.push({ url, init });
+    return new Response(JSON.stringify({ head: { vars: ["label"] }, results: { bindings: [{ label: { type: "literal", value: "17th Century CE" } }] } }), { status: 200 });
+  };
+  const tool = sparqlQueryTool({ endpoint: "http://127.0.0.1:7878/query", fetchImpl });
+  const answer = await tool.handler({ query: "SELECT ?label WHERE { ?c ?p ?label }" });
+  assert.deepEqual(answer, { variables: ["label"], rows: [{ label: "17th Century CE" }] });
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].init.method, "POST");
+  assert.equal(calls[0].init.headers.get("content-type"), "application/sparql-query");
 });
