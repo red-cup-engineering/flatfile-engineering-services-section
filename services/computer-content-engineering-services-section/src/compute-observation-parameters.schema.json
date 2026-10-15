@@ -1,0 +1,359 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:computer-content:compute-observation-parameters:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "policy",
+    "observation",
+    "operation",
+    "delivery"
+  ],
+  "properties": {
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordKind",
+        "resourceRecordType",
+        "witnessType",
+        "event",
+        "predicationsKind",
+        "currentKind",
+        "witnessKind",
+        "objectKind",
+        "valueType",
+        "recordFile",
+        "freshnessMs"
+      ],
+      "properties": {
+        "recordKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resourceRecordType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "witnessType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event": {
+          "type": "string",
+          "minLength": 1
+        },
+        "predicationsKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "currentKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "witnessKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objectKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "valueType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordFile": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)(?:\\.|\\.\\.)(?:/|$))[^\\\\]+$"
+        },
+        "freshnessMs": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "googleCloud",
+        "oracleCloud",
+        "machines",
+        "coverage",
+        "placementRule"
+      ],
+      "properties": {
+        "googleCloud": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cloudRunRegion"
+          ],
+          "properties": {
+            "cloudRunRegion": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "oracleCloud": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "profile": {
+              "type": "string",
+              "minLength": 1
+            },
+            "configFile": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "cloudflare": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "accountIdEnvironmentVariable",
+            "inventoryTokenEnvironmentVariable",
+            "buildTokenEnvironmentVariable",
+            "r2TokenEnvironmentVariable"
+          ],
+          "properties": {
+            "accountIdEnvironmentVariable": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "inventoryTokenEnvironmentVariable": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "buildTokenEnvironmentVariable": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "r2TokenEnvironmentVariable": {
+              "type": "string",
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+            }
+          }
+        },
+        "ssh": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "alias",
+            "machine"
+          ],
+          "properties": {
+            "alias": {
+              "type": "string",
+              "minLength": 1
+            },
+            "machine": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "evidence",
+                "role",
+                "newPlacement"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "evidence": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "role": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "newPlacement": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "machines": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "evidence",
+              "role",
+              "newPlacement"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "type": "string",
+                "minLength": 1
+              },
+              "newPlacement": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "coverage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "placementRule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "credentials": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "googleCloud": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "locator"
+              ],
+              "properties": {
+                "locator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "credentialsFile": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "oracleCloud": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "locator"
+              ],
+              "properties": {
+                "locator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "credentialsFile": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "cloudflare": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "locator"
+              ],
+              "properties": {
+                "locator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "credentialsFile": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "ssh": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "locator"
+              ],
+              "properties": {
+                "locator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "credentialsFile": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verb",
+        "summary",
+        "reads",
+        "writes",
+        "dataRootEnvironmentVariable"
+      ],
+      "properties": {
+        "verb": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reads": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "writes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "dataRootEnvironmentVariable": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "peerActorEnvironmentVariable",
+        "peerInboxEnvironmentVariable"
+      ],
+      "properties": {
+        "peerActorEnvironmentVariable": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "peerInboxEnvironmentVariable": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        }
+      }
+    }
+  }
+}

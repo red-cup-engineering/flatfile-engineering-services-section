@@ -30,7 +30,8 @@
     "./package.json": "./package.json",
     "./module-parameterization-schema": "./src/module-parameterization.schema.json",
     "./engineering-network-provider-schema": "./src/engineering-network-provider.schema.json",
-    "./node-job-deployment-records-schema": "./src/node-job-deployment-records.schema.json"
+    "./node-job-deployment-records-schema": "./src/node-job-deployment-records.schema.json",
+    "./compute-observation-parameters-schema": "./src/compute-observation-parameters.schema.json"
   },
   "scripts": {
     "test": "node --test test/*.test.mjs"
@@ -59,6 +60,14 @@
     }
   ],
   "files": [
-    "src/"
+    "src/",
+    "test/compute-observation-parameters.test.mjs",
+    "test/fixtures/compute-instance.json"
+  ],
+  "receivingTests": [
+    "test/compute-observation-parameters.test.mjs"
+  ],
+  "receivingFixtures": [
+    "test/fixtures/compute-instance.json"
   ]
 }
