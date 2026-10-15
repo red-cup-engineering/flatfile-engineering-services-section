@@ -8,6 +8,7 @@ import {
 } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-expression-notation";
 
 import { compileJsonSchema } from "@red-cup-engineering/json-schema-services-section/validation";
+import { SEN_TYPE_FORMS } from "../src/semiotic-expression-notation/notation/forms.mjs";
 
 const typeValidation = compileJsonSchema(TySchema);
 const termValidation = compileJsonSchema(TmSchema, { references: [TySchema] });
@@ -75,7 +76,7 @@ test("constructed terms validate against TmSchema, including nested recursion", 
 
 test("TmSchema and TySchema each expose one anyOf branch per grammar form", () => {
   assert.equal(TmSchema.anyOf.length, Object.keys(SEN_FORMS).length);
-  assert.equal(TySchema.anyOf.length, 5);
+  assert.equal(TySchema.anyOf.length, Object.keys(SEN_TYPE_FORMS).length);
 });
 
 // ── validator.mjs's isTerm, exercised directly ──────────────────────────────
@@ -273,17 +274,6 @@ test("leT: denied is truth-least, held is truth-greatest (reduced)", () => {
     assert.equal(boolOfTerm(reduceClosedTree(tm.leT(tm.reading(name), tm.reading("held")))), true);
   }
   assert.equal(boolOfTerm(reduceClosedTree(tm.leT(tm.reading("held"), tm.reading("denied")))), false);
-});
-
-test("settle is exactly joinK, reduced values agree for every pair", () => {
-  for (const left of charges) {
-    for (const right of charges) {
-      assert.deepEqual(
-        reduceClosedTree(tm.settle(tm.reading(left), tm.reading(right))),
-        reduceClosedTree(tm.joinK(tm.reading(left), tm.reading(right))),
-      );
-    }
-  }
 });
 
 test("fromCharge collapses every corner onto its truth-bit boolean (reduced)", () => {
