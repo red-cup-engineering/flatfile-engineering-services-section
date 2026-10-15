@@ -1,0 +1,49 @@
+{
+  "id": "receiving-strategy",
+  "actor": "actor:receiving",
+  "positionType": "urn:receiving:text",
+  "operation": {
+    "specification": "https://schemas.561.group/computer/computer-engineering.schema.json",
+    "version": 1,
+    "id": "receiving-identity",
+    "domain": {
+      "id": "urn:receiving:text",
+      "name": "Text",
+      "description": "Local receiving text carrier",
+      "schema": {
+        "type": "string"
+      },
+      "references": [],
+      "parentIds": [],
+      "parents": []
+    },
+    "codomain": {
+      "id": "urn:receiving:text",
+      "name": "Text",
+      "description": "Local receiving text carrier",
+      "schema": {
+        "type": "string"
+      },
+      "references": [],
+      "parentIds": [],
+      "parents": []
+    },
+    "effects": [],
+    "body": {
+      "kind": "sen",
+      "term": [
+        "lam",
+        [
+          "var",
+          0
+        ]
+      ],
+      "inputDescriptor": {
+        "kind": "string"
+      },
+      "outputDescriptor": {
+        "kind": "string"
+      }
+    }
+  }
+}

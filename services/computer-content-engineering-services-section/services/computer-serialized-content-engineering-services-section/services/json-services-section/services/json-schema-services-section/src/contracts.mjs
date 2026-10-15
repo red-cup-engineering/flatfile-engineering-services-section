@@ -1,4 +1,4 @@
-import { compileJsonSchema } from "./validation.mjs";
+import { compileJsonSchema, resolveSchemaUri } from "./validation.mjs";
 import { canonicalJson, canonicalizeJson, JSON_RESOURCE_ENVELOPE } from "@red-cup-engineering/json-services-section/canonical-json";
 export const SchemaContractSchema = {
     $id: "computer-data/schema-contract",
@@ -13,18 +13,23 @@ export const SchemaContractSchema = {
     description: "A category object declared by one JSON-Schema literal and its validator.",
     additionalProperties: false,
 };
-/** AJV resolves bare house schema addresses as URLs relative to the current
- * schema. Keep those bare addresses on the public contracts, but compile an
- * isolated absolute-name copy while retaining nested identifier scopes. */
+/** Bare house addresses retain their compatibility projection. Absolute public
+ * resource IDs already have URI scope: preserve them for the owner's evaluator
+ * rather than resolving public references against a private, encoded path. */
 function evaluatorSchemaGraph(root, references) {
     const contracts = [root, ...references];
+    const absolute = (id) => /^[a-z][a-z0-9+\-.]*:/iu.test(id);
+    const byId = new Map(contracts.map((contract) => [contract.id, contract.schema]));
     const addresses = new Map(contracts.map((contract) => [
         contract.id,
-        `https://schemas.computer-data.invalid/${encodeURIComponent(contract.id)}/`,
+        absolute(contract.id) ? contract.id : `https://schemas.computer-data.invalid/${encodeURIComponent(contract.id)}/`,
     ]));
+    // A public ID must not collide with a bare ID's private evaluator address.
+    if (new Set(addresses.values()).size !== addresses.size)
+        throw new TypeError(`schema ${root.id}: conflicting evaluator addresses`);
     const resolvedAddress = (reference, baseId) => {
-        if (reference.includes("://") || reference.startsWith("urn:"))
-            return reference;
+        if (absolute(reference) || absolute(baseId))
+            return resolveSchemaUri(baseId, reference);
         const parts = [...baseId.split("/").slice(0, -1), ...reference.split("/")];
         const normalized = [];
         for (const part of parts) {
@@ -37,10 +42,16 @@ function evaluatorSchemaGraph(root, references) {
         }
         return normalized.join("/");
     };
-    const addressOfReference = (reference, baseId) => addresses.get(reference) ?? addresses.get(resolvedAddress(reference, baseId));
+    const addressOfReference = (reference, baseId) => {
+        const exact = addresses.get(reference);
+        const relative = addresses.get(resolvedAddress(reference, baseId));
+        if (exact !== undefined && relative !== undefined && exact !== relative)
+            throw new TypeError(`schema ${root.id}: ambiguous reference ${reference}`);
+        return relative ?? exact;
+    };
     const registeredNestedIds = new Map();
     const schemaKeys = new Set([
-        "additionalItems", "additionalProperties", "allOf", "anyOf", "contains", "contentSchema", "dependencies", "dependentSchemas",
+        "additionalItems", "additionalProperties", "allOf", "anyOf", "contains", "dependencies", "dependentSchemas",
         "else", "if", "items", "not", "oneOf", "patternProperties", "prefixItems", "properties", "propertyNames",
         "then", "unevaluatedItems", "unevaluatedProperties", "$defs", "definitions",
     ]);
@@ -49,11 +60,19 @@ function evaluatorSchemaGraph(root, references) {
             return value;
         const result = {};
         const declaredId = value["$id"];
-        const scopeId = !isRoot && typeof declaredId === "string" ? resolvedAddress(declaredId, documentId) : documentId;
+        const scopeId = !isRoot && typeof declaredId === "string"
+            ? byId.has(declaredId) && !absolute(documentId) ? declaredId : resolvedAddress(declaredId, documentId)
+            : documentId;
         const scopeUri = !isRoot && typeof declaredId === "string" ? new URL(declaredId, uriScope).href : uriScope;
-        if (!isRoot && typeof declaredId === "string" && !addresses.has(declaredId)) {
+        if (!isRoot && typeof declaredId === "string" && byId.has(scopeId)) {
+            const normalized = (schema) => canonicalJson({ ...schema, $id: scopeId });
+            if (normalized(value) !== normalized(byId.get(scopeId)))
+                throw new TypeError(`schema ${root.id}: nested $id ${scopeId} names different schemas`);
+            return { $ref: addresses.get(scopeId) };
+        }
+        if (!isRoot && typeof declaredId === "string") {
             const prior = registeredNestedIds.get(scopeUri);
-            const serialized = JSON.stringify(value);
+            const serialized = canonicalJson({ ...value, $id: scopeId });
             if (prior !== undefined) {
                 if (prior !== serialized)
                     throw new TypeError(`schema ${root.id}: nested $id ${scopeUri} names different schemas`);
@@ -67,13 +86,11 @@ function evaluatorSchemaGraph(root, references) {
         const tupleItems = Array.isArray(value["items"]);
         for (const [key, item] of Object.entries(value)) {
             if (key === "$id") {
-                // Only compiled contract roots receive private absolute addresses.
-                // A nested $id establishes a local scope unless that exact semantic
-                // address is already compiled as a referenced root. Repeated URI
-                // scopes must carry byte-identical schemas or remain an explicit error.
+                // Root bare IDs receive private addresses. Public IDs and nested
+                // relative IDs preserve URI scope in the existing evaluator.
                 if (isRoot)
                     result[key] = addresses.get(String(item)) ?? item;
-                else if (!addresses.has(String(item)))
+                else
                     result[key] = item;
                 continue;
             }

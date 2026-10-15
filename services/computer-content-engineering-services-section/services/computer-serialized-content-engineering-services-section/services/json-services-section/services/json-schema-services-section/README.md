@@ -23,6 +23,36 @@ The pure semantic core is `src/index.mts`, built to `dist/` (`npm run build`).
 Several scripts import `dist/`, so build before running them from a checkout;
 `npm test` builds first.
 
+## Closed schema contracts
+
+`schemaFromGraph({ root, schemas })` is the explicit, immutable contract face.
+Unlike `schemaFrom`, it neither consults nor mutates the declaration registry.
+Each supplied `{ id, schema }` must carry the same unique `$id`; compilation
+refuses unresolved references and conflicting resource identities.
+
+Absolute public resource IDs retain their URI scope in the evaluator. Relative
+references resolve against the nearest `$id`, including nested resources,
+parent paths, anchors and JSON Pointer fragments. URI identity grants no network
+authority: only supplied resources and their embedded schemas are available.
+Bare house IDs retain exact-address compatibility and their private evaluator
+projection; if an exact bare address and a URI-relative address select different
+supplied resources, admission refuses the ambiguity. Public schemas are never
+rewritten. This contract face is distinct from the package root's narrower
+corpus API described above.
+
+The adapter shares `resolveSchemaUri` with the existing evaluator. The evaluator's
+existing resource/anchor registration gate refuses conflicting document and
+fragment claims, including embedded IDs and aliases of private bare-ID addresses.
+Indexing and eager reference checks traverse only the evaluator's existing
+supported schema-keyword locations; annotation and instance data do not register
+resources. This does not add custom-vocabulary support.
+There is no second instance judge, URI parser or retriever. See JSON Schema Core 2020-12
+sections [8.2](https://json-schema.org/draft/2020-12/json-schema-core#section-8.2)
+and [9.2](https://json-schema.org/draft/2020-12/json-schema-core#section-9.2).
+The URI and unchanged FeltOS strategy regressions are
+`test/contracts-uri-resolution.test.mjs` and
+`test/contracts-feltos-strategy.test.mjs`.
+
 ## Capabilities
 
 **Admission and judgment**
