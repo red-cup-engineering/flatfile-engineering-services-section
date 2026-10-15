@@ -305,7 +305,7 @@ export function* logDates(root, type) {
 // ---------------------------------------------------------------------------------------------
 // Heads.
 
-function withFileLock(lock, work) {
+export function withFileLock(lock, work) {
   mkdirSync(dirname(lock), { recursive: true });
   const deadline = Date.now() + LOCK_WAIT_MS;
   for (;;) {
