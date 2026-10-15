@@ -4,7 +4,6 @@ import { mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { assembleDirectoryCover, observeDirectoryPlate, observeInfomaterial, receiptOf, regularFileMaterial, validateDirectoryPatchCoverReceipt } from "../src/infomaterial.mjs";
-import { createTopologyProjection } from "../src/infomaterial-topology.mjs";
 
 const temporary = (label) => mkdtemp(join(tmpdir(), `infomaterial-${label}-`));
 const materialReceipt = async (path, observedAt) => ({ ...receiptOf(await observeInfomaterial(path)), patchRoot: path, observedAt });
@@ -61,19 +60,6 @@ test("an optional occurrence measurement is bound to the same mutation-checked f
     { path: "dependency.mjs", analysis: { analyzedPath: "dependency.mjs", analyzedSize: 23n } },
     { path: "module.mjs", analysis: { analyzedPath: "module.mjs", analyzedSize: 26n } },
   ]);
-});
-
-test("the topology projection writes one complete canonical N-Quads artifact", async () => {
-  const root = await temporary("topology-root"), data = await temporary("topology-data");
-  await mkdir(join(root, "d")); await writeFile(join(root, "d", "b.txt"), "beta"); await writeFile(join(root, "a.txt"), "alpha"); await symlink("a.txt", join(root, "alias"));
-  const projection = await createTopologyProjection({ observedRoot: root, providerDataRoot: data });
-  const result = await observeInfomaterial(root, { onOccurrence: projection.record });
-  const artifact = await (await projection.prepare({ graph: result.semanticId, expectedEntries: result.observation.entries })).commit();
-  const lines = (await readFile(artifact.path, "utf8")).trimEnd().split("\n");
-  assert.equal(artifact.mediaType, "application/n-quads");
-  assert.ok(lines.length >= result.observation.entries * 3);
-  assert.deepEqual(lines, [...lines].sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b))));
-  assert.ok(lines.every((line) => line.endsWith(` <${result.semanticId}> .`) && !line.includes("_:")));
 });
 
 test("a cover of child receipts reconstructs the same material root as recursive observation", async () => {

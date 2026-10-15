@@ -15,7 +15,6 @@
     "./search-files": "./scripts/search-files.mjs",
     "./write-file": "./scripts/write-file.mjs",
     "./infomaterial": "./src/infomaterial.mjs",
-    "./infomaterial-topology": "./src/infomaterial-topology.mjs",
     "./read-text-file": "./scripts/read-text-file.mjs",
     "./require-text-file-read": "./src/require-text-file-read.mjs",
     "./apply-text-file-content-edits": "./scripts/apply-text-file-content-edits.mjs",
@@ -51,7 +50,6 @@
   "dependencies": {
     "@red-cup-engineering/computer-content-address-engineering-services-section": "workspace:*",
     "@red-cup-engineering/computer-filepath-engineering-services-section": "workspace:*",
-    "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section": "workspace:*",
     "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "workspace:*",
     "@red-cup-engineering/json-services-section": "workspace:*",
     "@red-cup-engineering/jsonl-services-section": "workspace:*",
