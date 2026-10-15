@@ -133,7 +133,11 @@ if (!args.activitypub) {
   const eavtProviders = ['@red-cup-engineering/eavt-services-section','@red-cup-engineering/eavt'].filter(name => Object.hasOwn(originalManifest.dependencies ?? {}, name));
   if (eavtProviders.length !== 1) throw new TypeError('one declared original EAVT path provider required');
   const { dataArtifactAddress } = await supplier(oldRequire, eavtProviders[0] + '/data-artifact-address');
-  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource});
+  const { admit } = await supplier(newRequire, '@red-cup-engineering/computer-data-engineering-services-section/type-system');
+  const { claimType, evidenceType } = await supplier(newRequire, '@red-cup-engineering/signcell/semantic-carriers');
+  const { createSignClaim } = await supplier(newRequire, '@red-cup-engineering/signcell/semantic-claim');
+  const { seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock } = await supplier(newRequire, '@red-cup-engineering/semiotic-eavt-services-section/admit-seavt-row');
+  await convertMainWorld({source, output, oldRoot, newRoot, store, report, parseJournalWitness, openSegmentReader, semanticRecordOf, niBucketPath, semanticAddress, dataArtifactAddress, clockLastSource, admit, claimType, evidenceType, createSignClaim, seavtOfSignCell, signCellOfSeavt, isAbsoluteSeavtClock});
 } else {
   if (typeof args['old-activitypub'] !== 'string' || typeof args['new-activitypub'] !== 'string') throw new TypeError('exact --old-activitypub and --new-activitypub providers are required');
   const oldAp = fs.realpathSync(args['old-activitypub']), currentAp = fs.realpathSync(args['new-activitypub']);
