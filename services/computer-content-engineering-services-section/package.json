@@ -56,5 +56,8 @@
       "source": "@red-cup-engineering/immutable-content-custody-service",
       "owner": "@red-cup-engineering/immutable-content-custody-service"
     }
+  ],
+  "files": [
+    "src/"
   ]
 }
