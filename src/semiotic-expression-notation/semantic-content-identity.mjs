@@ -306,6 +306,69 @@ export function admitJsonSemanticContent({ bytes, token, objectKind } = {}) {
 export const GENERATIVE_PROOF_PATH_PROFILE = "urn:rce:proof-path:generative:0.0.1";
 export const PROOF_PATH_WITNESS_KIND = "semiotic-content.proof-path-witness";
 
+/** Proof-pathing v1's four typed generator classes.  A canonical spelling is
+ * necessary for address identity, but NEVER proves that a route's edges exist. */
+const PROOF_PATH_GENERATORS = new Set([
+  "specialization", "converse", "subject-projection", "object-projection",
+]);
+const proofPathEncoder = new TextEncoder();
+const proofPathDecoder = new TextDecoder("utf-8", { fatal: true });
+const safeProofPathByte = /^[A-Za-z0-9._-]$/;
+
+function encodeProofPathSegment(key) {
+  if (key === "") return "~e";
+  // The donor's v1 path format escapes both whole-dot directory segments.
+  if (key === "." || key === "..") return [...key].map(() => "~2e").join("");
+  let encoded = "", first = true;
+  for (const character of key) {
+    if (character === "~" || (first && character === ".") || !safeProofPathByte.test(character)) {
+      for (const byte of proofPathEncoder.encode(character))
+        encoded += "~" + byte.toString(16).padStart(2, "0");
+    } else encoded += character;
+    first = false;
+  }
+  return encoded;
+}
+
+function decodeCanonicalProofPathSegment(segment) {
+  if (segment === "~e") return "";
+  if (segment === "") return null;
+  const bytes = [];
+  for (let index = 0; index < segment.length;) {
+    if (segment[index] === "~") {
+      const hex = segment.slice(index + 1, index + 3);
+      if (!/^[0-9a-f]{2}$/.test(hex)) return null;
+      bytes.push(Number.parseInt(hex, 16));
+      index += 3;
+    } else if (safeProofPathByte.test(segment[index])) {
+      bytes.push(segment.charCodeAt(index));
+      index += 1;
+    } else return null;
+  }
+  try {
+    const decoded = proofPathDecoder.decode(new Uint8Array(bytes));
+    return encodeProofPathSegment(decoded) === segment ? decoded : null;
+  } catch { return null; }
+}
+
+/** Admit only root/(generator/library/node)* whose canonical root and terminal
+ * term keys match the named endpoints.  The separate qualified structure
+ * verifier must still check every edge under the committed structureRoot. */
+function proofPathMatchesEndpoints(path, sourceKey, targetKey) {
+  const parts = path.split("/");
+  if ((parts.length - 1) % 3 !== 0) return false;
+  const root = decodeCanonicalProofPathSegment(parts[0]);
+  if (root === null || root !== sourceKey) return false;
+  let reached = root;
+  for (let index = 1; index < parts.length; index += 3) {
+    if (!PROOF_PATH_GENERATORS.has(parts[index]) || parts[index + 1] !== "library")
+      return false;
+    reached = decodeCanonicalProofPathSegment(parts[index + 2]);
+    if (reached === null) return false;
+  }
+  return reached === targetKey;
+}
+
 /** Commit one exact generative proof-path witness as semantic content. This commits the proof
  * material; it does not make the proof profile's verifier part of the identity law. A qualified
  * verifier must separately reconstruct structureRoot and re-check path. */
@@ -325,6 +388,10 @@ export function identifyProofPathWitness({
   const admittedPath = canonicalString(path, "path");
   if (admittedSourceKey.length === 0 || admittedTargetKey.length === 0 || admittedPath.length === 0) {
     throw semanticContentRefusal("malformed-proof-path-witness", "sourceKey, targetKey, and path must be nonempty");
+  }
+  if (!proofPathMatchesEndpoints(admittedPath, admittedSourceKey, admittedTargetKey)) {
+    throw semanticContentRefusal("malformed-proof-path-witness",
+      "proof path must be canonically encoded, use licensed generator steps, and match sourceKey and targetKey");
   }
   return identifyJsonSemanticContent({
     objectKind: PROOF_PATH_WITNESS_KIND,
