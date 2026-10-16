@@ -28,6 +28,7 @@
     "./semiotic-expression-notation/json-codec": "./src/semiotic-expression-notation/json-codec.mjs",
     "./semiotic-expression-notation/semantic-content-identity": "./src/semiotic-expression-notation/semantic-content-identity.mjs",
     "./tally": "./src/tally.mjs",
+    "./x402-discovery-snapshot": "./src/x402-discovery-snapshot.mjs",
     "./number/exact-number": "./src/number/exact-number.mjs",
     "./number/exact-number-host": "./src/number/exact-number-host.mjs",
     "./number/deterministic-math": "./src/number/deterministic-math.mjs",
