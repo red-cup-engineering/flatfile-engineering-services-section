@@ -15,6 +15,7 @@ on:
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-graph.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs'
       - 'lib/metrologic/test/port-thread-routing.test.mjs'
+      - 'lib/metrologic/test/port-thread-connectivity.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/src/obstruction/capacity-flow.mjs'
       - 'lib/metrologic/test/capacity-flow.test.mjs'
@@ -38,6 +39,7 @@ on:
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-graph.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs'
       - 'lib/metrologic/test/port-thread-routing.test.mjs'
+      - 'lib/metrologic/test/port-thread-connectivity.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/src/obstruction/capacity-flow.mjs'
       - 'lib/metrologic/test/capacity-flow.test.mjs'
@@ -102,7 +104,8 @@ jobs:
           node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-condensate.mjs
           node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs
           node --check lib/metrologic/test/port-thread-routing.test.mjs
-          node --test lib/metrologic/test/port-thread-routing.test.mjs
+          node --check lib/metrologic/test/port-thread-connectivity.test.mjs
+          node --test lib/metrologic/test/port-thread-routing.test.mjs lib/metrologic/test/port-thread-connectivity.test.mjs
           node --input-type=module - <<'NODE'
           import assert from 'node:assert/strict';
           import {readFileSync} from 'node:fs';
