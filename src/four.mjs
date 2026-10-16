@@ -403,9 +403,11 @@ export function witnessBit(before, after) {
 // Obsmetrologia's FreeEnergyLyapunov: a reading's knowledge height is how many sides are told
 // (0, 1 or 2); along the knowledge order each cell's height gain is exactly one commitment (none
 // to one side), one mint (one side to both) or one jump (none to both, worth two), and a step's
-// flux is commits + mints + 2·jumps (cellFlux_decomposition, stepFlux_decomposition). The flux
-// counts wits. Commitments and mints are the reversible spend and jumps the irreversible one, and
-// at the closing step the seed's free energy is exactly their sum (budget_splits).
+// flux is commits + mints + 2·jumps (cellFlux_decomposition, stepFlux_decomposition). This counts
+// knowledge-order covers of the supplied readings. It does NOT independently establish WIT
+// evidence, ownership or a settled economic transfer: those require particular cell, source
+// and counterparty receipts outside this numerical projection. Commitments and mints are
+// reversible spend and jumps irreversible in the stated mathematical model (budget_splits).
 
 /** A reading's knowledge height: how many of its sides are told. */
 export const knowledgeHeight = (name) => sidesOfReading(name).filter(Boolean).length;
@@ -420,7 +422,8 @@ export function cellFlux(before, after) {
   return from === 0 ? (to === 2 ? "jump" : "commit") : "mint";
 }
 
-/** The WIT ledger of a step over cells given as [before, after] reading pairs. */
+/** Structural FOUR cover flux over [before, after] pairs. The historical `wits`
+ * output is cover multiplicity only, not a receipt of witnessed economic WITs. */
 export function witFlux(pairs) {
   const counts = { commits: 0, mints: 0, jumps: 0 };
   for (const [before, after] of pairs) {
