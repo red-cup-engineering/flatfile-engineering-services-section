@@ -79,6 +79,21 @@ Every pass obeys the local `PortGraph.legal_iff_distinct` law.
 bead-weaving graph or another closure engine. Source tests check the
 local-port and adjacency laws for all 1,100 forward DAGs through five events.
 
+The complete \`beadThread\` list consists of **local, individually legal
+passes**; those points need not form a single sequencing-compatible path.
+\`kinematicBeadStrandsOf(space)\` first rederives the full causal-diamond
+geometry and rejects mismatched/missing arrows or altered passes. It then
+computes a deterministic **minimum disjoint path cover** using bipartite
+maximum matching on the actual endpoint-sequencing relation. It returns
+\`strands\` (lists of the original local passes),
+\`matchedSequencing\`, \`strandCount\`, and \`requiresMultipleStrands\`.
+Every diamond is covered exactly once and every adjacent pair within a
+strand is genuinely sequenced. The number of required mathematical strands
+is the **maximum antichain width**, not a count of physical strings.
+The 1,100 small-DAG regression cases independently enumerate antichains
+and compare the exact width; the three-event chain already needs **two**
+strands because its long interval overlaps the short ones.
+
 This mathematical carrier does **not** supply a connected physical string,
 per-bead repeated occupation, independently separated contact/cell/visible
 graphs, bead geometry, a material realization, a proof of external SignChain
