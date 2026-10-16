@@ -146,8 +146,9 @@ export function markSpace(inputs, { relations = [] } = {}) {
     bitLength: resource.bitLength,
     presentations: Object.freeze([...presentations.get(resource.address).values()]),
   })).sort((a, b) => a.address < b.address ? -1 : a.address > b.address ? 1 : 0));
-  // Sort before freezing: Array.prototype.sort cannot mutate a frozen
-  // multi-element array and previously blocked precisely the desired union.
+  // Retain the existing sort-before-freeze operation; this deterministic
+  // resource order already worked. The new union builds on it without
+  // introducing a second resource topology.
   const space = Object.freeze({
     kind: "lspace.mark-space",
     resources, relations: edges,
