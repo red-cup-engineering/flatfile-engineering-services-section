@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
-import { markResource, bitAt, bitWindow, bitValues, markSpace } from "../src/digital-mark-space.mjs";
+import { markResource, bitAt, bitWindow, bitValues, markSpace, joinMarkSpaces } from "../src/digital-mark-space.mjs";
 
 test("arbitrary binary media share one canonical NI address and exact MSB-first bit coordinates", () => {
   const bytes = Uint8Array.from([0xa5, 0x01, 0xff]);
@@ -94,4 +94,26 @@ test("bulk bit values share the original raw-coordinate algebra without per-bit 
   assert.throws(() => bitValues({...resource},{offset:0,count:1}),/admitted/);
   assert.throws(() => bitValues(resource,{offset:0,count:32769}),/unbounded/);
   assert.throws(() => bitValues(resource,{offset:15,count:2}),/unbounded/);
+});
+
+test("multi-resource mark spaces remain sortable before freezing, and the source-owned union is stable",()=>{
+  const one=Uint8Array.of(0xa5),two=Uint8Array.of(0x5a),a=makeNiUri(one),b=makeNiUri(two);
+  const left=markSpace([{bytes:one,mediaType:"text/plain",source:{office:"Science",id:"one"}}]);
+  const right=markSpace([
+    {bytes:two,mediaType:"image/png",source:{office:"Engineering",id:"two"}},
+    {bytes:one,mediaType:"application/octet-stream",source:{office:"Operations",id:"one"}},
+  ],{relations:[{from:a,to:b,predicate:"reports",evidence:{for:["r1"],against:["r2"]}}]});
+  const first=joinMarkSpaces([left,right]),reverse=joinMarkSpaces([right,left,left]);
+  assert.equal(first.resources.length,2);
+  assert.ok(Object.isFrozen(first.resources));
+  assert.equal(first.resources.find(r=>r.address===a).presentations.length,2);
+  assert.deepEqual(first.resources,reverse.resources,"source-order and repeated input must not change a union");
+  assert.deepEqual(first.relations,reverse.relations,"repeated historical tellings keep one typed edge");
+  assert.deepEqual(first.relations[0].evidence,{for:["r1"],against:["r2"]});
+  assert.equal(first.bit(a,0).value,1);
+  assert.equal(first.bit(b,0).value,0);
+  assert.deepEqual(joinMarkSpaces([left,left]).resources,left.resources);
+  assert.equal(joinMarkSpaces([markSpace([]),left]).resources.length,1);
+  assert.throws(()=>joinMarkSpaces([{...left}]),/admitted mark space/);
+  assert.throws(()=>joinMarkSpaces([null]),/admitted mark space/);
 });

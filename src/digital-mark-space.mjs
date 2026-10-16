@@ -19,6 +19,7 @@ import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { bytesEqual, canonicalCarrier, semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
 
 const rawBytes = new WeakMap();
+const admittedSpaces = new WeakSet();
 const MAX_WINDOW = 256;
 const isIndex = value => Number.isSafeInteger(value) && value >= 0;
 const rawBitValue = (bytes, bit) => (bytes[Math.floor(bit / 8)] >> (7 - (bit % 8))) & 1;
@@ -145,11 +146,64 @@ export function markSpace(inputs, { relations = [] } = {}) {
     bitLength: resource.bitLength,
     presentations: Object.freeze([...presentations.get(resource.address).values()]),
   })).sort((a, b) => a.address < b.address ? -1 : a.address > b.address ? 1 : 0));
-  return Object.freeze({
+  // Sort before freezing: Array.prototype.sort cannot mutate a frozen
+  // multi-element array and previously blocked precisely the desired union.
+  const space = Object.freeze({
     kind: "lspace.mark-space",
     resources, relations: edges,
     get: address => held.get(address) ?? null,
     bit: (address, offset) => bitAt(held.get(address), offset),
     window: (address, options) => bitWindow(held.get(address), options),
   });
+  admittedSpaces.add(space);
+  return space;
+}
+
+/**
+ * Union independently admitted finite content-addressed resource charts.
+ *
+ * Distinct source presentations of identical bytes remain attached to the
+ * same NI identity; known typed testimony is deduplicated by its complete
+ * semantic identity. No cross-resource edge is fabricated to make a network
+ * look connected. This finite, idempotent union is NOT an infinite Scott
+ * directed-colimit theorem or an institutional authority grant.
+ *
+ * Inputs must be source-owned markSpace results: a shape-compatible object
+ * cannot masquerade as a witnessed content resource.
+ */
+export function joinMarkSpaces(spaces) {
+  if (!Array.isArray(spaces) || spaces.length > 64)
+    throw new RangeError("joinMarkSpaces: at most 64 admitted finite spaces");
+  const inputRows = new Map(), edges = new Map();
+  for (const space of spaces) {
+    if (!admittedSpaces.has(space))
+      throw new TypeError("joinMarkSpaces: source must be an admitted mark space");
+    for (const item of space.resources) {
+      const source = space.get(item.address);
+      const bytes = rawBytes.get(source);
+      if (bytes === undefined) throw new TypeError("joinMarkSpaces: original source bytes are missing");
+      for (const present of item.presentations) {
+        const key = semanticId([item.address, present.mediaType, present.source ?? null]);
+        inputRows.set(key, Object.freeze({
+          bytes, mediaType: present.mediaType,
+          ...(present.source === undefined ? {} : { source: present.source }),
+        }));
+        if (inputRows.size > 100000)
+          throw new RangeError("joinMarkSpaces: source presentation budget exceeded");
+      }
+    }
+    for (const relation of space.relations) {
+      edges.set(relation.id, {
+        from: relation.from, predicate: relation.predicate, to: relation.to,
+        evidence: relation.evidence,
+      });
+      if (edges.size > 100000)
+        throw new RangeError("joinMarkSpaces: relation budget exceeded");
+    }
+  }
+  const orderedInputs = [...inputRows].sort(([a],[b]) => a < b ? -1 : a > b ? 1 : 0)
+    .map(([,value]) => value);
+  const orderedRelations = [...edges].sort(([a],[b]) => a < b ? -1 : a > b ? 1 : 0)
+    .map(([,value]) => value);
+  return markSpace(orderedInputs, { relations: orderedRelations });
 }
