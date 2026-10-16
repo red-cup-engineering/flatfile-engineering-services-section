@@ -21,6 +21,7 @@ import { bytesEqual, canonicalCarrier, semanticId } from "@red-cup-engineering/c
 const rawBytes = new WeakMap();
 const MAX_WINDOW = 256;
 const isIndex = value => Number.isSafeInteger(value) && value >= 0;
+const rawBitValue = (bytes, bit) => (bytes[Math.floor(bit / 8)] >> (7 - (bit % 8))) & 1;
 const finiteString = value => typeof value === "string" && value.length > 0 && value.length <= 256;
 
 function snapshot(value) { return canonicalCarrier(value); }
@@ -51,12 +52,28 @@ export function bitAt(resource, bit) {
   const bytes = rawBytes.get(resource);
   if (bytes === undefined) throw new TypeError("bitAt: an admitted mark resource is required");
   if (!isIndex(bit) || bit >= resource.bitLength) throw new RangeError("bitAt: bit outside source resource");
-  const value = (bytes[Math.floor(bit / 8)] >> (7 - (bit % 8))) & 1;
+  const value = rawBitValue(bytes, bit);
   const triple = Object.freeze([resource.address, bit, value]);
   return Object.freeze({
     kind: "lspace.mark-bit", address: resource.address, bit, value,
     cell: triple, id: semanticId(triple),
   });
+}
+
+/**
+ * Exact bounded values of a bit interval on one admitted raw resource.
+ * Unlike bitAt this does not construct and hash a SignCell coordinate per
+ * bit: the consumer already has the source address and records positions.
+ * The Data owner remains sole source of bit ordering and source ownership.
+ */
+export function bitValues(resource, { offset = 0, count = 64 } = {}) {
+  const bytes = rawBytes.get(resource);
+  if (bytes === undefined) throw new TypeError("bitValues: admitted mark resource required");
+  if (!isIndex(offset) || !isIndex(count) || count > 32768 ||
+      offset > resource.bitLength || count > resource.bitLength - offset)
+    throw new RangeError("bitValues: invalid or unbounded bit interval");
+  return Object.freeze(Array.from({ length: count }, (_item, index) =>
+    rawBitValue(bytes, offset + index)));
 }
 
 /** Bounded bit projection. The source can be arbitrarily longer than the window. */

@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/computer-data-engineering-services-section",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "description": "Root for data concepts ordered by the prerequisites their services require: FOUR, exact numbers, the closure regimes, and the statics of the semiotic expression notation (its grammar, typing judgment, JSON bridge and the semantic identity of JSON content). Its lib holds Metrologic, the data layer's mathematics.",
   "bin": {

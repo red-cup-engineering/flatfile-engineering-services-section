@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
-import { markResource, bitAt, bitWindow, markSpace } from "../src/digital-mark-space.mjs";
+import { markResource, bitAt, bitWindow, bitValues, markSpace } from "../src/digital-mark-space.mjs";
 
 test("arbitrary binary media share one canonical NI address and exact MSB-first bit coordinates", () => {
   const bytes = Uint8Array.from([0xa5, 0x01, 0xff]);
@@ -80,4 +80,18 @@ test("no source, content type, or guessed address fabricates a relation or grant
   assert.throws(() => markSpace([{ bytes: Uint8Array.of(1), source: { a: NaN } }]), /finite/);
   const noArrow = markSpace([{ bytes: Uint8Array.of(0) }, { bytes: Uint8Array.of(1) }]);
   assert.equal(noArrow.relations.length, 0);
+});
+
+test("bulk bit values share the original raw-coordinate algebra without per-bit identity allocation", () => {
+  const original = Uint8Array.from([0xA5,0x5A]);
+  const resource = markResource(original);
+  original.fill(0);
+  assert.deepEqual(bitValues(resource,{offset:0,count:16}),
+    [1,0,1,0,0,1,0,1,0,1,0,1,1,0,1,0]);
+  assert.deepEqual(bitValues(resource,{offset:2,count:4}),
+    [2,3,4,5].map(index => bitAt(resource,index).value));
+  assert.deepEqual(bitValues(resource,{offset:16,count:0}),[]);
+  assert.throws(() => bitValues({...resource},{offset:0,count:1}),/admitted/);
+  assert.throws(() => bitValues(resource,{offset:0,count:32769}),/unbounded/);
+  assert.throws(() => bitValues(resource,{offset:15,count:2}),/unbounded/);
 });
