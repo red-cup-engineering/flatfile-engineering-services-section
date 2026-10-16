@@ -60,6 +60,33 @@ computer-proofing-system.
 
 Each surface has its own README in the corresponding directory.
 
+## Kinematic Space and canonical diamond-bead threading
+
+`@red-cup-engineering/metrologic/articulation/predicating/positing/settling/analysis/causal`
+exports `kinematicDiamondSpaceOf({eventCount,edges})`: a bounded (at most
+32 source events), topologically indexed causal DAG projection to the finite
+space K(C) of strictly reachable endpoint pairs. `sequencing` is endpoint
+sequencing, **not** interval nesting or shared timestamps. Distinct signed
+source evidence events remain distinct in the consuming SignCraft replay.
+
+The returned `beadThread` is the already-proved
+`Obsmetrologia.CausalSets.BlackHoles.diamondThread` readout: one canonical
+`{pointIndex,inPort:false,outPort:true}` pass for each diamond point.
+Every pass obeys the local `PortGraph.legal_iff_distinct` law.
+`beadThreadAdjacency` is the *same immutable relation object* as
+`sequencing`, conforming to
+`DiamondBeads.sequencingBeadAdjacency_thread`. This is **not** a separate
+bead-weaving graph or another closure engine. Source tests check the
+local-port and adjacency laws for all 1,100 forward DAGs through five events.
+
+This mathematical carrier does **not** supply a connected physical string,
+per-bead repeated occupation, independently separated contact/cell/visible
+graphs, bead geometry, a material realization, a proof of external SignChain
+rule licenses, or Lean-kernel admission. The remaining fields for
+`SequencingDiamondBeadPayload.toBeads` must be supplied and qualified
+separately; they must not be inferred from `beadThread` length or the
+`causalRanks` schedule.
+
 ## Finite numerical probability laws (distinct from FOUR knowledge)
 
 `@red-cup-engineering/metrologic/number/finite-law` owns three
