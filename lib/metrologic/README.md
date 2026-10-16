@@ -79,20 +79,33 @@ Every pass obeys the local `PortGraph.legal_iff_distinct` law.
 bead-weaving graph or another closure engine. Source tests check the
 local-port and adjacency laws for all 1,100 forward DAGs through five events.
 
-The complete \`beadThread\` list consists of **local, individually legal
+The complete `beadThread` list consists of **local, individually legal
 passes**; those points need not form a single sequencing-compatible path.
-\`kinematicBeadStrandsOf(space)\` first rederives the full causal-diamond
+`kinematicBeadStrandsOf(space)` first rederives the full causal-diamond
 geometry and rejects mismatched/missing arrows or altered passes. It then
 computes a deterministic **minimum disjoint path cover** using bipartite
 maximum matching on the actual endpoint-sequencing relation. It returns
-\`strands\` (lists of the original local passes),
-\`matchedSequencing\`, \`strandCount\`, and \`requiresMultipleStrands\`.
+`strands` (lists of the original local passes),
+`matchedSequencing`, `strandCount`, and `requiresMultipleStrands`.
 Every diamond is covered exactly once and every adjacent pair within a
 strand is genuinely sequenced. The number of required mathematical strands
 is the **maximum antichain width**, not a count of physical strings.
 The 1,100 small-DAG regression cases independently enumerate antichains
 and compare the exact width; the three-event chain already needs **two**
 strands because its long interval overlaps the short ones.
+
+The returned `maximumAntichain` is an **explicit lower-bound witness**, not
+just an asserted numeric width. Metrologic extracts it from alternating
+reachability in the maximum matching, while the existing `strands` are an
+upper-bound witness. `kinematicBeadCoverAdmits(space, cover)` independently
+checks that every bead pass occurs once, that all transitions are actual
+sequencing, and that the alleged antichain contains distinct pairwise
+incomparable points with exactly the same cardinality as the strand cover.
+The checker **does not run matching**. Equality of the two bounds certifies
+minimum cardinality for the supplied finite K(C), without claiming external
+witness authenticity or any physical material realization. The 32-event
+linear order yields 496 intervals and a concrete 256-member antichain
+crossing the central cut.
 
 This mathematical carrier does **not** supply a connected physical string,
 per-bead repeated occupation, independently separated contact/cell/visible
