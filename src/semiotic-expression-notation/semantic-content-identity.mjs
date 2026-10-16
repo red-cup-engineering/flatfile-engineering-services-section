@@ -369,6 +369,18 @@ function proofPathMatchesEndpoints(path, sourceKey, targetKey) {
   return reached === targetKey;
 }
 
+/** A proof-path coordinate names an *exact* source term key. The generic SEN
+ * string normalizer is allowed to normalize display/object-kind strings, but
+ * silently replacing a declared route endpoint would change the witness
+ * being committed. Refuse non-NFC coordinates rather than rebinding them. */
+function canonicalProofPathCoordinate(value, field) {
+  const normalized = canonicalString(value, field);
+  if (normalized !== value)
+    throw semanticContentRefusal("malformed-proof-path-witness",
+      `${field} must already be canonical NFC text; a witness cannot silently rename a term key`);
+  return value;
+}
+
 /** Commit one exact generative proof-path witness as semantic content. This commits the proof
  * material; it does not make the proof profile's verifier part of the identity law. A qualified
  * verifier must separately reconstruct structureRoot and re-check path. */
@@ -383,9 +395,9 @@ export function identifyProofPathWitness({
   if (proofProfile !== GENERATIVE_PROOF_PATH_PROFILE) {
     throw semanticContentRefusal("unsupported-proof-path-profile", `unsupported proof-path profile ${String(proofProfile)}`);
   }
-  const admittedSourceKey = canonicalString(sourceKey, "sourceKey");
-  const admittedTargetKey = canonicalString(targetKey, "targetKey");
-  const admittedPath = canonicalString(path, "path");
+  const admittedSourceKey = canonicalProofPathCoordinate(sourceKey, "sourceKey");
+  const admittedTargetKey = canonicalProofPathCoordinate(targetKey, "targetKey");
+  const admittedPath = canonicalProofPathCoordinate(path, "path");
   if (admittedSourceKey.length === 0 || admittedTargetKey.length === 0 || admittedPath.length === 0) {
     throw semanticContentRefusal("malformed-proof-path-witness", "sourceKey, targetKey, and path must be nonempty");
   }
