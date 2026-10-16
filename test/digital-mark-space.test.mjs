@@ -1,0 +1,83 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
+import { semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+import { markResource, bitAt, bitWindow, markSpace } from "../src/digital-mark-space.mjs";
+
+test("arbitrary binary media share one canonical NI address and exact MSB-first bit coordinates", () => {
+  const bytes = Uint8Array.from([0xa5, 0x01, 0xff]);
+  const resource = markResource(bytes, { mediaType: "image/png" });
+  const addr = makeNiUri(bytes);
+  bytes.fill(0);
+  assert.equal(resource.address, addr);
+  assert.equal(resource.byteLength, 3);
+  assert.equal(resource.bitLength, 24);
+  assert.deepEqual(Array.from({ length: 16 }, (_, i) => bitAt(resource, i).value),
+    [1,0,1,0,0,1,0,1, 0,0,0,0,0,0,0,1]);
+  const first = bitAt(resource, 0);
+  assert.deepEqual(first.cell, [addr, 0, 1]);
+  assert.equal(first.id, semanticId([addr, 0, 1]));
+  assert.ok(Object.isFrozen(first.cell));
+  assert.notEqual(bitAt(resource, 1).id, first.id);
+  assert.equal(markResource(Uint8Array.from([0xa5, 0x01, 0xff]), { mediaType: "application/octet-stream" }).address, addr);
+});
+
+test("a bounded window traverses any digital resource without a document parser", () => {
+  const res = markResource(Uint8Array.from([0xff, 0x00, 0x80]));
+  const first = bitWindow(res, { offset: 4, limit: 9 });
+  assert.equal(first.offset, 4);
+  assert.deepEqual(first.bits.map(bit => bit.value), [1,1,1,1,0,0,0,0,0]);
+  assert.equal(first.next, 13);
+  const last = bitWindow(res, { offset: first.next, limit: 64 });
+  assert.equal(last.next, null);
+  assert.equal(last.bits.length, 11);
+  for (const bad of [-1, 0.5, NaN, 257, 1e99]) {
+    assert.throws(() => bitWindow(res, { limit: bad }), /bitWindow/);
+  }
+  assert.throws(() => bitAt(res, 24), /outside/);
+  assert.throws(() => bitAt({ ...res }, 0), /admitted/);
+  assert.deepEqual(bitWindow(markResource(new Uint8Array(0))).bits, []);
+});
+
+test("one typed space keeps all source presentations of equal bytes and only authored edges", () => {
+  const bytes = new TextEncoder().encode("a");
+  const extra = Uint8Array.from([0x00,0xfe,0x42]);
+  const from = makeNiUri(bytes), to = makeNiUri(extra);
+  const origin = { repository: "science", locator: "a.md", revision: "r1" };
+  const entries = [
+    { bytes, mediaType: "text/markdown", source: origin },
+    { bytes: Uint8Array.from(bytes), mediaType: "application/octet-stream", source: { repository: "code", locator: "a.bin" } },
+    { bytes: extra, mediaType: "image/jpeg", source: { repository: "media" } },
+  ];
+  const graph = markSpace(entries, { relations: [
+    { from, to, predicate: "declares-related", evidence: { for: ["source-1"], against: ["source-2"] } },
+  ] });
+  origin.locator = "tampered"; entries[0].bytes[0] = 0;
+  assert.equal(graph.resources.length, 2, "same raw bytes, one address");
+  assert.equal(graph.resources.find(r => r.address === from).presentations.length, 2);
+  assert.equal(graph.resources.find(r => r.address === from).presentations[0].source.locator, "a.md");
+  assert.equal(graph.relations.length, 1);
+  assert.deepEqual(graph.relations[0].evidence, { for: ["source-1"], against: ["source-2"] });
+  assert.equal(graph.bit(from, 0).value, 0);
+  assert.equal(graph.bit(to, 0).value, 0);
+  assert.equal(graph.window(to, { limit: 4 }).bits.length, 4);
+  assert.ok(Object.isFrozen(graph.resources));
+  assert.ok(Object.isFrozen(graph.relations[0].evidence));
+  assert.equal(markSpace(entries.slice(1)).relations.length, 0, "no inferred arrow between distinct resources");
+});
+
+test("no source, content type, or guessed address fabricates a relation or grant", () => {
+  const a = markResource(Uint8Array.of(0x00)).address;
+  const b = markResource(Uint8Array.of(0x01)).address;
+  assert.throws(() => markSpace([{ bytes: Uint8Array.of(0) }], {
+    relations: [{ from: a, to: b, predicate: "published" }],
+  }), /known address endpoints/);
+  assert.throws(() => markSpace([{ bytes: Uint8Array.of(0) }], {
+    relations: [{ from: a, to: a, predicate: "related", evidence: { for: true, against: [] } }],
+  }), /evidence/);
+  assert.throws(() => markResource([0,1]), /Uint8Array/);
+  assert.throws(() => markResource(Uint8Array.of(1), { mediaType: "" }), /mediaType/);
+  assert.throws(() => markSpace([{ bytes: Uint8Array.of(1), source: { a: NaN } }]), /finite/);
+  const noArrow = markSpace([{ bytes: Uint8Array.of(0) }, { bytes: Uint8Array.of(1) }]);
+  assert.equal(noArrow.relations.length, 0);
+});
