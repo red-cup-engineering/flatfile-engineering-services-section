@@ -178,7 +178,10 @@ per-bead **and per-hole** pass counts, and the existing
 `portGraph.condensate` FOUR readings at those local counts.
 
 ```js
-import { minimumPortThreadRouteOf, portThreadRouteOf } from
+import {
+  minimumPortThreadRouteOf, portThreadRouteOf,
+  closedPortThreadFeasibilityOf, coveringPortThreadRouteOf,
+} from
   "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/analysis/port-thread-routing";
 
 const p = (beadId, port) => ({ beadId, port });
@@ -190,6 +193,10 @@ const links = [
 ];
 const result = minimumPortThreadRouteOf({ beads, links, closed: true });
 // result.minimalPassCount === 3; each bead has occupation 1.
+const possible = closedPortThreadFeasibilityOf({ beads, links });
+const constructive = coveringPortThreadRouteOf({ beads, links });
+// possible.feasible === true; constructive.passCount === 3.
+// A positive feasibility decision does not claim minimum thread length.
 // To independently receive a proposed walk:
 const receipt = portThreadRouteOf({
   beads, links, closed: true, requireEveryBead: true,
@@ -207,6 +214,53 @@ are actually admitted. The bounded solver refuses unsupported sizes
 (greater than nine beads, sixty oriented local passes, ninety-six
 external links, or its 300,000-state budget) instead of calling a
 budget exhaustion a mathematical impossibility.
+
+**New finite closed-walk characterization and constructive receiving.**
+`closedPortThreadFeasibilityOf({beads,links})` builds the graph of
+**oriented legal hole passes** (one pass state per oriented hole) and adds
+a directed edge only for an explicitly listed external exit-to-entry
+connector. A nonempty closed route visiting every bead exists **if and
+only if** one cyclic strongly connected component of this state graph
+contains a pass of every listed bead. Necessity follows by following
+any valid closed word around its visits; sufficiency follows by
+concatenating directed paths between each bead's representative in
+that component and returning to the start. An isolated singleton
+without a self-loop is not a cycle.
+
+The feasibility result exposes the complete finite strong-component
+coverage, the number of cyclic components, the maximum number of
+beads covered by any one cyclic component, and the actual covering
+pass indices when one exists. This is a mathematical **yes/no decision**
+on the bounded carrier, *independent* of how expensive a particular
+route would be to construct.
+
+`coveringPortThreadRouteOf({beads,links})` then builds an actual
+possibly repeated route and **replays it independently** through
+`portThreadRouteOf`. It can return `route-search-budget-exceeded` or
+`route-pass-budget-exceeded` even when the exact feasibility report
+says `feasible: true`. It must never equate those resource limits
+with geometric impossibility. The former unit-cost minimum search
+still handles at most nine beads; the new strong-component decision
+accepts up to 4,096 beads, up to 24 paired holes per bead, and at most
+131,072 explicitly listed external connectors. The oriented transition
+graph is indexed once from ports rather than reconstructed with a
+pass-by-connector nested scan.
+
+`test/port-thread-connectivity.test.mjs` checks the necessary-and-
+sufficient criterion against an independent 64-graph directed-word
+enumeration and 256 mixed-orientation connector graphs with an
+independent Floyd–Warshall oracle. It also checks a 1,500-bead closed
+ring, a branching route that must revisit its hub, different holes
+on the same repeatedly visited bead, a one-bead two-pass cycle,
+disjoint strongly connected components, and strict causal K(C)
+sequencing without invented material closure.
+
+The construction establishes neither Demaine–Kirkpatrick–Lin
+graph-tightening's required junction connectivity nor the later
+turn-cost, weighted thread length, friction, collision,
+materialization, or community-specific authorization conditions.
+Those are separate qualifying interfaces, not silently assumed
+results of this strongly connected component theorem.
 
 Global `passCount` and local occupation are **not interchangeable**.
 For a three-bead cycle with one pass at each bead, the global
