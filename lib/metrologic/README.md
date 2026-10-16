@@ -134,8 +134,27 @@ covers the target points. These record **information lost**, not a failed
 calculation: incomparable source events may be identified, and
 incomparable source diamonds may become sequenceable after a target
 gains causal relations. **Maximum-antichain and minimum-strand
-certificates do not automatically transport under these maps.** Consumers
-must recalculate and independently admit them against the target K(C).
+certificates do not automatically transport under these maps.** When the
+induced diamond map is a genuine **order isomorphism** (bijective on points,
+preserving and reflecting sequencing), `kinematicBeadCoverTransportOf`
+instead maps the already-admitted source strands and maximum antichain
+directly onto target points, independently admits the target dual bounds,
+and returns `metrologic.kinematicBeadCoverTransport.v1`. This does **not**
+rerun maximum matching. The order isomorphism need not be a bijection on
+underlying events: adjoining a disconnected event, for example, leaves K(C)
+unchanged. Non-isomorphisms and forged source certificates refuse. A general
+strict K(f) can still transport its points even when an optimal bead cover
+cannot be reused.
+
+To reduce repetitive K(C) reconstruction, the implementation privately
+recognizes only immutable canonical spaces and admitted covers originally
+created by its own provider; neither a copied wrapper nor a JSON clone
+inherits that trust. Serialized inputs undergo full canonical validation
+and dual-witness checks. Private typed-array sequencing lookup replaces
+repeated string-keyed graph scans, while the full independent checker
+remains available through `kinematicBeadCoverAdmits`. Certificate transport
+avoids an optimization search; whether it is faster in a deployed workload
+must be measured separately, not inferred from that fact.
 
 The regression suite checks 1,100 identity carriers, 2,067 total
 small-DAG event maps (536 admitted, 1,531 refused) against an independent
