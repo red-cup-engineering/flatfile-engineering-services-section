@@ -94,3 +94,34 @@ test("noncanonical or mismatched proof paths cannot mint witness identities", ()
     (error) => error.code === "malformed-proof-path-witness",
   );
 });
+
+
+test("exact Unicode proof endpoints never normalize to a different witness", () => {
+  const canonical = identifyProofPathWitness({
+    structureRoot, sourceKey: "é", targetKey: "Ω",
+    path: "~c3~a9/converse/library/~ce~a9",
+  });
+  assert.equal(isNiUri(canonical.token), true);
+
+  // Before admission hardened, this *succeeded*: sourceKey was silently
+  // normalized from the decomposed key to the path's composed root.
+  assert.throws(() => identifyProofPathWitness({
+    structureRoot, sourceKey: "e\u0301", targetKey: "Ω",
+    path: "~c3~a9/converse/library/~ce~a9",
+  }), error => error.code === "malformed-proof-path-witness");
+  assert.throws(() => identifyProofPathWitness({
+    structureRoot, sourceKey: "mark", targetKey: "O\u0308",
+    path: "mark/converse/library/~c3~96",
+  }), error => error.code === "malformed-proof-path-witness");
+  assert.throws(() => identifyProofPathWitness({
+    structureRoot, sourceKey: "mark", targetKey: "claim",
+    path: "mark/converse/library/cla\u0301im",
+  }), error => error.code === "malformed-proof-path-witness");
+
+  // A decomposed term whose bytes are explicitly encoded in the route must
+  // also refuse rather than changing its meaning under semantic normalization.
+  assert.throws(() => identifyProofPathWitness({
+    structureRoot, sourceKey: "e\u0301", targetKey: "claim",
+    path: "e~cc~81/converse/library/claim",
+  }), error => error.code === "malformed-proof-path-witness");
+});
