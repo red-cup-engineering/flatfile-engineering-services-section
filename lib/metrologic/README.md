@@ -115,6 +115,36 @@ rule licenses, or Lean-kernel admission. The remaining fields for
 separately; they must not be inferred from `beadThread` length or the
 `causalRanks` schedule.
 
+### Finite Kinematic Space transport has an exact morphism criterion
+
+`kinematicDiamondTransportOf(sourceSpace, targetSpace, eventMap)` maps
+each diamond `(a,b)` to `(f(a),f(b))` **if and only if** the total
+listed-event map `f` preserves every strict source causal pair. That
+condition is necessary because every strict pair is an admitted diamond;
+it is sufficient because equality and strict precedence preserve
+endpoint sequencing. The endpoint construction respects identities and
+composition, so it is functorial on this category of finite causal sets
+and strict-precedence-preserving maps. No reflexive-order-only map is
+silently promoted to a strict map.
+
+The executable returns exact indexed `eventMap` and `pointMap`,
+`identifiedPoints`, `newlyComparable`, `unmappedTargetPoints`, and
+whether the result embeds the source point order into the target or
+covers the target points. These record **information lost**, not a failed
+calculation: incomparable source events may be identified, and
+incomparable source diamonds may become sequenceable after a target
+gains causal relations. **Maximum-antichain and minimum-strand
+certificates do not automatically transport under these maps.** Consumers
+must recalculate and independently admit them against the target K(C).
+
+The regression suite checks 1,100 identity carriers, 2,067 total
+small-DAG event maps (536 admitted, 1,531 refused) against an independent
+strict-reachability oracle, composition, non-injective lawful maps,
+newly introduced comparabilities, sparse-map refusal and forged source
+geometry. These are executable finite comparisons alongside the
+general endpoint proof, **not** a declaration-specific Lean-kernel
+admission or a physical causal interpretation.
+
 ## Finite numerical probability laws (distinct from FOUR knowledge)
 
 `@red-cup-engineering/metrologic/number/finite-law` owns three
