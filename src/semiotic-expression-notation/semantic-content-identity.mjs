@@ -395,6 +395,11 @@ export function identifyProofPathWitness({
   if (proofProfile !== GENERATIVE_PROOF_PATH_PROFILE) {
     throw semanticContentRefusal("unsupported-proof-path-profile", `unsupported proof-path profile ${String(proofProfile)}`);
   }
+  // The committed generator structure is the first authority boundary.
+  // Reject invalid NI roots before considering potentially malformed routes:
+  // callers must not mistake a bad structure commitment for a path defect.
+  const admittedStructureRoot = canonicalNi(structureRoot, "structureRoot");
+  const admittedWitnessRoot = canonicalNi(witnessRoot, "witnessRoot");
   const admittedSourceKey = canonicalProofPathCoordinate(sourceKey, "sourceKey");
   const admittedTargetKey = canonicalProofPathCoordinate(targetKey, "targetKey");
   const admittedPath = canonicalProofPathCoordinate(path, "path");
@@ -410,12 +415,12 @@ export function identifyProofPathWitness({
     value: {
       version: 1,
       proofProfile,
-      structureRoot: canonicalNi(structureRoot, "structureRoot"),
+      structureRoot: admittedStructureRoot,
       sourceKey: admittedSourceKey,
       targetKey: admittedTargetKey,
       path: admittedPath,
     },
-    witnessRoot: canonicalNi(witnessRoot, "witnessRoot"),
+    witnessRoot: admittedWitnessRoot,
   });
 }
 
