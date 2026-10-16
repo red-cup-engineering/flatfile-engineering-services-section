@@ -285,6 +285,39 @@ replays an emitted route through actual named ports and returns
 `holeLengthUm`, `connectorLengthUm`, and `totalLengthUm`.
 A non-calibrated input explicitly yields `lengthsCalibrated: false`.
 
+**Independently check the kinetic optimum.** On bounded queries, pass
+`includeOptimalityCertificate: true` to
+`minimumMaterialPortThreadRouteOf`. The optional
+`optimalityCertificate` contains a threshold `L` (as an exact decimal
+micrometre string) and a finite collection of lower-bound states
+`(start, last, visitedMask, boundUm)`. The independent
+`materialPortThreadOptimalityAdmits(spec, certificate)` first
+replays the proposed route and its exact cost, then checks:
+
+- every possible initial pass with cost less than `L` has a claimed
+  lower-bound state no greater than its actual starting cost;
+- every connector transition from a certified state whose proposed
+  accumulated cost would be less than `L` leads to another certified
+  state with no larger lower bound;
+- no certified all-covered state can reach the terminal goal (including
+  a closing connector when required) for less than `L`.
+
+By induction, **any hypothetically cheaper word would have to stay
+inside these checked states and arrive at a forbidden cheap terminal**.
+The actual admitted word of cost `L` is the matching upper bound.
+Thus `optimalityAdmission.lowerBoundUm` and `upperBoundUm` are
+equal independently of the solver. This is a genuine finite
+**kinetic-proof receipt**, not a self-labelled optimal route or a
+Lean-kernel certificate about the world.
+
+The optional certificate is capped at 10,000 states to bound receipt
+size. A request that would exceed that limit refuses as
+`material-optimality-certificate-budget-exceeded`; retry without the
+optional certificate to obtain an optimized route without falsely
+claiming independent proof. The test suite checks all 128 tiny
+open/closed weighted instances with this independent verifier and
+rejects tampered, incomplete and duplicated frontier states.
+
 For a concrete falsification of pass-count optimality, give three
 beads A, B, C unit-cost hole passages, length-1 connectors A↔B
 and A↔C, and length-100 connectors B↔C. The original pass-count
