@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/data-custody-directory-service",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "type": "module",
   "description": "Resolves and verifies the three lawful data/ custody directories -- logs, records, state -- a service's flatfile data may live under.",
   "license": "Apache-2.0",
