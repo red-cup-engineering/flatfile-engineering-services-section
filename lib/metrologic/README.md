@@ -262,6 +262,51 @@ materialization, or community-specific authorization conditions.
 Those are separate qualifying interfaces, not silently assumed
 results of this strongly connected component theorem.
 
+**Kinetic, dimensioned thread-length optimization.** The same source-owned
+`port-thread-routing` export now also provides
+`materialPortThreadRouteOf` and `minimumMaterialPortThreadRouteOf`.
+The latter solves the **exact additive minimum-length** objective on the
+same bounded nine-bead pass-state carrier, instead of minimizing the
+number of bead-hole passes. It is a separate objective, not a rival
+port graph or a duplicate settlement engine.
+
+Every bead must provide `holeLengthsUm`, an array of **positive
+safe-integer micrometre estimates**, in the same order as its paired
+`holes`. Every allowed directed external connector must provide
+`lengthUm`, a **nonnegative safe-integer micrometre estimate**. There
+are no assumed, zero-filled, or distance-inferred defaults. The
+optimizer uses nonnegative-weight Dijkstra on
+`(firstPass, lastPass, visitedBeadMask)` and counts each repeated
+hole passage and connector, including the closing connector. It
+computes all total lengths using `BigInt` and serializes results as
+decimal integer strings. The independent `materialPortThreadRouteOf`
+replays an emitted route through actual named ports and returns
+`holePassLengthsUm`, `connectorSegmentLengthsUm`,
+`holeLengthUm`, `connectorLengthUm`, and `totalLengthUm`.
+A non-calibrated input explicitly yields `lengthsCalibrated: false`.
+
+For a concrete falsification of pass-count optimality, give three
+beads A, B, C unit-cost hole passages, length-1 connectors A↔B
+and A↔C, and length-100 connectors B↔C. The original pass-count
+solver returns a three-pass covering cycle costing 105 micrometres.
+The length solver correctly chooses A→B→A→C→A, which is four
+actual bead passes and a last-to-first closing connector,
+costing only **8 micrometres**. Neither solution implies a
+physical cord layout, safe tensile load, friction or measured
+diameter.
+
+The additional `test/port-thread-material-length.test.mjs`
+enumerates all 64 three-bead directed graphs under both open and
+closed weighted objectives, compares with an independent explicit
+thread-word oracle, checks a cheaper multi-hole alternative,
+independently replays repeated connector costs, verifies
+`BigInt` totals above `Number.MAX_SAFE_INTEGER`, and refuses
+unpriced, fractional, negative or unsafe-integer lengths.
+The bounded optimizer returns `material-route-search-budget-exceeded`
+rather than falsely claiming graph-theoretic impossibility.
+Graph-scale closed-port feasibility remains the independent
+strong-component decision and is not limited by the length optimizer.
+
 Global `passCount` and local occupation are **not interchangeable**.
 For a three-bead cycle with one pass at each bead, the global
 `condensate(3)` is the held-both FOUR reading, but **none** of its
