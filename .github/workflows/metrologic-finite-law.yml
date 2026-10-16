@@ -11,6 +11,10 @@ on:
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs'
       - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/causal-kinematic.test.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-condensate.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-graph.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs'
+      - 'lib/metrologic/test/port-thread-routing.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/src/obstruction/capacity-flow.mjs'
       - 'lib/metrologic/test/capacity-flow.test.mjs'
@@ -30,6 +34,10 @@ on:
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs'
       - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/causal-kinematic.test.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-condensate.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-graph.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs'
+      - 'lib/metrologic/test/port-thread-routing.test.mjs'
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/src/obstruction/capacity-flow.mjs'
       - 'lib/metrologic/test/capacity-flow.test.mjs'
@@ -72,6 +80,38 @@ jobs:
         run: |
           node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/chromatic-lorentzian.mjs
           node --test lib/metrologic/test/chromatic-lorentzian.test.mjs
+
+
+  bead-port-routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exercise actual data-owned FOUR and port-routing source without a remote registry
+        run: |
+          set -euo pipefail
+          # The source checkout is itself the Data owner's package; resolve
+          # its own public FOUR export without a competing implementation.
+          mkdir -p node_modules/@red-cup-engineering
+          ln -s "$GITHUB_WORKSPACE" node_modules/@red-cup-engineering/computer-data-engineering-services-section
+          node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-condensate.mjs
+          node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs
+          node --check lib/metrologic/test/port-thread-routing.test.mjs
+          node --test lib/metrologic/test/port-thread-routing.test.mjs
+          node --input-type=module - <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          const pkg=JSON.parse(readFileSync('lib/metrologic/package.json','utf8'));
+          assert.equal(
+            pkg.exports['./articulation/predicating/positing/settling/analysis/port-thread-routing'].import,
+            './src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs'
+          );
+          NODE
 
   graded-resource-law:
     runs-on: ubuntu-latest
