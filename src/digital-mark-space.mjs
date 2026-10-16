@@ -172,14 +172,17 @@ export function markSpace(inputs, { relations = [] } = {}) {
  * Inputs must be source-owned markSpace results: a shape-compatible object
  * cannot masquerade as a witnessed content resource.
  */
-export function joinMarkSpaces(spaces) {
+export function joinMarkSpaces(spaces, { relations = [] } = {}) {
   if (!Array.isArray(spaces) || spaces.length > 64)
     throw new RangeError("joinMarkSpaces: at most 64 admitted finite spaces");
-  const inputRows = new Map(), edges = new Map();
+  if (!Array.isArray(relations) || relations.length > 4096)
+    throw new RangeError("joinMarkSpaces: at most 4096 explicitly witnessed cross-chart relations");
+  const inputRows = new Map(), edges = new Map(), knownAddresses = new Set();
   for (const space of spaces) {
     if (!admittedSpaces.has(space))
       throw new TypeError("joinMarkSpaces: source must be an admitted mark space");
     for (const item of space.resources) {
+      knownAddresses.add(item.address);
       const source = space.get(item.address);
       const bytes = rawBytes.get(source);
       if (bytes === undefined) throw new TypeError("joinMarkSpaces: original source bytes are missing");
@@ -201,6 +204,18 @@ export function joinMarkSpaces(spaces) {
       if (edges.size > 100000)
         throw new RangeError("joinMarkSpaces: relation budget exceeded");
     }
+  }
+  // Only source-supplied testimony may connect different territorial charts.
+  // Both endpoints must actually occur in the admitted union; no path,
+  // timestamp, shared text or identity similarity fabricates an arrow.
+  for (const relation of relations) {
+    const admitted = admitRelation(relation, knownAddresses);
+    edges.set(admitted.id, {
+      from: admitted.from, predicate: admitted.predicate, to: admitted.to,
+      evidence: admitted.evidence,
+    });
+    if (edges.size > 100000)
+      throw new RangeError("joinMarkSpaces: relation budget exceeded");
   }
   const orderedInputs = [...inputRows].sort(([a],[b]) => a < b ? -1 : a > b ? 1 : 0)
     .map(([,value]) => value);

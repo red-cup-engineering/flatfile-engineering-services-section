@@ -117,3 +117,29 @@ test("multi-resource mark spaces remain sortable before freezing, and the source
   assert.throws(()=>joinMarkSpaces([{...left}]),/admitted mark space/);
   assert.throws(()=>joinMarkSpaces([null]),/admitted mark space/);
 });
+
+test("cross-territory charts join with explicit two-sided relations, never implicit causality", () => {
+  const sourceA=Uint8Array.of(0xa5,0x01),sourceB=Uint8Array.of(0x7f);
+  const a=makeNiUri(sourceA),b=makeNiUri(sourceB);
+  const science=markSpace([{bytes:sourceA,mediaType:"application/json",source:{office:"Science"}}]);
+  const publicService=markSpace([{bytes:sourceB,mediaType:"image/png",source:{office:"Public"}}]);
+  const alleged={from:a,to:b,predicate:"is-described-by",
+    evidence:{for:[{issuer:"office-A"}],against:[{issuer:"office-B"}]}};
+  assert.deepEqual(joinMarkSpaces([science,publicService]).relations,[],
+    "shared digital space does not invent a cross-Office edge");
+  const space=joinMarkSpaces([science,publicService],{relations:[alleged,alleged]});
+  assert.equal(space.resources.length,2);
+  assert.equal(space.relations.length,1);
+  assert.deepEqual(space.relations[0].evidence,alleged.evidence);
+  assert.equal(space.bit(a,0).value,1);
+  assert.equal(space.bit(b,0).value,0);
+  assert.deepEqual(joinMarkSpaces([publicService,science],{relations:[alleged]}).relations,
+    space.relations,"union order cannot rewrite already witnessed relation identity");
+  assert.throws(()=>joinMarkSpaces([science],{relations:[alleged]}),/known address endpoints/);
+  assert.throws(()=>joinMarkSpaces([science,publicService],{
+    relations:[{...alleged,evidence:{for:[],against:"false"}}]
+  }),/evidence/);
+  assert.throws(()=>joinMarkSpaces([science,publicService],{relations:[{
+    ...alleged,to:makeNiUri(Uint8Array.of(0x22)),
+  }]}),/known address endpoints/);
+});
