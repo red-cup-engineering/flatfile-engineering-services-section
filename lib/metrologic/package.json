@@ -185,6 +185,9 @@
     "./articulation/predicating/positing/settling/analysis/port-graph": {
       "import": "./src/articulation/predicating/positing/settling/analysis/port-graph.mjs"
     },
+    "./articulation/predicating/positing/settling/analysis/port-thread-routing": {
+      "import": "./src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs"
+    },
     "./articulation/predicating/positing/settling/analysis/quantale-enriched-sheaf": {
       "import": "./src/articulation/predicating/positing/settling/analysis/quantale-enriched-sheaf.mjs"
     },
