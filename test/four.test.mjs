@@ -167,3 +167,32 @@ test("binary-relation composition is directional even though FOUR fusion is comm
   assert.equal(sidesOfReading("potential")[0],sidesOfReading("stable")[0]);
   assert.equal(symmetricEvidenceDifferenceReading("potential","stable"),"active");
 });
+
+test("Record tally increments need not create another FOUR cover", async () => {
+  const {record, recordAdd, readingOfRecord, witFlux} = await import("../src/four.mjs");
+  const empty = record(0, 0);
+  const first = recordAdd(empty, record(1, 0));
+  const repeated = recordAdd(first, record(1, 0));
+  const contested = recordAdd(repeated, record(0, 1));
+  assert.deepEqual(repeated, record(2, 0), "the Record retains evidence multiplicity");
+  assert.equal(readingOfRecord(first), "potential");
+  assert.equal(readingOfRecord(repeated), "potential");
+  assert.equal(witFlux([[readingOfRecord(first), readingOfRecord(repeated)]]).wits, 0);
+  assert.deepEqual(witFlux([
+    [readingOfRecord(empty), readingOfRecord(first)],
+    [readingOfRecord(first), readingOfRecord(repeated)],
+    [readingOfRecord(repeated), readingOfRecord(contested)],
+  ]), {commits: 1, mints: 1, jumps: 0, reversible: 2, irreversible: 0, wits: 2});
+  // This numerical flux has neither source witnesses nor independently received ACK/ATT.
+});
+
+test("bottom-to-both is two covers, never one minted WIT", async () => {
+  const {four, isKnowledgeCover, witnessBit, witFlux, readingOfRecord, record} = await import("../src/four.mjs");
+  const bottom = four(false, false), top = four(true, true);
+  assert.equal(isKnowledgeCover(bottom, top), false);
+  assert.throws(() => witnessBit(bottom, top), error => error.code === "not-one-wit");
+  assert.equal(witFlux([[readingOfRecord(record(0, 0)), readingOfRecord(record(1, 1))]]).wits, 2);
+  assert.equal(isKnowledgeCover(bottom, four(true, false)), true);
+  assert.equal(witnessBit(bottom, four(true, false)), "positiveEvidence");
+  assert.throws(() => witFlux([["potential", "absurd"]]), /not-knowledge-ascent/u);
+});
