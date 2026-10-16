@@ -35,3 +35,62 @@ test("a proof-path witness refuses untyped or noncanonical addressing material",
   assert.throws(() => identifyProofPathWitness({ structureRoot, sourceKey: "mark", targetKey: "claim", path: "mark/claim", proofProfile: "urn:other" }),
     (error) => error.code === "unsupported-proof-path-profile");
 });
+
+
+test("canonical typed path spellings bind both endpoints without claiming graph proof", () => {
+  const escaped = identifyProofPathWitness({
+    structureRoot,
+    sourceKey: "a/b",
+    targetKey: "..",
+    path: "a~2fb/object-projection/library/~2e~2e",
+  });
+  assert.equal(isNiUri(escaped.token), true);
+  // Syntax alone does not check that this generator edge is in structureRoot.
+  const unverified = identifyProofPathWitness({
+    structureRoot, sourceKey: "mark", targetKey: "unknown",
+    path: "mark/converse/library/unknown",
+  });
+  assert.equal(isNiUri(unverified.token), true);
+  const reflexive = identifyProofPathWitness({
+    structureRoot, sourceKey: "mark", targetKey: "mark", path: "mark",
+  });
+  assert.equal(isNiUri(reflexive.token), true);
+});
+
+test("noncanonical or mismatched proof paths cannot mint witness identities", () => {
+  const malformedPaths = [
+    "mark/claim",
+    "mark/specialization/claim",
+    "mark/specialization/not-library/claim",
+    "mark/unsupported/library/claim",
+    "mark/specialization/library/claim/",
+    "mark/specialization/library/claim//",
+    "mark/specialization/library/cl~61im",
+    "mark/specialization/library/cl~2Fim",
+    "mark/specialization/library/cl%61im",
+    "mark/specialization/library/cl~ffim",
+    "./specialization/library/claim",
+    "mark/specialization/library/claim/..",
+  ];
+  for (const path of malformedPaths) {
+    assert.throws(
+      () => identifyProofPathWitness({ structureRoot, sourceKey: "mark", targetKey: "claim", path }),
+      (error) => error.code === "malformed-proof-path-witness",
+      path,
+    );
+  }
+  assert.throws(
+    () => identifyProofPathWitness({
+      structureRoot, sourceKey: "wrong", targetKey: "claim",
+      path: "mark/specialization/library/claim",
+    }),
+    (error) => error.code === "malformed-proof-path-witness",
+  );
+  assert.throws(
+    () => identifyProofPathWitness({
+      structureRoot, sourceKey: "mark", targetKey: "wrong",
+      path: "mark/specialization/library/claim",
+    }),
+    (error) => error.code === "malformed-proof-path-witness",
+  );
+});
