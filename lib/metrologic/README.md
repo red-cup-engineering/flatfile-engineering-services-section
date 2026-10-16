@@ -164,6 +164,67 @@ geometry. These are executable finite comparisons alongside the
 general endpoint proof, **not** a declaration-specific Lean-kernel
 admission or a physical causal interpretation.
 
+## Bead routing: actual port walks and local occupation
+
+`@red-cup-engineering/metrologic/articulation/predicating/positing/settling/analysis/port-thread-routing`
+is the data-owned **finite material port-routing** API, distinct from
+`analysis/causal` and its acyclic K(C) diamond sequencing. The former
+works with named rigid bead units, explicit paired ports for each hole,
+and explicitly supplied **directed external connector segments**.
+`portThreadRouteOf` checks the complete word of internal hole passes
+and external connectors including an explicit closed-loop join. It
+retains repeated visits, exact traversed thread segments, local
+per-bead **and per-hole** pass counts, and the existing
+`portGraph.condensate` FOUR readings at those local counts.
+
+```js
+import { minimumPortThreadRouteOf, portThreadRouteOf } from
+  "@red-cup-engineering/metrologic/articulation/predicating/positing/settling/analysis/port-thread-routing";
+
+const p = (beadId, port) => ({ beadId, port });
+const beads = ["a", "b", "c"].map(id => ({ id, holes: [["in", "out"]] }));
+const links = [
+  { from: p("a","out"), to: p("b","in") },
+  { from: p("b","out"), to: p("c","in") },
+  { from: p("c","out"), to: p("a","in") },
+];
+const result = minimumPortThreadRouteOf({ beads, links, closed: true });
+// result.minimalPassCount === 3; each bead has occupation 1.
+// To independently receive a proposed walk:
+const receipt = portThreadRouteOf({
+  beads, links, closed: true, requireEveryBead: true,
+  passes: result.thread.map(({beadId,enter,exit})=>({beadId,enter,exit})),
+});
+```
+
+`minimumPortThreadRouteOf` uses a bounded exact breadth-first
+search to minimize **the number of bead-hole passes** covering all
+listed beads, not cord length, weighted turns, material tension, or the
+Demaine/Kirkpatrick/Lin graph-tightening objective. A closed port-route
+may repeat a bead; a causal K(C) sequencing graph cannot supply the
+required closed directed walk unless independent material connectors
+are actually admitted. The bounded solver refuses unsupported sizes
+(greater than nine beads, sixty oriented local passes, ninety-six
+external links, or its 300,000-state budget) instead of calling a
+budget exhaustion a mathematical impossibility.
+
+Global `passCount` and local occupation are **not interchangeable**.
+For a three-bead cycle with one pass at each bead, the global
+`condensate(3)` is the held-both FOUR reading, but **none** of its
+three individual bead occupations is held-both. Branching routes that
+revisit the hub can have a genuinely locally held-both reading.
+The presence of such a reading **does not establish physical
+superjamming**: contact, friction, placement, stiffness, surface
+visibility, machine feasibility, and cultural authority require
+independent evidence. This API does not synthesize these missing
+graphs or assert authorization to fabricate a physical object.
+
+The test `test/port-thread-routing.test.mjs` exercises the real
+consumer interface, independent explicit-route replay, local and
+per-hole counts, failure cases, and all 128 open/closed scenarios
+over the 64 directed port-link graphs with three beads against an
+independently enumerated route-word oracle.
+
 ## Finite numerical probability laws (distinct from FOUR knowledge)
 
 `@red-cup-engineering/metrologic/number/finite-law` owns three
