@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/metrologic",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "module",
   "description": "Metrologic: the data layer's mathematics, the shared JavaScript implementation of the mathematical operations every layer above it uses.",
   "keywords": [
@@ -296,7 +296,6 @@
     "./models/physics/models/kinetic-theory/molecular-chaos-gluing": "./src/models/physics/models/kinetic-theory/molecular-chaos-gluing.mjs",
     "./models/physics/models/glass/kappa-sector-charges": "./src/models/physics/models/glass/kappa-sector-charges.mjs",
     "./models/physics/models/quantum-contextuality/reconciliation-quote": "./src/models/physics/models/quantum-contextuality/reconciliation-quote.mjs",
-    "./models/physics/session-presence": "./src/models/physics/session-presence.mjs",
     "./models/graphs/module-cohesion": "./src/models/graphs/module-cohesion.mjs",
     "./models/graphs/directed-multigraph": "./src/models/graphs/directed-multigraph.mjs",
     "./settling/schema/site": "./src/articulation/predicating/positing/settling/site.mjs",
