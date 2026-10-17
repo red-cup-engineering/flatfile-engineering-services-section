@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/metrologic",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "type": "module",
   "description": "Metrologic: the data layer's mathematics, the shared JavaScript implementation of the mathematical operations every layer above it uses.",
   "keywords": [
@@ -148,9 +148,6 @@
     },
     "./articulation/predicating/positing/settling/analysis/flow": {
       "import": "./src/articulation/predicating/positing/settling/analysis/flow.mjs"
-    },
-    "./articulation/predicating/positing/settling/analysis/formats-four": {
-      "import": "./src/articulation/predicating/positing/settling/analysis/formats-four.mjs"
     },
     "./articulation/predicating/positing/settling/analysis/frobenius-tqft": {
       "import": "./src/articulation/predicating/positing/settling/analysis/frobenius-tqft.mjs"
