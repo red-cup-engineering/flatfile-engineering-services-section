@@ -145,7 +145,7 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
       continue;
     }
     const rail = resource.network + "|" + resource.asset.toLowerCase();
-    const prior = byRail.get(rail) ?? 0n;
+    const prior = byRail.has(rail) ? byRail.get(rail) : 0n;
     byRail.set(rail, resource.amount === null || prior === null
       ? null : prior + BigInt(resource.amount));
   }
@@ -160,7 +160,6 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
   const unpriced = amounts.filter((a) => a === null).length;
   const multiOption = resources.filter((r) => r.amounts.length > 1).length;
   if (unpriced) problems.push(`${unpriced} resource(s) without a valid integer amount`);
-  if (unknownRail) problems.push(`${unknownRail} resource(s) without a known network and asset`);
   if (multiOption) problems.push(`${multiOption} resource(s) list several accepts; only the first is priced`);
   return Object.freeze({
     kind: SNAPSHOT_KIND,
@@ -175,6 +174,7 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
       calls30d: observedCalls,
       listedPriceUnits,
       listedPriceUnitsByRail,
+      priceRailsComplete: unknownRail === 0 && amounts.every((amount) => amount !== null),
     }),
     resources: Object.freeze(resources),
   });
