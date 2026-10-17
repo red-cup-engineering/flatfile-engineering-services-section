@@ -40,7 +40,8 @@
     "./media/raster": "./src/media/raster.mjs",
     "./run-json-command": "./src/run-json-command.mjs",
     "./package.json": "./package.json",
-    "./digital-mark-space": "./src/digital-mark-space.mjs"
+    "./digital-mark-space": "./src/digital-mark-space.mjs",
+    "./content-space-operation-schemas": "./src/content-space-operation-schemas.mjs"
   },
   "files": [
     "bin",
