@@ -43,7 +43,8 @@
     "./digital-mark-space": "./src/digital-mark-space.mjs",
     "./content-space-operation-schemas": "./src/content-space-operation-schemas.mjs",
     "./semiotic-content-address": "./lib/semiotic-content-address/src/semiotic-content-address.mjs",
-    "./raw-content-address": "./lib/semiotic-content-address/src/raw-content-address.mjs"
+    "./raw-content-address": "./lib/semiotic-content-address/src/raw-content-address.mjs",
+    "./ordinal-evidence": "./src/ordinal-evidence.mjs"
   },
   "files": [
     "bin",
