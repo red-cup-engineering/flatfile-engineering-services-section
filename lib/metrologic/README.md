@@ -13,11 +13,37 @@ This package is ESM-only, Node >=20, and organized by explicit subpath exports.
 It does not provide a broad default import.
 Consumers should import the math surface they actually descend through.
 
-Metrologic is the data layer's mathematics: it lives in the computer data section's lib and
-imports only data (FOUR, exact numbers, closure regimes), content, JSON and EAVT, so every
-layer above data may import it. The Laplacian, PyMetrologic, and enriched-category research
+Metrologic is the data layer's mathematics, currently source-owned at
+`computer-data-engineering-services-section/lib/metrologic` while its complete
+standalone-root source is carried on the extraction branch
+`split/metrologic-standalone-20261017`. The root package's mathematical imports
+are FOUR, exact numbers, closure regimes and selected JSON presentation functions;
+Metrologic has no direct SignCell, NI/content-address or agent faculty dependency.
+Its primitive `./mark` is an uninterpreted schematic carrier, not a digest or an
+equality oracle. The Laplacian, PyMetrologic, and enriched-category research
 applications live under computer-math-system; proof-assistant integration lives in
 computer-proofing-system.
+
+## Source-generated Mark and observational identity
+
+`@red-cup-engineering/metrologic/mark` supplies the single schematic Mark
+shape. Its `value` is any presented datum, with no NI name, witness strength,
+or primitive equality. SignCell imports that schema and implements the
+technological admission and address space downstream.
+
+`./articulation/predicating/equality` now requires a caller-supplied
+comparison with a trace, test family and either an identification witness
+or separating obstruction. Unknown is not false and payload-byte coincidence
+is not `Quot.sound`.
+
+The abstract `obstruction/settling` filtration receives its observational
+`keyOf` explicitly when treating opaque objects as equivalent. Without
+an admitted relation, distinct object occurrences remain distinct.
+SignCraft supplies SignCell's coincidence relation when projecting native
+SignCells to this generic mathematics. `./chu` similarly treats reference
+positions as distinct unless its consumer supplies `samePoint`/`sameState`.
+These are *conditional* constructions downstream of the originating act,
+not proofs that exclusion itself generated the observations.
 
 ## Separation of mathematics from semiotic technology
 
