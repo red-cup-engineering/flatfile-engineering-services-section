@@ -161,3 +161,87 @@ test("diff refuses snapshots of different merchants or endpoints", () => {
   assert.throws(() => diffSnapshots(a, { ...a, payTo: "0x" + "1".repeat(40) }), /different payTo/);
   assert.throws(() => diffSnapshots(a, { ...a, endpoint: "https://other.example.test/m" }), /different endpoints/);
 });
+
+
+test("unknown call and payer counts do not create zero totals or a false new-payer signal", () => {
+  const beforeListing = withResources((rs) => {
+    rs[0].quality.l30DaysTotalCalls = null;
+    rs[0].quality.l30DaysUniquePayers = null;
+  });
+  const afterListing = withResources((rs) => {
+    rs[0].quality.l30DaysTotalCalls = 3;
+    rs[0].quality.l30DaysUniquePayers = 3;
+  });
+  const before = taken([beforeListing], "2026-01-02T00:00:00Z");
+  const after = taken([afterListing], "2026-01-03T00:00:00Z");
+  assert.equal(before.complete, true, "complete listing does not imply measured demand");
+  assert.equal(before.totals.calls30d, null, "one missing count makes the aggregate unknown");
+  assert.equal(after.totals.calls30d, 4);
+  const diff = diffSnapshots(before, after);
+  const item = diff.changed.find((row) => row.resource === afterListing.resources[0].resource);
+  assert.ok(item, "measurement coverage changed");
+  assert.equal(item.callsDelta, null);
+  assert.equal(item.uniquePayersDelta, null);
+  assert.equal(diff.totalsDelta.calls30d, null);
+  assert.equal(diff.newPayerSignals.includes(item.resource), false,
+    "no positive payer delta can be inferred without its baseline");
+});
+
+test("malformed discovery counters stay unknown instead of coercing arrays, whitespace or fractions", () => {
+  const bad = resourceEntry({
+    ...entry("malformed"), quality: {
+      l30DaysTotalCalls: [], l30DaysUniquePayers: " ",
+    },
+  });
+  assert.equal(bad.calls30d, null);
+  assert.equal(bad.uniquePayers30d, null);
+  for (const value of [0.25, "2.5", -1, "NaN", "9007199254740993", {}, true]) {
+    assert.equal(resourceEntry({ ...entry("invalid"), quality: {
+      l30DaysTotalCalls: value, l30DaysUniquePayers: value,
+    } }).calls30d, null);
+  }
+});
+
+test("last-called activity compares actual instants, not ISO offset strings or invalid claims", () => {
+  const beforeListing = withResources((rs) => {
+    rs[1].quality.lastCalledAt = "2026-01-02T23:30:00-05:00";
+  });
+  const before = taken([beforeListing], "2026-01-03T05:00:00Z");
+  const earlierListing = withResources((rs) => {
+    rs[1].quality.lastCalledAt = "2026-01-03T03:00:00Z";
+  });
+  const earlier = diffSnapshots(before, taken([earlierListing], "2026-01-03T06:00:00Z"));
+  assert.deepEqual(earlier.active, [], "different timezone spelling is not a later call");
+  const laterListing = withResources((rs) => {
+    rs[1].quality.lastCalledAt = "2026-01-03T05:00:00Z";
+  });
+  const later = diffSnapshots(before, taken([laterListing], "2026-01-03T06:00:00Z"));
+  assert.deepEqual(later.active, [laterListing.resources[1].resource]);
+  const invalidListing = withResources((rs) => {
+    rs[1].quality.lastCalledAt = "yesterday";
+  });
+  const invalid = diffSnapshots(before, taken([invalidListing], "2026-01-03T06:00:00Z"));
+  assert.deepEqual(invalid.active, [], "an unparseable source time cannot establish activity");
+  const yearOnlyListing = withResources((rs) => {
+    rs[1].quality.lastCalledAt = "2027";
+  });
+  assert.deepEqual(diffSnapshots(before, taken([yearOnlyListing], "2026-01-03T06:00:00Z")).active, [],
+    "a valid-looking date fragment is not a qualified timestamp");
+});
+
+test("known active calls without a payer baseline retain an explicitly unknown payer reading", () => {
+  const beforeListing = withResources((rs) => {
+    rs[1].quality.l30DaysUniquePayers = null;
+  });
+  const afterListing = withResources((rs) => {
+    rs[1].quality.l30DaysUniquePayers = 2;
+    rs[1].quality.lastCalledAt = "2026-01-04T09:00:00Z";
+  });
+  const d = diffSnapshots(
+    taken([beforeListing], "2026-01-03T00:00:00Z"),
+    taken([afterListing], "2026-01-04T20:00:00Z"),
+  );
+  assert.deepEqual(d.active, [afterListing.resources[1].resource]);
+  assert.deepEqual(d.newPayerSignals, []);
+  assert.deepEqual(d.activeWithoutPayerRise, [afterListing.resources[1].resource]);
+});

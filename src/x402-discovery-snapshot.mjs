@@ -46,9 +46,13 @@ const same = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
 
 /** A counter becomes a finite non-negative number, or null when absent or malformed (never 0 by accident). */
 const num = (value) => {
-  if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
+  // Bazaar's rolling call/payer counts are cardinalities, not generic numbers.
+  // Number([]), Number(" "), and rounded large integers must not become 0 or
+  // an invented exact count. Unknown/malformed testimony stays unknown.
+  if (typeof value === "string" && !/^\d+$/u.test(value)) return null;
+  if (typeof value !== "string" && typeof value !== "number") return null;
   const n = Number(value);
-  return Number.isFinite(n) && n >= 0 ? n : null;
+  return Number.isSafeInteger(n) && n >= 0 ? n : null;
 };
 
 /** An amount is a base-unit integer string, or null. Decimals and junk are not coerced. */
@@ -109,6 +113,11 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
     if (t !== declared) problems.push(`pagination total changed at page ${i}: ${declared} -> ${t}`);
   }
   const amounts = resources.map((r) => r.amount);
+  const calls = resources.map((r) => r.calls30d);
+  const sumCalls = calls.every((n) => n !== null)
+    ? calls.reduce((sum, n) => sum + BigInt(n), 0n) : null;
+  const observedCalls = sumCalls !== null && sumCalls <= BigInt(Number.MAX_SAFE_INTEGER)
+    ? Number(sumCalls) : null;
   const unpriced = amounts.filter((a) => a === null).length;
   const multiOption = resources.filter((r) => r.amounts.length > 1).length;
   if (unpriced) problems.push(`${unpriced} resource(s) without a valid integer amount`);
@@ -123,7 +132,7 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
     problems: Object.freeze(problems),
     totals: Object.freeze({
       resources: resources.length,
-      calls30d: resources.reduce((sum, r) => sum + (r.calls30d ?? 0), 0),
+      calls30d: observedCalls,
       listedPriceUnits: amounts.reduce((sum, a) => sum + BigInt(a ?? "0"), 0n).toString(),
     }),
     resources: Object.freeze(resources),
@@ -173,23 +182,40 @@ export function diffSnapshots(previous, next) {
   const added = addedEntries.map((r) => r.resource);
   const removed = previous.resources.filter((r) => !after.has(r.resource)).map((r) => r.resource);
   const priceKey = (r) => JSON.stringify(r.amounts ?? [r.amount]);
+  // A missing earlier or later counter is not a measured increase/decrease.
+  const counterDelta = (a, b) => Number.isSafeInteger(a) && Number.isSafeInteger(b) ? b - a : null;
   const changed = [];
   for (const [resource, now] of after) {
     const was = before.get(resource);
     if (!was) continue;
     const delta = {
       resource,
-      callsDelta: (now.calls30d ?? 0) - (was.calls30d ?? 0),
-      uniquePayersDelta: (now.uniquePayers30d ?? 0) - (was.uniquePayers30d ?? 0),
+      callsDelta: counterDelta(was.calls30d, now.calls30d),
+      uniquePayersDelta: counterDelta(was.uniquePayers30d, now.uniquePayers30d),
       lastCalledAt: { from: was.lastCalledAt, to: now.lastCalledAt },
       amount: { from: was.amount, to: now.amount },
       priceChanged: priceKey(was) !== priceKey(now),
     };
-    const moved = delta.callsDelta !== 0 || delta.uniquePayersDelta !== 0
-      || was.lastCalledAt !== now.lastCalledAt || delta.priceChanged;
+    const counterCoverageChanged = Number.isSafeInteger(was.calls30d) !== Number.isSafeInteger(now.calls30d)
+      || Number.isSafeInteger(was.uniquePayers30d) !== Number.isSafeInteger(now.uniquePayers30d);
+    const moved = (delta.callsDelta !== null && delta.callsDelta !== 0)
+      || (delta.uniquePayersDelta !== null && delta.uniquePayersDelta !== 0)
+      || counterCoverageChanged || was.lastCalledAt !== now.lastCalledAt || delta.priceChanged;
     if (moved) changed.push(delta);
   }
-  const advanced = (d) => d.lastCalledAt.to !== null && (d.lastCalledAt.from === null || d.lastCalledAt.to > d.lastCalledAt.from);
+  // Compare RFC3339-style instants chronologically. Offsets have different
+  // lexicographic order, and an invalid vendor timestamp proves no activity.
+  const instant = (value) => {
+    if (typeof value !== "string" ||
+        !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(value)) return null;
+    const millis = Date.parse(value);
+    return Number.isFinite(millis) ? millis : null;
+  };
+  const advanced = (d) => {
+    const to = instant(d.lastCalledAt.to);
+    const from = instant(d.lastCalledAt.from);
+    return to !== null && (d.lastCalledAt.from === null || (from !== null && to > from));
+  };
   const activeChanged = changed.filter(advanced);
   const activeAdded = addedEntries.filter((r) => r.lastCalledAt !== null || (r.calls30d ?? 0) > 0);
   return Object.freeze({
@@ -201,14 +227,15 @@ export function diffSnapshots(previous, next) {
     changed,
     active: [...activeChanged.map((d) => d.resource), ...activeAdded.map((r) => r.resource)],
     newPayerSignals: [
-      ...changed.filter((d) => d.uniquePayersDelta > 0).map((d) => d.resource),
+      ...changed.filter((d) => d.uniquePayersDelta !== null && d.uniquePayersDelta > 0).map((d) => d.resource),
       ...addedEntries.filter((r) => (r.uniquePayers30d ?? 0) > 0).map((r) => r.resource),
     ],
-    activeWithoutPayerRise: activeChanged.filter((d) => d.uniquePayersDelta <= 0).map((d) => d.resource),
+    activeWithoutPayerRise: activeChanged.filter((d) => d.uniquePayersDelta === null || d.uniquePayersDelta <= 0)
+      .map((d) => d.resource),
     priceChanges: changed.filter((d) => d.priceChanged).map((d) => d.resource),
     totalsDelta: Object.freeze({
       resources: next.totals.resources - previous.totals.resources,
-      calls30d: next.totals.calls30d - previous.totals.calls30d,
+      calls30d: counterDelta(previous.totals.calls30d, next.totals.calls30d),
     }),
   });
 }

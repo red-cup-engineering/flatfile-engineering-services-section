@@ -39,7 +39,15 @@ paid call is Untested; the on-chain Transfer events to `payTo` are the independe
   duplicate URLs, malformed amount, multi-option pricing).
 - A response whose `payTo` (or any `accepts[].payTo`) differs from the requested one is refused with
   an error, never recorded under the requested address.
-- Counters that are absent or malformed are `null`, not `0`. Amounts that are not integer strings are
+- Counters that are absent, non-integral, unsafe (> 2^53 - 1), or malformed are `null`, not `0`.
+  A total 30-day call count is `null` if any constituent count is unknown; this is
+  **measurement coverage**, not incomplete pagination. A cross-snapshot counter delta is
+  `null` when either baseline or subsequent reading is missing, so a metric first
+  appearing as 3 does not create three invented new calls or payers. This applies
+  to the total delta as well. Timestamp activity compares parsed instants rather
+  than lexical UTC-offset strings; invalid vendor timestamps cannot prove activity.
+  Known activity with unknown payer delta remains `activeWithoutPayerRise`.
+  Amounts that are not integer strings are
   `null` and mark the snapshot incomplete. Only `accepts[0]` is the headline `amount`; every option's
   amount is kept in `amounts`, and a diff treats a change in any of them as a price change.
 
