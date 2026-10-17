@@ -245,3 +245,63 @@ test("known active calls without a payer baseline retain an explicitly unknown p
   assert.deepEqual(d.newPayerSignals, []);
   assert.deepEqual(d.activeWithoutPayerRise, [afterListing.resources[1].resource]);
 });
+
+
+test("the official x402 v2 items envelope works without a leaf-specific translation", async () => {
+  const source = base();
+  const official = {
+    x402Version: 2, payTo: PAY_TO,
+    pagination: { limit: 20, offset: 0, total: source.resources.length },
+    items: source.resources,
+  };
+  const snapshot = await takeSnapshot(parameters, {
+    fetchJson: async url => {
+      assert.equal(new URL(url).searchParams.get("payTo"), PAY_TO);
+      return official;
+    },
+    now: () => new Date("2026-10-17T23:00:00Z"),
+  });
+  assert.equal(snapshot.complete, true);
+  assert.equal(snapshot.totals.resources, 3);
+  assert.equal(snapshot.totals.calls30d, 3);
+  assert.deepEqual(snapshot.resources.map(r => r.serviceName), ["a", "b", "c"]);
+});
+
+test("legacy resources stay admissible, but dual or missing arrays refuse before pagination", async () => {
+  const legacy = taken([base()], "2026-10-17T23:00:00Z");
+  assert.equal(legacy.complete, true);
+  const modern = { ...base(), items: base().resources };
+  assert.throws(() => taken([modern], "2026-10-17T23:00:00Z"),
+    /exactly one of items or resources/u);
+  await assert.rejects(() => takeSnapshot(parameters, {
+    fetchJson: async () => ({ payTo: PAY_TO, pagination: { total: 0 } }),
+  }), /exactly one of items or resources/u);
+});
+
+test("distinct network or asset prices remain separate atomic measures", () => {
+  const mixed = base();
+  mixed.resources[1].accepts[0].asset = "0x" + "ff".repeat(20);
+  const result = taken([mixed], "2026-10-17T23:00:00Z");
+  assert.equal(result.complete, true);
+  assert.equal(result.totals.listedPriceUnits, null,
+    "cross-token atomic values have no common sum");
+  assert.deepEqual(result.totals.listedPriceUnitsByRail, {
+    ["eip155:8453|0x" + "cd".repeat(20)]: "50000",
+    ["eip155:8453|0x" + "ff".repeat(20)]: "10000",
+  });
+});
+
+test("missing or unpriced rail does not generate an invented zero-valued offer", () => {
+  const unpriced = base();
+  unpriced.resources[0].accepts[0].amount = null;
+  const result = taken([unpriced], "2026-10-17T23:00:00Z");
+  assert.equal(result.complete, false);
+  assert.equal(result.totals.listedPriceUnits, null);
+  assert.equal(result.totals.listedPriceUnitsByRail["eip155:8453|0x" + "cd".repeat(20)], null);
+  const noRail = base();
+  delete noRail.resources[0].accepts[0].asset;
+  const unknown = taken([noRail], "2026-10-17T23:00:00Z");
+  assert.equal(unknown.complete, false);
+  assert.equal(unknown.totals.listedPriceUnits, null);
+  assert.match(unknown.problems.join("; "), /network and asset/u);
+});
