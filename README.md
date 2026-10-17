@@ -22,9 +22,13 @@ with that content form instead.
 folds seed text into a stable 32-bit value and steps a deterministic numeric
 stream. It has no game, simulation, or wall-clock policy.
 
-Canonical semiotic carrier identity and raw byte address records are implemented
-once at `lib/semiotic-content-address/`, directly below Computer Data.
-The Data package exports `./semiotic-content-address` and `./raw-content-address`.
-These reuse the already qualified URI, CBOR and Cryptographic Data codecs.
-The published SignCell package keeps its old dependency until the Data revision
-with those exports is published and selected by that original receiver.
+The independent `@red-cup-engineering/semiotic-content-address` package is
+now an actual Git submodule at `lib/semiotic-content-address/`; its original
+NFC/CBOR carrier and raw address algorithms, regression tests, and
+content-domain audit are source-owned together. URI, CBOR, and Cryptographic
+Data remain upstream. Computer Code no longer duplicates its audit.
+The Data root's current exports and internal relative imports are a
+transitional source selection; package-native imports, immutable registry
+releases, real dependent version selection, and SignCell's original
+consumer migration still require independent receiving. Do not manually chase
+ancestor Gitlinks; use the existing source-owned gitlink normalizer.
