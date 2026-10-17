@@ -31,7 +31,7 @@ test("a bounded window traverses any digital resource without a document parser"
   const last = bitWindow(res, { offset: first.next, limit: 64 });
   assert.equal(last.next, null);
   assert.equal(last.bits.length, 11);
-  for (const bad of [-1, 0.5, NaN, 257, 1e99]) {
+  for (const bad of [-1, 0, 0.5, NaN, 1e99]) {
     assert.throws(() => bitWindow(res, { limit: bad }), /bitWindow/);
   }
   assert.throws(() => bitAt(res, 24), /outside/);
@@ -92,8 +92,8 @@ test("bulk bit values share the original raw-coordinate algebra without per-bit 
     [2,3,4,5].map(index => bitAt(resource,index).value));
   assert.deepEqual(bitValues(resource,{offset:16,count:0}),[]);
   assert.throws(() => bitValues({...resource},{offset:0,count:1}),/admitted/);
-  assert.throws(() => bitValues(resource,{offset:0,count:32769}),/unbounded/);
-  assert.throws(() => bitValues(resource,{offset:15,count:2}),/unbounded/);
+  assert.throws(() => bitValues(resource,{offset:0,count:32769}),/invalid bit interval/);
+  assert.throws(() => bitValues(resource,{offset:15,count:2}),/invalid bit interval/);
 });
 
 test("multi-resource mark spaces remain sortable before freezing, and the source-owned union is stable",()=>{
@@ -142,4 +142,37 @@ test("cross-territory charts join with explicit two-sided relations, never impli
   assert.throws(()=>joinMarkSpaces([science,publicService],{relations:[{
     ...alleged,to:makeNiUri(Uint8Array.of(0x22)),
   }]}),/known address endpoints/);
+});
+
+test("the same pure coordinate algebra admits a caller-sized bit projection above obsolete 256/32768 thresholds", () => {
+  const resource = markResource(new Uint8Array(4097));
+  const window = bitWindow(resource, { offset: 0, limit: 257 });
+  assert.equal(window.bits.length, 257);
+  assert.equal(window.next, 257);
+  const values = bitValues(resource, { offset: 0, count: 32769 });
+  assert.equal(values.length, 32769);
+  assert.ok(values.every(value => value === 0));
+  assert.equal(bitWindow(resource, {offset:resource.bitLength-2,limit:Number.MAX_SAFE_INTEGER}).bits.length,2);
+  assert.throws(()=>bitValues(resource, {offset:0,count:resource.bitLength+1}),/invalid bit interval/);
+  assert.throws(()=>bitWindow(resource, {offset:-1,limit:3}),/bitWindow/);
+});
+
+test("a source-owned union admits more than 64 finite independent charts and 4096 explicit relations", () => {
+  const sources = Array.from({length:70}, (_, i) =>
+    markSpace([{bytes:Uint8Array.from([i]),source:{office:"Science",index:i}}]));
+  const charts = joinMarkSpaces(sources);
+  assert.equal(charts.resources.length,70);
+  const from = sources[0].resources[0].address, to = sources[1].resources[0].address;
+  const testimony = Array.from({length:4097}, (_, i) => ({
+    from,to,predicate:"associated-by-witness",
+    evidence:{for:[{issuer:"fixture",i}],against:[]},
+  }));
+  const union = joinMarkSpaces(sources,{relations:testimony});
+  assert.equal(union.resources.length,70);
+  assert.equal(union.relations.length,4097);
+  assert.deepEqual(joinMarkSpaces([sources[0],sources[1]]).relations,[],
+    "no relation is invented merely because both sources fit in memory");
+  assert.throws(()=>joinMarkSpaces([sources[0]], {relations:[testimony[0]]}),
+    /known address endpoints/);
+  assert.throws(()=>joinMarkSpaces([...sources,{...sources[0]}]),/admitted mark space/);
 });
