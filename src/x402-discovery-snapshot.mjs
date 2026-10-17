@@ -146,9 +146,8 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
     }
     const rail = resource.network + "|" + resource.asset.toLowerCase();
     const prior = byRail.get(rail) ?? 0n;
-    if (resource.amount !== null)
-      byRail.set(rail, prior + BigInt(resource.amount));
-    else byRail.set(rail, prior);
+    byRail.set(rail, resource.amount === null || prior === null
+      ? null : prior + BigInt(resource.amount));
   }
   const oneRail = byRail.size === 1 && unknownRail === 0 &&
     amounts.every((amount) => amount !== null);
@@ -156,7 +155,7 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
     oneRail ? [...byRail.values()][0].toString() : null;
   const listedPriceUnitsByRail = Object.freeze(Object.fromEntries(
     [...byRail.entries()].sort(([a], [b]) => a.localeCompare(b))
-      .map(([rail, sum]) => [rail, sum.toString()])
+      .map(([rail, sum]) => [rail, sum === null ? null : sum.toString()])
   ));
   const unpriced = amounts.filter((a) => a === null).length;
   const multiOption = resources.filter((r) => r.amounts.length > 1).length;
