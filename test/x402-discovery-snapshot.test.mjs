@@ -301,7 +301,8 @@ test("missing or unpriced rail does not generate an invented zero-valued offer",
   const noRail = base();
   delete noRail.resources[0].accepts[0].asset;
   const unknown = taken([noRail], "2026-10-17T23:00:00Z");
-  assert.equal(unknown.complete, false);
+  assert.equal(unknown.complete, true,
+    "missing price-rail qualification does not erase observed resources or calls");
   assert.equal(unknown.totals.listedPriceUnits, null);
-  assert.match(unknown.problems.join("; "), /network and asset/u);
+  assert.equal(unknown.totals.priceRailsComplete, false);
 });
