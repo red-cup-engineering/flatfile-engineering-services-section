@@ -14,7 +14,13 @@
 	path = services/computer-content-engineering-services-section
 	url = https://github.com/red-cup-engineering/computer-content-engineering-services-section.git
 	branch = main
+<<<<<<< c39cc6f445b4c9fa4324b4628708574b355cc319
 [submodule "semiotic-content-address"]
 	path = lib/semiotic-content-address
 	url = https://github.com/red-cup-engineering/semiotic-content-address-system.git
+=======
+[submodule "services/semiotic-eavt-engineering-services-section"]
+	path = services/semiotic-eavt-engineering-services-section
+	url = https://github.com/red-cup-engineering/semiotic-eavt-engineering-services-section.git
+>>>>>>> acdb7a47
 	branch = main
