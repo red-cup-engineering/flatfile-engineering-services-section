@@ -389,9 +389,6 @@
     "./number/finite-law": {
       "import": "./src/number/finite-law.mjs"
     },
-    "./number/finite-subset": {
-      "import": "./src/number/finite-subset.mjs"
-    },
     "./number/finite-capacity": {
       "import": "./src/number/finite-capacity.mjs"
     },
