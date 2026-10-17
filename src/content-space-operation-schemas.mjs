@@ -20,6 +20,36 @@ const record = (properties,required) => Object.freeze({
   type:"object",properties,required,additionalProperties:false,
 });
 
+/** One immutable NI source link; its path is a collection coordinate, not a filesystem path. */
+const linkRecord = record({path,ni},["path","ni"]);
+const links = Object.freeze({type:"array",minItems:1,maxItems:128,items:linkRecord});
+const node = record({
+  path:{type:"array",minItems:0,maxItems:16,items:{type:"string",minLength:1,maxLength:128}},
+  ni,kind:{enum:["tree","object"]},
+  mediaType:{type:"string",minLength:1},
+  byteLength:{type:"integer",minimum:0},
+},["path","ni","kind","mediaType","byteLength"]);
+
+/** Publish a complete admitted set of already-held sources under ONE CAS transition. */
+export const contentSpaceLinkBatchInputSchema = record(
+  {name,expected,links},["name","expected","links"]);
+export const contentSpaceBatchPublicationSchema = record({
+  kind:{const:"semiotic-content.named-batch-publication"},version:{const:1},
+  action:{const:"link-batch"},name,expected,rootNi:ni,links,
+},["kind","version","action","name","expected","rootNi","links"]);
+
+/** Read a bounded immutable Merkle snapshot, subject to independent grants. */
+export const contentSpaceWalkInputSchema = record({
+  name,
+  maximumNodes:{type:"integer",minimum:1,maximum:256},
+  maximumDepth:{type:"integer",minimum:0,maximum:16},
+},["name"]);
+export const contentSpaceWalkOutputSchema = record({
+  kind:{const:"semiotic-content.named-walk"},version:{const:1},
+  name,rootNi:ni,count:{type:"integer",minimum:1,maximum:256},
+  nodes:{type:"array",minItems:1,maxItems:256,items:node},
+},["kind","version","name","rootNi","count","nodes"]);
+
 export const contentSpacePutInputSchema = record(
   {name,expected,path,carrier},["name","expected","path","carrier"]);
 export const contentSpaceLinkInputSchema = record(
