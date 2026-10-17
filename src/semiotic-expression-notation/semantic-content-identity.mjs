@@ -9,7 +9,7 @@
  * no evaluation. Normalizing an arbitrary term is the SEN evaluator's, and its identity
  * (`identifyNormalizedSemanticContent`) is the code layer's, built on this envelope law.
  */
-import { bytesEqual, coincides, decodeSemantic, semanticAddress, semanticId } from "@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address";
+import { bytesEqual, coincides, decodeSemantic, semanticAddress, semanticId } from "../../lib/semiotic-content-address/src/semiotic-content-address.mjs";
 import { isNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { jsonToTerm, termToJson } from "./json-codec.mjs";
 import { checkTerm, inferTerm } from "./typing.mjs";

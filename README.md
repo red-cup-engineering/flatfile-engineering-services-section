@@ -21,3 +21,10 @@ with that content form instead.
 `src/randomization` is a dependency-free data derivation primitive: it
 folds seed text into a stable 32-bit value and steps a deterministic numeric
 stream. It has no game, simulation, or wall-clock policy.
+
+Canonical semiotic carrier identity and raw byte address records are implemented
+once at `lib/semiotic-content-address/`, directly below Computer Data.
+The Data package exports `./semiotic-content-address` and `./raw-content-address`.
+These reuse the already qualified URI, CBOR and Cryptographic Data codecs.
+The published SignCell package keeps its old dependency until the Data revision
+with those exports is published and selected by that original receiver.
