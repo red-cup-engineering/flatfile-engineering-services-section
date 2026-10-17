@@ -59,6 +59,21 @@ const num = (value) => {
 const amountOf = (value) => (typeof value === "string" && /^\d+$/.test(value) ? value
   : Number.isSafeInteger(value) && value >= 0 ? String(value) : null);
 
+/**
+ * x402 v2 specification calls the page array "items"; existing Bazaar services
+ * may return "resources". Exactly one unambiguous array is admitted. This
+ * belongs in shared Data rather than every x402/market application.
+ */
+export function discoveryPageResources(page) {
+  if (page === null || typeof page !== "object" || Array.isArray(page))
+    throw new TypeError("discovery page must be an object");
+  const modern = Array.isArray(page.items);
+  const legacy = Array.isArray(page.resources);
+  if (modern === legacy)
+    throw new TypeError("discovery page must carry exactly one of items or resources");
+  return modern ? page.items : page.resources;
+}
+
 /** Reduce one Bazaar resource entry to the fields demand analysis needs (drops payload examples). */
 export function resourceEntry(raw) {
   if (raw === null || typeof raw !== "object" || typeof raw.resource !== "string" || raw.resource === "") {
@@ -95,7 +110,7 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
     if (page.payTo !== undefined && !same(page.payTo, payTo)) {
       throw new Error(`snapshotRecord: response payTo ${page.payTo} does not match requested payTo`);
     }
-    for (const raw of page.resources ?? []) {
+    for (const raw of discoveryPageResources(page)) {
       for (const a of raw?.accepts ?? []) {
         if (a?.payTo !== undefined && !same(a.payTo, payTo)) {
           throw new Error(`snapshotRecord: accepts payTo for ${raw.resource} does not match requested payTo`);
@@ -118,9 +133,35 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
     ? calls.reduce((sum, n) => sum + BigInt(n), 0n) : null;
   const observedCalls = sumCalls !== null && sumCalls <= BigInt(Number.MAX_SAFE_INTEGER)
     ? Number(sumCalls) : null;
+  // Prices are atomic units of distinct assets/rails, never unqualified
+  // interchangeable numbers. Preserve the old total only for one complete
+  // common rail; expose exact totals by rail for lawful heterogeneous reads.
+  const byRail = new Map();
+  let unknownRail = 0;
+  for (const resource of resources) {
+    if (typeof resource.network !== "string" || !resource.network ||
+        typeof resource.asset !== "string" || !resource.asset) {
+      unknownRail += 1;
+      continue;
+    }
+    const rail = resource.network + "|" + resource.asset.toLowerCase();
+    const prior = byRail.get(rail) ?? 0n;
+    if (resource.amount !== null)
+      byRail.set(rail, prior + BigInt(resource.amount));
+    else byRail.set(rail, prior);
+  }
+  const oneRail = byRail.size === 1 && unknownRail === 0 &&
+    amounts.every((amount) => amount !== null);
+  const listedPriceUnits = resources.length === 0 ? "0" :
+    oneRail ? [...byRail.values()][0].toString() : null;
+  const listedPriceUnitsByRail = Object.freeze(Object.fromEntries(
+    [...byRail.entries()].sort(([a], [b]) => a.localeCompare(b))
+      .map(([rail, sum]) => [rail, sum.toString()])
+  ));
   const unpriced = amounts.filter((a) => a === null).length;
   const multiOption = resources.filter((r) => r.amounts.length > 1).length;
   if (unpriced) problems.push(`${unpriced} resource(s) without a valid integer amount`);
+  if (unknownRail) problems.push(`${unknownRail} resource(s) without a known network and asset`);
   if (multiOption) problems.push(`${multiOption} resource(s) list several accepts; only the first is priced`);
   return Object.freeze({
     kind: SNAPSHOT_KIND,
@@ -133,7 +174,8 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
     totals: Object.freeze({
       resources: resources.length,
       calls30d: observedCalls,
-      listedPriceUnits: amounts.reduce((sum, a) => sum + BigInt(a ?? "0"), 0n).toString(),
+      listedPriceUnits,
+      listedPriceUnitsByRail,
     }),
     resources: Object.freeze(resources),
   });
@@ -149,7 +191,7 @@ export async function takeSnapshot(parameters, { fetchJson, now = () => new Date
   for (let i = 0; i < MAX_PAGES; i += 1) {
     const page = await fetchJson(merchantUrl(checked, offset));
     pages.push(page);
-    const got = page.resources?.length ?? 0;
+    const got = discoveryPageResources(page).length;
     const total = page.pagination?.total ?? 0;
     offset += got;
     if (offset >= total) { finished = true; break; }
