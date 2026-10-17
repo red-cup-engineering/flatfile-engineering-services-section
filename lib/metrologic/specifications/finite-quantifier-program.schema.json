@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://561.group/schema/obsmetrologic-settlement/finite-quantifier-program.schema.json",
+  "title": "Executable finite FOUR hyperdoctrine quantifier diagram",
+  "description": "Pure JSON composition of already-owned existence/universality adjoints along total finite index morphisms. Does not admit JavaScript, implicit missing evidence, arbitrary linear consumption, or transfinitely many positions.",
+  "type": "object",
+  "required": [
+    "kind",
+    "order",
+    "initial",
+    "stages"
+  ],
+  "properties": {
+    "kind": {
+      "const": "hyperdoctrine.finiteQuantifierProgram"
+    },
+    "order": {
+      "enum": [
+        "knowledge",
+        "truth"
+      ]
+    },
+    "initial": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/knowledgeReading"
+      }
+    },
+    "stages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/stage"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "knowledgeReading": {
+      "enum": [
+        "absurd",
+        "potential",
+        "active",
+        "stable"
+      ],
+      "description": "The four generated knowledge-family names from the existing FOUR provider."
+    },
+    "keys": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "stage": {
+      "type": "object",
+      "required": [
+        "quantifier",
+        "source",
+        "target",
+        "table"
+      ],
+      "properties": {
+        "quantifier": {
+          "enum": [
+            "exists",
+            "forall"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/keys"
+        },
+        "target": {
+          "$ref": "#/$defs/keys"
+        },
+        "table": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
