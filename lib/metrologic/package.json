@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/metrologic",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "type": "module",
   "description": "Metrologic: the data layer's mathematics, the shared JavaScript implementation of the mathematical operations every layer above it uses.",
   "keywords": [
@@ -379,9 +379,6 @@
     },
     "./closure/formal-context": "./src/closure/formal-context.mjs",
     "./closure/formal-concepts": "./src/closure/formal-concepts.mjs",
-    "./articulation/predicating/positing/settling/analysis/proof-foam": {
-      "import": "./src/articulation/predicating/positing/settling/analysis/proof-foam.mjs"
-    },
     "./models/physics/models/kinetic-theory/boltzmann-entropy": "./src/models/physics/models/kinetic-theory/boltzmann-entropy.mjs",
     "./number/evidence-bits": "./src/number/evidence-bits.mjs",
     "./number/polynomial-ints": "./src/number/polynomial-ints.mjs",
