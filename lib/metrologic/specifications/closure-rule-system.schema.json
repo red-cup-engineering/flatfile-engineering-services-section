@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://561.group/schema/obsmetrologic-settlement/closure-rule-system.schema.json",
+  "$id": "urn:561:metrologic:closure-rule-system:v1",
   "title": "Finite positive-threshold FOUR closure system",
   "description": "Executable, purely additive finite declaration. The actual interpreter is the existing metrologic closure-rule-system carrier; JSON Schema checks shape only, not cross-cell membership, rule-name identity, provenance or the mathematical theorem.",
   "type": "object",
