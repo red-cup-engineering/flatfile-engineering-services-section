@@ -1,9 +1,13 @@
 # @red-cup-engineering/metrologic
 
-The one logic kernel every 561-group and family-engine package imports: bilattice
-predication as the floor, an opt-in categorical hyperdoctrine over it, a charge
-readout utility, Chu spaces over FOUR, and the settled math modules that computer
-packages import as their semantic substrate.
+The mathematical library consumed by the 561 Group's higher semiotic and agent
+packages: pure operations and finite readouts over articulations, predications,
+FOUR charges, closures, and their derived projections. The primitive research
+direction is **relationlessness → source-generated articulation → open Fregean
+predication → independently told evidence/FOUR → positing → settling**. The
+code available here implements selected downstream mathematics; its current
+FOUR and categorical carriers are not proofs that the earliest generative
+arrows have been constructed.
 
 This package is ESM-only, Node >=20, and organized by explicit subpath exports.
 It does not provide a broad default import.
@@ -15,9 +19,29 @@ layer above data may import it. The Laplacian, PyMetrologic, and enriched-catego
 applications live under computer-math-system; proof-assistant integration lives in
 computer-proofing-system.
 
+## Separation of mathematics from semiotic technology
+
+Metrologic does not own the `ni:` identity, JSON-schema admission, witness
+provenance or document/graph schemas that SignCell introduces. Seven inherited
+technology schema copies were retired from `specifications/`; their
+authoritative runtime schemas are in
+[`red-cup-engineering/signcell/src/semantic-carriers.mjs`](https://github.com/red-cup-engineering/signcell/blob/main/src/semantic-carriers.mjs).
+The previous `formats-four` table of serialization format names is a
+**declared Computing application scenario**, now owned by the original
+Agent Organization Engine `@red-cup-engineering/computing/encoding` surface,
+not a Mark-derived mathematical classification. A declaration that HTML
+has an aperiodic closure regime is not a result of mathematics.
+
+Retain the distinction between a Mark whose contents can be any admitted
+schema, the artifact needed to carry that Mark through a technology, and
+the **later** justified measurements of its relations. Current finite
+`Charge`/FOUR code must not be offered as the generating explanation for
+relationlessness or the Concept Horse; follow the original Obsmetrologia
+[use/mention mathematics](https://github.com/lenticule-science/obsmetrologia/blob/main/Obsmetrologia/Language/Predicating/UseMention.lean).
+
 ## The three families
 
-- **`@red-cup-engineering/metrologic/bilattice`** — the floor. The four-regime descent
+- **`@red-cup-engineering/metrologic/bilattice`** — the existing FOUR/charge algebra floor **once an articulation and predication are admitted**, not the metaphysical or Mark origin. The four-regime descent
   (`articulate → predicate → posit → settle`) over a lossless four-valued
   evidence carrier, both cone pairs (`brim`/`adjudicate`/`presume`), and the
   void reads (`saturate`, `precipitate`, `estrange`, `vanish`, ...). The charge
