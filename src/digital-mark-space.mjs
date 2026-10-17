@@ -20,10 +20,9 @@ import { bytesEqual, canonicalCarrier, semanticId } from "../lib/semiotic-conten
 
 const rawBytes = new WeakMap();
 const admittedSpaces = new WeakSet();
-const MAX_WINDOW = 256;
 const isIndex = value => Number.isSafeInteger(value) && value >= 0;
 const rawBitValue = (bytes, bit) => (bytes[Math.floor(bit / 8)] >> (7 - (bit % 8))) & 1;
-const finiteString = value => typeof value === "string" && value.length > 0 && value.length <= 256;
+const presentString = value => typeof value === "string" && value.length > 0;
 
 function snapshot(value) { return canonicalCarrier(value); }
 
@@ -31,7 +30,7 @@ function snapshot(value) { return canonicalCarrier(value); }
 export function markResource(bytes, { mediaType = "application/octet-stream", source } = {}) {
   if (!(bytes instanceof Uint8Array))
     throw new TypeError("markResource: binary source must be Uint8Array");
-  if (!finiteString(mediaType))
+  if (!presentString(mediaType))
     throw new TypeError("markResource: mediaType must be a nonempty bounded string");
   if (!Number.isSafeInteger(bytes.byteLength * 8))
     throw new RangeError("markResource: bit-address space exceeds safe integer indices");
@@ -70,20 +69,20 @@ export function bitAt(resource, bit) {
 export function bitValues(resource, { offset = 0, count = 64 } = {}) {
   const bytes = rawBytes.get(resource);
   if (bytes === undefined) throw new TypeError("bitValues: admitted mark resource required");
-  if (!isIndex(offset) || !isIndex(count) || count > 32768 ||
+  if (!isIndex(offset) || !isIndex(count) ||
       offset > resource.bitLength || count > resource.bitLength - offset)
-    throw new RangeError("bitValues: invalid or unbounded bit interval");
+    throw new RangeError("bitValues: invalid bit interval");
   return Object.freeze(Array.from({ length: count }, (_item, index) =>
     rawBitValue(bytes, offset + index)));
 }
 
 /** Bounded bit projection. The source can be arbitrarily longer than the window. */
 export function bitWindow(resource, { offset = 0, limit = 64 } = {}) {
-  if (!isIndex(offset) || !isIndex(limit) || limit < 1 || limit > MAX_WINDOW)
-    throw new RangeError("bitWindow: safe offset and 1..256 bit limit required");
+  if (!isIndex(offset) || !isIndex(limit) || limit < 1)
+    throw new RangeError("bitWindow: safe nonnegative offset and positive bit limit required");
   if (!rawBytes.has(resource)) throw new TypeError("bitWindow: an admitted mark resource is required");
   if (offset > resource.bitLength) throw new RangeError("bitWindow: offset past end");
-  const end = Math.min(resource.bitLength, offset + limit);
+  const end = offset + Math.min(resource.bitLength - offset, limit);
   const bits = Object.freeze(Array.from({ length: end - offset }, (_, i) => bitAt(resource, offset + i)));
   return Object.freeze({
     kind: "lspace.mark-window", resource: resource.address, bitLength: resource.bitLength,
@@ -99,7 +98,7 @@ export function bitWindow(resource, { offset = 0, limit = 64 } = {}) {
 function admitRelation(value, addresses) {
   if (value === null || typeof value !== "object" || Array.isArray(value) ||
       !addresses.has(value.from) || !addresses.has(value.to) ||
-      !finiteString(value.predicate))
+      !presentString(value.predicate))
     throw new TypeError("markSpace: each relation needs known address endpoints and typed predicate");
   const evidence = value.evidence === undefined ? { for: [], against: [] } : value.evidence;
   if (!evidence || !Array.isArray(evidence.for) || !Array.isArray(evidence.against))
@@ -173,10 +172,10 @@ export function markSpace(inputs, { relations = [] } = {}) {
  * cannot masquerade as a witnessed content resource.
  */
 export function joinMarkSpaces(spaces, { relations = [] } = {}) {
-  if (!Array.isArray(spaces) || spaces.length > 64)
-    throw new RangeError("joinMarkSpaces: at most 64 admitted finite spaces");
-  if (!Array.isArray(relations) || relations.length > 4096)
-    throw new RangeError("joinMarkSpaces: at most 4096 explicitly witnessed cross-chart relations");
+  if (!Array.isArray(spaces))
+    throw new TypeError("joinMarkSpaces: sources must be an array of admitted finite spaces");
+  if (!Array.isArray(relations))
+    throw new TypeError("joinMarkSpaces: cross-chart relations must be an array");
   const inputRows = new Map(), edges = new Map(), knownAddresses = new Set();
   for (const space of spaces) {
     if (!admittedSpaces.has(space))
@@ -192,8 +191,6 @@ export function joinMarkSpaces(spaces, { relations = [] } = {}) {
           bytes, mediaType: present.mediaType,
           ...(present.source === undefined ? {} : { source: present.source }),
         }));
-        if (inputRows.size > 100000)
-          throw new RangeError("joinMarkSpaces: source presentation budget exceeded");
       }
     }
     for (const relation of space.relations) {
@@ -201,8 +198,6 @@ export function joinMarkSpaces(spaces, { relations = [] } = {}) {
         from: relation.from, predicate: relation.predicate, to: relation.to,
         evidence: relation.evidence,
       });
-      if (edges.size > 100000)
-        throw new RangeError("joinMarkSpaces: relation budget exceeded");
     }
   }
   // Only source-supplied testimony may connect different territorial charts.
@@ -214,8 +209,6 @@ export function joinMarkSpaces(spaces, { relations = [] } = {}) {
       from: admitted.from, predicate: admitted.predicate, to: admitted.to,
       evidence: admitted.evidence,
     });
-    if (edges.size > 100000)
-      throw new RangeError("joinMarkSpaces: relation budget exceeded");
   }
   const orderedInputs = [...inputRows].sort(([a],[b]) => a < b ? -1 : a > b ? 1 : 0)
     .map(([,value]) => value);
