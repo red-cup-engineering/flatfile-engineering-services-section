@@ -59,6 +59,34 @@ const num = (value) => {
 const amountOf = (value) => (typeof value === "string" && /^\d+$/.test(value) ? value
   : Number.isSafeInteger(value) && value >= 0 ? String(value) : null);
 
+/** Read the requirement's integer amount, never an inferred price.
+ * x402 v2 uses amount; v1 used maxAmountRequired, still present in older
+ * discovery records. Conflicting/malformed dual declarations stay unknown.
+ * Other schemes cannot be priced as exact atomic-unit payments. */
+function paymentAmount(requirement) {
+  if (!requirement || typeof requirement !== "object" || Array.isArray(requirement) ||
+      (requirement.scheme !== undefined && requirement.scheme !== "exact")) return null;
+  const modern = Object.hasOwn(requirement, "amount");
+  const legacy = Object.hasOwn(requirement, "maxAmountRequired");
+  if (!modern && !legacy) return null;
+  const a = modern ? amountOf(requirement.amount) : null;
+  const b = legacy ? amountOf(requirement.maxAmountRequired) : null;
+  if (modern && legacy) {
+    return a !== null && b !== null && BigInt(a) === BigInt(b) ? a : null;
+  }
+  return modern ? a : b;
+}
+
+/** Preserve each payment option's rail with the price. Two identical token
+ * integers on different networks or assets are different commercial terms. */
+function paymentOption(requirement) {
+  const field = key => typeof requirement?.[key] === "string" ? requirement[key] : null;
+  return Object.freeze({
+    scheme: field("scheme"), network: field("network"), asset: field("asset"),
+    payTo: field("payTo"), amount: paymentAmount(requirement),
+  });
+}
+
 /**
  * x402 v2 specification calls the page array "items"; existing Bazaar services
  * may return "resources". Exactly one unambiguous array is admitted. This
@@ -80,15 +108,17 @@ export function resourceEntry(raw) {
     throw new TypeError("resource entry: resource must be a non-empty string");
   }
   const accepts = Array.isArray(raw.accepts) ? raw.accepts : [];
-  const accept = accepts[0] ?? {};
+  const options = Object.freeze(accepts.map(paymentOption));
+  const accept = options[0] ?? {};
   const quality = raw.quality ?? {};
   return Object.freeze({
     resource: raw.resource,
     serviceName: raw.serviceName ?? null,
     network: accept.network ?? null,
     asset: accept.asset ?? null,
-    amount: amountOf(accept.amount),
-    amounts: Object.freeze(accepts.map((a) => amountOf(a?.amount))),
+    amount: accept.amount ?? null,
+    amounts: Object.freeze(options.map(option => option.amount)),
+    paymentOptions: options,
     tags: Object.freeze([...(raw.tags ?? [])]),
     calls30d: num(quality.l30DaysTotalCalls),
     uniquePayers30d: num(quality.l30DaysUniquePayers),
@@ -227,7 +257,7 @@ export function diffSnapshots(previous, next) {
   const addedEntries = next.resources.filter((r) => !before.has(r.resource));
   const added = addedEntries.map((r) => r.resource);
   const removed = previous.resources.filter((r) => !after.has(r.resource)).map((r) => r.resource);
-  const priceKey = (r) => JSON.stringify(r.amounts ?? [r.amount]);
+  const priceKey = (r) => JSON.stringify(r.paymentOptions ?? (r.amounts ?? [r.amount]));
   // A missing earlier or later counter is not a measured increase/decrease.
   const counterDelta = (a, b) => Number.isSafeInteger(a) && Number.isSafeInteger(b) ? b - a : null;
   const changed = [];
