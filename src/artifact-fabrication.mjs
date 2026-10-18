@@ -128,14 +128,265 @@ function traceability(value, clauseIds, constraintIds, projectionIds, obligation
     return { type: "ArtifactFabricationTrace", version: 1, requirementId: item.requirementId, constraintIds: unique(item.constraintIds, constraintIds, "constraintIds"), projectionIds: unique(item.projectionIds, projectionIds, "projectionIds"), acceptanceObligationIds: unique(item.acceptanceObligationIds, obligationIds, "acceptanceObligationIds") };
   });
 }
+/*
+ * Epistemic law of the fabrication chain (version 2 candidates; the specification of 2026-10-18,
+ * "epistemic claims in artifact fabrication"). A conjecture is never a reason: every claim a
+ * requirement, restriction, parameter or acceptance obligation rests on is measured (dataset
+ * locator, digest, derivation), derived (premises, derivation) or conjectured (hypothesis,
+ * measurement plan, best estimate). Every number in a clause names its claim or a definitionally
+ * exact unit or constant. A dependency, API or behavior is only ever a measured claim.
+ */
+const EPISTEMIC_STATUSES = ["measured", "derived", "conjectured"];
+const CLAIM_KINDS = ["parameter", "world", "dependency", "api", "behavior"];
+const IMPLEMENTATION_CLAIM_KINDS = new Set(["dependency", "api", "behavior"]);
+const PREMISE_KINDS = ["claim", "requirement", "constraint", "citation"];
+/** Units and constants that are exact by definition; the only numbers a clause may carry without a claim. */
+export const DEFINITIONALLY_EXACT_PARAMETERS = Object.freeze({
+  "seconds-per-minute": Object.freeze({ value: 60, unit: "s/min" }),
+  "minutes-per-hour": Object.freeze({ value: 60, unit: "min/h" }),
+  "hours-per-day": Object.freeze({ value: 24, unit: "h/d" }),
+  "seconds-per-day": Object.freeze({ value: 86400, unit: "s/d" }),
+  "cents-per-dollar": Object.freeze({ value: 100, unit: "cent/USD" }),
+  "percent-denominator": Object.freeze({ value: 100, unit: "percent" }),
+});
+const SHA256 = /^sha256:[a-f0-9]{64}$/u;
+const NUMERIC_LITERAL = /(?<![A-Za-z0-9_.\-§#@/:{])\d[\d,]*(?:\.\d+)?%?(?![A-Za-z0-9_}])/u;
+function contentDigest(value) { return typeof value === "string" && (SHA256.test(value) || isNiUri(value)); }
+function textOrNull(value) { return typeof value === "string" && value.length > 0 && !/[\r\n]/u.test(value); }
+function ids(value) { return Array.isArray(value) ? value.map((item) => (record(item) ? item.id : undefined)).filter((item) => typeof item === "string") : []; }
+
+function measuredBasis(basis, path) {
+  const bad = (what) => refuse("MEASURED_CLAIM_WITHOUT_EVIDENCE", `${path} is measured and must carry ${what}`, path);
+  if (!record(basis) || basis.type !== "ArtifactFabricationMeasuredBasis") bad("an ArtifactFabricationMeasuredBasis (dataset locator, content digest, derivation)");
+  if (!textOrNull(basis.locator)) bad("the dataset locator");
+  if (!contentDigest(basis.digest)) bad("a content digest (sha256 or ni) of the dataset");
+  if (!textOrNull(basis.derivation)) bad("the derivation that produced the value");
+  exact(basis, ["type", "locator", "digest", "derivation"], path);
+  return { type: basis.type, locator: basis.locator, digest: basis.digest, derivation: basis.derivation };
+}
+function derivedBasis(basis, path) {
+  const bad = (what) => refuse("DERIVED_CLAIM_WITHOUT_PREMISES", `${path} is derived and must carry ${what}`, path);
+  if (!record(basis) || basis.type !== "ArtifactFabricationDerivedBasis") bad("an ArtifactFabricationDerivedBasis (premises, derivation)");
+  if (!Array.isArray(basis.premises) || basis.premises.length === 0) bad("at least one premise");
+  if (!textOrNull(basis.derivation)) bad("the derivation from its premises");
+  exact(basis, ["type", "premises", "derivation"], path);
+  const premises = basis.premises.map((premise, index) => {
+    const premisePath = `${path}.premises[${index}]`; exact(premise, ["type", "kind", "ref"], premisePath);
+    if (premise.type !== "ArtifactFabricationPremise" || !PREMISE_KINDS.includes(premise.kind)) refuse("INVALID_PREMISE", `${premisePath} must be an ArtifactFabricationPremise of kind ${PREMISE_KINDS.join(", ")}`, premisePath);
+    return { type: premise.type, kind: premise.kind, ref: text(premise.ref, `${premisePath}.ref`) };
+  });
+  return { type: basis.type, premises, derivation: basis.derivation };
+}
+function conjecturedBasis(basis, path) {
+  const bad = (what) => refuse("CONJECTURE_WITHOUT_MEASUREMENT_PLAN", `${path} is conjectured and must carry ${what}`, path);
+  if (!record(basis) || basis.type !== "ArtifactFabricationConjecturedBasis") bad("an ArtifactFabricationConjecturedBasis (hypothesis, measurement plan, estimate derivation)");
+  if (!textOrNull(basis.hypothesis)) bad("the hypothesis");
+  const plan = basis.measurementPlan;
+  if (!record(plan) || plan.type !== "ArtifactFabricationMeasurementPlan" || !textOrNull(plan.observable) || !textOrNull(plan.instrument) || !textOrNull(plan.decisionRule)) bad("a measurement plan naming its observable, its receiver or instrument and the decision rule the measurement settles");
+  exact(plan, ["type", "observable", "instrument", "decisionRule"], `${path}.measurementPlan`);
+  if (!textOrNull(basis.estimateDerivation)) refuse("CONJECTURE_WITHOUT_ESTIMATE", `${path} is conjectured and work proceeds on its best derived estimate, so it must carry the estimate's derivation`, path);
+  exact(basis, ["type", "hypothesis", "measurementPlan", "estimateDerivation"], path);
+  return { type: basis.type, hypothesis: basis.hypothesis, measurementPlan: { type: plan.type, observable: plan.observable, instrument: plan.instrument, decisionRule: plan.decisionRule }, estimateDerivation: basis.estimateDerivation };
+}
+function quantity(value, path) {
+  if (value === null) return null;
+  exact(value, ["type", "value", "unit"], path);
+  if (value.type !== "ArtifactFabricationQuantity" || typeof value.value !== "number" || !Number.isFinite(value.value)) refuse("INVALID_QUANTITY", `${path} must be null or an ArtifactFabricationQuantity with a finite value`, path);
+  return { type: value.type, value: value.value, unit: text(value.unit, `${path}.unit`) };
+}
+/** Admits the typed claims and resolves each claim's transitive grounding in conjecture (`groundedOn`). */
+function claimsOf(value, premiseIds) {
+  if (!Array.isArray(value)) refuse("INVALID_CLAIMS", "claims must be an array", "claims");
+  const seen = new Set();
+  const admitted = value.map((item, index) => {
+    const path = `claims[${index}]`; exact(item, ["type", "version", "id", "kind", "statement", "status", "quantity", "basis", "sourceSpan"], path);
+    if (item.type !== "ArtifactFabricationClaim" || item.version !== 1 || !CLAIM_KINDS.includes(item.kind)) refuse("INVALID_CLAIM", `${path} must be ArtifactFabricationClaim@1 of kind ${CLAIM_KINDS.join(", ")}`, path);
+    if (!EPISTEMIC_STATUSES.includes(item.status)) refuse("INVALID_EPISTEMIC_STATUS", `${path}.status must be measured, derived or conjectured`, `${path}.status`);
+    const claimId = id(item.id, `${path}.id`); if (seen.has(claimId)) refuse("DUPLICATE_CLAIM_ID", `claims repeats ${claimId}`, path); seen.add(claimId);
+    if (IMPLEMENTATION_CLAIM_KINDS.has(item.kind) && item.status !== "measured") refuse("IMPLEMENTATION_CLAIM_NOT_MEASURED", `${path} claims a ${item.kind}; a dependency, API or behavior is backed by an observed artifact (registry version, API response, test run), never asserted`, path);
+    const basis = item.status === "measured" ? measuredBasis(item.basis, `${path}.basis`) : item.status === "derived" ? derivedBasis(item.basis, `${path}.basis`) : conjecturedBasis(item.basis, `${path}.basis`);
+    return { type: "ArtifactFabricationClaim", version: 1, id: claimId, kind: item.kind, statement: text(item.statement, `${path}.statement`), status: item.status, quantity: quantity(item.quantity, `${path}.quantity`), basis, sourceSpan: span(item.sourceSpan, `${path}.sourceSpan`) };
+  });
+  const byId = new Map(admitted.map((claim) => [claim.id, claim]));
+  for (const claim of admitted) {
+    if (claim.status !== "derived") continue;
+    claim.basis.premises.forEach((premise, index) => {
+      const known = premise.kind === "claim" ? byId.has(premise.ref) : premise.kind === "requirement" ? premiseIds.requirements.has(premise.ref) : premise.kind === "constraint" ? premiseIds.constraints.has(premise.ref) : true;
+      if (!known) refuse("UNKNOWN_PREMISE_REFERENCE", `claims.${claim.id}.basis.premises[${index}] names no ${premise.kind} ${premise.ref}`, `claims.${claim.id}`);
+    });
+  }
+  const grounding = new Map(); const visiting = new Set();
+  const ground = (claim) => {
+    if (grounding.has(claim.id)) return grounding.get(claim.id);
+    if (visiting.has(claim.id)) refuse("CIRCULAR_DERIVATION", `claim ${claim.id} is derived from itself`, `claims.${claim.id}`);
+    visiting.add(claim.id); let result;
+    if (claim.status === "conjectured") result = new Set([claim.id]);
+    else if (claim.status === "measured") result = new Set();
+    else { result = new Set(); for (const premise of claim.basis.premises) if (premise.kind === "claim") for (const root of ground(byId.get(premise.ref))) result.add(root); }
+    visiting.delete(claim.id); grounding.set(claim.id, result); return result;
+  };
+  return admitted.map((claim) => ({ ...claim, groundedOn: [...ground(claim)].sort() }));
+}
+function claimReferences(value, path, claims) {
+  if (!Array.isArray(value)) refuse("INVALID_CLAIM_REFERENCES", `${path}.claimIds must be an array`, `${path}.claimIds`);
+  const seen = new Set();
+  for (const claimId of value) {
+    if (typeof claimId !== "string" || !claims.has(claimId)) refuse("UNKNOWN_CLAIM_REFERENCE", `${path}.claimIds names no admitted claim`, `${path}.claimIds`);
+    if (seen.has(claimId)) refuse("DUPLICATE_CLAIM_REFERENCE", `${path}.claimIds repeats ${claimId}`, `${path}.claimIds`);
+    seen.add(claimId);
+  }
+  return [...seen].sort();
+}
+function parametersOf(value, path, claims) {
+  if (!Array.isArray(value)) refuse("INVALID_PARAMETERS", `${path}.parameters must be an array`, `${path}.parameters`);
+  const seen = new Set();
+  return value.map((item, index) => {
+    const here = `${path}.parameters[${index}]`; exact(item, ["type", "version", "name", "value", "unit", "claimId", "exact"], here);
+    if (item.type !== "ArtifactFabricationParameter" || item.version !== 1 || typeof item.value !== "number" || !Number.isFinite(item.value)) refuse("INVALID_PARAMETER", `${here} must be ArtifactFabricationParameter@1 with a finite value`, here);
+    const name = id(item.name, `${here}.name`); if (seen.has(name)) refuse("DUPLICATE_PARAMETER_NAME", `${path}.parameters repeats ${name}`, here); seen.add(name);
+    const unit = text(item.unit, `${here}.unit`);
+    if ((item.claimId === null) === (item.exact === null)) refuse("PARAMETER_WITHOUT_CLAIM", `${here} must reference exactly one claim, or name one definitionally exact unit or constant; a bare number is refused`, here);
+    if (item.claimId !== null) {
+      const claim = typeof item.claimId === "string" ? claims.get(item.claimId) : undefined;
+      if (!claim) refuse("UNKNOWN_CLAIM_REFERENCE", `${here}.claimId names no admitted claim`, here);
+      if (claim.quantity === null || claim.quantity.value !== item.value || claim.quantity.unit !== unit) refuse("PARAMETER_CLAIM_MISMATCH", `${here} must equal the quantity its claim ${claim.id} carries`, here);
+    } else {
+      const definition = DEFINITIONALLY_EXACT_PARAMETERS[item.exact];
+      if (!definition || definition.value !== item.value || definition.unit !== unit) refuse("EXACT_PARAMETER_MISMATCH", `${here}.exact must name a definitionally exact unit or constant and carry its exact value and unit`, here);
+    }
+    return { type: "ArtifactFabricationParameter", version: 1, name, value: item.value, unit, claimId: item.claimId, exact: item.exact };
+  });
+}
+/** Refuses a numeric literal in a clause statement; a number enters only as a declared `{{parameter}}`. */
+function statementWithoutBareNumbers(statement, parameters, path) {
+  const declared = new Set(parameters.map(({ name }) => name));
+  for (const [, name] of statement.matchAll(/\{\{([^{}]*)\}\}/gu)) if (!declared.has(name)) refuse("UNKNOWN_PARAMETER_PLACEHOLDER", `${path} places {{${name}}} but declares no such parameter`, path);
+  const bare = statement.replace(/\{\{[^{}]*\}\}/gu, " ").replace(/`[^`\n]*`/gu, " ");
+  const literal = NUMERIC_LITERAL.exec(bare);
+  if (literal) refuse("PARAMETER_WITHOUT_CLAIM", `${path} carries the bare number ${literal[0]}; declare it as a parameter that references a claim`, path);
+  return statement;
+}
+function epistemicItem(item, path, claims, { statementKey, restriction, scan = true }) {
+  const parameters = parametersOf(item.parameters, path, claims); const claimIds = claimReferences(item.claimIds, path, claims);
+  if (scan) statementWithoutBareNumbers(item[statementKey], parameters, `${path}.${statementKey}`);
+  if (restriction) {
+    if (claimIds.length === 0) refuse("RESTRICTION_WITHOUT_CLAIM", `${path} refuses, narrows or constrains work and must name the claims it rests on`, path);
+    if (claimIds.every((claimId) => claims.get(claimId).groundedOn.length > 0)) refuse("RESTRICTION_GROUNDED_ON_CONJECTURE", `${path} rests only on conjecture; a conjecture motivates a measurement and is never the sole ground for refusing or narrowing work`, path);
+  }
+  return { parameters, claimIds };
+}
+function clausesV2(value, name, type, required, claims) {
+  if (!Array.isArray(value) || (required && value.length === 0)) refuse("MISSING_CLAUSES", `${name} must contain ${required ? "at least one" : "a"} clause array`, name);
+  const seen = new Set();
+  return value.map((item, index) => {
+    const path = `${name}[${index}]`; exact(item, ["type", "version", "id", "statement", "parameters", "claimIds", "sourceSpan"], path);
+    if (item.type !== type || item.version !== 2) refuse("INVALID_CLAUSE", `${path} must be ${type}@2`, path);
+    const clauseId = id(item.id, `${path}.id`); if (seen.has(clauseId)) refuse("DUPLICATE_CLAUSE_ID", `${name} repeats ${clauseId}`, path); seen.add(clauseId);
+    const statement = text(item.statement, `${path}.statement`);
+    const { parameters, claimIds } = epistemicItem({ ...item, statement }, path, claims, { statementKey: "statement", restriction: type === "ArtifactFabricationProhibition" });
+    return { type, version: 2, id: clauseId, statement, parameters, claimIds, sourceSpan: span(item.sourceSpan, `${path}.sourceSpan`) };
+  });
+}
+function questionsV2(value, claims) {
+  if (!Array.isArray(value)) refuse("INVALID_OPEN_QUESTIONS", "openQuestions must be an array", "openQuestions");
+  const seen = new Set();
+  const admitted = value.map((item, index) => {
+    const path = `openQuestions[${index}]`; exact(item, ["type", "version", "id", "question", "blocking", "claimId", "sourceSpan"], path);
+    if (item.type !== "ArtifactFabricationOpenQuestion" || item.version !== 2 || typeof item.blocking !== "boolean") refuse("INVALID_OPEN_QUESTION", `${path} must be ArtifactFabricationOpenQuestion@2`, path);
+    const questionId = id(item.id, `${path}.id`); if (seen.has(questionId)) refuse("DUPLICATE_OPEN_QUESTION_ID", `openQuestions repeats ${questionId}`, path); seen.add(questionId);
+    if (item.claimId !== null && (typeof item.claimId !== "string" || !claims.has(item.claimId))) refuse("UNKNOWN_CLAIM_REFERENCE", `${path}.claimId must be null or name an admitted claim`, path);
+    return { type: "ArtifactFabricationOpenQuestion", version: 2, id: questionId, question: text(item.question, `${path}.question`), blocking: item.blocking, claimId: item.claimId, sourceSpan: span(item.sourceSpan, `${path}.sourceSpan`) };
+  });
+  for (const question of admitted) {
+    if (question.blocking && question.claimId !== null && claims.get(question.claimId).groundedOn.length > 0) refuse("BLOCKED_ON_MEASURABLE_CONJECTURE", `open question ${question.id} blocks on a conjecture that can be measured; make it a non-blocking measurement obligation and proceed on the best derived estimate`, `openQuestions.${question.id}`);
+  }
+  const blocking = admitted.find((question) => question.blocking); if (blocking) refuse("BLOCKING_OPEN_QUESTION", `open question ${blocking.id} blocks fabrication`, `openQuestions.${blocking.id}`);
+  return admitted;
+}
+function constraintsV2(value, claims) {
+  if (!Array.isArray(value) || value.length === 0) refuse("MISSING_CONSTRAINTS", "constraints must contain laws and standards", "constraints");
+  const seen = new Set(); let laws = 0; let standards = 0;
+  const admitted = value.map((item, index) => {
+    const path = `constraints[${index}]`; exact(item, ["type", "version", "id", "kind", "authority", "revision", "locator", "applicability", "statement", "parameters", "claimIds", "sourceSpan"], path);
+    if (item.type !== "ArtifactFabricationConstraint" || item.version !== 2 || !["law", "standard", "operational"].includes(item.kind)) refuse("INVALID_CONSTRAINT", `${path} must be an ArtifactFabricationConstraint@2 law, standard, or operational constraint`, path);
+    const constraintId = id(item.id, `${path}.id`); if (seen.has(constraintId)) refuse("DUPLICATE_CONSTRAINT_ID", `constraints repeats ${constraintId}`, path); seen.add(constraintId);
+    if (item.kind === "law") laws += 1;
+    if (item.kind === "standard") standards += 1;
+    const statement = text(item.statement, `${path}.statement`);
+    // A law or standard cites an external authority and revision; only an operational constraint authors numbers.
+    const { parameters, claimIds } = epistemicItem({ ...item, statement }, path, claims, { statementKey: "statement", restriction: item.kind === "operational", scan: item.kind === "operational" });
+    return { type: "ArtifactFabricationConstraint", version: 2, id: constraintId, kind: item.kind, authority: text(item.authority, `${path}.authority`), revision: text(item.revision, `${path}.revision`), locator: text(item.locator, `${path}.locator`), applicability: text(item.applicability, `${path}.applicability`), statement, parameters, claimIds, sourceSpan: span(item.sourceSpan, `${path}.sourceSpan`) };
+  });
+  if (laws === 0) refuse("MISSING_LAW", "constraints must name at least one mathematical or structural law", "constraints");
+  if (standards === 0) refuse("MISSING_STANDARD", "constraints must name at least one conformance standard", "constraints");
+  return admitted;
+}
+function obligationsV2(value, claims) {
+  if (!Array.isArray(value) || value.length === 0) refuse("MISSING_ACCEPTANCE_OBLIGATIONS", "acceptanceObligations must contain at least one obligation", "acceptanceObligations");
+  const seen = new Set();
+  return value.map((item, index) => {
+    const path = `acceptanceObligations[${index}]`; exact(item, ["type", "version", "id", "kind", "statement", "parameters", "claimIds", "sourceSpan"], path);
+    if (item.type !== "ArtifactFabricationAcceptanceObligation" || item.version !== 2 || !["test", "assay", "review"].includes(item.kind)) refuse("INVALID_ACCEPTANCE_OBLIGATION", `${path} must be a test, assay, or review obligation at version 2`, path);
+    const obligationId = id(item.id, `${path}.id`); if (seen.has(obligationId)) refuse("DUPLICATE_ACCEPTANCE_OBLIGATION_ID", `acceptanceObligations repeats ${obligationId}`, path); seen.add(obligationId);
+    const statement = text(item.statement, `${path}.statement`);
+    const { parameters, claimIds } = epistemicItem({ ...item, statement }, path, claims, { statementKey: "statement", restriction: false });
+    return { type: "ArtifactFabricationAcceptanceObligation", version: 2, id: obligationId, kind: item.kind, statement, parameters, claimIds, sourceSpan: span(item.sourceSpan, `${path}.sourceSpan`) };
+  });
+}
+function admitSpecificationV2(candidate) {
+  exact(candidate, ["type", "version", "source", "artifact", "claims", "requirements", "prohibitions", "openQuestions", "constraints", "projections", "acceptanceObligations", "traceability"], "candidate");
+  if (candidate.type !== "ArtifactFabricationSpecificationCandidate") refuse("INVALID_CANDIDATE", "candidate must be ArtifactFabricationSpecificationCandidate@2", "candidate");
+  const claimList = claimsOf(candidate.claims, { requirements: new Set(ids(candidate.requirements)), constraints: new Set(ids(candidate.constraints)) });
+  const claims = new Map(claimList.map((claim) => [claim.id, claim]));
+  const requirements = clausesV2(candidate.requirements, "requirements", "ArtifactFabricationRequirement", true, claims);
+  const prohibitions = clausesV2(candidate.prohibitions, "prohibitions", "ArtifactFabricationProhibition", false, claims);
+  const clauseIds = new Set(); for (const clause of [...requirements, ...prohibitions]) { if (clauseIds.has(clause.id)) refuse("DUPLICATE_CLAUSE_ID", `settled clauses repeat ${clause.id}`, "candidate"); clauseIds.add(clause.id); }
+  const openQuestions = questionsV2(candidate.openQuestions, claims);
+  const admitted = { type: "ArtifactFabricationSpecification", version: 2, source: source(candidate.source), artifact: artifact(candidate.artifact), claims: claimList, requirements, prohibitions, openQuestions, constraints: constraintsV2(candidate.constraints, claims), projections: projections(candidate.projections), acceptanceObligations: obligationsV2(candidate.acceptanceObligations, claims) };
+  const scheduled = new Set([...admitted.acceptanceObligations.filter(({ kind }) => kind === "assay").flatMap(({ claimIds }) => claimIds), ...openQuestions.map(({ claimId }) => claimId).filter((claimId) => claimId !== null)]);
+  for (const claim of claimList) if (claim.status === "conjectured" && !scheduled.has(claim.id)) refuse("CONJECTURE_WITHOUT_MEASUREMENT_OBLIGATION", `conjecture ${claim.id} is named by no assay obligation and no non-blocking open question, so no measurement is scheduled`, `claims.${claim.id}`);
+  admitted.traceability = traceability(candidate.traceability, clauseIds, new Set(admitted.constraints.map(({ id: value }) => value)), new Set(admitted.projections.map(({ id: value }) => value)), new Set(admitted.acceptanceObligations.map(({ id: value }) => value)));
+  admitted.specificationDigest = semanticId(admitted);
+  return freeze(admitted);
+}
+/** Counts an admitted version 2 specification's claims by epistemic status, and those that rest on conjecture. */
+export function summarizeArtifactFabricationClaims(specification) {
+  const claims = record(specification) && Array.isArray(specification.claims) ? specification.claims : [];
+  const count = (status) => claims.filter((claim) => claim.status === status).length;
+  return Object.freeze({ measured: count("measured"), derived: count("derived"), conjectured: count("conjectured"), derivedOnConjecture: claims.filter((claim) => claim.status === "derived" && claim.groundedOn.length > 0).length });
+}
+/** Lists, without refusing, what a version 1 candidate would be refused for at version 2: its migration debt. */
+export function findArtifactFabricationEpistemicDebt(candidate) {
+  const debt = [];
+  const scan = (items, name, restriction) => {
+    if (!Array.isArray(items)) return;
+    items.forEach((item, index) => {
+      if (!record(item) || (name === "constraints" && item.kind !== "operational")) return;
+      const path = `${name}[${index}]`;
+      if (typeof item.statement === "string" && NUMERIC_LITERAL.test(item.statement.replace(/`[^`\n]*`/gu, " "))) debt.push({ code: "PARAMETER_WITHOUT_CLAIM", path: `${path}.statement` });
+      if (restriction) debt.push({ code: "RESTRICTION_WITHOUT_CLAIM", path });
+    });
+  };
+  if (record(candidate)) { scan(candidate.requirements, "requirements", false); scan(candidate.prohibitions, "prohibitions", true); scan(candidate.constraints, "constraints", true); scan(candidate.acceptanceObligations, "acceptanceObligations", false); }
+  return Object.freeze(debt);
+}
+function admittedSpecification(specification) {
+  if (!record(specification) || specification.type !== "ArtifactFabricationSpecification" || ![1, 2].includes(specification.version) || typeof specification.specificationDigest !== "string") refuse("INVALID_SPECIFICATION", "specification must be an admitted ArtifactFabricationSpecification@1 or @2", "specification");
+}
 function refusal(error, type) {
   if (error instanceof Refusal) return freeze({ type, version: 1, code: error.code, message: error.message, path: error.path });
   throw error;
 }
 
-/** Admits a closed-world, language-neutral artifact fabrication specification without ambient I/O. */
+/**
+ * Admits a closed-world, language-neutral artifact fabrication specification without ambient I/O.
+ * Version 2 candidates carry typed epistemic claims and bind the epistemic law; version 1 candidates
+ * are the legacy unclaimed form, admitted unchanged (same record, same digest) until their producers migrate.
+ */
 export function admitArtifactFabricationSpecification(candidate) {
   try {
+    if (record(candidate) && candidate.version === 2) return admitSpecificationV2(candidate);
+    if (record(candidate) && typeof candidate.version === "number" && candidate.version !== 1) refuse("UNSUPPORTED_CANDIDATE_VERSION", "candidate version must be 1 (legacy, unclaimed) or 2 (epistemic claims)", "candidate");
     exact(candidate, ["type", "version", "source", "artifact", "requirements", "prohibitions", "openQuestions", "constraints", "projections", "acceptanceObligations", "traceability"], "candidate");
     if (candidate.type !== "ArtifactFabricationSpecificationCandidate" || candidate.version !== 1) refuse("INVALID_CANDIDATE", "candidate must be ArtifactFabricationSpecificationCandidate@1", "candidate");
     const requirements = clauses(candidate.requirements, "requirements", "ArtifactFabricationRequirement", "statement", true);
@@ -152,7 +403,7 @@ export function admitArtifactFabricationSpecification(candidate) {
 /** Admits an evidence-free, exhaustive realization plan before a fabricator performs effects. */
 export function admitArtifactFabricationRealizationPlan(specification, candidate) {
   try {
-    if (!record(specification) || specification.type !== "ArtifactFabricationSpecification" || specification.version !== 1 || typeof specification.specificationDigest !== "string") refuse("INVALID_SPECIFICATION", "specification must be an admitted ArtifactFabricationSpecification@1", "specification");
+    admittedSpecification(specification);
     exact(candidate, ["type", "version", "artifactId", "specificationDigest", "projectionIds", "acceptanceObligationIds"], "candidate");
     if (candidate.type !== "ArtifactFabricationRealizationPlanCandidate" || candidate.version !== 1) refuse("INVALID_PLAN_CANDIDATE", "candidate must be ArtifactFabricationRealizationPlanCandidate@1", "candidate");
     if (candidate.artifactId !== specification.artifact.id || candidate.specificationDigest !== specification.specificationDigest) refuse("SPECIFICATION_BINDING_MISMATCH", "plan must bind the admitted artifact id and specification digest", "candidate");
@@ -176,7 +427,7 @@ export function admitArtifactFabricationRealizationPlan(specification, candidate
 /** Admits evidence that realizes every trace of an admitted artifact fabrication specification. */
 export function admitArtifactFabricationRealizationReceipt(specification, candidate) {
   try {
-    if (!record(specification) || specification.type !== "ArtifactFabricationSpecification" || specification.version !== 1 || typeof specification.specificationDigest !== "string") refuse("INVALID_SPECIFICATION", "specification must be an admitted ArtifactFabricationSpecification@1", "specification");
+    admittedSpecification(specification);
     exact(candidate, ["type", "version", "artifactId", "specificationDigest", "realizations", "acceptances"], "candidate");
     if (candidate.type !== "ArtifactFabricationRealizationReceiptCandidate" || candidate.version !== 1) refuse("INVALID_RECEIPT_CANDIDATE", "candidate must be ArtifactFabricationRealizationReceiptCandidate@1", "candidate");
     if (candidate.artifactId !== specification.artifact.id || candidate.specificationDigest !== specification.specificationDigest) refuse("SPECIFICATION_BINDING_MISMATCH", "receipt must bind the admitted artifact id and specification digest", "candidate");
