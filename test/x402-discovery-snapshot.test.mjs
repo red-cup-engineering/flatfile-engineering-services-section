@@ -340,3 +340,86 @@ test("every advertised x402 alternative must belong to the selected merchant", (
   assert.equal(acceptable.complete, false,
     "the pre-existing multiple-price uncertainty still survives");
 });
+
+
+test("both x402 payment requirement generations have exact atomic prices without an adapter", () => {
+  const legacy = entry("legacy");
+  legacy.x402Version = 1;
+  delete legacy.accepts[0].amount;
+  legacy.accepts[0].maxAmountRequired = "200";
+  const modern = entry("modern", { amount: "300" });
+  modern.x402Version = 2;
+  const discovered = {
+    x402Version: 2, payTo: PAY_TO,
+    pagination: { total: 2, offset: 0, limit: 20 },
+    items: [legacy, modern],
+  };
+  const snap = taken([discovered], "2026-10-18T17:00:00Z");
+  assert.equal(snap.complete, true);
+  assert.equal(snap.totals.listedPriceUnits, "500");
+  assert.deepEqual(snap.resources.map(resource => resource.amount), ["200", "300"]);
+  assert.deepEqual(snap.resources.map(resource => resource.paymentOptions[0].scheme), ["exact", "exact"]);
+  assert.equal(snap.totals.listedPriceUnitsByRail["eip155:8453|0x" + "cd".repeat(20)], "500");
+});
+
+test("duplicate old and modern amounts agree only when the atomic values agree", () => {
+  const both = withResources(resources => {
+    resources[0].accepts[0].maxAmountRequired = "010000";
+  });
+  const agreed = taken([both], "2026-10-18T17:00:00Z");
+  assert.equal(agreed.complete, true);
+  assert.equal(agreed.resources[0].amount, "10000");
+  const conflicted = withResources(resources => {
+    resources[0].accepts[0].maxAmountRequired = "20000";
+  });
+  const contradiction = taken([conflicted], "2026-10-18T17:00:00Z");
+  assert.equal(contradiction.complete, false);
+  assert.equal(contradiction.resources[0].amount, null);
+  assert.equal(contradiction.totals.listedPriceUnits, null);
+  assert.match(contradiction.problems.join(","), /without a valid integer amount/);
+  const malformed = withResources(resources => {
+    resources[0].accepts[0].maxAmountRequired = "USD 10000";
+  });
+  assert.equal(taken([malformed], "2026-10-18T17:00:00Z").resources[0].amount, null);
+});
+
+test("changing the chain or asset is a payment-terms change even when integer price is identical", () => {
+  const previous = taken([base()], "2026-10-17T17:00:00Z");
+  const next = withResources(resources => {
+    resources[1].accepts[0].network = "eip155:1";
+    resources[2].accepts[0].asset = "0x" + "fa".repeat(20);
+  });
+  const diff = diffSnapshots(previous, taken([next], "2026-10-18T17:00:00Z"));
+  assert.deepEqual(diff.priceChanges, [next.resources[1].resource, next.resources[2].resource]);
+  assert.deepEqual(diff.active, [], "rail migration alone cannot fabricate a paid call");
+});
+
+test("a second option changing its rail is visible even if headline price stays the same", () => {
+  const prior = withResources(resources => {
+    resources[0].accepts.push({ ...resources[0].accepts[0], amount: "20000" });
+  });
+  const later = withResources(resources => {
+    resources[0].accepts.push({
+      ...resources[0].accepts[0], amount: "20000", asset: "0x" + "ee".repeat(20),
+    });
+  });
+  const left = taken([prior], "2026-10-17T17:00:00Z");
+  const right = taken([later], "2026-10-18T17:00:00Z");
+  const diff = diffSnapshots(left, right);
+  assert.deepEqual(diff.priceChanges, [later.resources[0].resource]);
+  assert.equal(right.complete, false, "ambiguous multi-option headline stays incomplete");
+  assert.equal(left.resources[0].amount, right.resources[0].amount);
+});
+
+test("unknown exact price or unsupported scheme cannot become sellable zero-price evidence", () => {
+  const unsupported = withResources(resources => {
+    resources[0].accepts[0].scheme = "upto";
+  });
+  const snap = taken([unsupported], "2026-10-18T17:00:00Z");
+  assert.equal(snap.complete, false);
+  assert.equal(snap.resources[0].amount, null);
+  const missing = withResources(resources => {
+    delete resources[0].accepts[0].amount;
+  });
+  assert.equal(taken([missing], "2026-10-18T17:00:00Z").resources[0].amount, null);
+});
