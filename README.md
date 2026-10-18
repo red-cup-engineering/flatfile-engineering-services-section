@@ -32,3 +32,18 @@ transitional source selection; package-native imports, immutable registry
 releases, real dependent version selection, and SignCell's original
 consumer migration still require independent receiving. Do not manually chase
 ancestor Gitlinks; use the existing source-owned gitlink normalizer.
+
+## Persistent indexed data shared by higher faculties
+
+`@red-cup-engineering/computer-data-engineering-services-section/persistent-map`
+exposes the canonical string-keyed structurally shared `PersistentMap`
+with fork, get, set, delete, insertion-order iteration and collision-safe
+lookup. The **original exact implementation** is inherited from
+`red-cup-engineering/signcraft` source blob
+`67e6d811a4008c6270e93c64c153293806037b6b`, with its original native test blob
+`9499322c2d9a99085dc9cde0d71d241078b57558` received into Data without changing either file.
+It is a reusable in-memory data structure, not a Mark identity oracle,
+semiosis rule, transaction journal or assertion of physical memory performance.
+SignCraft must import this Data supplier rather than maintain a second HAMT.
+The new Data 0.3.0 source identity does not claim published/installed registry
+bytes until the release is separately received.
