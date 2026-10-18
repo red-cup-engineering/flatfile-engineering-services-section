@@ -4,6 +4,11 @@
   "private": false,
   "type": "module",
   "description": "Canonical Turtle IRIREF and literal writing actuator recovered from Relating.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/computer-file-engineering-services-section.git",
+    "directory": "services/flatfile-engineering-services-section/services/serialization-services-section/services/rdf-file-services-section/services/turtle-file-services-section/services/turtle-term-writing-service"
+  },
   "exports": {
     ".": {
       "types": "./src/index.mts",
