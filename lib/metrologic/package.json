@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/metrologic",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "type": "module",
   "description": "Metrologic: the data layer's mathematics, the shared JavaScript implementation of the mathematical operations every layer above it uses.",
   "keywords": [
@@ -130,6 +130,9 @@
     },
     "./articulation/predicating/positing/settling/analysis/laplacian": {
       "import": "./src/articulation/predicating/positing/settling/analysis/laplacian.mjs"
+    },
+    "./articulation/predicating/positing/settling/analysis/numeric-laplacian": {
+      "import": "./src/articulation/predicating/positing/settling/analysis/numeric-laplacian.mjs"
     },
     "./articulation/predicating/positing/settling/analysis/coordination-cohomology": {
       "import": "./src/articulation/predicating/positing/settling/analysis/coordination-cohomology.mjs"
