@@ -1,4 +1,4 @@
-import { semanticId } from "../lib/semiotic-content-address/src/semiotic-content-address.mjs";
+import { semanticId } from "@red-cup-engineering/semiotic-content-address";
 import { isNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 
 class Refusal extends Error {

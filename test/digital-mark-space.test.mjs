@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { semanticId } from "@red-cup-engineering/computer-data-engineering-services-section/semiotic-content-address";
+import { semanticId } from "@red-cup-engineering/semiotic-content-address";
 import { markResource, bitAt, bitWindow, bitValues, markSpace, joinMarkSpaces } from "../src/digital-mark-space.mjs";
 
 test("arbitrary binary media share one canonical NI address and exact MSB-first bit coordinates", () => {

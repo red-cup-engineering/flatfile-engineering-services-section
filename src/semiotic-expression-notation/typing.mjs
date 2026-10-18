@@ -1,5 +1,5 @@
 /** One SEN judgment over the canonical Curry-Howard-Lambek grammar. */
-import { canonicalizeSemioticJson as normalizeCarrier } from "../../lib/semiotic-content-address/src/semiotic-content-address.mjs";
+import { canonicalizeSemioticJson as normalizeCarrier } from "@red-cup-engineering/semiotic-content-address";
 import {
   mapSenTerm,
   validateSenTerm,

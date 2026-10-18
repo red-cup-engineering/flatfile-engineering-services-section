@@ -16,7 +16,7 @@
  * paths and shared words do NOT imply causal, semantic or authority arrows.
  */
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
-import { bytesEqual, canonicalCarrier, semanticId } from "../lib/semiotic-content-address/src/semiotic-content-address.mjs";
+import { bytesEqual, canonicalCarrier, semanticId } from "@red-cup-engineering/semiotic-content-address";
 
 const rawBytes = new WeakMap();
 const admittedSpaces = new WeakSet();
