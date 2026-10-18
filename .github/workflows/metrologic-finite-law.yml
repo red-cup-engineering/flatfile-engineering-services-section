@@ -22,7 +22,9 @@ on:
       - 'lib/metrologic/test/capacity-flow.test.mjs'
       - 'lib/metrologic/package.json'
       - 'services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/src/framework-rigidity.mjs'
       - 'services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/test/framework-rigidity.test.mjs'
       - 'services/number-services-section/services/exact-number-data-service/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
   pull_request:
@@ -47,7 +49,9 @@ on:
       - 'lib/metrologic/test/capacity-flow.test.mjs'
       - 'lib/metrologic/package.json'
       - 'services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/src/framework-rigidity.mjs'
       - 'services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/test/framework-rigidity.test.mjs'
       - 'services/number-services-section/services/exact-number-data-service/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
 permissions:
@@ -130,6 +134,10 @@ jobs:
         run: |
           node --check services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs
           node --test services/number-services-section/services/exact-number-data-service/test/commodity-carrier.test.mjs services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs
+      - name: Fabricate exact-coordinate planar and three-dimensional contact-rigidity readouts
+        run: |
+          node --check services/number-services-section/services/exact-number-data-service/src/framework-rigidity.mjs
+          node --test services/number-services-section/services/exact-number-data-service/test/rational-matrix.test.mjs services/number-services-section/services/exact-number-data-service/test/framework-rigidity.test.mjs
       - name: Verify canonical exact-number package interface
         run: |
           node --input-type=module - <<'NODE'
@@ -138,4 +146,5 @@ jobs:
           const p=JSON.parse(readFileSync('services/number-services-section/services/exact-number-data-service/package.json','utf8'));
           assert.equal(p.exports['./resource-measurement'],'./src/resource-measurement.mjs');
           assert.equal(p.exports['./graded'],'./src/graded.mjs');
+          assert.equal(p.exports['./framework-rigidity'],'./src/framework-rigidity.mjs');
           NODE
