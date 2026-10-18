@@ -39,6 +39,8 @@ paid call is Untested; the on-chain Transfer events to `payTo` are the independe
   duplicate URLs, malformed amount, multi-option pricing).
 - A response whose `payTo` (or any `accepts[].payTo`) differs from the requested one is refused with
   an error, never recorded under the requested address.
+- x402 v2's `GET /discovery/resources` uses the official `items` array; older Bazaar deployments can still use `resources`. The Data reader accepts **exactly one** such array per page, so the original Networking, Causeway and Opportunity clients cannot silently count 0 products from an otherwise valid v2 response. Dual or missing arrays refuse before effect or market inference.
+- Atomic prices remain scoped by actual `network|asset`. `listedPriceUnits` is retained only for a single fully priced rail; it is `null` for mixed, unknown or partially priced rails. `listedPriceUnitsByRail` retains exact atomic totals per known rail, with `null` if any constituent amount is unobserved. `priceRailsComplete` is distinct from source pagination completeness; an incomplete asset label is not evidence that a measured call never occurred.
 - Counters that are absent, non-integral, unsafe (> 2^53 - 1), or malformed are `null`, not `0`.
   A total 30-day call count is `null` if any constituent count is unknown; this is
   **measurement coverage**, not incomplete pagination. A cross-snapshot counter delta is
@@ -71,7 +73,7 @@ paid call is Untested; the on-chain Transfer events to `payTo` are the independe
 
 - `readSnapshotParameters(record)` validates R1.
 - `merchantUrl(parameters, offset)` builds one page request (limit 20).
-- `takeSnapshot(parameters, { fetchJson, now })` pages until `offset >= total` (hard cap 50 pages).
+- `takeSnapshot(parameters, { fetchJson, now })` pages through the standard v2 `items` or legacy `resources` envelope until `offset >= total` (hard cap 50 pages).
   Transport is injected; the module has no network code and no dependencies.
 - `snapshotRecord({ parameters, pages, takenAt, notes })` is the pure reducer. It drops payload
   examples (large, not demand data), sorts by resource, collapses duplicate resource URLs (last wins,
