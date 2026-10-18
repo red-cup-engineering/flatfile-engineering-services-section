@@ -194,5 +194,5 @@ test("bottom-to-both is two covers, never one minted WIT", async () => {
   assert.equal(witFlux([[readingOfRecord(record(0, 0)), readingOfRecord(record(1, 1))]]).wits, 2);
   assert.equal(isKnowledgeCover(bottom, four(true, false)), true);
   assert.equal(witnessBit(bottom, four(true, false)), "positiveEvidence");
-  assert.throws(() => witFlux([["potential", "absurd"]]), /not-knowledge-ascent/u);
+  assert.throws(() => witFlux([["potential", "absurd"]]), error => error.code === "not-knowledge-ascent");
 });

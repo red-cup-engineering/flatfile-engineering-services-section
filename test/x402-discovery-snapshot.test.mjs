@@ -99,7 +99,7 @@ test("resourceEntry: null counters stay null, bad amounts do not throw, missing 
   assert.equal(snap.resources[0].amount, null);
   assert.equal(snap.complete, false);
   assert.throws(() => resourceEntry({ accepts: [] }), /resource must be/);
-  assert.throws(() => taken([listing([{ serviceName: "x" }], 1)], "2026-01-02T00:00:00Z"), /resource must be/);
+  assert.throws(() => taken([listing([{ ...entry("x"), resource: undefined }], 1)], "2026-01-02T00:00:00Z"), /resource must be/);
 });
 
 test("diff: identical snapshots show nothing", () => {
