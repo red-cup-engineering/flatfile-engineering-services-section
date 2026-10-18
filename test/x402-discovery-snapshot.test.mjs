@@ -306,3 +306,37 @@ test("missing or unpriced rail does not generate an invented zero-valued offer",
   assert.equal(unknown.totals.listedPriceUnits, null);
   assert.equal(unknown.totals.priceRailsComplete, false);
 });
+
+
+test("merchant discovery cannot claim calls from an unscoped payment requirement", () => {
+  const observedAt = "2026-10-17T23:00:00Z";
+  const absent = withResources((resources) => {
+    resources[0].accepts = [];
+  });
+  assert.throws(() => taken([absent], observedAt), /payment alternatives/u);
+  const unscoped = withResources((resources) => {
+    delete resources[0].accepts[0].payTo;
+  });
+  assert.throws(() => taken([unscoped], observedAt), /accepts payTo/u,
+    "top-level payTo is not substitute evidence for this resource's receiver");
+});
+
+test("every advertised x402 alternative must belong to the selected merchant", () => {
+  const original = taken([base()], "2026-10-17T23:00:00Z");
+  assert.equal(original.complete, true);
+  const mixed = withResources((resources) => {
+    resources[0].accepts.push({
+      ...resources[0].accepts[0], payTo: "0x" + "fe".repeat(20),
+    });
+  });
+  assert.throws(() => taken([mixed], "2026-10-17T23:00:00Z"), /accepts payTo/u);
+  const alternate = withResources((resources) => {
+    resources[0].accepts.push({
+      ...resources[0].accepts[0], amount: "10001",
+    });
+  });
+  const acceptable = taken([alternate], "2026-10-17T23:00:00Z");
+  assert.equal(acceptable.totals.resources, 3);
+  assert.equal(acceptable.complete, false,
+    "the pre-existing multiple-price uncertainty still survives");
+});
