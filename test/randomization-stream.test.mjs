@@ -2,7 +2,32 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { hashSeed } from '../src/randomization/hash-seed.mjs';
 import { mulberry32 } from '../src/randomization/mulberry32.mjs';
-import { randomStream, seededStream } from '../src/randomization/stream.mjs';
+import { randomStream, seededStream, shuffle } from '../src/randomization/stream.mjs';
+
+test('shuffle: supplied draws reach each three-item permutation exactly once', () => {
+  const input = Object.freeze(['a', 'b', 'c']);
+  const permutations = new Set();
+  for (const first of [1 / 6, 1 / 2, 5 / 6]) {
+    for (const second of [1 / 4, 3 / 4]) {
+      const draws = [first, second];
+      let used = 0;
+      permutations.add(JSON.stringify(shuffle(input, () => draws[used++])));
+      assert.equal(used, 2);
+    }
+  }
+  assert.equal(permutations.size, 6);
+  assert.deepEqual(input, ['a', 'b', 'c']);
+  const noDraw = () => assert.fail('zero- and one-item shuffles consume no draws');
+  assert.deepEqual(shuffle([], noDraw), []);
+  assert.deepEqual(shuffle(new Set(['a']), noDraw), ['a']);
+});
+
+test('randomStream: shared shuffle preserves the existing mixed draw sequence', () => {
+  const stream = randomStream(12345);
+  assert.equal(stream.next(), 0.9797282677609473);
+  assert.deepEqual(stream.shuffle([0, 1, 2, 3, 4]), [0, 3, 2, 4, 1]);
+  assert.equal(stream.next(), 0.34747186047025025);
+});
 
 test('seededStream: same seed string -> identical, infinite stream of next() values, forever', () => {
   const a = seededStream('daily-2026-08-19');
