@@ -37,8 +37,7 @@ paid call is Untested; the on-chain Transfer events to `payTo` are the independe
   real changes (the diff sets `incomplete`), and do not replace a previous complete snapshot as the
   baseline with it. Read `problems` for the reason (page cap, empty page, total changed mid-paging,
   duplicate URLs, malformed amount, multi-option pricing).
-- A response whose `payTo` (or any `accepts[].payTo`) differs from the requested one is refused with
-  an error, never recorded under the requested address.
+- A response whose optional top-level `payTo` differs from the requested one refuses. For **every resource**, payment alternatives must be present and every `accepts[].payTo` must explicitly match the requested merchant. Missing alternatives, omitted payee identities, and mixed-recipient resources refuse rather than laundering unrelated Bazaar activity into the selected merchant. A page-level hint or matching discovery URL alone is not payment-recipient evidence.
 - x402 v2's `GET /discovery/resources` uses the official `items` array; older Bazaar deployments can still use `resources`. The Data reader accepts **exactly one** such array per page, so the original Networking, Causeway and Opportunity clients cannot silently count 0 products from an otherwise valid v2 response. Dual or missing arrays refuse before effect or market inference.
 - Atomic prices remain scoped by actual `network|asset`. `listedPriceUnits` is retained only for a single fully priced rail; it is `null` for mixed, unknown or partially priced rails. `listedPriceUnitsByRail` retains exact atomic totals per known rail, with `null` if any constituent amount is unobserved. `priceRailsComplete` is distinct from source pagination completeness; an incomplete asset label is not evidence that a measured call never occurred.
 - Counters that are absent, non-integral, unsafe (> 2^53 - 1), or malformed are `null`, not `0`.
