@@ -1,0 +1,42 @@
+name: Computer Data pure operations
+
+on:
+  push:
+    paths:
+      - 'src/x402-discovery-snapshot.mjs'
+      - 'test/x402-discovery-snapshot.test.mjs'
+      - 'src/persistent-map.mjs'
+      - 'test/persistent-map.test.mjs'
+      - 'src/randomization/**'
+      - 'test/randomization-*.test.mjs'
+      - '.github/workflows/computer-data-pure-operations.yml'
+  pull_request:
+    paths:
+      - 'src/x402-discovery-snapshot.mjs'
+      - 'test/x402-discovery-snapshot.test.mjs'
+      - 'src/persistent-map.mjs'
+      - 'test/persistent-map.test.mjs'
+      - 'src/randomization/**'
+      - 'test/randomization-*.test.mjs'
+      - '.github/workflows/computer-data-pure-operations.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pure-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exercise original pure Data producers and their consumers
+        run: |
+          node --check src/x402-discovery-snapshot.mjs
+          node --check src/persistent-map.mjs
+          node --test test/x402-discovery-snapshot.test.mjs test/persistent-map.test.mjs test/randomization-hash-seed.test.mjs test/randomization-mulberry32.test.mjs test/randomization-stream.test.mjs
