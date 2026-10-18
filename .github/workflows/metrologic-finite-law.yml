@@ -25,6 +25,7 @@ on:
       - 'services/number-services-section/services/exact-number-data-service/src/framework-rigidity.mjs'
       - 'services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs'
       - 'services/number-services-section/services/exact-number-data-service/test/framework-rigidity.test.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/bin/readout-framework-rigidity.mjs'
       - 'services/number-services-section/services/exact-number-data-service/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
   pull_request:
@@ -52,6 +53,7 @@ on:
       - 'services/number-services-section/services/exact-number-data-service/src/framework-rigidity.mjs'
       - 'services/number-services-section/services/exact-number-data-service/test/resource-measurement.test.mjs'
       - 'services/number-services-section/services/exact-number-data-service/test/framework-rigidity.test.mjs'
+      - 'services/number-services-section/services/exact-number-data-service/bin/readout-framework-rigidity.mjs'
       - 'services/number-services-section/services/exact-number-data-service/package.json'
       - '.github/workflows/metrologic-finite-law.yml'
 permissions:
@@ -137,6 +139,7 @@ jobs:
       - name: Fabricate exact-coordinate planar and three-dimensional contact-rigidity readouts
         run: |
           node --check services/number-services-section/services/exact-number-data-service/src/framework-rigidity.mjs
+          node --check services/number-services-section/services/exact-number-data-service/bin/readout-framework-rigidity.mjs
           node --test services/number-services-section/services/exact-number-data-service/test/rational-matrix.test.mjs services/number-services-section/services/exact-number-data-service/test/framework-rigidity.test.mjs
       - name: Verify canonical exact-number package interface
         run: |
