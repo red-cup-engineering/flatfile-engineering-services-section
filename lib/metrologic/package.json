@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/metrologic",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "type": "module",
   "description": "Metrologic: the data layer's mathematics, the shared JavaScript implementation of the mathematical operations every layer above it uses.",
   "keywords": [
@@ -403,6 +403,9 @@
     },
     "./models/games/concurrent-game": {
       "import": "./src/models/games/concurrent-game.mjs"
+    },
+    "./chu/knowledge-relations": {
+      "import": "./src/chu-knowledge-relations.mjs"
     }
   },
   "files": [
