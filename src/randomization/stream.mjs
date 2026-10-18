@@ -9,6 +9,20 @@ import { hashSeed } from "./hash-seed.mjs";
 import { mulberry32 } from "./mulberry32.mjs";
 
 /**
+ * Fisher–Yates copy of a finite iterable. The caller supplies each draw in
+ * [0, 1); no seed, random source, or input mutation is hidden in the operation.
+ * Exactly max(0, n - 1) draws are consumed for n items.
+ */
+export function shuffle(items, next) {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(next() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+/**
  * Draws from a 32-bit state: `next()` in [0, 1); `int(min, max)` inclusive; `range(min, max)`
  * real; `pick(items)` one element, `undefined` from an empty list; `chance(p)` true with
  * probability p; `shuffle(items)` a Fisher–Yates copy.
@@ -22,14 +36,7 @@ export function randomStream(state) {
     range: (min, max) => min + next() * (max - min),
     pick: (items) => (items.length === 0 ? undefined : items[Math.floor(next() * items.length)]),
     chance: (p) => next() < p,
-    shuffle: (items) => {
-      const out = items.slice();
-      for (let i = out.length - 1; i > 0; i--) {
-        const j = int(0, i);
-        [out[i], out[j]] = [out[j], out[i]];
-      }
-      return out;
-    },
+    shuffle: (items) => shuffle(items, next),
   };
 }
 
