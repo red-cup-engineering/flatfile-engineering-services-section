@@ -21,13 +21,42 @@ provenance:
   received-under: engineering-services-section/lib/agency/skills/realize-research-grounded-engineering-work/SKILL.md
   duty: engineering-services-section/lib/agency/duties/realizing-allocated-engineering-work.json
   dispatched-by: the Leader's standing direction of 2026-10-09, through Bare Cedar Fog's Claude character
-  findings: ../notes/2026/10/09/2026-10-09-note-on-data-bloat-and-drift-in-data-records.md
+  findings: https://github.com/red-cup-engineering/computer-data-engineering-services-section/blob/f767856cf74c330354ff421e6942c4f5a27ea6d4/content/text/documents/articles/notes/2026/10/09/2026-10-09-note-on-data-bloat-and-drift-in-data-records.md
   governing: engineering-services-section/services/computer-engineering-services-section/services/computer-systems-engineering-services-section/content/text/documents/specifications/2026-10-06-metered-derivable-journal.md
 ---
 
 # Record kinds and their carriers
 
 Paths are relative to `lib/emsenn/services/561-group/services/`. "The note" is the findings note named in `provenance.findings`. "The journal spec" is the governing 2026-10-06 specification, whose Laws 1-6 this document applies to `data/records`; it adds no law.
+
+## Source measurement retained without a competing living note
+
+The original [October 9, 2026 measurement](https://github.com/red-cup-engineering/computer-data-engineering-services-section/blob/f767856cf74c330354ff421e6942c4f5a27ea6d4/content/text/documents/articles/notes/2026/10/09/2026-10-09-note-on-data-bloat-and-drift-in-data-records.md) is a
+**dated source observation**, not a current census or an independent operative
+definition. Its exact original bytes and authorship remain available at that
+immutable Git revision; the earlier separately filed findings note is retired
+from the current source tree. The measurements below preserve its key evidence
+in this specification's existing D1 disposition and its receiving obligations.
+
+- The sampled forest held **1,726 files / 76,781,166 bytes** under 130
+  `data/records` kinds. **46,029,296 bytes (59.95%)** were candidates
+  for derivation, contingent on an exact generator/revision match.
+- The observation found **15 exact-blob groups / 23 redundant file paths**,
+  **63 source files** misfiled as records, **454 JSON Schema documents**
+  with no `x-codegen` inputs and **116 unresolved archive-host identifiers**.
+  It also found **137 EAVT-shaped concept rows** stamped with the migration
+  time rather than the original observation time.
+- Distinct author testimony, independently recorded acts, private contact
+  material, immutable historical evidence and unreceived generated outputs
+  cannot be retired by matching names, digests or a brief text summary.
+  The D1 family dispositions and DR-14–19/32/35–37 requirements continue
+  to govern any actual deletion.
+
+The existing Red Cup JSON Schema `censusRecords` implementation and
+`json-schema-census --records` now produce a derived per-kind reading.
+That **does not** establish completed generated emitters, consumer migration
+or receipt of the proposed source-record reductions. Generate the view when
+needed; do not check in another census record or report copy.
 
 ## Statement of the theory this specification realizes
 
