@@ -111,8 +111,13 @@ export function snapshotRecord({ parameters, pages, takenAt, notes = [] }) {
       throw new Error(`snapshotRecord: response payTo ${page.payTo} does not match requested payTo`);
     }
     for (const raw of discoveryPageResources(page)) {
-      for (const a of raw?.accepts ?? []) {
-        if (a?.payTo !== undefined && !same(a.payTo, payTo)) {
+      // A merchant filter and a top-level payTo hint are not evidence that
+      // every discovered resource actually pays this merchant. Require the
+      // original payment requirements, including their own scoped recipient.
+      if (!Array.isArray(raw?.accepts) || raw.accepts.length === 0)
+        throw new TypeError(`snapshotRecord: merchant resource ${String(raw?.resource)} needs payment alternatives`);
+      for (const a of raw.accepts) {
+        if (typeof a?.payTo !== "string" || !same(a.payTo, payTo)) {
           throw new Error(`snapshotRecord: accepts payTo for ${raw.resource} does not match requested payTo`);
         }
       }
