@@ -48,9 +48,20 @@ paid call is Untested; the on-chain Transfer events to `payTo` are the independe
   to the total delta as well. Timestamp activity compares parsed instants rather
   than lexical UTC-offset strings; invalid vendor timestamps cannot prove activity.
   Known activity with unknown payer delta remains `activeWithoutPayerRise`.
-  Amounts that are not integer strings are
-  `null` and mark the snapshot incomplete. Only `accepts[0]` is the headline `amount`; every option's
-  amount is kept in `amounts`, and a diff treats a change in any of them as a price change.
+  Amounts that are not nonnegative atomic-unit integers remain
+  `null` and mark the snapshot incomplete. The Data reader accepts x402 v2's
+  `amount` and v1's `maxAmountRequired` as alternate wire presentations of
+  an exact payment requirement. If both are supplied, they must agree as
+  integer values; malformed/conflicting dual amounts and non-`exact` schemes
+  have unknown prices, never an inferred zero. Only `accepts[0]` is the headline
+  `amount`; every alternative is retained in `paymentOptions` with its
+  original `scheme`, `network`, `asset`, `payTo`, and parsed atomic amount.
+  The older `amounts` projection remains for existing consumers. A price
+  change compares the entire set of payment options, not just the integers:
+  a chain, token, recipient or additional option changing is commercially
+  meaningful even when the headline integer stays equal.
+  These observations are seller-advertised terms, not paid demand, receipts,
+  USD prices, transferable rights or a proof that the service can be delivered.
 
 ## Signals and their limits (Inferred from the field semantics; Untested against two live days)
 
@@ -102,3 +113,14 @@ should write records anywhere; this PR adds the reader only.
 
 A runner, an on-chain Transfer reader, and a cross-check between them are plausible follow-ups. None
 is specified here: each needs its own field list, checkpoint format and schema before it is buildable.
+
+## Current operation and receipt
+
+The original dependency-free Node source and test are selected by
+`.github/workflows/computer-data-pure-operations.yml` along with the shared
+persistent-map and random-stream suppliers. Use the repository's native
+`node --test test/x402-discovery-snapshot.test.mjs` for the full x402 regression
+suite; the tests cover v1/v2, mixed rails, alternative changes and refusals.
+This source/CI selection is **not** the installed merchant, signed payment,
+client acquisition or independently received after-cost profit. Those belong to
+the consuming market service and its actual payment/receiving journal.
