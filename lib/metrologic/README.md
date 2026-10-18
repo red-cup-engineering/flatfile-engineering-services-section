@@ -407,6 +407,40 @@ per-hole counts, failure cases, and all 128 open/closed scenarios
 over the 64 directed port-link graphs with three beads against an
 independently enumerated route-word oracle.
 
+## Signed formal contexts and supported implications
+
+`@red-cup-engineering/metrologic/closure/formal-context` provides
+`withSignedAttributes(ctx)` to extend an existing context's declared alphabet
+to its positive and negative attributes without adding incidence rows.
+`makeContext` keeps its positive-only default when no denial rows are supplied.
+A known but unobserved denial then has empty extent; an unknown attribute
+continues to fail carrier admission.
+
+`lawfulBasis` compiles its exact supported implication family using only
+actually incident columns. This preserves implication closure for every seed,
+including contradictory seeds, while preventing unused negative columns from
+doubling the exponential compilation dimension. Full `dgBasis` and Galois
+prime operators continue to use the complete declared alphabet. The
+preservation argument is in
+[specifications/formal-context.md](specifications/formal-context.md).
+
+## Finite numerical conductance
+
+`@red-cup-engineering/metrologic/articulation/predicating/positing/settling/analysis/numeric-laplacian`
+owns the numerical Laplacian, nonnegative edge energy, symmetric eigenvalues,
+least positive spectral gap, and spectral distance bound over finite indexed
+graphs. Its input is a symmetric nonnegative weight matrix and, where needed,
+a finite scalar vector. Named attributes and evidence projection remain in
+SignCraft's conductance field.
+
+The numerical solver normalizes scales and derives nullity from positive-edge
+connectivity. It refuses nonconvergence and unresolved positive gaps instead
+of treating small conductances as zero. `numericRefusalBound` cancels uniform
+weight scale before computing the quotient, including when a raw energy or
+gap would overflow or underflow. Exact integer/rational graph operations
+remain in `analysis/laplacian`. The complete component contract and numerical
+limits are in [specifications/numeric-laplacian.md](specifications/numeric-laplacian.md).
+
 ## Finite numerical probability laws (distinct from FOUR knowledge)
 
 `@red-cup-engineering/metrologic/number/finite-law` owns three
@@ -454,3 +488,4 @@ pnpm test
 ```
 
 Runtime exports load directly from JavaScript ESM source; no TypeScript build is required.
+
