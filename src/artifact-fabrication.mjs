@@ -146,6 +146,10 @@ export const DEFINITIONALLY_EXACT_PARAMETERS = Object.freeze({
   "minutes-per-hour": Object.freeze({ value: 60, unit: "min/h" }),
   "hours-per-day": Object.freeze({ value: 24, unit: "h/d" }),
   "seconds-per-day": Object.freeze({ value: 86400, unit: "s/d" }),
+  "seconds-per-hour": Object.freeze({ value: 3600, unit: "s/h" }),
+  "seconds-per-week": Object.freeze({ value: 604800, unit: "s/week" }),
+  "days-per-week": Object.freeze({ value: 7, unit: "d/week" }),
+  "joules-per-kilowatt-hour": Object.freeze({ value: 3600000, unit: "J/kWh" }),
   "cents-per-dollar": Object.freeze({ value: 100, unit: "cent/USD" }),
   "percent-denominator": Object.freeze({ value: 100, unit: "percent" }),
 });
