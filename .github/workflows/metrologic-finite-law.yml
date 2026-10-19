@@ -11,6 +11,8 @@ on:
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs'
       - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/causal-kinematic.test.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal-past-wall.mjs'
+      - 'lib/metrologic/test/causal-past-wall.test.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-condensate.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-graph.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs'
@@ -41,6 +43,8 @@ on:
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs'
       - 'lib/metrologic/test/causal-mobius.test.mjs'
       - 'lib/metrologic/test/causal-kinematic.test.mjs'
+      - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal-past-wall.mjs'
+      - 'lib/metrologic/test/causal-past-wall.test.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-condensate.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-graph.mjs'
       - 'lib/metrologic/src/articulation/predicating/positing/settling/analysis/port-thread-routing.mjs'
@@ -90,6 +94,12 @@ jobs:
           node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal.mjs
           node --check lib/metrologic/test/causal-kinematic.test.mjs
           node --test lib/metrologic/test/causal-kinematic.test.mjs
+
+      - name: Verify derived principal-past walls and exact Euclidean trigonometry
+        run: |
+          node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/causal-past-wall.mjs
+          node --check lib/metrologic/test/causal-past-wall.test.mjs
+          node --test lib/metrologic/test/causal-past-wall.test.mjs
       - name: Verify finite chromatic motion and exact integer guards
         run: |
           node --check lib/metrologic/src/articulation/predicating/positing/settling/analysis/chromatic-lorentzian.mjs

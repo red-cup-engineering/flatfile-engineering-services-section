@@ -481,6 +481,38 @@ import { chuSpaceOfMatrix } from "@red-cup-engineering/metrologic/articulation/p
 Do not rederive bilattice, hyperdoctrine, readout, or Chu operations locally.
 Extend the defining mathematical module when a consumer needs another operation; consumers import that module directly.
 
+## Finite causal-wall and Euclidean-angle shadows
+
+The exact finite derivation in Obsmetrologia's [October 19 causal-diamonds
+research](https://github.com/lenticule-science/obsmetrologia/blob/main/docs/research/2026-10-19-causal-diamonds-crofton-contrasts-foata.md)
+is executable here without postulating any ambient geometry. The pure
+`./articulation/predicating/positing/settling/analysis/causal-past-wall`
+export accepts an already generated **finite strict transitive order**:
+`{pointCount, precedence:[{parent,child}]}`. Its
+`finitePastWallMetricOf` derives each principal causal past and exact
+separating-wall distance `|P(x) △ P(y)|`; its `finitePastWallAngleOf`
+recovers the exact dot product and cosine from the induced binary
+characteristic-vector embedding. Unit walls and Euclidean inner product
+are explicitly chosen *downstream readouts*, not proof of physical angles.
+
+For callers with a K(C) derived from the original
+`kinematicDiamondSpaceOf`, the existing `analysis/causal` export now
+provides `kinematicPastWallMetricOf(space)` and
+`kinematicPastWallAngleOf(space,{vertex,first,second})`.
+They **revalidate** deserialized spaces through the original canonical
+kinematic geometry. A missing transitive edge or forged sequencing order
+cannot create a metric. Zero-length angle arms refuse; complete
+transitively-closed precedence and a bounded carrier are required.
+
+The distance is both a unit-wall metric and a *squared* Euclidean distance
+in a derived Hamming-cube embedding. A physical length, angle, Crofton
+measure, Ryu–Takayanagi entropy, quantum positivity law, arbitrary
+L-Space coordinate or recipient permission does not follow from it.
+The full source-owned finite test exercises 1,100 independently derived
+small K(C) orders and a branched counterexample. Machine-facing numbers
+are JSON-safe; encoding, units, network negotiation and authentication
+remain in their proper downstream owners.
+
 ## Development
 
 ```sh
