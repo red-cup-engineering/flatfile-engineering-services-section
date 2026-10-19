@@ -195,6 +195,7 @@ test("legacy version 1 candidates are admitted unchanged and list their migratio
     { code: "RESTRICTION_WITHOUT_CLAIM", path: "prohibitions[0]" },
   ]);
   assert.deepEqual(findArtifactFabricationEpistemicDebt(null), []);
+  assert.deepEqual(findArtifactFabricationEpistemicDebt(candidate()), [], "a version 2 candidate has no debt: the admission binds it");
   assert.equal(admitArtifactFabricationSpecification({ ...legacy(), claims: [] }).code, "UNEXPECTED_FIELDS");
 });
 
