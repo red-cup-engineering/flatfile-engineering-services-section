@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { makeNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
 import { semanticId } from "@red-cup-engineering/semiotic-content-address";
-import { markResource, bitAt, bitWindow, bitValues, markSpace, joinMarkSpaces } from "../src/digital-mark-space.mjs";
+import { markResource, markBytes, bitAt, bitWindow, bitValues, markSpace, joinMarkSpaces } from "../src/digital-mark-space.mjs";
 
 test("arbitrary binary media share one canonical NI address and exact MSB-first bit coordinates", () => {
   const bytes = Uint8Array.from([0xa5, 0x01, 0xff]);
@@ -175,4 +175,27 @@ test("a source-owned union admits more than 64 finite independent charts and 409
   assert.throws(()=>joinMarkSpaces([sources[0]], {relations:[testimony[0]]}),
     /known address endpoints/);
   assert.throws(()=>joinMarkSpaces([...sources,{...sources[0]}]),/admitted mark space/);
+});
+
+
+test("standards consumers recover exact bytes without changing original Mark identity", () => {
+  const input = new TextEncoder().encode('<https://example.org/s> <https://example.org/p> "x" .\n');
+  const original = Uint8Array.from(input);
+  const source = markResource(input, { mediaType: "application/n-quads" });
+  const address = source.address;
+  input.fill(0);
+  const delivered = markBytes(source);
+  assert.deepEqual(delivered, original);
+  assert.deepEqual(markBytes(source, { offset: 1, length: 9 }), original.slice(1, 10));
+  delivered.fill(255);
+  assert.deepEqual(markBytes(source), original, "transport copy cannot mutate admitted bytes");
+  assert.equal(source.address, address);
+  assert.equal(makeNiUri(markBytes(source)), address);
+  assert.deepEqual(markBytes(markResource(new Uint8Array(0))), new Uint8Array(0));
+  assert.deepEqual(markBytes(source, { offset: original.length, length: 0 }), new Uint8Array(0));
+  assert.throws(() => markBytes({ ...source }), /admitted mark resource/u);
+  for (const bad of [
+    {offset: -1}, {offset: 0.5}, {offset: original.length + 1},
+    {length: -1}, {length: original.length + 1}
+  ]) assert.throws(() => markBytes(source, bad), /byte range/u);
 });
