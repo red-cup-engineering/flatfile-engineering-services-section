@@ -409,6 +409,9 @@
     },
     "./chu/indexed-knowledge-relations": {
       "import": "./src/indexed-knowledge-relations.mjs"
+    },
+    "./articulation/predicating/positing/settling/analysis/causal-past-wall": {
+      "import": "./src/articulation/predicating/positing/settling/analysis/causal-past-wall.mjs"
     }
   },
   "files": [
