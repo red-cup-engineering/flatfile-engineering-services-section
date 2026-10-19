@@ -363,9 +363,10 @@ export function summarizeArtifactFabricationClaims(specification) {
   const count = (status) => claims.filter((claim) => claim.status === status).length;
   return Object.freeze({ measured: count("measured"), derived: count("derived"), conjectured: count("conjectured"), derivedOnConjecture: claims.filter((claim) => claim.status === "derived" && claim.groundedOn.length > 0).length });
 }
-/** Lists, without refusing, what a version 1 candidate would be refused for at version 2: its migration debt. */
+/** Lists, without refusing, what a version 1 candidate would be refused for at version 2: its migration debt. A version 2 candidate has none: the admission binds it. */
 export function findArtifactFabricationEpistemicDebt(candidate) {
   const debt = [];
+  if (record(candidate) && candidate.version === 2) return Object.freeze(debt);
   const scan = (items, name, restriction) => {
     if (!Array.isArray(items)) return;
     items.forEach((item, index) => {
