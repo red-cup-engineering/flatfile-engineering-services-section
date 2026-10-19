@@ -18,3 +18,7 @@
 	path = lib/semiotic-content-address
 	url = https://github.com/red-cup-engineering/semiotic-content-address-system.git
 	branch = main
+[submodule "exact-number-data-service"]
+	path = services/number-services-section/services/exact-number-data-service
+	url = https://github.com/red-cup-engineering/exact-number-data-service.git
+	branch = main
