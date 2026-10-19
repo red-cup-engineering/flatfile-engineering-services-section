@@ -5,6 +5,8 @@ import {
   admitArtifactFabricationRealizationReceipt,
   admitArtifactFabricationSpecification,
   DEFINITIONALLY_EXACT_PARAMETERS,
+  codeSpanIsParameter,
+  firstBareNumber,
   findArtifactFabricationEpistemicDebt,
   summarizeArtifactFabricationClaims,
 } from "../src/artifact-fabrication.mjs";
@@ -250,4 +252,26 @@ test("admission is idempotent: an admitted version 2 specification re-admits to 
   const lie = structuredClone({ type: "ArtifactFabricationSpecificationCandidate", ...rest });
   lie.claims.find(({ id }) => id === "fill-rate").groundedOn = [];
   assert.equal(admitArtifactFabricationSpecification(lie).code, "GROUNDING_MISMATCH");
+});
+
+test("code spans are scanned: identifiers, versions and dates pass; parameters need a claim", () => {
+  for (const span of ["sha256", "utf8", "v24", "RFC 8949", "ISO 8601", "0.7.0", "v1.2.3-rc.1", "2026-10-19", "/api/v2/markets", "eavt-services-section", "\"depth\""]) {
+    const value = candidate(); value.requirements[0].statement = `The gate shall halt within {{halt}} per \`${span}\``;
+    const r = refusalOf(value); assert.equal(r.type, "ArtifactFabricationSpecification", `${span}: ${r.code} ${r.message}`);
+  }
+  for (const span of ["per_page=50", "limit: 500", "\"limit\": 50", "50", "10,000", "x >= 3", "limit<10", "60 * 5", "2 + 3", "depth==4"]) {
+    assertRefused((v) => { v.requirements[0].statement = `The gate shall page with \`${span}\``; }, "PARAMETER_WITHOUT_CLAIM");
+  }
+  assertRefused((v) => { v.acceptanceObligations[0].statement = "Verify `retries=3` halts"; }, "PARAMETER_WITHOUT_CLAIM");
+  assert.equal(codeSpanIsParameter("per_page=50"), true);
+  assert.equal(codeSpanIsParameter("sha256"), false);
+  assert.equal(firstBareNumber("page with `per_page=50`"), "per_page=50");
+  assert.equal(firstBareNumber("use `utf8` and {{n}}"), null);
+});
+
+test("the epistemic-debt finder scans code spans the same way", () => {
+  const value = candidate(); value.version = 1;
+  value.requirements = [{ statement: "Page with `per_page=50`" }, { statement: "Digest with `sha256`" }];
+  const debt = findArtifactFabricationEpistemicDebt(value);
+  assert.deepEqual(debt.filter((d) => d.code === "PARAMETER_WITHOUT_CLAIM").map((d) => d.path), ["requirements[0].statement"]);
 });

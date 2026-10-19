@@ -269,13 +269,35 @@ function parametersOf(value, path, claims) {
     return { type: "ArtifactFabricationParameter", version: 1, name, value: item.value, unit, claimId: item.claimId, exact: item.exact };
   });
 }
+const CODE_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_.\-/]*$/u;
+const CODE_VERSION = /^v?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.\-+]+)?$/u;
+const CODE_DATE = /^\d{4}-\d{2}-\d{2}(?:T[0-9:.]+Z?)?$/u;
+const CODE_PARAMETER = [
+  /^[-+]?\d[\d,]*(?:\.\d+)?%?$/u,
+  /(?:^|[^\w.])["']?[A-Za-z_][\w.\-]*["']?\s*(?:=|:|==|===|!=|<=|>=|<|>)\s*[-+]?\d/u,
+  /[<>]=?\s*[-+]?\d|\d\s*[<>]/u,
+  /\d\s*[+*\/×÷]\s*\d|\d\s+-\s+\d/u,
+];
+/** A backtick span is an identifier, version, date, or locator (admitted without a claim), or a parameter: `name=number`, `name: number`, a bare number, a comparison, or arithmetic. */
+export function codeSpanIsParameter(span) {
+  const code = span.trim();
+  if (!/\d/u.test(code)) return false;
+  if (CODE_IDENTIFIER.test(code) || CODE_VERSION.test(code) || CODE_DATE.test(code)) return false;
+  return CODE_PARAMETER.some((pattern) => pattern.test(code));
+}
+/** The first bare number in a statement, scanning prose and code spans alike; placeholders are not numbers. */
+export function firstBareNumber(statement) {
+  const noPlaceholders = statement.replace(/\{\{[^{}]*\}\}/gu, " ");
+  for (const [, span] of noPlaceholders.matchAll(/`([^`\n]*)`/gu)) if (codeSpanIsParameter(span)) return span.trim();
+  const literal = NUMERIC_LITERAL.exec(noPlaceholders.replace(/`[^`\n]*`/gu, " "));
+  return literal ? literal[0] : null;
+}
 /** Refuses a numeric literal in a clause statement; a number enters only as a declared `{{parameter}}`. */
 function statementWithoutBareNumbers(statement, parameters, path) {
   const declared = new Set(parameters.map(({ name }) => name));
   for (const [, name] of statement.matchAll(/\{\{([^{}]*)\}\}/gu)) if (!declared.has(name)) refuse("UNKNOWN_PARAMETER_PLACEHOLDER", `${path} places {{${name}}} but declares no such parameter`, path);
-  const bare = statement.replace(/\{\{[^{}]*\}\}/gu, " ").replace(/`[^`\n]*`/gu, " ");
-  const literal = NUMERIC_LITERAL.exec(bare);
-  if (literal) refuse("PARAMETER_WITHOUT_CLAIM", `${path} carries the bare number ${literal[0]}; declare it as a parameter that references a claim`, path);
+  const literal = firstBareNumber(statement);
+  if (literal) refuse("PARAMETER_WITHOUT_CLAIM", `${path} carries the bare number ${literal}; declare it as a parameter that references a claim`, path);
   return statement;
 }
 function epistemicItem(item, path, claims, { statementKey, restriction, scan = true }) {
@@ -376,7 +398,7 @@ export function findArtifactFabricationEpistemicDebt(candidate) {
     items.forEach((item, index) => {
       if (!record(item) || (name === "constraints" && item.kind !== "operational")) return;
       const path = `${name}[${index}]`;
-      if (typeof item.statement === "string" && NUMERIC_LITERAL.test(item.statement.replace(/`[^`\n]*`/gu, " "))) debt.push({ code: "PARAMETER_WITHOUT_CLAIM", path: `${path}.statement` });
+      if (typeof item.statement === "string" && firstBareNumber(item.statement) !== null) debt.push({ code: "PARAMETER_WITHOUT_CLAIM", path: `${path}.statement` });
       if (restriction) debt.push({ code: "RESTRICTION_WITHOUT_CLAIM", path });
     });
   };
