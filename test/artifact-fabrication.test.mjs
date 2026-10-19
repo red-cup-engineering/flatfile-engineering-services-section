@@ -214,3 +214,18 @@ test("plans and receipts bind both specification versions and require evidence f
   }
   assert.equal(admitArtifactFabricationRealizationPlan({ type: "ArtifactFabricationSpecification", version: 3, specificationDigest: "x" }, {}).code, "INVALID_SPECIFICATION");
 });
+
+test("admission is idempotent: an admitted version 2 specification re-admits to itself, and a false grounding is refused", () => {
+  const value = candidate();
+  value.claims.push(conjectureClaim(), { ...derivedClaim(), id: "fill-rate", quantity: { type: "ArtifactFabricationQuantity", value: 0.5, unit: "ratio" }, basis: { ...derivedClaim().basis, premises: [{ type: "ArtifactFabricationPremise", kind: "claim", ref: "queue-share" }] } });
+  value.acceptanceObligations.push(assay());
+  value.traceability[0].acceptanceObligationIds.push("measure-queue");
+  const admitted = refusalOf(value);
+  assert.equal(admitted.type, "ArtifactFabricationSpecification", admitted.message);
+  const { specificationDigest, type, ...rest } = admitted;
+  const again = admitArtifactFabricationSpecification({ type: "ArtifactFabricationSpecificationCandidate", ...rest });
+  assert.equal(again.specificationDigest, specificationDigest);
+  const lie = structuredClone({ type: "ArtifactFabricationSpecificationCandidate", ...rest });
+  lie.claims.find(({ id }) => id === "fill-rate").groundedOn = [];
+  assert.equal(admitArtifactFabricationSpecification(lie).code, "GROUNDING_MISMATCH");
+});
