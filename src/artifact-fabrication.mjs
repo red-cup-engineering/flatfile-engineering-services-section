@@ -198,8 +198,12 @@ function quantity(value, path) {
 function claimsOf(value, premiseIds) {
   if (!Array.isArray(value)) refuse("INVALID_CLAIMS", "claims must be an array", "claims");
   const seen = new Set();
-  const admitted = value.map((item, index) => {
-    const path = `claims[${index}]`; exact(item, ["type", "version", "id", "kind", "statement", "status", "quantity", "basis", "sourceSpan"], path);
+  const stated = new Map();
+  const admitted = value.map((given, index) => {
+    // An admitted claim carries the `groundedOn` the admission computed; re-admitting it must reproduce it.
+    const path = `claims[${index}]`; const { groundedOn, ...item } = record(given) ? given : {};
+    exact(record(given) ? item : given, ["type", "version", "id", "kind", "statement", "status", "quantity", "basis", "sourceSpan"], path);
+    if (groundedOn !== undefined) stated.set(item.id, groundedOn);
     if (item.type !== "ArtifactFabricationClaim" || item.version !== 1 || !CLAIM_KINDS.includes(item.kind)) refuse("INVALID_CLAIM", `${path} must be ArtifactFabricationClaim@1 of kind ${CLAIM_KINDS.join(", ")}`, path);
     if (!EPISTEMIC_STATUSES.includes(item.status)) refuse("INVALID_EPISTEMIC_STATUS", `${path}.status must be measured, derived or conjectured`, `${path}.status`);
     const claimId = id(item.id, `${path}.id`); if (seen.has(claimId)) refuse("DUPLICATE_CLAIM_ID", `claims repeats ${claimId}`, path); seen.add(claimId);
@@ -225,7 +229,11 @@ function claimsOf(value, premiseIds) {
     else { result = new Set(); for (const premise of claim.basis.premises) if (premise.kind === "claim") for (const root of ground(byId.get(premise.ref))) result.add(root); }
     visiting.delete(claim.id); grounding.set(claim.id, result); return result;
   };
-  return admitted.map((claim) => ({ ...claim, groundedOn: [...ground(claim)].sort() }));
+  return admitted.map((claim) => {
+    const groundedOn = [...ground(claim)].sort();
+    if (stated.has(claim.id) && JSON.stringify(stated.get(claim.id)) !== JSON.stringify(groundedOn)) refuse("GROUNDING_MISMATCH", `claim ${claim.id} states a grounding other than the conjectures it rests on`, `claims.${claim.id}`);
+    return { ...claim, groundedOn };
+  });
 }
 function claimReferences(value, path, claims) {
   if (!Array.isArray(value)) refuse("INVALID_CLAIM_REFERENCES", `${path}.claimIds must be an array`, `${path}.claimIds`);

@@ -80,6 +80,7 @@ Each statement gives a positive, an alternate and a refusal example. "Admits" me
 **S9. The admission shall version its candidate.** Version 2 carries claims and binds S1 to S8. Version 1, the unclaimed form the translators emit, is admitted unchanged, with the same record and digest, so existing consumers keep working until their producers migrate; version 1 cannot express a claim, so the law cannot bind it. `findArtifactFabricationEpistemicDebt` lists what a version 1 candidate would be refused for at version 2.
 - Positive: a version 1 candidate is admitted as before; a version 2 candidate is admitted as a version 2 specification.
 - Alternate: a version 1 candidate with a bare number lists `PARAMETER_WITHOUT_CLAIM` in its debt.
+- Alternate: an admitted version 2 specification, with its `specificationDigest` removed, re-admits to the same digest; a `groundedOn` it states must be the one the admission computes, or the claim refuses `GROUNDING_MISMATCH`.
 - Refusal: any other version refuses `UNSUPPORTED_CANDIDATE_VERSION`; a version 2 candidate with a version 1 clause refuses `INVALID_CLAUSE`.
 
 **S10. Plan and receipt admissions shall bind a version 1 or version 2 specification, and a receipt shall carry evidence for every projection and acceptance obligation.**
