@@ -391,15 +391,8 @@ function refusal(error, type) {
   throw error;
 }
 
-/**
- * Admits a closed-world, language-neutral artifact fabrication specification without ambient I/O.
- * Version 2 candidates carry typed epistemic claims and bind the epistemic law; version 1 candidates
- * are the legacy unclaimed form, admitted unchanged (same record, same digest) until their producers migrate.
- */
-export function admitArtifactFabricationSpecification(candidate) {
-  try {
-    if (record(candidate) && candidate.version === 2) return admitSpecificationV2(candidate);
-    if (record(candidate) && typeof candidate.version === "number" && candidate.version !== 1) refuse("UNSUPPORTED_CANDIDATE_VERSION", "candidate version must be 1 (legacy, unclaimed) or 2 (epistemic claims)", "candidate");
+/** The legacy unclaimed form (candidate version 1). Throws a Refusal; reached only to read a record whose digest is already admitted. */
+function admitSpecificationV1(candidate) {
     exact(candidate, ["type", "version", "source", "artifact", "requirements", "prohibitions", "openQuestions", "constraints", "projections", "acceptanceObligations", "traceability"], "candidate");
     if (candidate.type !== "ArtifactFabricationSpecificationCandidate" || candidate.version !== 1) refuse("INVALID_CANDIDATE", "candidate must be ArtifactFabricationSpecificationCandidate@1", "candidate");
     const requirements = clauses(candidate.requirements, "requirements", "ArtifactFabricationRequirement", "statement", true);
@@ -410,6 +403,24 @@ export function admitArtifactFabricationSpecification(candidate) {
     admitted.traceability = traceability(candidate.traceability, clauseIds, new Set(admitted.constraints.map(({ id: value }) => value)), new Set(admitted.projections.map(({ id: value }) => value)), new Set(admitted.acceptanceObligations.map(({ id: value }) => value)));
     admitted.specificationDigest = semanticId(admitted);
     return freeze(admitted);
+}
+
+/**
+ * Admits a closed-world, language-neutral artifact fabrication specification without ambient I/O.
+ * Version 2 candidates carry typed epistemic claims and bind the epistemic law; version 1 candidates
+ * are the legacy unclaimed form, admitted unchanged (same record, same digest) until their producers migrate.
+ */
+export function admitArtifactFabricationSpecification(candidate, { admittedDigest } = {}) {
+  try {
+    let admitted;
+    if (record(candidate) && candidate.version === 2) admitted = admitSpecificationV2(candidate);
+    else {
+      if (record(candidate) && typeof candidate.version === "number" && candidate.version !== 1) refuse("UNSUPPORTED_CANDIDATE_VERSION", "candidate version must be 2 (epistemic claims); version 1 is retired and is read only against the digest it was admitted under", "candidate");
+      if (record(candidate) && candidate.version === 1 && admittedDigest === undefined) refuse("LEGACY_CANDIDATE_RETIRED", "version 1 (unclaimed) candidates are retired: the producer states its claims and emits version 2. A stored version 1 specification is read by passing the digest it was admitted under as { admittedDigest }", "candidate");
+      admitted = admitSpecificationV1(candidate);
+    }
+    if (admittedDigest !== undefined && admitted.specificationDigest !== admittedDigest) refuse("ADMITTED_DIGEST_MISMATCH", "the candidate does not re-admit to the digest it is read under", "candidate");
+    return admitted;
   } catch (error) { return refusal(error, "ArtifactFabricationSpecificationRefusal"); }
 }
 

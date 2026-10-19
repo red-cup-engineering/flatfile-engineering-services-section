@@ -171,6 +171,7 @@ test("a dependency, API or behavior is only ever a measured claim", () => {
 test("clauses must be at the claim-bearing version and candidates versioned", () => {
   assertRefused((v) => { v.requirements[0].version = 1; }, "INVALID_CLAUSE");
   assertRefused((v) => { v.version = 3; }, "UNSUPPORTED_CANDIDATE_VERSION");
+  assert.equal(admitArtifactFabricationSpecification({ ...legacy(), version: 0 }).code, "UNSUPPORTED_CANDIDATE_VERSION");
   assertRefused((v) => { delete v.claims; }, "UNEXPECTED_FIELDS");
   assertRefused((v) => { v.constraints = [constraint("law", "law")]; }, "MISSING_STANDARD");
 });
@@ -187,8 +188,26 @@ function legacy() {
   };
 }
 
-test("legacy version 1 candidates are admitted unchanged and list their migration debt", () => {
-  const admitted = admitArtifactFabricationSpecification(legacy());
+// The digest the legacy fixture was admitted under, before version 1 was retired (the record and its digest are unchanged).
+const LEGACY_DIGEST = "ni:///sha-256;AzuFL1eOPxS0FT71kUNtGbRDWhdxaGccWLhK9MJ_01s";
+const readLegacy = () => admitArtifactFabricationSpecification(legacy(), { admittedDigest: LEGACY_DIGEST });
+
+test("a new version 1 candidate is retired, and a stored one is read only against the digest it was admitted under", () => {
+  const retired = admitArtifactFabricationSpecification(legacy());
+  assert.equal(retired.type, "ArtifactFabricationSpecificationRefusal");
+  assert.equal(retired.code, "LEGACY_CANDIDATE_RETIRED");
+  const read = readLegacy();
+  assert.equal(read.type, "ArtifactFabricationSpecification");
+  assert.equal(read.specificationDigest, LEGACY_DIGEST, "the stored record's digest is unchanged");
+  const edited = legacy(); edited.requirements[0].statement = "The gate shall halt within 6 seconds";
+  assert.equal(admitArtifactFabricationSpecification(edited, { admittedDigest: LEGACY_DIGEST }).code, "ADMITTED_DIGEST_MISMATCH");
+  assert.equal(admitArtifactFabricationSpecification(candidate(), { admittedDigest: "ni:///sha-256;wrong" }).code, "ADMITTED_DIGEST_MISMATCH");
+  const v2 = refusalOf(candidate());
+  assert.equal(admitArtifactFabricationSpecification(candidate(), { admittedDigest: v2.specificationDigest }).specificationDigest, v2.specificationDigest);
+});
+
+test("a stored version 1 specification reads unchanged and lists its migration debt", () => {
+  const admitted = readLegacy();
   assert.equal(admitted.type, "ArtifactFabricationSpecification");
   assert.equal(admitted.version, 1);
   assert.equal("claims" in admitted, false);
@@ -198,11 +217,11 @@ test("legacy version 1 candidates are admitted unchanged and list their migratio
   ]);
   assert.deepEqual(findArtifactFabricationEpistemicDebt(null), []);
   assert.deepEqual(findArtifactFabricationEpistemicDebt(candidate()), [], "a version 2 candidate has no debt: the admission binds it");
-  assert.equal(admitArtifactFabricationSpecification({ ...legacy(), claims: [] }).code, "UNEXPECTED_FIELDS");
+  assert.equal(admitArtifactFabricationSpecification({ ...legacy(), claims: [] }, { admittedDigest: LEGACY_DIGEST }).code, "UNEXPECTED_FIELDS");
 });
 
 test("plans and receipts bind both specification versions and require evidence for every projection and obligation", () => {
-  for (const specification of [admitArtifactFabricationSpecification(legacy()), refusalOf(candidate())]) {
+  for (const specification of [readLegacy(), refusalOf(candidate())]) {
     const plan = { type: "ArtifactFabricationRealizationPlanCandidate", version: 1, artifactId: "gate", specificationDigest: specification.specificationDigest, projectionIds: ["package"], acceptanceObligationIds: ["accept"] };
     assert.equal(admitArtifactFabricationRealizationPlan(specification, plan).type, "ArtifactFabricationRealizationPlan");
     assert.equal(admitArtifactFabricationRealizationPlan(specification, { ...plan, acceptanceObligationIds: [] }).code, "INCOMPLETE_PLAN_COVERAGE");
