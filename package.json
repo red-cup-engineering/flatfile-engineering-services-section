@@ -10,8 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/red-cup-engineering/bare-cedar-fog.git",
-    "directory": "services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/computer-file-engineering-services-section/services/flatfile-engineering-services-section"
+    "url": "git+https://github.com/red-cup-engineering/flatfile-engineering-services-section.git"
   },
   "engines": {
     "node": ">=22"
