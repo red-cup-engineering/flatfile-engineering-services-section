@@ -423,3 +423,22 @@ test("unknown exact price or unsupported scheme cannot become sellable zero-pric
   });
   assert.equal(taken([missing], "2026-10-18T17:00:00Z").resources[0].amount, null);
 });
+
+
+test("x402 discovery refuses normalized invalid dates and retains nanosecond differences", () => {
+  const beforeListing = withResources(resources => { resources[1].quality.lastCalledAt = "2026-02-28T23:59:59.999999999Z"; });
+  const before = taken([beforeListing], "2026-03-01T00:00:00Z");
+  const bad = withResources(resources => { resources[1].quality.lastCalledAt = "2026-02-31T00:00:00Z"; });
+  assert.deepEqual(diffSnapshots(before, taken([bad], "2026-03-01T01:00:00Z")).active, []);
+  const good = withResources(resources => { resources[1].quality.lastCalledAt = "2026-03-01T00:00:00.000000001Z"; });
+  assert.deepEqual(diffSnapshots(before, taken([good], "2026-03-01T01:00:00Z")).active, [good.resources[1].resource]);
+});
+
+test("an unparseable newly added resource time cannot invent an observed call", () => {
+  const before = taken([base()], "2026-03-01T00:00:00Z");
+  const later = base();
+  const item = entry("unknown-added", { calls: 0, payers: 0, last: "2026-02-31T00:00:00Z" });
+  later.resources.push(item);
+  later.pagination.total = later.resources.length;
+  assert.deepEqual(diffSnapshots(before, taken([later], "2026-03-02T00:00:00Z")).active, []);
+});

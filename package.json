@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/computer-data-engineering-services-section",
-  "version": "0.6.1",
+  "version": "0.6.2-dev.1",
   "private": false,
   "type": "module",
   "description": "Root for data concepts ordered by the prerequisites their services require: FOUR, exact numbers, the closure regimes, and the statics of the semiotic expression notation (its grammar, typing judgment, JSON bridge and the semantic identity of JSON content). Its lib holds Metrologic, the data layer's mathematics.",
@@ -49,7 +49,8 @@
     "./digital-mark-space": "./src/digital-mark-space.mjs",
     "./content-space-operation-schemas": "./src/content-space-operation-schemas.mjs",
     "./persistent-map": "./src/persistent-map.mjs",
-    "./simulation/discrete-clock": "./src/simulation/discrete-clock.mjs"
+    "./simulation/discrete-clock": "./src/simulation/discrete-clock.mjs",
+    "./time/rfc3339": "./src/time/rfc3339.mjs"
   },
   "files": [
     "bin",

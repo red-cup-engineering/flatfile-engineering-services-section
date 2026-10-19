@@ -1,3 +1,5 @@
+import { compareRfc3339Instants, parseRfc3339Instant } from "./time/rfc3339.mjs";
+
 /**
  * x402-discovery-snapshot - dated records of a merchant's demand as the x402 Bazaar discovery
  * service reports it, and the day-over-day diff of two such records.
@@ -279,21 +281,13 @@ export function diffSnapshots(previous, next) {
       || counterCoverageChanged || was.lastCalledAt !== now.lastCalledAt || delta.priceChanged;
     if (moved) changed.push(delta);
   }
-  // Compare RFC3339-style instants chronologically. Offsets have different
-  // lexicographic order, and an invalid vendor timestamp proves no activity.
-  const instant = (value) => {
-    if (typeof value !== "string" ||
-        !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/u.test(value)) return null;
-    const millis = Date.parse(value);
-    return Number.isFinite(millis) ? millis : null;
-  };
-  const advanced = (d) => {
-    const to = instant(d.lastCalledAt.to);
-    const from = instant(d.lastCalledAt.from);
-    return to !== null && (d.lastCalledAt.from === null || (from !== null && to > from));
-  };
+  // Date identity comes from Computer Data, not an x402-specific parser.
+  const advanced = d => d.lastCalledAt.to !== null &&
+    parseRfc3339Instant(d.lastCalledAt.to) !== null &&
+    (d.lastCalledAt.from === null ||
+      compareRfc3339Instants(d.lastCalledAt.from, d.lastCalledAt.to) === -1);
   const activeChanged = changed.filter(advanced);
-  const activeAdded = addedEntries.filter((r) => r.lastCalledAt !== null || (r.calls30d ?? 0) > 0);
+  const activeAdded = addedEntries.filter((r) => parseRfc3339Instant(r.lastCalledAt) !== null || (r.calls30d ?? 0) > 0);
   return Object.freeze({
     from: previous.takenAt,
     to: next.takenAt,
