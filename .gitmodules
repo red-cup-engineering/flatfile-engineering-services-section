@@ -22,3 +22,7 @@
 	path = services/number-services-section/services/exact-number-data-service
 	url = https://github.com/red-cup-engineering/exact-number-data-service.git
 	branch = main
+[submodule "credential-custody-service"]
+	path = services/credential-custody-service
+	url = https://github.com/red-cup-engineering/credential-custody-service.git
+	branch = main
