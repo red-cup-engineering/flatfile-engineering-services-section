@@ -114,6 +114,8 @@ test("every number names a claim or a definitionally exact constant", () => {
   exactValue.requirements[0].parameters.push(param("minute", 60, "s/min", null, "seconds-per-minute"));
   assert.equal(refusalOf(exactValue).type, "ArtifactFabricationSpecification");
   assert.ok(DEFINITIONALLY_EXACT_PARAMETERS["cents-per-dollar"]);
+  for (const [name, value] of [["seconds-per-hour", 3600], ["seconds-per-week", 604800], ["days-per-week", 7], ["joules-per-kilowatt-hour", 3600000]]) assert.equal(DEFINITIONALLY_EXACT_PARAMETERS[name].value, value);
+  assert.equal(DEFINITIONALLY_EXACT_PARAMETERS["seconds-per-week"].value, DEFINITIONALLY_EXACT_PARAMETERS["seconds-per-day"].value * DEFINITIONALLY_EXACT_PARAMETERS["days-per-week"].value);
   assertRefused((v) => { v.requirements[0].parameters[0].claimId = null; }, "PARAMETER_WITHOUT_CLAIM");
   assertRefused((v) => { v.requirements[0].statement = "The gate shall halt after 5 seconds"; }, "PARAMETER_WITHOUT_CLAIM");
   assertRefused((v) => { v.acceptanceObligations[0].statement = "Verify at least 3 halts"; }, "PARAMETER_WITHOUT_CLAIM");
