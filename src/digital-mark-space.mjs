@@ -47,6 +47,27 @@ export function markResource(bytes, { mediaType = "application/octet-stream", so
   return resource;
 }
 
+/**
+ * Recover the exact binary payload for an authorized consumer of this admitted
+ * resource. The caller receives a NEW Uint8Array and cannot mutate the bytes
+ * committed to the original raw RFC 6920 address. This operation interprets
+ * neither the MIME presentation nor the content's meaning.
+ *
+ * A media transport, standards codec, or later SignCell witness can therefore
+ * consume exactly the original bytes instead of fabricating the input again
+ * from per-bit coordinates or trusting an address-only JSON description.
+ */
+export function markBytes(resource, { offset = 0, length } = {}) {
+  const bytes = rawBytes.get(resource);
+  if (bytes === undefined) throw new TypeError("markBytes: admitted mark resource required");
+  const count = length === undefined ? bytes.length - offset : length;
+  if (!isIndex(offset) || !isIndex(count) ||
+      offset > bytes.length || count > bytes.length - offset) {
+    throw new RangeError("markBytes: invalid byte range");
+  }
+  return Uint8Array.from(bytes.subarray(offset, offset + count));
+}
+
 /** Return one Mark's actual (address, bit, value), as a typed, addressed cell. */
 export function bitAt(resource, bit) {
   const bytes = rawBytes.get(resource);
