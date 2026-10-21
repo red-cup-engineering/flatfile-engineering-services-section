@@ -300,6 +300,53 @@ test("plans and receipts refuse malformed purported admitted specifications inst
   // compiler/printer/renderer, verifying the referenced bytes, or customer use.
 });
 
+test("plans and receipts re-admit every specification digest, not a forged source label", () => {
+  for (const admitted of [readLegacy(), refusalOf(candidate())]) {
+    assert.equal(admitted.type, "ArtifactFabricationSpecification");
+    const plan = {
+      type: "ArtifactFabricationRealizationPlanCandidate", version: 1,
+      artifactId: "gate", specificationDigest: admitted.specificationDigest,
+      projectionIds: ["package"], acceptanceObligationIds: ["accept"],
+    };
+    const evidence = { type: "ArtifactFabricationEvidence", locator: "run:1", digest: sha };
+    const receipt = {
+      type: "ArtifactFabricationRealizationReceiptCandidate", version: 1,
+      artifactId: "gate", specificationDigest: admitted.specificationDigest,
+      realizations: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, projectionId: "package", evidence }],
+      acceptances: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, acceptanceObligationId: "accept", evidence }],
+    };
+    // Ordinary admitted v1 and v2 specifications remain valid inputs.
+    assert.equal(admitArtifactFabricationRealizationPlan(admitted, plan).type,
+                 "ArtifactFabricationRealizationPlan");
+    assert.equal(admitArtifactFabricationRealizationReceipt(admitted, receipt).type,
+                 "ArtifactFabricationRealizationReceipt");
+    const changes = [
+      (s) => { s.artifact.kind = "scientific-article"; },
+      (s) => { s.requirements[0].statement = "Tampered after admission"; },
+      (s) => { s.source.provenance.digest = "sha256:" + "b".repeat(64); },
+      (s) => { s.projections[0].id = "altered-projection"; },
+      (s) => { s.acceptanceObligations[0].id = "altered-acceptance"; },
+      (s) => { s.specificationDigest = "ni:///sha-256;forged"; },
+    ];
+    if (admitted.version === 2) {
+      changes.push((s) => { s.claims[0].quantity.value = 999; });
+      changes.push((s) => { s.claims[0].basis.locator = "other-data.jsonl"; });
+    }
+    for (const [index, change] of changes.entries()) {
+      const invalid = structuredClone(admitted);
+      change(invalid);
+      assert.equal(admitArtifactFabricationRealizationPlan(invalid, plan).code,
+                   "INVALID_SPECIFICATION",
+                   `tampered v${admitted.version} plan case ${index}`);
+      assert.equal(admitArtifactFabricationRealizationReceipt(invalid, receipt).code,
+                   "INVALID_SPECIFICATION",
+                   `tampered v${admitted.version} receipt case ${index}`);
+    }
+  }
+  // A typed Data receipt with digest-addressed references still does not
+  // establish that the cited build, print, rendering or receipt actually ran.
+});
+
 test("admission is idempotent: an admitted version 2 specification re-admits to itself, and a false grounding is refused", () => {
   const value = candidate();
   value.claims.push(conjectureClaim(), { ...derivedClaim(), id: "fill-rate", quantity: { type: "ArtifactFabricationQuantity", value: 0.5, unit: "ratio" }, basis: { ...derivedClaim().basis, premises: [{ type: "ArtifactFabricationPremise", kind: "claim", ref: "queue-share" }] } });
