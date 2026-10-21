@@ -239,6 +239,67 @@ test("plans and receipts bind both specification versions and require evidence f
   assert.equal(admitArtifactFabricationRealizationPlan({ type: "ArtifactFabricationSpecification", version: 3, specificationDigest: "x" }, {}).code, "INVALID_SPECIFICATION");
 });
 
+test("fabrication kind is not limited to software or material lots", () => {
+  const digests = [];
+  for (const kind of ["computer-code", "dataset", "scientific-article", "media-asset", "material-component"]) {
+    const value = candidate();
+    value.artifact.kind = kind;
+    const admitted = refusalOf(value);
+    assert.equal(admitted.type, "ArtifactFabricationSpecification", kind);
+    assert.equal(admitted.artifact.kind, kind);
+    digests.push(admitted.specificationDigest);
+    const plan = admitArtifactFabricationRealizationPlan(admitted, {
+      type: "ArtifactFabricationRealizationPlanCandidate", version: 1,
+      artifactId: "gate", specificationDigest: admitted.specificationDigest,
+      projectionIds: ["package"], acceptanceObligationIds: ["accept"],
+    });
+    assert.equal(plan.type, "ArtifactFabricationRealizationPlan", kind);
+    assert.equal("realizations" in plan, false, "a plan does not attest to produced bytes");
+  }
+  assert.equal(new Set(digests).size, 5, "artifact kinds must have separate source identities");
+  assertRefused((v) => { v.artifact.kind = ""; }, "INVALID_TEXT");
+  assertRefused((v) => { v.artifact.kind = "software\nmaterial"; }, "INVALID_TEXT");
+});
+
+test("plans and receipts refuse malformed purported admitted specifications instead of throwing", () => {
+  const admitted = refusalOf(candidate());
+  assert.equal(admitted.type, "ArtifactFabricationSpecification");
+  const malformed = [
+    { ...admitted, artifact: null },
+    { ...admitted, artifact: { type: "FabricatedArtifactIdentity", version: 1, id: "", kind: "fixture" } },
+    { ...admitted, projections: [null] },
+    { ...admitted, acceptanceObligations: [{ id: null }] },
+    { ...admitted, traceability: null },
+    { ...admitted, projections: null },
+    { ...admitted, acceptanceObligations: null },
+  ];
+  const plan = {
+    type: "ArtifactFabricationRealizationPlanCandidate", version: 1,
+    artifactId: "gate", specificationDigest: admitted.specificationDigest,
+    projectionIds: ["package"], acceptanceObligationIds: ["accept"],
+  };
+  const evidence = { type: "ArtifactFabricationEvidence", locator: "run:1", digest: sha };
+  const receipt = {
+    type: "ArtifactFabricationRealizationReceiptCandidate", version: 1,
+    artifactId: "gate", specificationDigest: admitted.specificationDigest,
+    realizations: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, projectionId: "package", evidence }],
+    acceptances: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, acceptanceObligationId: "accept", evidence }],
+  };
+  for (const [index, invalid] of malformed.entries()) {
+    assert.equal(admitArtifactFabricationRealizationPlan(invalid, plan).code,
+                 "INVALID_SPECIFICATION", `plan case ${index}`);
+    assert.equal(admitArtifactFabricationRealizationReceipt(invalid, receipt).code,
+                 "INVALID_SPECIFICATION", `receipt case ${index}`);
+  }
+  // The normal admitted specification still supports both structural consumers.
+  assert.equal(admitArtifactFabricationRealizationPlan(admitted, plan).type,
+               "ArtifactFabricationRealizationPlan");
+  assert.equal(admitArtifactFabricationRealizationReceipt(admitted, receipt).type,
+               "ArtifactFabricationRealizationReceipt");
+  // These are structural Data admissions; they cannot attest to running a
+  // compiler/printer/renderer, verifying the referenced bytes, or customer use.
+});
+
 test("admission is idempotent: an admitted version 2 specification re-admits to itself, and a false grounding is refused", () => {
   const value = candidate();
   value.claims.push(conjectureClaim(), { ...derivedClaim(), id: "fill-rate", quantity: { type: "ArtifactFabricationQuantity", value: 0.5, unit: "ratio" }, basis: { ...derivedClaim().basis, premises: [{ type: "ArtifactFabricationPremise", kind: "claim", ref: "queue-share" }] } });
