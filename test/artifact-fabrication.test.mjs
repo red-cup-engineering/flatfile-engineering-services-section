@@ -347,6 +347,60 @@ test("plans and receipts re-admit every specification digest, not a forged sourc
   // establish that the cited build, print, rendering or receipt actually ran.
 });
 
+test("plan and receipt refuse mutated source cuts across nested evidence kinds", () => {
+  // Closed, bounded mutation census of *the original Data admission*.
+  // Invalid witnesses cannot be turned into proof of any fabricated medium.
+  const admitted = refusalOf(candidate());
+  assert.equal(admitted.type, "ArtifactFabricationSpecification");
+  const plan = {
+    type: "ArtifactFabricationRealizationPlanCandidate", version: 1,
+    artifactId: admitted.artifact.id, specificationDigest: admitted.specificationDigest,
+    projectionIds: ["package"], acceptanceObligationIds: ["accept"],
+  };
+  const evidence = { type: "ArtifactFabricationEvidence", locator: "run:1", digest: sha };
+  const receipt = {
+    type: "ArtifactFabricationRealizationReceiptCandidate", version: 1,
+    artifactId: admitted.artifact.id, specificationDigest: admitted.specificationDigest,
+    realizations: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, projectionId: "package", evidence }],
+    acceptances: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, acceptanceObligationId: "accept", evidence }],
+  };
+  const paths = [
+    "source", "artifact", "claims", "requirements", "prohibitions",
+    "openQuestions", "constraints", "projections", "acceptanceObligations",
+    "traceability", "artifact.id", "artifact.kind", "artifact.version",
+    "source.identity", "source.provenance", "source.provenance.digest",
+    "claims.0", "claims.0.basis", "claims.0.basis.locator",
+    "claims.0.quantity", "claims.1.basis", "claims.1.basis.premises",
+    "requirements.0", "requirements.0.parameters",
+    "requirements.0.claimIds", "constraints.0", "constraints.0.claimIds",
+    "projections.0", "projections.0.id", "acceptanceObligations.0",
+    "acceptanceObligations.0.claimIds", "traceability.0",
+    "traceability.0.requirementId", "traceability.0.constraintIds",
+    "traceability.0.projectionIds", "traceability.0.acceptanceObligationIds",
+  ];
+  const mutants = [null, [], {}, 42, true, "", ["invalid"]];
+  let checked = 0;
+  for (const path of paths) {
+    for (const replacement of mutants) {
+      const invalid = structuredClone(admitted);
+      const segments = path.split(".");
+      let location = invalid;
+      for (const part of segments.slice(0, -1)) location = location[part];
+      location[segments[segments.length - 1]] = replacement;
+      // An empty list substituted for an already empty list is a *no-op*;
+      // it is not an invalid case and must not be counted as a refusal.
+      if (JSON.stringify(invalid) === JSON.stringify(admitted)) continue;
+      const reason = `${path} / ${JSON.stringify(replacement)}`;
+      assert.equal(admitArtifactFabricationRealizationPlan(invalid, plan).code,
+                   "INVALID_SPECIFICATION", `plan accepted altered ${reason}`);
+      assert.equal(admitArtifactFabricationRealizationReceipt(invalid, receipt).code,
+                   "INVALID_SPECIFICATION", `receipt accepted altered ${reason}`);
+      checked += 1;
+    }
+  }
+  assert.ok(checked >= 200, "the source-mutation refusal census was unexpectedly narrowed");
+});
+
 test("admission is idempotent: an admitted version 2 specification re-admits to itself, and a false grounding is refused", () => {
   const value = candidate();
   value.claims.push(conjectureClaim(), { ...derivedClaim(), id: "fill-rate", quantity: { type: "ArtifactFabricationQuantity", value: 0.5, unit: "ratio" }, basis: { ...derivedClaim().basis, premises: [{ type: "ArtifactFabricationPremise", kind: "claim", ref: "queue-share" }] } });
