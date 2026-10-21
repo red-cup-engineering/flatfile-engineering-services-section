@@ -407,6 +407,21 @@ export function findArtifactFabricationEpistemicDebt(candidate) {
 }
 function admittedSpecification(specification) {
   if (!record(specification) || specification.type !== "ArtifactFabricationSpecification" || ![1, 2].includes(specification.version) || typeof specification.specificationDigest !== "string") refuse("INVALID_SPECIFICATION", "specification must be an admitted ArtifactFabricationSpecification@1 or @2", "specification");
+  // An asserted type/version/digest alone does not supply a usable source-owned
+  // specification. Plan and receipt callers must refuse missing nested evidence
+  // before dereferencing it, rather than throw TypeError on adversarial input.
+  // This structural guard is NOT independent digest/producer verification.
+  const a = specification.artifact;
+  if (!record(a) || a.type !== "FabricatedArtifactIdentity" || a.version !== 1
+      || typeof a.id !== "string" || a.id.length === 0
+      || typeof a.kind !== "string" || a.kind.length === 0
+      || !["projections", "acceptanceObligations"].every((key) =>
+        Array.isArray(specification[key]) &&
+        specification[key].every((item) =>
+          record(item) && typeof item.id === "string" && item.id.length > 0))
+      || !Array.isArray(specification.traceability)) {
+    refuse("INVALID_SPECIFICATION", "specification is missing a usable artifact identity, referenced obligations/projections or traceability", "specification");
+  }
 }
 function refusal(error, type) {
   if (error instanceof Refusal) return freeze({ type, version: 1, code: error.code, message: error.message, path: error.path });
@@ -470,7 +485,7 @@ export function admitArtifactFabricationRealizationPlan(specification, candidate
   } catch (error) { return refusal(error, "ArtifactFabricationRealizationPlanRefusal"); }
 }
 
-/** Admits evidence that realizes every trace of an admitted artifact fabrication specification. */
+/** Structurally admits referenced evidence for each trace; does not dereference or independently verify produced bytes, maker execution, or recipient acceptance. */
 export function admitArtifactFabricationRealizationReceipt(specification, candidate) {
   try {
     admittedSpecification(specification);
