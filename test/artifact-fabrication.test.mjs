@@ -29,12 +29,12 @@ const assay = () => obligation({ id: "measure-queue", kind: "assay", statement: 
 
 function candidate() {
   return {
-    type: "ArtifactFabricationSpecificationCandidate", version: 2, source, artifact,
+    type: "ArtifactFabricationSpecificationCandidate", version: 2, source: structuredClone(source), artifact: structuredClone(artifact),
     claims: [measuredClaim(), derivedClaim()],
     requirements: [clause("ArtifactFabricationRequirement", "halt", "The gate shall halt within {{halt}}", { parameters: [param("halt", 8, "s", "halt-seconds")], claimIds: ["halt-seconds"] })],
     prohibitions: [], openQuestions: [],
     constraints: [constraint("law", "law"), constraint("standard", "standard")],
-    projections: [projection], acceptanceObligations: [obligation()], traceability: [trace()],
+    projections: [structuredClone(projection)], acceptanceObligations: [obligation()], traceability: [trace()],
   };
 }
 const refusalOf = (value) => admitArtifactFabricationSpecification(value);
@@ -181,10 +181,10 @@ test("clauses must be at the claim-bearing version and candidates versioned", ()
 function legacy() {
   const old = (type, id, statement) => ({ type, version: 1, id, statement, sourceSpan: at });
   return {
-    type: "ArtifactFabricationSpecificationCandidate", version: 1, source, artifact,
+    type: "ArtifactFabricationSpecificationCandidate", version: 1, source: structuredClone(source), artifact: structuredClone(artifact),
     requirements: [old("ArtifactFabricationRequirement", "halt", "The gate shall halt within 5 seconds")], prohibitions: [old("ArtifactFabricationProhibition", "no-stale", "The gate shall not quote on stale data")], openQuestions: [],
     constraints: ["law", "standard"].map((kind) => ({ type: "ArtifactFabricationConstraint", version: 1, id: kind, kind, authority: "A", revision: "r", locator: "l", applicability: "all", statement: "Holds", sourceSpan: at })),
-    projections: [projection],
+    projections: [structuredClone(projection)],
     acceptanceObligations: [{ type: "ArtifactFabricationAcceptanceObligation", version: 1, id: "accept", kind: "test", statement: "Verify", sourceSpan: at }],
     traceability: [{ ...trace(), constraintIds: ["law", "standard"] }, { ...trace(), requirementId: "no-stale" }],
   };
