@@ -406,22 +406,29 @@ export function findArtifactFabricationEpistemicDebt(candidate) {
   return Object.freeze(debt);
 }
 function admittedSpecification(specification) {
-  if (!record(specification) || specification.type !== "ArtifactFabricationSpecification" || ![1, 2].includes(specification.version) || typeof specification.specificationDigest !== "string") refuse("INVALID_SPECIFICATION", "specification must be an admitted ArtifactFabricationSpecification@1 or @2", "specification");
-  // An asserted type/version/digest alone does not supply a usable source-owned
-  // specification. Plan and receipt callers must refuse missing nested evidence
-  // before dereferencing it, rather than throw TypeError on adversarial input.
-  // This structural guard is NOT independent digest/producer verification.
-  const a = specification.artifact;
-  if (!record(a) || a.type !== "FabricatedArtifactIdentity" || a.version !== 1
-      || typeof a.id !== "string" || a.id.length === 0
-      || typeof a.kind !== "string" || a.kind.length === 0
-      || !["projections", "acceptanceObligations"].every((key) =>
-        Array.isArray(specification[key]) &&
-        specification[key].every((item) =>
-          record(item) && typeof item.id === "string" && item.id.length > 0))
-      || !Array.isArray(specification.traceability)) {
-    refuse("INVALID_SPECIFICATION", "specification is missing a usable artifact identity, referenced obligations/projections or traceability", "specification");
+  if (!record(specification) || specification.type !== "ArtifactFabricationSpecification"
+      || ![1, 2].includes(specification.version)
+      || typeof specification.specificationDigest !== "string") {
+    refuse("INVALID_SPECIFICATION", "specification must be an admitted ArtifactFabricationSpecification@1 or @2", "specification");
   }
+  // An asserted type/version/digest and plausible nested IDs are not an
+  // admission: the record may have changed since the digest was computed.
+  // Re-run the same original versioned Data admission to verify every source,
+  // claim, trace, projection, obligation and content digest before either a
+  // realization plan or a receipt can refer to the alleged specification.
+  // V1 remains readable ONLY under its original admitted digest.
+  const { type, specificationDigest, ...body } = specification;
+  const checked = admitArtifactFabricationSpecification(
+    { ...body, type: "ArtifactFabricationSpecificationCandidate" },
+    { admittedDigest: specificationDigest },
+  );
+  if (checked.type !== "ArtifactFabricationSpecification") {
+    refuse("INVALID_SPECIFICATION",
+      `specification must re-admit under its content digest (${checked.code || "refused"})`,
+      "specification");
+  }
+  // This verifies the source record, NOT the existence of a produced artifact,
+  // the evidence locator's bytes, a signed attestation or a recipient's result.
 }
 function refusal(error, type) {
   if (error instanceof Refusal) return freeze({ type, version: 1, code: error.code, message: error.message, path: error.path });
