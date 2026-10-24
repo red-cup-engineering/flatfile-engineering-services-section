@@ -51,7 +51,8 @@
     "./persistent-map": "./src/persistent-map.mjs",
     "./simulation/discrete-clock": "./src/simulation/discrete-clock.mjs",
     "./time/rfc3339": "./src/time/rfc3339.mjs",
-    "./mark-relation-query": "./src/mark-relation-query.mjs"
+    "./mark-relation-query": "./src/mark-relation-query.mjs",
+    "./resource-capacity-allocation": "./src/resource-capacity-allocation.mjs"
   },
   "files": [
     "bin",
