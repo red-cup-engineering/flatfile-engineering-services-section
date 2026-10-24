@@ -1,0 +1,9 @@
+# Stationary integral direct limits
+
+`colimStructure` must preserve the exact integer connecting matrix and its finite invariants without turning rank, determinant, or Smith normal form into a general classification of its stationary direct limit. For example, `diag(2,3)` presents `Z[1/2] ⊕ Z[1/3]`, which is not `Z[1/6]^2`: multiplication by 2 is not onto the former group.
+
+The existing uniform localized-module result remains justified when the stable determinant is 1 (the stable integer lattice has an automorphism), or the stable rational rank is at most 1 (the nonzero stable action is multiplication by its integer eigenvalue). These include the existing named unimodular substitutions and rank-one Thue–Morse example. Other cases retain their immutable stationary presentation and return an explicit classification obstruction. This boundary intentionally supplies no general direct-limit classifier.
+
+The explicit `localizedIntegerModule` constructor still constructs the module its arguments name. It does not establish that a supplied matrix has that colimit. Substitution duality and finite invariant comparisons must withhold their positive result when their required module classification is unavailable. An obstruction means unsupported classification, not inequivalence. The finite MLD interface remains an invariant comparison, not a construction of local derivation maps.
+
+Source warrant: Lenticule Science Math research note `content/text/documents/articles/notes/2026/10/23/stationary-direct-limit-determinant-counterexample.md`, merged at `641188bdf95ec9e913d4d4b4456005266529e04c` in `lenticule-science/math-services-section`. Native regression must cover the diagonal counterexample, preservation of the exact matrix against caller mutation, named supported examples, and obstruction propagation through consumers.
