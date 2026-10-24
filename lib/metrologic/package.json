@@ -430,7 +430,9 @@
   "scripts": {
     "test": "node --max-old-space-size=256 --test --test-concurrency=1 --test-timeout=15000",
     "test:crofton": "node --test --test-timeout=15000 test/causal-crofton.test.mjs",
-    "check:crofton": "node --check src/articulation/predicating/positing/settling/analysis/causal-crofton.mjs && node --check test/causal-crofton.test.mjs"
+    "check:crofton": "node --check src/articulation/predicating/positing/settling/analysis/causal-crofton.mjs && node --check test/causal-crofton.test.mjs",
+    "check:fluid": "node --check src/models/physics/models/fluid.mjs && node --check test/finite-fluid-circulation.test.mjs",
+    "test:fluid": "node --test test/finite-fluid-circulation.test.mjs"
   },
   "private": false
 }
