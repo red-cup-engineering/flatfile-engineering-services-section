@@ -22,6 +22,8 @@ on:
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/src/obstruction/capacity-flow.mjs'
       - 'lib/metrologic/test/capacity-flow.test.mjs'
+      - 'lib/metrologic/src/models/physics/models/fluid.mjs'
+      - 'lib/metrologic/test/finite-fluid-circulation.test.mjs'
       - 'lib/metrologic/package.json'
       - 'services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs'
       - 'services/number-services-section/services/exact-number-data-service/src/resource-flow.mjs'
@@ -54,6 +56,8 @@ on:
       - 'lib/metrologic/test/chromatic-lorentzian.test.mjs'
       - 'lib/metrologic/src/obstruction/capacity-flow.mjs'
       - 'lib/metrologic/test/capacity-flow.test.mjs'
+      - 'lib/metrologic/src/models/physics/models/fluid.mjs'
+      - 'lib/metrologic/test/finite-fluid-circulation.test.mjs'
       - 'lib/metrologic/package.json'
       - 'services/number-services-section/services/exact-number-data-service/src/resource-measurement.mjs'
       - 'services/number-services-section/services/exact-number-data-service/src/resource-flow.mjs'
@@ -74,6 +78,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify exact finite-fluid algebra and stable proof-bearing snapshots
+        run: |
+          # Uses only the original Metrologic/Data-owned exact integer supplier.
+          # No registry install, external credentials, physics provider, or
+          # self-asserted Lean/physical receipt is required for these source laws.
+          node --check lib/metrologic/src/models/physics/models/fluid.mjs
+          node --check lib/metrologic/test/finite-fluid-circulation.test.mjs
+          node --test lib/metrologic/test/finite-fluid-circulation.test.mjs
       - name: Check generic finite-law source
         run: node --check lib/metrologic/src/number/finite-law.mjs
       - name: Check exact directed-incidence algebra syntax
