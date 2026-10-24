@@ -4,6 +4,7 @@ import {
   admitArtifactFabricationRealizationPlan,
   admitArtifactFabricationRealizationReceipt,
   admitArtifactFabricationSpecification,
+  admitOperationMeaningClosure,
   DEFINITIONALLY_EXACT_PARAMETERS,
   codeSpanIsParameter,
   firstBareNumber,
@@ -436,4 +437,75 @@ test("the epistemic-debt finder scans code spans the same way", () => {
   value.requirements = [{ statement: "Page with `per_page=50`" }, { statement: "Digest with `sha256`" }];
   const debt = findArtifactFabricationEpistemicDebt(value);
   assert.deepEqual(debt.filter((d) => d.code === "PARAMETER_WITHOUT_CLAIM").map((d) => d.path), ["requirements[0].statement"]);
+});
+
+
+test("original fabrication input admission bounds cyclic, deep, accessor and sparse JSON before proof/plan", () => {
+  const original = candidate();
+  assert.equal(refusalOf(original).type, "ArtifactFabricationSpecification");
+  const cases = [
+    ["direct cycle", () => { const loop = {}; loop.me = loop; return loop; }],
+    ["mutual cycle", () => { const a = {}, b = { a }; a.b = b; return a; }],
+    ["excess nesting", () => { let v = { value: true }; for (let i = 0; i < 160; i++) v = { next: v }; return v; }],
+    ["sparse array", () => ({ steps: [1,,3] })],
+    ["extra array property", () => { const v = [1,2]; v.extra = "not transmitted"; return { steps: v }; }],
+    ["symbol-only field", () => { const v = { step: true }; v[Symbol("secret")] = "untransmitted"; return v; }],
+    ["excess node budget", () => ({ events: Array.from({ length: 65536 }, () => 0) })],
+  ];
+  for (const [label, build] of cases) {
+    const value = candidate();
+    value.projections[0].configuration = build();
+    const result = refusalOf(value);
+    assert.equal(result.type, "ArtifactFabricationSpecificationRefusal", label);
+    assert.equal(result.code, "INVALID_PROJECTION", label);
+  }
+  let getterCalls = 0;
+  const unsafe = candidate();
+  Object.defineProperty(unsafe.projections[0].configuration, "auth", {
+    enumerable: true, get() { getterCalls++; throw new Error("untrusted getter called"); },
+  });
+  assert.equal(refusalOf(unsafe).code, "INVALID_PROJECTION");
+  assert.equal(getterCalls, 0, "admission inspects JSON descriptors, never invokes untrusted accessors");
+
+  const shared = { allowed: true };
+  const validAlias = candidate();
+  validAlias.projections[0].configuration = { original: shared, second: shared };
+  assert.equal(refusalOf(validAlias).type, "ArtifactFabricationSpecification",
+    "shared acyclic references serialize to valid duplicated JSON values");
+  let nested = { leaf: true };
+  for (let i = 0; i < 64; i++) nested = { next: nested };
+  const bounded = candidate();
+  bounded.projections[0].configuration = nested;
+  assert.equal(refusalOf(bounded).type, "ArtifactFabricationSpecification",
+    "moderately nested legitimate closure remains admissible");
+});
+
+test("language-neutral operation closure inherits safe JSON admission without fabricator effects", () => {
+  const original = {
+    type: "OperationMeaningClosureCandidate", version: 1,
+    operations: [{ name: "quoted-effect", description: "Quote bounded admitted data",
+      inputSchema: { type: "object" }, outputSchema: { type: "object" } }],
+    examples: [{ name: "plain", operation: "quoted-effect", input: { count: 1 }, output: { result: "ok" } }],
+    dependencies: [],
+  };
+  assert.equal(admitOperationMeaningClosure(original).type, "OperationMeaningClosure");
+  const cycle = {}; cycle.self = cycle;
+  const invalidSchema = { ...original,
+    operations: [{ ...original.operations[0], inputSchema: cycle }] };
+  assert.equal(admitOperationMeaningClosure(invalidSchema).code, "INVALID_SCHEMA");
+  let getterCalls = 0;
+  const badOutput = { result: "ok" };
+  Object.defineProperty(badOutput, "token", { enumerable: true,
+    get() { getterCalls++; throw new Error("untrusted producer getter"); } });
+  const invalidExample = { ...original,
+    examples: [{ ...original.examples[0], output: badOutput }] };
+  assert.equal(admitOperationMeaningClosure(invalidExample).code, "INVALID_EXAMPLE");
+  assert.equal(getterCalls, 0);
+  let deep = { result: 1 };
+  for (let i = 0; i < 160; i++) deep = { part: deep };
+  const invalidDepth = { ...original,
+    examples: [{ ...original.examples[0], input: deep }] };
+  assert.equal(admitOperationMeaningClosure(invalidDepth).code, "INVALID_EXAMPLE");
+  const real = admitOperationMeaningClosure(original);
+  assert.equal(real.examples[0].output.result, "ok");
 });
