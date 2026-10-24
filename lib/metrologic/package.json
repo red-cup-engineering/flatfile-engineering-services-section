@@ -296,6 +296,7 @@
     "./models/topology/settling-site": "./src/articulation/predicating/positing/settling/graph/settling-site.mjs",
     "./models/topology/keratin": "./src/models/topology/keratin.mjs",
     "./models/order/run-causal-set": "./src/models/order/run-causal-set.mjs",
+    "./models/physics/models/fluid": "./src/models/physics/models/fluid.mjs",
     "./models/physics/models/kinetic-theory/molecular-chaos-gluing": "./src/models/physics/models/kinetic-theory/molecular-chaos-gluing.mjs",
     "./models/physics/models/glass/kappa-sector-charges": "./src/models/physics/models/glass/kappa-sector-charges.mjs",
     "./models/physics/models/quantum-contextuality/reconciliation-quote": "./src/models/physics/models/quantum-contextuality/reconciliation-quote.mjs",
