@@ -128,3 +128,78 @@ receiving. Natural-safe input guards do not establish safe unbounded arithmetic,
 and this change proves neither seed totality/purity nor arbitrary process
 correspondence. No native authentication or physical-source-reader change is
 part of this repair.
+
+## Current catalog admission and Computing provider
+
+The 2026-10-25 receiving extends the original boundary above after independently
+reproducing three further defects: a copied or altered certificate could borrow
+the original public kind, a declaration object could coerce itself into a catalog
+name, and a supplied process could hide a wrong first step with its own equality.
+This is an authored correction of the existing implementation, not fabricated
+source or a new proof engine.
+
+The current proof owner is
+[Computing Science](https://github.com/lenticule-science/computer-science-obsmetrology-science-services-section).
+Its `ObsmetrologiaComputing/RegimeGate.lean` and
+`ObsmetrologiaComputing/RegimeCycle.lean` retain the `Obsmetrologia` declaration
+namespace. The exact received source blobs are respectively
+`952a7c79354475937b91e033d2b09fa0a8cbd6cf` and
+`8e6a868413e32d4cf5e9b6d11541eaeb76a97ee2`; the original declaration names
+`Obsmetrologia.omega_ahead` and `Obsmetrologia.residue_germ_ahead` are unchanged.
+The original fixed-residue proof retains a total `Nat → Record` seed, a fixed
+nonzero natural residue and bounds uniform over every sequence index.
+`AheadCertificate.limit_unique` additionally requires antisymmetry. The older
+Stage/Turn-to-regime table is not part of this provider. Local scheduling helpers
+do not assign a mathematical regime to a software layer or stage; the declared
+gate-profile comparisons remain distinct from universal carrier proofs.
+
+The receiving contract is:
+
+1. Catalog lookup requires a primitive string naming an own catalog entry.
+   Coercible objects, boxed strings and inherited names are refused without
+   inspecting parameters or invoking declaration coercion. Shape and hypothesis
+   obstructions for actual catalog names retain their existing meanings.
+2. Successful construction freezes the same certificate and owned parameters,
+   then records that object in a private module-local `WeakSet`. The existing
+   capture, hypothesis, canonicalization and realizer operations are unchanged.
+3. Both consumers check local issuance before reading certificate fields or
+   invoking its functions. Null, public-kind objects, proxies, copied objects,
+   changed declarations and replaced realizers return the existing
+   `not-a-certificate` obstruction. A certificate from another loaded module is
+   not locally issued; transport declaration/parameter data and reconstruct it
+   through the receiving module's original `certificateOf` API.
+4. A supplied ahead process is compared with the admitted certificate's equality,
+   not an equality chosen by that process. A wrong first step is obstructed even
+   if `process.lattice.eq` always returns true. Germ sequence comparison retains
+   its original bounded coordinate checks.
+
+The permanent regressions in `test/certificate.test.mjs` exercise these
+boundaries, genuine constructors, cross-module reconstruction and the explicit
+16-stage/17-stage process counterexample. The independently authored 12-case
+receiver observed 4 passes and 8 boundary failures on the original module, then
+12 passes on the repaired module with the same genuine suppliers. The complete
+native package suite, including six new permanent regressions, passed 627 cases
+with no failures, skips or cancellations under Node 24.22.1. Receiving used the
+declared Data 0.2.0, Exact Number 0.1.1 and JSON 0.4.0 providers. The command was
+`node --max-old-space-size=256 --test --test-concurrency=1 --test-timeout=15000 --test-isolation=none --test-reporter=tap`.
+An initial child-isolated attempt reported only file nodes, so it was not counted
+as assertion execution; the native in-process run reported every case and its
+complete final TAP plan. The earlier counts above remain historical results for
+their earlier source, not this edition's suite.
+
+During integration, main advanced through PR247 at
+`1b9da18560108ffcd23519ef3c925f911c1ea95b`. Its two exact closure-rule files were
+received before the final package: the receipt now names
+`Obsmetrologia.ClosureRule.immediate_consequence_lfp`, and its original test checks
+that declaration and the fixed-point result. The combined native suite again
+passed all 627 cases with no failures, skips or cancellations. This concurrent
+correction and the current SignCell submodule selection are preserved by the
+ordinary merge; the certificate module retains the independently received bytes.
+
+Constructor identity prevents substitution of the admitted object; it does not
+freeze a seed function's captured state or establish its purity or totality.
+Likewise, bounded process agreement does not prove agreement outside the checked
+prefix, including at the limit. Safe-integer guards do not implement unbounded
+Lean arithmetic. The formal provider and this native runtime receiving are
+separate evidence: no universal JavaScript-to-Lean interpretation, registry
+publication, installed consumer upgrade or closed fabrication loop is claimed.
