@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/metrologic",
-  "version": "0.14.3-dev.1",
+  "version": "0.14.3-dev.4",
   "type": "module",
   "description": "Metrologic: the data layer's mathematics, the shared JavaScript implementation of the mathematical operations every layer above it uses.",
   "keywords": [
@@ -418,7 +418,13 @@
     "README.md",
     "src",
     "scripts",
-    "specifications"
+    "specifications",
+    "test/capacity-flow.test.mjs",
+    "test/shared-source-capacity-receiving.test.mjs"
+  ],
+  "receivingTests": [
+    "test/capacity-flow.test.mjs",
+    "test/shared-source-capacity-receiving.test.mjs"
   ],
   "sideEffects": false,
   "dependencies": {
