@@ -398,6 +398,10 @@
     "./obstruction/capacity-flow": {
       "default": "./src/obstruction/capacity-flow.mjs"
     },
+    "./obstruction/exact-resource-flow": "./src/obstruction/exact-resource-flow.mjs",
+    "./obstruction/resource-flow-verifier": "./src/obstruction/resource-flow-verifier.mjs",
+    "./obstruction/exact-resource-work": "./src/obstruction/exact-resource-work.mjs",
+    "./obstruction/exact-resource-envelope": "./src/obstruction/exact-resource-envelope.mjs",
     "./mark": {
       "import": "./src/mark.mjs"
     },
@@ -420,11 +424,16 @@
     "scripts",
     "specifications",
     "test/capacity-flow.test.mjs",
-    "test/shared-source-capacity-receiving.test.mjs"
+    "test/shared-source-capacity-receiving.test.mjs",
+    "test/exact-resource-flow.test.mjs",
+    "test/exact-resource-work-receiving.test.mjs",
+    "test/fixtures/exact-resource-work.json"
   ],
   "receivingTests": [
     "test/capacity-flow.test.mjs",
-    "test/shared-source-capacity-receiving.test.mjs"
+    "test/shared-source-capacity-receiving.test.mjs",
+    "test/exact-resource-flow.test.mjs",
+    "test/exact-resource-work-receiving.test.mjs"
   ],
   "sideEffects": false,
   "dependencies": {
