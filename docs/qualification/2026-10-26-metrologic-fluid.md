@@ -38,3 +38,11 @@ Original PR workflow run40127233429 has three failed jobs with no received step 
 ## Adjacent publication received
 
 The already-qualified Data capacity boundary is now present in immutable `@red-cup-engineering/computer-data-engineering-services-section@0.7.2-dev.1338`, gitHead `4d648b4b9076b7244e9a1894a7ff9a7df285b132`. Its 72,151-byte archive matched registry integrity `sha512-PJxhOxN2jhNv2BBvemvhSPnX+VFXaYoYAq/HVVGRwsxjO9L/4ewLPD6HeHuULRZ+aIJ1A4R0qr3gJLsVtUzKzw==`. The archive contains the exact capacity adapter `fb06798467544e49d350ce5f7d8ec4930885f09c` and regression `64499d53b3a77417476d012b034f2e28577b7f68` previously received. This closes that package publication gap; it is not a new host installation or a repeated test claim.
+
+## Issued archive received on 2026-10-26
+
+The original Bare Cedar Fog publisher received the exact Data landing `c487f167cc3302a4cec6a7f8b1c87d611e756344` in [run40386231305](https://github.com/561-group/bare-cedar-fog/actions/runs/40386231305). It admitted the regular, Data-owned `lib/metrologic` member and reported that immutable `@red-cup-engineering/metrologic@0.14.3-dev.1348` already holds that selected package content. This is a content match, not a claim that its registry `gitHead` equals the requested landing: the actual metadata records `22db79bf6ead6d263cb66b9f06b6769727605a5c`.
+
+An independent download of that exact immutable archive verified its SHA-1 and SHA-512 integrity. The 453,192-byte archive contains211 members, has SHA-256 `4214035bb736ee97e4c088948e130e534289d192a19933dd48dc7d765369b140`, and retains integrity `sha512-P6wgCe0Agg5LS6KUein+2wDaB5v7BJNjdAT+VXsaxxPMf4Hx/wTy6frGmfFkhLkQR46qdhCnGuUQHnK9NOeI/g==`. Its actual fluid module has the exact selected Git blob `f3c4b58f2669ea579d701bff59b7dd594363b8be`.
+
+The downloaded package's declared Data0.2.0, ExactNumber0.1.1 and Json0.4.0 providers remain the genuine, unchanged closure used above. Running `node test/finite-fluid-circulation.test.mjs` from the actual extracted package exercised its public export: all seven cases passed, with zero failures or skips. This closes issued-package receiving for the finite fluid correction. Runtime installation, physical fluid observation and Lean-kernel execution remain separate claims.
