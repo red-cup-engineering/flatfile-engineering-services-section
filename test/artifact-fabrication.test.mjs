@@ -4,6 +4,7 @@ import {
   admitArtifactFabricationRealizationPlan,
   admitArtifactFabricationRealizationReceipt,
   admitArtifactFabricationSpecification,
+  admitOperationMeaningClosure,
   DEFINITIONALLY_EXACT_PARAMETERS,
   codeSpanIsParameter,
   firstBareNumber,
@@ -29,12 +30,12 @@ const assay = () => obligation({ id: "measure-queue", kind: "assay", statement: 
 
 function candidate() {
   return {
-    type: "ArtifactFabricationSpecificationCandidate", version: 2, source, artifact,
+    type: "ArtifactFabricationSpecificationCandidate", version: 2, source: structuredClone(source), artifact: structuredClone(artifact),
     claims: [measuredClaim(), derivedClaim()],
     requirements: [clause("ArtifactFabricationRequirement", "halt", "The gate shall halt within {{halt}}", { parameters: [param("halt", 8, "s", "halt-seconds")], claimIds: ["halt-seconds"] })],
     prohibitions: [], openQuestions: [],
     constraints: [constraint("law", "law"), constraint("standard", "standard")],
-    projections: [projection], acceptanceObligations: [obligation()], traceability: [trace()],
+    projections: [structuredClone(projection)], acceptanceObligations: [obligation()], traceability: [trace()],
   };
 }
 const refusalOf = (value) => admitArtifactFabricationSpecification(value);
@@ -181,10 +182,10 @@ test("clauses must be at the claim-bearing version and candidates versioned", ()
 function legacy() {
   const old = (type, id, statement) => ({ type, version: 1, id, statement, sourceSpan: at });
   return {
-    type: "ArtifactFabricationSpecificationCandidate", version: 1, source, artifact,
+    type: "ArtifactFabricationSpecificationCandidate", version: 1, source: structuredClone(source), artifact: structuredClone(artifact),
     requirements: [old("ArtifactFabricationRequirement", "halt", "The gate shall halt within 5 seconds")], prohibitions: [old("ArtifactFabricationProhibition", "no-stale", "The gate shall not quote on stale data")], openQuestions: [],
     constraints: ["law", "standard"].map((kind) => ({ type: "ArtifactFabricationConstraint", version: 1, id: kind, kind, authority: "A", revision: "r", locator: "l", applicability: "all", statement: "Holds", sourceSpan: at })),
-    projections: [projection],
+    projections: [structuredClone(projection)],
     acceptanceObligations: [{ type: "ArtifactFabricationAcceptanceObligation", version: 1, id: "accept", kind: "test", statement: "Verify", sourceSpan: at }],
     traceability: [{ ...trace(), constraintIds: ["law", "standard"] }, { ...trace(), requirementId: "no-stale" }],
   };
@@ -239,6 +240,168 @@ test("plans and receipts bind both specification versions and require evidence f
   assert.equal(admitArtifactFabricationRealizationPlan({ type: "ArtifactFabricationSpecification", version: 3, specificationDigest: "x" }, {}).code, "INVALID_SPECIFICATION");
 });
 
+test("fabrication kind is not limited to software or material lots", () => {
+  const digests = [];
+  for (const kind of ["computer-code", "dataset", "scientific-article", "media-asset", "material-component"]) {
+    const value = candidate();
+    value.artifact.kind = kind;
+    const admitted = refusalOf(value);
+    assert.equal(admitted.type, "ArtifactFabricationSpecification", kind);
+    assert.equal(admitted.artifact.kind, kind);
+    digests.push(admitted.specificationDigest);
+    const plan = admitArtifactFabricationRealizationPlan(admitted, {
+      type: "ArtifactFabricationRealizationPlanCandidate", version: 1,
+      artifactId: "gate", specificationDigest: admitted.specificationDigest,
+      projectionIds: ["package"], acceptanceObligationIds: ["accept"],
+    });
+    assert.equal(plan.type, "ArtifactFabricationRealizationPlan", kind);
+    assert.equal("realizations" in plan, false, "a plan does not attest to produced bytes");
+  }
+  assert.equal(new Set(digests).size, 5, "artifact kinds must have separate source identities");
+  assertRefused((v) => { v.artifact.kind = ""; }, "INVALID_TEXT");
+  assertRefused((v) => { v.artifact.kind = "software\nmaterial"; }, "INVALID_TEXT");
+});
+
+test("plans and receipts refuse malformed purported admitted specifications instead of throwing", () => {
+  const admitted = refusalOf(candidate());
+  assert.equal(admitted.type, "ArtifactFabricationSpecification");
+  const malformed = [
+    { ...admitted, artifact: null },
+    { ...admitted, artifact: { type: "FabricatedArtifactIdentity", version: 1, id: "", kind: "fixture" } },
+    { ...admitted, projections: [null] },
+    { ...admitted, acceptanceObligations: [{ id: null }] },
+    { ...admitted, traceability: null },
+    { ...admitted, projections: null },
+    { ...admitted, acceptanceObligations: null },
+  ];
+  const plan = {
+    type: "ArtifactFabricationRealizationPlanCandidate", version: 1,
+    artifactId: "gate", specificationDigest: admitted.specificationDigest,
+    projectionIds: ["package"], acceptanceObligationIds: ["accept"],
+  };
+  const evidence = { type: "ArtifactFabricationEvidence", locator: "run:1", digest: sha };
+  const receipt = {
+    type: "ArtifactFabricationRealizationReceiptCandidate", version: 1,
+    artifactId: "gate", specificationDigest: admitted.specificationDigest,
+    realizations: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, projectionId: "package", evidence }],
+    acceptances: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, acceptanceObligationId: "accept", evidence }],
+  };
+  for (const [index, invalid] of malformed.entries()) {
+    assert.equal(admitArtifactFabricationRealizationPlan(invalid, plan).code,
+                 "INVALID_SPECIFICATION", `plan case ${index}`);
+    assert.equal(admitArtifactFabricationRealizationReceipt(invalid, receipt).code,
+                 "INVALID_SPECIFICATION", `receipt case ${index}`);
+  }
+  // The normal admitted specification still supports both structural consumers.
+  assert.equal(admitArtifactFabricationRealizationPlan(admitted, plan).type,
+               "ArtifactFabricationRealizationPlan");
+  assert.equal(admitArtifactFabricationRealizationReceipt(admitted, receipt).type,
+               "ArtifactFabricationRealizationReceipt");
+  // These are structural Data admissions; they cannot attest to running a
+  // compiler/printer/renderer, verifying the referenced bytes, or customer use.
+});
+
+test("plans and receipts re-admit every specification digest, not a forged source label", () => {
+  for (const admitted of [readLegacy(), refusalOf(candidate())]) {
+    assert.equal(admitted.type, "ArtifactFabricationSpecification");
+    const plan = {
+      type: "ArtifactFabricationRealizationPlanCandidate", version: 1,
+      artifactId: "gate", specificationDigest: admitted.specificationDigest,
+      projectionIds: ["package"], acceptanceObligationIds: ["accept"],
+    };
+    const evidence = { type: "ArtifactFabricationEvidence", locator: "run:1", digest: sha };
+    const receipt = {
+      type: "ArtifactFabricationRealizationReceiptCandidate", version: 1,
+      artifactId: "gate", specificationDigest: admitted.specificationDigest,
+      realizations: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, projectionId: "package", evidence }],
+      acceptances: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, acceptanceObligationId: "accept", evidence }],
+    };
+    // Ordinary admitted v1 and v2 specifications remain valid inputs.
+    assert.equal(admitArtifactFabricationRealizationPlan(admitted, plan).type,
+                 "ArtifactFabricationRealizationPlan");
+    assert.equal(admitArtifactFabricationRealizationReceipt(admitted, receipt).type,
+                 "ArtifactFabricationRealizationReceipt");
+    const changes = [
+      (s) => { s.artifact.kind = "scientific-article"; },
+      (s) => { s.requirements[0].statement = "Tampered after admission"; },
+      (s) => { s.source.provenance.digest = "sha256:" + "b".repeat(64); },
+      (s) => { s.projections[0].id = "altered-projection"; },
+      (s) => { s.acceptanceObligations[0].id = "altered-acceptance"; },
+      (s) => { s.specificationDigest = "ni:///sha-256;forged"; },
+    ];
+    if (admitted.version === 2) {
+      changes.push((s) => { s.claims[0].quantity.value = 999; });
+      changes.push((s) => { s.claims[0].basis.locator = "other-data.jsonl"; });
+    }
+    for (const [index, change] of changes.entries()) {
+      const invalid = structuredClone(admitted);
+      change(invalid);
+      assert.equal(admitArtifactFabricationRealizationPlan(invalid, plan).code,
+                   "INVALID_SPECIFICATION",
+                   `tampered v${admitted.version} plan case ${index}`);
+      assert.equal(admitArtifactFabricationRealizationReceipt(invalid, receipt).code,
+                   "INVALID_SPECIFICATION",
+                   `tampered v${admitted.version} receipt case ${index}`);
+    }
+  }
+  // A typed Data receipt with digest-addressed references still does not
+  // establish that the cited build, print, rendering or receipt actually ran.
+});
+
+test("plan and receipt refuse mutated source cuts across nested evidence kinds", () => {
+  // Closed, bounded mutation census of *the original Data admission*.
+  // Invalid witnesses cannot be turned into proof of any fabricated medium.
+  const admitted = refusalOf(candidate());
+  assert.equal(admitted.type, "ArtifactFabricationSpecification");
+  const plan = {
+    type: "ArtifactFabricationRealizationPlanCandidate", version: 1,
+    artifactId: admitted.artifact.id, specificationDigest: admitted.specificationDigest,
+    projectionIds: ["package"], acceptanceObligationIds: ["accept"],
+  };
+  const evidence = { type: "ArtifactFabricationEvidence", locator: "run:1", digest: sha };
+  const receipt = {
+    type: "ArtifactFabricationRealizationReceiptCandidate", version: 1,
+    artifactId: admitted.artifact.id, specificationDigest: admitted.specificationDigest,
+    realizations: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, projectionId: "package", evidence }],
+    acceptances: [{ type: "ArtifactFabricationRealizationEvidence", version: 1, acceptanceObligationId: "accept", evidence }],
+  };
+  const paths = [
+    "source", "artifact", "claims", "requirements", "prohibitions",
+    "openQuestions", "constraints", "projections", "acceptanceObligations",
+    "traceability", "artifact.id", "artifact.kind", "artifact.version",
+    "source.identity", "source.provenance", "source.provenance.digest",
+    "claims.0", "claims.0.basis", "claims.0.basis.locator",
+    "claims.0.quantity", "claims.1.basis", "claims.1.basis.premises",
+    "requirements.0", "requirements.0.parameters",
+    "requirements.0.claimIds", "constraints.0", "constraints.0.claimIds",
+    "projections.0", "projections.0.id", "acceptanceObligations.0",
+    "acceptanceObligations.0.claimIds", "traceability.0",
+    "traceability.0.requirementId", "traceability.0.constraintIds",
+    "traceability.0.projectionIds", "traceability.0.acceptanceObligationIds",
+  ];
+  const mutants = [null, [], {}, 42, true, "", ["invalid"]];
+  let checked = 0;
+  for (const path of paths) {
+    for (const replacement of mutants) {
+      const invalid = structuredClone(admitted);
+      const segments = path.split(".");
+      let location = invalid;
+      for (const part of segments.slice(0, -1)) location = location[part];
+      location[segments[segments.length - 1]] = replacement;
+      // An empty list substituted for an already empty list is a *no-op*;
+      // it is not an invalid case and must not be counted as a refusal.
+      if (JSON.stringify(invalid) === JSON.stringify(admitted)) continue;
+      const reason = `${path} / ${JSON.stringify(replacement)}`;
+      assert.equal(admitArtifactFabricationRealizationPlan(invalid, plan).code,
+                   "INVALID_SPECIFICATION", `plan accepted altered ${reason}`);
+      assert.equal(admitArtifactFabricationRealizationReceipt(invalid, receipt).code,
+                   "INVALID_SPECIFICATION", `receipt accepted altered ${reason}`);
+      checked += 1;
+    }
+  }
+  assert.ok(checked >= 200, "the source-mutation refusal census was unexpectedly narrowed");
+});
+
 test("admission is idempotent: an admitted version 2 specification re-admits to itself, and a false grounding is refused", () => {
   const value = candidate();
   value.claims.push(conjectureClaim(), { ...derivedClaim(), id: "fill-rate", quantity: { type: "ArtifactFabricationQuantity", value: 0.5, unit: "ratio" }, basis: { ...derivedClaim().basis, premises: [{ type: "ArtifactFabricationPremise", kind: "claim", ref: "queue-share" }] } });
@@ -274,4 +437,75 @@ test("the epistemic-debt finder scans code spans the same way", () => {
   value.requirements = [{ statement: "Page with `per_page=50`" }, { statement: "Digest with `sha256`" }];
   const debt = findArtifactFabricationEpistemicDebt(value);
   assert.deepEqual(debt.filter((d) => d.code === "PARAMETER_WITHOUT_CLAIM").map((d) => d.path), ["requirements[0].statement"]);
+});
+
+
+test("original fabrication input admission bounds cyclic, deep, accessor and sparse JSON before proof/plan", () => {
+  const original = candidate();
+  assert.equal(refusalOf(original).type, "ArtifactFabricationSpecification");
+  const cases = [
+    ["direct cycle", () => { const loop = {}; loop.me = loop; return loop; }],
+    ["mutual cycle", () => { const a = {}, b = { a }; a.b = b; return a; }],
+    ["excess nesting", () => { let v = { value: true }; for (let i = 0; i < 160; i++) v = { next: v }; return v; }],
+    ["sparse array", () => ({ steps: [1,,3] })],
+    ["extra array property", () => { const v = [1,2]; v.extra = "not transmitted"; return { steps: v }; }],
+    ["symbol-only field", () => { const v = { step: true }; v[Symbol("secret")] = "untransmitted"; return v; }],
+    ["excess node budget", () => ({ events: Array.from({ length: 65536 }, () => 0) })],
+  ];
+  for (const [label, build] of cases) {
+    const value = candidate();
+    value.projections[0].configuration = build();
+    const result = refusalOf(value);
+    assert.equal(result.type, "ArtifactFabricationSpecificationRefusal", label);
+    assert.equal(result.code, "INVALID_PROJECTION", label);
+  }
+  let getterCalls = 0;
+  const unsafe = candidate();
+  Object.defineProperty(unsafe.projections[0].configuration, "auth", {
+    enumerable: true, get() { getterCalls++; throw new Error("untrusted getter called"); },
+  });
+  assert.equal(refusalOf(unsafe).code, "INVALID_PROJECTION");
+  assert.equal(getterCalls, 0, "admission inspects JSON descriptors, never invokes untrusted accessors");
+
+  const shared = { allowed: true };
+  const validAlias = candidate();
+  validAlias.projections[0].configuration = { original: shared, second: shared };
+  assert.equal(refusalOf(validAlias).type, "ArtifactFabricationSpecification",
+    "shared acyclic references serialize to valid duplicated JSON values");
+  let nested = { leaf: true };
+  for (let i = 0; i < 64; i++) nested = { next: nested };
+  const bounded = candidate();
+  bounded.projections[0].configuration = nested;
+  assert.equal(refusalOf(bounded).type, "ArtifactFabricationSpecification",
+    "moderately nested legitimate closure remains admissible");
+});
+
+test("language-neutral operation closure inherits safe JSON admission without fabricator effects", () => {
+  const original = {
+    type: "OperationMeaningClosureCandidate", version: 1,
+    operations: [{ name: "quoted-effect", description: "Quote bounded admitted data",
+      inputSchema: { type: "object" }, outputSchema: { type: "object" } }],
+    examples: [{ name: "plain", operation: "quoted-effect", input: { count: 1 }, output: { result: "ok" } }],
+    dependencies: [],
+  };
+  assert.equal(admitOperationMeaningClosure(original).type, "OperationMeaningClosure");
+  const cycle = {}; cycle.self = cycle;
+  const invalidSchema = { ...original,
+    operations: [{ ...original.operations[0], inputSchema: cycle }] };
+  assert.equal(admitOperationMeaningClosure(invalidSchema).code, "INVALID_SCHEMA");
+  let getterCalls = 0;
+  const badOutput = { result: "ok" };
+  Object.defineProperty(badOutput, "token", { enumerable: true,
+    get() { getterCalls++; throw new Error("untrusted producer getter"); } });
+  const invalidExample = { ...original,
+    examples: [{ ...original.examples[0], output: badOutput }] };
+  assert.equal(admitOperationMeaningClosure(invalidExample).code, "INVALID_EXAMPLE");
+  assert.equal(getterCalls, 0);
+  let deep = { result: 1 };
+  for (let i = 0; i < 160; i++) deep = { part: deep };
+  const invalidDepth = { ...original,
+    examples: [{ ...original.examples[0], input: deep }] };
+  assert.equal(admitOperationMeaningClosure(invalidDepth).code, "INVALID_EXAMPLE");
+  const real = admitOperationMeaningClosure(original);
+  assert.equal(real.examples[0].output.result, "ok");
 });

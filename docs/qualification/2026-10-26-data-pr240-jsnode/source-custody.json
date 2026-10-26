@@ -1,0 +1,1284 @@
+{
+  "consumerRepository": "red-cup-engineering/jsnode-package-engineering-services-section",
+  "consumerSource": "2f4d07de3b92b54bdc7acc95914dfd70fa31a812",
+  "immutablePackage": "@red-cup-engineering/jsnode-package-services-section@0.5.1-dev.4",
+  "receivedSourceFiles": [
+    {
+      "path": "README.md",
+      "bytes": 20370,
+      "gitBlobSha1": "273c2b75cc072dd6daf21515a9f34e263451174a",
+      "sha256": "c29fe41bd7c512ecc535995aec1e7ce8ff9e5b95e6e0435fb40dd2ef6a855cdf"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1101,
+      "gitBlobSha1": "61dbf67e6e610419422691ddd728f2c3647608bb",
+      "sha256": "e264f6d8d0c46911b9ca7a2a46a10fd1a2e7b64822f236b04a6afa7ee79083af"
+    },
+    {
+      "path": "examples/source-free-module-order.md",
+      "bytes": 2479,
+      "gitBlobSha1": "7dc4f754ff20ffd1a0a38276d0754d43545502af",
+      "sha256": "755fe9a80592e07fb5c16932870b7a05098e49fe9ad09dcc5d5ad89238f12679"
+    },
+    {
+      "path": "examples/source-free-connected-module-order.md",
+      "bytes": 2639,
+      "gitBlobSha1": "e93499512e8d5835deb239a7082703eb246525f8",
+      "sha256": "35c33014eaf0b012399f4aa4ccdb1d9f5c08637937881f1c37ac4e47877aef8c"
+    },
+    {
+      "path": "test/project-jsnode-modules.test.mjs",
+      "bytes": 8123,
+      "gitBlobSha1": "ed0708a18d307d2936ce7052095bfd14e15c4eae",
+      "sha256": "876146a80807bd0f1719f586c75d07c5034660d68420b5f993cfb36d6b99fde2"
+    },
+    {
+      "path": "test/standardize-package-tests.test.mjs",
+      "bytes": 4319,
+      "gitBlobSha1": "6380c4360be70c653dc71dcf574dff0e8e6da753",
+      "sha256": "2c5c395bd2623ce9abce2757258a0f6bb8ed11672c121a3cca8de84590a5e4ad"
+    },
+    {
+      "path": "test/package-tree.test.mjs",
+      "bytes": 1076,
+      "gitBlobSha1": "a96a6a14c8e874bfbcac0895ebaa4a0c13cbc001",
+      "sha256": "803ae2133ce72808722ec52c00038fd69985ee5969344126d969bc37a09d1cd4"
+    },
+    {
+      "path": "test/workspace-exports-resolve.test.mjs",
+      "bytes": 7223,
+      "gitBlobSha1": "66b37c7bc27ae6c046e9bc4a0390e2498103128d",
+      "sha256": "765725a6e60bfca5e2c1f33bb95d713145ac84e0c26140296ce85a176013ebb1"
+    },
+    {
+      "path": "test/operation-closure-binding.test.mjs",
+      "bytes": 3070,
+      "gitBlobSha1": "bee3aa8475ed10e130f3fb14ca301c3fb3eea468",
+      "sha256": "e8d66733b352dd84592f40bdc283178044a46ed0510f0a90b978e8a54e13ea3b"
+    },
+    {
+      "path": "test/check-package-interfaces.test.mjs",
+      "bytes": 8105,
+      "gitBlobSha1": "c463c69ccac29e36c5c4a8b9d67fbf32a0decb5c",
+      "sha256": "3189f14d757d1210f36c421a95cfb73c206720bda32f2394688e88a2a6bbfdcb"
+    },
+    {
+      "path": "test/project-jsnode-operation-package-readme.test.mjs",
+      "bytes": 1355,
+      "gitBlobSha1": "687fc58699448d80095e4595e88430278e44928c",
+      "sha256": "a09e0578f3c83731cf8f42baa921d419a3acf1704568021360d770aed63c8b82"
+    },
+    {
+      "path": "test/planner-semver.test.mjs",
+      "bytes": 1356,
+      "gitBlobSha1": "e142812cd64817cb3569ae53f4a328d98f1ebe0a",
+      "sha256": "e39e58c7f288af5d69ee374d2c591017a2a45bfc1a4b0ef342cace8a173fc64d"
+    },
+    {
+      "path": "test/workspace-schema-contracts.test.mjs",
+      "bytes": 7460,
+      "gitBlobSha1": "90b9d089985aab015922a5601082bcb9c8fa8c8b",
+      "sha256": "25654c1e65032c63c26254b7095d61071220a2753cd9480387933441ad233110"
+    },
+    {
+      "path": "test/publication-files.test.mjs",
+      "bytes": 2382,
+      "gitBlobSha1": "3ff737ad701cca88a70f9bd3959087ef02db8e4f",
+      "sha256": "9d8a5d90da69b5ec36eab44b61cbf87a1dca4d0324a6c89b1e1eafaabc5320a6"
+    },
+    {
+      "path": "test/translate-markdown-claims.test.mjs",
+      "bytes": 9416,
+      "gitBlobSha1": "613c86a88484642abc7b5b3ed59136f992cdf71b",
+      "sha256": "a44b8e50a6660e40904a5d64eb8f6b0f3d4612803658416a6b192dd0175d7cba"
+    },
+    {
+      "path": "test/fabrication-records.test.mjs",
+      "bytes": 1361,
+      "gitBlobSha1": "01f4935d35fb560de182a305bbd352e37b64e5db",
+      "sha256": "e6efa5a9038f402dd62207c00c1a790e8867a57dc46492d89e1bb4ba65dc0d3b"
+    },
+    {
+      "path": "test/clause-assay-derivation.test.mjs",
+      "bytes": 3306,
+      "gitBlobSha1": "058bcc7055168617e7004b5ede21ae3ab7319821",
+      "sha256": "f2e8390de52c87bb329022aebe5cbcca92e38a6c5cbaee654f91259617fa9ad0"
+    },
+    {
+      "path": "test/pnpm-lockfile-importers.test.mjs",
+      "bytes": 1868,
+      "gitBlobSha1": "05a2e98cb64775b1b204eaa1df52fe9a1d275246",
+      "sha256": "f445a7a1d3288475796bfd444d86c99676b881dabb202e9a7f590c46aaa8f6e4"
+    },
+    {
+      "path": "test/native-assay-profile.test.mjs",
+      "bytes": 16664,
+      "gitBlobSha1": "76adbece5462eb4b716e5b35f696d84e3566ad18",
+      "sha256": "91ade107c40bdf7679d724efda9b0773efd7fff4be43f592ea18825641b903ea"
+    },
+    {
+      "path": "test/admit-jsnode-operation-package-specification.test.mjs",
+      "bytes": 8626,
+      "gitBlobSha1": "ec9c55d17ce0d9ff3a9e890a46a79301b25c176f",
+      "sha256": "8f6943e82932086cf46e35a13756587487e4c66bf5e7a163aa20f6a62ccda9df"
+    },
+    {
+      "path": "test/package-test-plan.test.mjs",
+      "bytes": 6972,
+      "gitBlobSha1": "f4ee635daa0cc2842b76dac4c18b367334123020",
+      "sha256": "3bc087bcaf6996634264a0c61ee64dceb1110f6d421f24fdef46b9355248038c"
+    },
+    {
+      "path": "test/standardize-package-tests-regressions.test.mjs",
+      "bytes": 11669,
+      "gitBlobSha1": "3da0a5221525bb0d4cf18fe24720e441c182729b",
+      "sha256": "8f428dc0430be16c4984a884e247a917e6cdcd591c3ddcfed9b2ea8820cf953b"
+    },
+    {
+      "path": "test/assay-completion.test.mjs",
+      "bytes": 11044,
+      "gitBlobSha1": "9e6ae7b2aaa16ac44c681e1137c6f4189bed98f4",
+      "sha256": "c70457da977c21efe39bca4daab284e28d2da34a75f0af58c0838a61ef208e3c"
+    },
+    {
+      "path": "test/fabricate-markdown-jsnode-operation-package.test.mjs",
+      "bytes": 15141,
+      "gitBlobSha1": "b49a38195e6c9e3071d4e86c6e8bf4701456e8a1",
+      "sha256": "a4998cc17fee54ba5a7a4c31a60c0a37b2a2e987e7c4b1529d24179370569d81"
+    },
+    {
+      "path": "test/package-imports.test.mjs",
+      "bytes": 2442,
+      "gitBlobSha1": "40b1fea047ee984ccaa8cab84e4e543436e95098",
+      "sha256": "3c6bc946f33f9fab76fc5b96dd3d1c73575ed03bcea6d56880f5b6e3f9539fb1"
+    },
+    {
+      "path": "test/connected-module-fabrication.test.mjs",
+      "bytes": 8426,
+      "gitBlobSha1": "b42fbe4ca91c8969ad9a1e288919818610b5d793",
+      "sha256": "d80a69c9b4ad91e6d46a3d6ee392f01415d746b3e51a1f4c7c46f3f1d1f6c62b"
+    },
+    {
+      "path": "test/check-javascript-export-comment-discipline-faces.test.mjs",
+      "bytes": 4095,
+      "gitBlobSha1": "6fb39aa386c9ce17a9ccebf6d80cd9ba5c2e3b96",
+      "sha256": "910b78e64231c92aee6c7721e2572123eee492d138b7605591287c47c0a62b03"
+    },
+    {
+      "path": "test/project-jsnode-operation-source-from-arguments.test.mjs",
+      "bytes": 13286,
+      "gitBlobSha1": "7f9df9fc322526c3bdaf92e701d02b4ab1a6ac62",
+      "sha256": "7d33563321e5593b0dfc25ab96131c74adcb4bd0e62f58eefffb20bbee47a3e5"
+    },
+    {
+      "path": "test/assay-channels.test.mjs",
+      "bytes": 10357,
+      "gitBlobSha1": "7eefba56b6d631816cae010ad980ccd11d45675c",
+      "sha256": "66b603a29733956ce71e447b91e8df374e99beb63c2bdc1003f5d5dddae4abb0"
+    },
+    {
+      "path": "test/project-jsnode-operation-tests.test.mjs",
+      "bytes": 2270,
+      "gitBlobSha1": "1d8ca0ef2900adec66fafc1999f1ad849709d9b8",
+      "sha256": "aa135fbb8b406f4ebce6da0c559734d4d00366861159ebda5a330513ce0ee801"
+    },
+    {
+      "path": "test/package-interfaces.test.mjs",
+      "bytes": 10129,
+      "gitBlobSha1": "221cd58764d7cbaeb9e069abaaf5db3802c937c3",
+      "sha256": "6d132dc31cbb1e3da9ee9d3fcd687961f2ff968c02bf32b8f1e9830ee409862c"
+    },
+    {
+      "path": "test/create-jsnode-operation-package.test.mjs",
+      "bytes": 13689,
+      "gitBlobSha1": "fdc28462dff426343faa06e1dd95212bfe8f55e8",
+      "sha256": "cc85a97f908004c3b90126be1ad15d59df388876f7f87839e349f460a769cfa3"
+    },
+    {
+      "path": "test/translate-markdown-jsnode-operation-package-specification.test.mjs",
+      "bytes": 4114,
+      "gitBlobSha1": "0f80fba64348e41970a618d553778d59ff09cb41",
+      "sha256": "30514dfa11f7014f6b6e79cacd03db3a4ab410e053d60e6a38af030c242535bd"
+    },
+    {
+      "path": "test/project-jsnode-operation-package.test.mjs",
+      "bytes": 4956,
+      "gitBlobSha1": "b9ba110cf8edeacc26ba436c7e7ba31c6034c272",
+      "sha256": "6bd220cd48a6c920fcefa78c3c2f92ee0877a3e495c39f09e18e918c7a743a62"
+    },
+    {
+      "path": "test/standardize-jsnode-scripts.test.mjs",
+      "bytes": 21267,
+      "gitBlobSha1": "e7de2038d131addbec2cf4e5b2d496bbf414ade3",
+      "sha256": "1abed194d312a76aaf98fa8d76c31588893c9ec4f0b9de83ea4dac5225b70f76"
+    },
+    {
+      "path": "test/native-assay-schema.test.mjs",
+      "bytes": 8592,
+      "gitBlobSha1": "efb4325ed120d904e1f6bf65ded5506f816e9b21",
+      "sha256": "d62ef7bb4747dc68887505b15b8ff3da5876d965b2ba4292d3db18f889d2619d"
+    },
+    {
+      "path": "test/sync-package-manifest.test.mjs",
+      "bytes": 3326,
+      "gitBlobSha1": "3eca3d3ede57f8351df4c9fc620d74fd34c24d35",
+      "sha256": "b43ab920d7277908f19b461f29ce6f99efeccf1961bf07e712282b2d0a664ed5"
+    },
+    {
+      "path": "test/planner-behavior.test.mjs",
+      "bytes": 2743,
+      "gitBlobSha1": "d7e3a79e9159a0eed6aff34b15c5179add0c9d8c",
+      "sha256": "496f5666fb493ad57fc4ca2e88cdc3524a0aa9de24ea85b904868bdaff5373eb"
+    },
+    {
+      "path": "test/admit-jsnode-operation-package-creation-receipt.test.mjs",
+      "bytes": 2684,
+      "gitBlobSha1": "1d51e15f147d88c2259b03fe0ce60a5ec7682048",
+      "sha256": "98c89996a1195e2a3c7885f6083cd023e95920cea3734a97ff0ecabb218fde3d"
+    },
+    {
+      "path": "test/check-javascript-export-comment-discipline.test.mjs",
+      "bytes": 5873,
+      "gitBlobSha1": "46601a3e6de737b78f3ae4d541799fff73f1d417",
+      "sha256": "8ff24502e606b0706a4845ea300fe7bfafc66a8d64172919ef288192fb6cb32e"
+    },
+    {
+      "path": "test/misfold.test.mjs",
+      "bytes": 2648,
+      "gitBlobSha1": "455b426b31ceb8cf403dcab07710939ef62b1230",
+      "sha256": "409d8a01c922783583d82e95ff443d1195a1292684a2be0c324c93ba628947e8"
+    },
+    {
+      "path": "test/planner-module-closure.test.mjs",
+      "bytes": 1280,
+      "gitBlobSha1": "51e576d3d154378e4901b12673629f6195d6359e",
+      "sha256": "366d1c6bdb61b8a5949701e9f3664df14362f2c450a55a79b09f9a06b903e76d"
+    },
+    {
+      "path": "src/assay-completion.mjs",
+      "bytes": 6994,
+      "gitBlobSha1": "bc3d83262c347fc1500132567875ce5ad1dcf6d2",
+      "sha256": "b6974630cc46693d8a5e45bd5e45b15a1c72f597ffd5ff30aabad8b42ef3fc4c"
+    },
+    {
+      "path": "src/translate-markdown-jsnode-operation-package-specification.mjs",
+      "bytes": 37462,
+      "gitBlobSha1": "1dc7dd23c544fa5e1c7a51fa78cea53db9f556af",
+      "sha256": "c9029dc0cfabc46ff7550134970d3891520573dc44bc98568a88718c76196825"
+    },
+    {
+      "path": "src/fabrication-receipts.mjs",
+      "bytes": 10712,
+      "gitBlobSha1": "0d50ad53c0bd1b594ba7b23e6658f93778f1533f",
+      "sha256": "87317797367a3433e7c6b1d654fd5bf6a45268c0be4ec142b758d99afe188733"
+    },
+    {
+      "path": "src/admit-jsnode-operation-package-creation-receipt.mjs",
+      "bytes": 7580,
+      "gitBlobSha1": "626a2952709a84ecadd496b7248bf6aabd993f6e",
+      "sha256": "665e84cdd2cfc564d2f3f3af23abe91af5b52b1cf1c4e0572606f8d09460219f"
+    },
+    {
+      "path": "src/project-jsnode-operation-tests.mjs",
+      "bytes": 3498,
+      "gitBlobSha1": "2b1ee796dd5c4b5d8502f082fdc28c13d0d3b497",
+      "sha256": "588a0d7c3683f7f187cc54341da49a2d224c2c6e914a8d98d719ef96aba64ef3"
+    },
+    {
+      "path": "src/fabricate-markdown-jsnode-operation-package.mjs",
+      "bytes": 21891,
+      "gitBlobSha1": "5bc4265127c5984c5d4e90188f6db7cf09c9aea7",
+      "sha256": "47d764e113692bf961088c8494e6ff9b3b704fb9cdca31ffee909ae51c393043"
+    },
+    {
+      "path": "src/project-jsnode-operation-package-readme.mjs",
+      "bytes": 2154,
+      "gitBlobSha1": "ab1c319a10909527539d02d27c04fd8c72e6f88a",
+      "sha256": "e0d3c7dfd4c47409c94696e59521acd692a0acbcaf63772283cf97c89c238f1f"
+    },
+    {
+      "path": "src/standardize-package-tests.mjs",
+      "bytes": 10885,
+      "gitBlobSha1": "2348033fb0ab57af9d12cce829970d7838749a32",
+      "sha256": "850c2c36aac79dd24d6830e27037d575ebc9c7caaed86b60001a72e3a43988b6"
+    },
+    {
+      "path": "src/package-files.mjs",
+      "bytes": 1685,
+      "gitBlobSha1": "a6aba12e33bc1631ce4956ba30faee9e35c20298",
+      "sha256": "7c103875fae1e329b3ab3cc5fb777807c0a25981bc76a0836e7974951e2acf65"
+    },
+    {
+      "path": "src/project-jsnode-operation-package.mjs",
+      "bytes": 3805,
+      "gitBlobSha1": "d2baa9a28122ff923cd301440ecb9c670f04cffe",
+      "sha256": "5b10fbbd7585c5f4e484c5c13e6f34b0c8f8127ba546d4a54f54b47938b11fab"
+    },
+    {
+      "path": "src/fabrication-records.mjs",
+      "bytes": 2663,
+      "gitBlobSha1": "23c9dde7d36db80297b90fe42f0f847f6ad92ee3",
+      "sha256": "b5b2881167a586398f30359d3f7ee0a96c64d5442b3303408c12296f6b69acd2"
+    },
+    {
+      "path": "src/jsnode-package.mjs",
+      "bytes": 3870,
+      "gitBlobSha1": "36af8f3edbda7569afb3add4fc858d242b9d31f2",
+      "sha256": "1183945d072326055798416c923c7c19e7f5e3b87f99f02fa3cd930aa0a1d8f5"
+    },
+    {
+      "path": "src/package-imports.mjs",
+      "bytes": 4241,
+      "gitBlobSha1": "27e3aec137f58d89a1cf669b62c1ece6b7936777",
+      "sha256": "5c2100d1cab0a79c7615b1e21eb6f156ac7844eff45c8d904e6dca213055a93b"
+    },
+    {
+      "path": "src/create-jsnode-operation-package.mjs",
+      "bytes": 18997,
+      "gitBlobSha1": "1851f49844709d09f83a7c3ab81812174a007204",
+      "sha256": "ebe5488e89addc94a37a6a7b301a13a93624d5fb5e720d05db40a9d8fcbbfb97"
+    },
+    {
+      "path": "src/package-test-plan.mjs",
+      "bytes": 6879,
+      "gitBlobSha1": "e86dafdf65e64f0ade8786abe5c28dcb8e3f4e97",
+      "sha256": "7bbe0f8925ecd4dabef28b657d381ba0007dd1e73090e553a28a74d419c92820"
+    },
+    {
+      "path": "src/native-assay-profile.mjs",
+      "bytes": 10609,
+      "gitBlobSha1": "7f74f9f746defabcb506798623e3275387becaee",
+      "sha256": "0a316e30ff8157a725cb4d27afa8ee99283c7622e6391fc560a3605f5198b299"
+    },
+    {
+      "path": "src/project-jsnode-module-paths.mjs",
+      "bytes": 1320,
+      "gitBlobSha1": "642f54368ed385af957d0e62e9efa9deec6aab22",
+      "sha256": "cd2b91fcca026dbc096392cf2384a7e2063a3a8fed15443bf0ea871d747df94f"
+    },
+    {
+      "path": "src/stage-text-file-creation-projections.mjs",
+      "bytes": 6112,
+      "gitBlobSha1": "38cec46c8a27afe9e3254085edc1a96b88c4dde6",
+      "sha256": "538ab55419b2ed9eede5e711d0bb526097a28fc065380364f965a52db90ada1f"
+    },
+    {
+      "path": "src/misfold.mjs",
+      "bytes": 5490,
+      "gitBlobSha1": "78027fa8cbaa44914b7bc18f8e10f72a0d8057d8",
+      "sha256": "f6bd891e076af7ee63f06143209c5f9660d3c1f55143716a1b391630189c15fd"
+    },
+    {
+      "path": "src/assay-channels.mjs",
+      "bytes": 8868,
+      "gitBlobSha1": "d860221c253d429ab9240005cc98f4a02fbc1ab7",
+      "sha256": "a61d41093d3dd38bc5bba6e70abbe5e396ccee6d103f95703a9031a231443c97"
+    },
+    {
+      "path": "src/project-jsnode-modules.mjs",
+      "bytes": 7914,
+      "gitBlobSha1": "fce73eaf485ac8bcd7a2f5ecad38f8ddca3a6dbd",
+      "sha256": "f50fa0e4c97517018f67aff2181658f66dca709d427ae42ffe483bf42565dc74"
+    },
+    {
+      "path": "src/sync-package-manifest.mjs",
+      "bytes": 5725,
+      "gitBlobSha1": "564d8e0586ff039cdbbcf7fd7034243d79e11cee",
+      "sha256": "96ad7241b55134356466272ff5e9ad16e913369fc5ad62999e6a6765e4432ad1"
+    },
+    {
+      "path": "src/package-tree.mjs",
+      "bytes": 1875,
+      "gitBlobSha1": "8f537c9b53b839b1208988b8e377e154a853c58f",
+      "sha256": "f02f7a64757c425c8c769dd3322035db1ed90e1afb132b17281c8c490f22cc3a"
+    },
+    {
+      "path": "src/project-jsnode-operation-source-from-arguments.mjs",
+      "bytes": 8471,
+      "gitBlobSha1": "92cfa82e162fcea785a6de19ba6af7f757feb7d2",
+      "sha256": "277be1f8b420797d4c7eb5bbed55678da0ca327a58dcb34fc8978f2493127e2c"
+    },
+    {
+      "path": "src/derive-jsnode-package-from-closure.mjs",
+      "bytes": 31348,
+      "gitBlobSha1": "53ea728ec37cf9fbf99b91621b2ed54eb9a71f2a",
+      "sha256": "7e5aeb9bf7ecea187a757d38f394c31eba2266b7b52492d125f4441cfef424ab"
+    },
+    {
+      "path": "src/plan-jsnode-modules.mjs",
+      "bytes": 9404,
+      "gitBlobSha1": "0d466d5eb398fff813d4faf376913d586d6cbb61",
+      "sha256": "5dbc2b7d2a56db534f79ac6ee535be36b600c7872a46dd5a4ac644e6ebdebc41"
+    },
+    {
+      "path": "src/closed-assay-schema.mjs",
+      "bytes": 694,
+      "gitBlobSha1": "8b66420609443eaddba455def659ca5b289b2fc9",
+      "sha256": "1f74414b9e09fba951fea07b8ce7e93ef41c6f9eaeb7b87825e1c63202c7dde3"
+    },
+    {
+      "path": "src/admit-jsnode-operation-package-specification.mjs",
+      "bytes": 22559,
+      "gitBlobSha1": "6026e770f40ade64551c23f40fd2f6a3ed6bb024",
+      "sha256": "9f0205c28e5240459b978850dd52c17135c696d04b85b5d9711b9dc73983f220"
+    },
+    {
+      "path": "scripts/check-javascript-export-comment-discipline.mjs",
+      "bytes": 11409,
+      "gitBlobSha1": "34a74c4b5e40417b1e544a0bda021bd1397e344a",
+      "sha256": "e86e3aebd8f731b914e93e75a9006b6db3a7e606eb139ae6c8a6948d0668e657"
+    },
+    {
+      "path": "scripts/emit-fabrication-receipts-to-eavt.mjs",
+      "bytes": 3686,
+      "gitBlobSha1": "fc871de350594b99fb596537744b25fef78e5aef",
+      "sha256": "d6986917ac1f4f199ac2eb10c6105caa0fa44a3c0a3866e4be3c26bd1388f179"
+    },
+    {
+      "path": "scripts/run-package-tests.mjs",
+      "bytes": 3516,
+      "gitBlobSha1": "5620006cbefffd2cc43608a757d0fb415e86a3e9",
+      "sha256": "efb301bb3844d78460065554551ba1575a1fcccc0b50e8dcb51e8e4187623a48"
+    },
+    {
+      "path": "scripts/standardize-package-tests.mjs",
+      "bytes": 3241,
+      "gitBlobSha1": "c87b977cb9938dd588c0b8e1316145f602c93a7f",
+      "sha256": "b2f262228827a6e37b3740c7d04580ec2a8743041c6f64aa4ef311de9f828f1e"
+    },
+    {
+      "path": "scripts/check-package-interfaces.mjs",
+      "bytes": 5191,
+      "gitBlobSha1": "c908e1190e67b855b90e6df2364d795ab28668d4",
+      "sha256": "08c0b4f77cbb5504ff47bc43ca9cc9ab04f5120accff167add18970bc5d1549e"
+    },
+    {
+      "path": "scripts/check-package-syntax.mjs",
+      "bytes": 1303,
+      "gitBlobSha1": "b6bb8141f0d97723eee7d153a37e530a96732f83",
+      "sha256": "3a940e8c960ca3cff5b4db0c19883f2240549749793b49d35201360678e04e09"
+    },
+    {
+      "path": "scripts/project-jsnode-package-cli.mjs",
+      "bytes": 1985,
+      "gitBlobSha1": "106796617066cd3120392906e477153f739af1f6",
+      "sha256": "d7ceb1c526a05bfad4af40acfa359ce00be820e60430b62685e00e420a874934"
+    },
+    {
+      "path": "scripts/sync-package-manifest.mjs",
+      "bytes": 3478,
+      "gitBlobSha1": "a88a4c1100a39bab3c6f15f434fd8bba4b82cbc5",
+      "sha256": "50df21500938248afea31198720680f562417091696bed1bfe7362aae1b53019"
+    },
+    {
+      "path": "apps/translate-markdown-cli.mjs",
+      "bytes": 917,
+      "gitBlobSha1": "57199680f92dafa7d4e1b117dfd357d6ae7be7e9",
+      "sha256": "8deb9aca67e94ed94c9c6d89e5ad311d4faadd8a3670dc848794b2e42658e6e1"
+    },
+    {
+      "path": "apps/jsnode-package-cli.mjs",
+      "bytes": 2948,
+      "gitBlobSha1": "b43d99ab8aae54d7d196a6664656e68ad6313015",
+      "sha256": "41b502b8c8f00d75748ee5e1356ba37d82ba915ce6b601e2c0950137296f12d0"
+    },
+    {
+      "path": "apps/standardize-jsnode-scripts.mjs",
+      "bytes": 33222,
+      "gitBlobSha1": "c3e85685b635cfafddbc935bf717da6ab08cad3c",
+      "sha256": "96885dde242c2efda971c61e4edd672756349ce28524aa1874ea619655174b1b"
+    },
+    {
+      "path": "data/records/2026-09-04-jsnode-script-reprojection-rule.json",
+      "bytes": 3005,
+      "gitBlobSha1": "f2c86aa24edd72494689704818757e910b838aa5",
+      "sha256": "6fa9deeba7974d419e51a3c5f908e38dcaab81347189b828983f705e9d8b0339"
+    },
+    {
+      "path": "data/records/jsnode-package-cli.specification.json",
+      "bytes": 5478,
+      "gitBlobSha1": "258394574cbfc946126db86d4d7d9bbaa7251d9e",
+      "sha256": "08d8f789b2a2b01a3919a63808d1fee760d4c4adca3583afb2e26fca44bf5b60"
+    },
+    {
+      "path": "data/records/schema/translate-markdown-jsnode-operation-package-specification.input.schema.json",
+      "bytes": 187,
+      "gitBlobSha1": "07f321a22b006b8084f1284b9f8ffc3f567ec5f4",
+      "sha256": "51f5eaf5df232aa452118698c72b05b45f4f79df02097ee2798388c249d21243"
+    },
+    {
+      "path": "data/records/schema/create-jsnode-operation-package.input.schema.json",
+      "bytes": 163,
+      "gitBlobSha1": "26dd4c3b28d5462b2383d199bb76632333499ae6",
+      "sha256": "8bcc6604e9fcc40658a0fc4359f360e3a8fbc17423a6ad01da2fbbd344850a64"
+    },
+    {
+      "path": "data/records/schema/create-jsnode-operation-package.output.schema.json",
+      "bytes": 153,
+      "gitBlobSha1": "b200bf042cfb156d62ebad49c153e18ca1c1374d",
+      "sha256": "99f11b2819bdf763f9736ae498f3502cce4d8079bce4c0f4b2d81bd968760a99"
+    },
+    {
+      "path": "data/records/schema/fabricate-markdown-jsnode-operation-package.output.schema.json",
+      "bytes": 165,
+      "gitBlobSha1": "f3fa811d8be26ae2fb6f4ad15b8a49f2fd690449",
+      "sha256": "d2a7e8182b411558d56b1f9fccf7f3a89ea10d7ff0f28eea795ee0ca68991f8d"
+    },
+    {
+      "path": "data/records/schema/project-jsnode-operation-package.output.schema.json",
+      "bytes": 170,
+      "gitBlobSha1": "3dd7df7916a6dac9aed20fa86cbe701a8f656b83",
+      "sha256": "50a9680976b9a578942ad2c9dd0aa2dcfee932d4f7c600dcc44e28b43d2d2710"
+    },
+    {
+      "path": "data/records/schema/jsnode-script-reprojection-rule.schema.json",
+      "bytes": 4060,
+      "gitBlobSha1": "69c8aba28b562562d959ba4066bb14fb8b969c4f",
+      "sha256": "177c1110cead9411bf5fe24bcee9cbadab7d90b877328e9e7bb790aa4f7e3b26"
+    },
+    {
+      "path": "data/records/schema/admit-jsnode-operation-package-specification.input.schema.json",
+      "bytes": 175,
+      "gitBlobSha1": "f618edb04b50d7c2a9737abe7123e87b925f8099",
+      "sha256": "9e82f0071cb9d341cfa49d2ea4bee72c8f75574d4413e3222e45ef15d62fc395"
+    },
+    {
+      "path": "data/records/schema/fabricate-markdown-jsnode-operation-package.input.schema.json",
+      "bytes": 186,
+      "gitBlobSha1": "8012c5b6d12ddaa61ab7d5ec1c67c6753bcf0513",
+      "sha256": "c78afbf9b38bf1597aebb89f5bdc0f78b83376d6662ddf5e270b0f789111f50e"
+    },
+    {
+      "path": "data/records/schema/admit-jsnode-operation-package-specification.output.schema.json",
+      "bytes": 181,
+      "gitBlobSha1": "1eaaf81d06e3ea28e2c75143b81fb5d16c215e26",
+      "sha256": "850a455a33d112f5ecbe79602e36494b18ad4fc07c96c299709516b4e2720a22"
+    },
+    {
+      "path": "data/records/schema/project-jsnode-operation-package.input.schema.json",
+      "bytes": 164,
+      "gitBlobSha1": "ac65b3910e77d1e71e47038e343194c6c8f31d71",
+      "sha256": "7ec84de98607d1c1126315f33c6a18f787df6e9434cd9418b0e941811819c902"
+    },
+    {
+      "path": "data/records/schema/jsnode-module-specification.schema.json",
+      "bytes": 4412,
+      "gitBlobSha1": "ae9cd8923b712084ffff132e3aaa8f7c2edcd01c",
+      "sha256": "c9eef3191cdc0e1d582998dd119d919ad55f1f1e969639d1c5fab70d7e556da2"
+    },
+    {
+      "path": "data/records/schema/translate-markdown-jsnode-operation-package-specification.output.schema.json",
+      "bytes": 193,
+      "gitBlobSha1": "df92d1d4cbc95c663560ca94ec6a832419a3578a",
+      "sha256": "d674e933b63b1fb331ec0b40d391fa8c3d0b12515ce0c39139cf4ff59fae3017"
+    },
+    {
+      "path": "test/support/local-registry.mjs",
+      "bytes": 819,
+      "gitBlobSha1": "379183b3c3549f11754f3d10b1125843b51ce6c3",
+      "sha256": "8cb33f91767fc072b1f6016ec640bee999b3f90412ca579ece337e050e594a33"
+    },
+    {
+      "path": "test/fixtures/controlled-local-assay.mjs",
+      "bytes": 2070,
+      "gitBlobSha1": "d5e9c4f60d7263a8fa7e8bfdd6ceb059032d5292",
+      "sha256": "6e9d6b83c5ad9b204e33f0ee4f4a76ba0bb18d8b150b8404299c73150cdde1ca"
+    },
+    {
+      "path": "test/fixtures/greet-person.md",
+      "bytes": 3448,
+      "gitBlobSha1": "fe40804b7c92fca7ed588c3ad03636c28aa31bad",
+      "sha256": "fad082d7328a8a4421727caec6829b38bc8f0932d3dfff83877b09d9ef8ae1e9"
+    },
+    {
+      "path": "test/fixtures/module-work-order.mjs",
+      "bytes": 2711,
+      "gitBlobSha1": "a5fad9aafb82c51ef2ef4b5780fd96263ebfc611",
+      "sha256": "4987b5a2bd5bcb5df33c58889eebb581f8816c6fe173d140aea0858be501f211"
+    },
+    {
+      "path": "src/workspace/package-manifest.mjs",
+      "bytes": 2678,
+      "gitBlobSha1": "83988f3feb33a6a35309f013860140ae45e9ea3a",
+      "sha256": "0b9b6a52a3d83d54090fd221fbf7dc4273e29730e83ba5cfddcc1d1995bc5603"
+    },
+    {
+      "path": "src/workspace/publication-status.mjs",
+      "bytes": 7051,
+      "gitBlobSha1": "edec22c50adb88261a7bd7a07855958c13c7e298",
+      "sha256": "def63799584c001508ef8ac35f05ee0df36e12dcdc1270dcc185a967c6401701"
+    },
+    {
+      "path": "src/workspace/lockfile.mjs",
+      "bytes": 1909,
+      "gitBlobSha1": "1499c1394fbf37595f1c0845befe0af5823c9209",
+      "sha256": "66df20e1805b951cf50cd6a221d1f373c85795438ac297a788f7f93743a0cea8"
+    },
+    {
+      "path": "src/workspace/pnpm-lockfile.mjs",
+      "bytes": 9081,
+      "gitBlobSha1": "e1d1d559dc223c800df97a5270b29dbb67a1497b",
+      "sha256": "7659b3029e4ec574f2ea1ce0f2d2c1f303e9daecda1ed8e23d163df21e5f1ecc"
+    },
+    {
+      "path": "src/workspace/publication-files.mjs",
+      "bytes": 1935,
+      "gitBlobSha1": "7c20ceb4049de1ad38d17843e2323123a4fc168d",
+      "sha256": "233f302b3a43687afa7ef62d026273b0aa2f93c574d6888fde5858355869a25c"
+    },
+    {
+      "path": "src/workspace/workspace-declaration.mjs",
+      "bytes": 2637,
+      "gitBlobSha1": "a828f7d05d206b212b8aebc3b8e600c93f7ddc7c",
+      "sha256": "875392c38c7ff79a1475d10baeb3ceb6ef3395a997f63afde3a2135a89534d98"
+    },
+    {
+      "path": "src/workspace/package-interfaces.mjs",
+      "bytes": 9731,
+      "gitBlobSha1": "9201578034d2338b83f095acb7c6e36b597b9258",
+      "sha256": "812fbdc5460aab997a04dd92f5c49d8f27e6ebbecdf14fd381748d584cab38f1"
+    },
+    {
+      "path": "src/workspace/package-surface.mjs",
+      "bytes": 5536,
+      "gitBlobSha1": "caba9475e939e42d602db1998d68e4a5bf5ec7fb",
+      "sha256": "ee0a42265cd14f1d07da0851a0c7c6f4aae14a30df9336d6440cb1cc1c0248ff"
+    },
+    {
+      "path": "src/workspace/bins/index.mjs",
+      "bytes": 2213,
+      "gitBlobSha1": "f75df9df2fc1f75517bea66e3e5e695b8118d05b",
+      "sha256": "6dd22db3f37b8c399510f883de2a7de0dead672a50292373a6f48c5a3a0b29f0"
+    },
+    {
+      "path": "src/workspace/bins/script-catalog.mjs",
+      "bytes": 1355,
+      "gitBlobSha1": "c74865e1d5f4f302be5450d715e9f804bab296aa",
+      "sha256": "f86367c4371c001670282770470af24bda9357435e124adea1ee123a79cfeb9f"
+    },
+    {
+      "path": "src/workspace/exports/index.mjs",
+      "bytes": 6923,
+      "gitBlobSha1": "e90fddaf272434dbbe6ed97292c1821dbf9d975a",
+      "sha256": "f1ce112d00729e79d08e1fd80c55d7cdb2f5ef7a63c579fe87e0c80265bf8164"
+    },
+    {
+      "path": "src/workspace/exports/resolve.mjs",
+      "bytes": 8309,
+      "gitBlobSha1": "f85e78882b73d2d69981dd1f4d1ccc55f4a55148",
+      "sha256": "245919db43dc23dbc670749f613a112412635d59a28328e30592d49c7c36e6fd"
+    },
+    {
+      "path": "src/workspace/schemas/admission.mjs",
+      "bytes": 5225,
+      "gitBlobSha1": "bb217dd309b9e40c79a053e697fab66f679e9711",
+      "sha256": "11af4c7ed9723ba9cd69c9c4e9fb7cd3f3776ad76bbf214ca613e2480170a510"
+    },
+    {
+      "path": "src/workspace/schemas/publication-status.mjs",
+      "bytes": 3802,
+      "gitBlobSha1": "b7093bff275b5b59ee29ff7459964052bc775078",
+      "sha256": "6dae1dcf20e86e58cf1e8e313b60a9d3d9b76bbf7841d5efc63ac9862f383427"
+    },
+    {
+      "path": "src/workspace/schemas/bins.mjs",
+      "bytes": 3164,
+      "gitBlobSha1": "282a46c927a348914bc9e4bb52f44e438ba10741",
+      "sha256": "5a55ea48184f2d889935c689973a215bc4e52a993799fa6dd6660c2fbe2b5efa"
+    },
+    {
+      "path": "src/workspace/schemas/exports.mjs",
+      "bytes": 1718,
+      "gitBlobSha1": "08e730c6652b2f87ed7a6df0ca1f4e0129e52d18",
+      "sha256": "9eebdce3ff7fae5fa1b01fee062c916c7260338c57b8feb8c04df9cc4f43df08"
+    },
+    {
+      "path": "src/workspace/schemas/package-surface.mjs",
+      "bytes": 2086,
+      "gitBlobSha1": "4f7cacf4ff5a9ee9e37ca2128044a1b620d7e077",
+      "sha256": "5b680d5914260b5f2121c6d0c95395d154fe829690efea1d825e4a2f0683200a"
+    },
+    {
+      "path": "content/text/documents/specifications/project-jsnode-operation-source-from-arguments.md",
+      "bytes": 28332,
+      "gitBlobSha1": "406810ae4fa7621eff771f3fbf445c4eb064ff6f",
+      "sha256": "7dc8cb68700c87fdced752c04ad4cd1af3b6f90cc468a7cdd3752633c8431ec8"
+    }
+  ],
+  "publishedManifest": [
+    {
+      "path": "package.json",
+      "bytes": 6358,
+      "gitBlobSha1": "9739b27e464f096a80ba9d79c32c0cce4aa5cf45",
+      "sha256": "edef4ff4e506a4ba33d2d2cb49ec12a1c408981c22b67b4fdcb5c7d14b6c3c40",
+      "sourceBlob": "ab7e2b8bbccce973a908125c2a887e99cad9aa6c"
+    }
+  ],
+  "supplierSelections": [
+    {
+      "name": "@red-cup-engineering/computer-filepath-engineering-services-section",
+      "declaredVersion": "0.1.0",
+      "selectedVersion": "0.1.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+computer-filepath-engineering-services-section@0.1.0/node_modules/@red-cup-engineering/computer-filepath-engineering-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 1356,
+        "gitBlobSha1": "d00140575ad913bd00f7202855e3661d77a7132d",
+        "sha256": "9b9a36059f033250dd8847aa80fdbaeaae39184a06c0edcddc9bab7c85244261"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/computer-text-content-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/json-services-section": "0.4.0"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/computer-text-content-engineering-services-section",
+      "declaredVersion": "0.1.0",
+      "selectedVersion": "0.1.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+computer-text-content-engineering-services-section@0.1.0/node_modules/@red-cup-engineering/computer-text-content-engineering-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 867,
+        "gitBlobSha1": "7fbc206066d7516974b8507370b2b792151d04df",
+        "sha256": "22738dc6b73e2d03f61f67dfa4d5e0262de379bc89833ece463654602ab1df41"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/json-services-section": "0.4.0"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/cryptographic-computer-data-engineering-services-section",
+      "declaredVersion": "0.3.1",
+      "selectedVersion": "0.3.1",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+cryptographic-computer-data-engineering-services-section@0.3.1/node_modules/@red-cup-engineering/cryptographic-computer-data-engineering-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 1177,
+        "gitBlobSha1": "7746fe13ac83aaa48e9b8f00bf2e1cb58143c8a8",
+        "sha256": "a566ae04f9addac8538c1b3a8d23414305de15961c1facfafb5f99751ffd3dd7"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/json-services-section": "0.4.0"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/eavt-services-section",
+      "declaredVersion": "0.11.0",
+      "selectedVersion": "0.11.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+eavt-services-section@0.11.0/node_modules/@red-cup-engineering/eavt-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 6461,
+        "gitBlobSha1": "b0836c035e254f7d9d5dcc00b8f1d0e812d6c1bd",
+        "sha256": "07b0aab00b1fec97f2e4d09541971e8843b7efd2361d2f7934df286cd2f92a1c"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/cbor-services-section": "0.1.1",
+        "@red-cup-engineering/computer-content-address-engineering-services-section": "0.2.0",
+        "@red-cup-engineering/computer-content-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/computer-data-engineering-services-section": "0.2.0",
+        "@red-cup-engineering/computer-file-engineering-services-section": "0.4.0",
+        "@red-cup-engineering/computer-filepath-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/computer-text-content-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/datom-services-section": "0.1.0",
+        "@red-cup-engineering/json-schema-services-section": "0.5.0",
+        "@red-cup-engineering/json-services-section": "0.4.0",
+        "@red-cup-engineering/jsonl-services-section": "0.1.0",
+        "@red-cup-engineering/metrologic": "0.4.0",
+        "@red-cup-engineering/signcell": "0.2.0",
+        "@red-cup-engineering/uri-services-section": "0.1.1"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/execute-javascript-node-command-service",
+      "declaredVersion": "0.3.1",
+      "selectedVersion": "0.3.1",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+execute-javascript-node-command-service@0.3.1/node_modules/@red-cup-engineering/execute-javascript-node-command-service",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 1244,
+        "gitBlobSha1": "2439decad7dfd371db27c42f05d37397d529978e",
+        "sha256": "c6cb5856e2e07677ed09a2b31f4fdff6afb2dab6ddd55b5d6be963c4dc8302f9"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/javascript-node-services-section": "0.3.2"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/computer-file-engineering-services-section",
+      "declaredVersion": "0.4.0",
+      "selectedVersion": "0.4.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+computer-file-engineering-services-section@0.4.0/node_modules/@red-cup-engineering/computer-file-engineering-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 2969,
+        "gitBlobSha1": "f90bcd3c6b7dad9062b4d26547b0e098ee42ccb8",
+        "sha256": "6d5f429a0780668747b1fc04db5e8d62284f1187109b4a4946cadf6e9694b64e"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/computer-content-address-engineering-services-section": "0.2.0",
+        "@red-cup-engineering/computer-filepath-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
+        "@red-cup-engineering/json-services-section": "0.4.0",
+        "@red-cup-engineering/jsonl-services-section": "0.1.0",
+        "@red-cup-engineering/signcell": "0.1.0"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/inspect-installed-npm-package-service",
+      "declaredVersion": "0.3.2",
+      "selectedVersion": "0.3.2",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+inspect-installed-npm-package-service@0.3.2/node_modules/@red-cup-engineering/inspect-installed-npm-package-service",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 1048,
+        "gitBlobSha1": "5210b756b615e00f54147c3fdabfea32d4c87bed",
+        "sha256": "d62a252cc8720570b298a612162bac273874f9a3ccbd6d4fef940b77d0e235b3"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/json-services-section": "0.4.0",
+        "@red-cup-engineering/jsonl-services-section": "0.1.0",
+        "@red-cup-engineering/javascript-file-import-services-section": "0.1.1",
+        "@red-cup-engineering/javascript-node-services-section": "0.3.2",
+        "@red-cup-engineering/read-javascript-file-export-documentation-service": "0.1.5"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/javascript-node-services-section",
+      "declaredVersion": "0.3.2",
+      "selectedVersion": "0.3.2",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+javascript-node-services-section@0.3.2/node_modules/@red-cup-engineering/javascript-node-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 4078,
+        "gitBlobSha1": "5a7d3a4de8a0bcc03b7c4207cc1f92c591a9e9ec",
+        "sha256": "b9fc01eee9dcea51c3910091eff398f43d6da5b22a5b866c435f44ea4b1b3108"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/computer-text-content-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
+        "@red-cup-engineering/json-services-section": "0.4.0",
+        "@red-cup-engineering/computer-data-engineering-services-section": "0.2.0",
+        "@red-cup-engineering/metrologic": "0.4.0",
+        "@red-cup-engineering/jsonl-services-section": "0.1.0",
+        "@red-cup-engineering/json-schema-services-section": "0.5.0",
+        "@red-cup-engineering/computer-content-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/signcell": "0.2.0",
+        "@red-cup-engineering/markdown-engineering-services-section": "0.5.2",
+        "@red-cup-engineering/read-javascript-file-export-documentation-service": "0.1.5",
+        "@red-cup-engineering/computer-code-engineering-services-section": "0.1.2",
+        "@red-cup-engineering/node-process-services-section": "0.2.2"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/json-schema-services-section",
+      "declaredVersion": "0.5.0",
+      "selectedVersion": "0.5.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 6953,
+        "gitBlobSha1": "eb67d873c2a8934e17a564502e91ae431f5f6083",
+        "sha256": "e2e9018c1e2b1cf8bb90072932cae24d26f4f9748fad812627a09a8429d1c2e7"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@hyperjump/browser": "1.5.1",
+        "@hyperjump/json-schema": "1.18.0",
+        "@red-cup-engineering/computer-data-engineering-services-section": "0.2.0",
+        "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
+        "@red-cup-engineering/json-services-section": "0.4.0",
+        "@red-cup-engineering/uri-services-section": "0.1.1"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/json-services-section",
+      "declaredVersion": "0.4.0",
+      "selectedVersion": "0.4.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 2734,
+        "gitBlobSha1": "2e1214eb36ebe14d11796b049620bf66ffa188d8",
+        "sha256": "1b5945abba04ed87ad57a2a97586ee03b4742d8539fe43c2fabdec1161c181be"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {}
+    },
+    {
+      "name": "@red-cup-engineering/jsonl-services-section",
+      "declaredVersion": "0.1.0",
+      "selectedVersion": "0.1.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+jsonl-services-section@0.1.0/node_modules/@red-cup-engineering/jsonl-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 1222,
+        "gitBlobSha1": "e0a5f10a56ba0e4c95b462e56dac3066829679b3",
+        "sha256": "1ad55396a51c1fa122e2c23d72e2e383d7b17076182261ceca3d0eb2a1576fbf"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/computer-content-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
+        "@red-cup-engineering/json-services-section": "0.4.0"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/npm-package-services-section",
+      "declaredVersion": "0.1.2",
+      "selectedVersion": "0.1.2",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+npm-package-services-section@0.1.2/node_modules/@red-cup-engineering/npm-package-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 3521,
+        "gitBlobSha1": "ec5a27735bde83438ee98043b790ce69cc937c63",
+        "sha256": "561432d03c3698a3ff24d1d84bbb1e1dc69447e6e9976d54d509839b6378885d"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/computer-filepath-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/computer-file-engineering-services-section": "0.4.0",
+        "@red-cup-engineering/json-services-section": "0.4.0",
+        "@red-cup-engineering/jsonl-services-section": "0.1.0",
+        "@red-cup-engineering/execute-javascript-node-command-service": "0.3.1",
+        "@red-cup-engineering/javascript-node-services-section": "0.3.2",
+        "@red-cup-engineering/read-javascript-file-export-documentation-service": "0.1.5"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/npm-workspace-publication-service",
+      "declaredVersion": "0.14.0",
+      "selectedVersion": "0.14.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+npm-workspace-publication-service@0.14.0/node_modules/@red-cup-engineering/npm-workspace-publication-service",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 6459,
+        "gitBlobSha1": "57040b243d73d3f3d55c26152ff4ef56bb07bf07",
+        "sha256": "aa72c06cd36f084bd765725b5971b90bab602d3b6eb2b646670bf0e8a1ee88e2"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "semver": "7.7.2",
+        "@red-cup-engineering/semiotic-eavt-services-section": "0.1.0",
+        "@red-cup-engineering/computer-filepath-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
+        "@red-cup-engineering/computer-file-engineering-services-section": "0.4.0",
+        "@red-cup-engineering/metrologic": "0.4.0",
+        "@red-cup-engineering/uri-services-section": "0.1.1",
+        "@red-cup-engineering/computer-content-address-engineering-services-section": "0.2.0",
+        "@red-cup-engineering/execute-javascript-node-command-service": "0.3.1",
+        "@red-cup-engineering/git-services-section": "0.1.2",
+        "@red-cup-engineering/javascript-node-services-section": "0.3.2",
+        "@red-cup-engineering/npm-registry-read-service": "0.1.2",
+        "@red-cup-engineering/npm-registry-snapshot-services-section": "0.1.1"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/read-javascript-file-export-documentation-service",
+      "declaredVersion": "0.1.5",
+      "selectedVersion": "0.1.5",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+read-javascript-file-export-documentation-service@0.1.5/node_modules/@red-cup-engineering/read-javascript-file-export-documentation-service",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 1126,
+        "gitBlobSha1": "8fe552b4cbd6ea50274b81f184081580f3c6a588",
+        "sha256": "1e31299bc608deef3a8f43429f889fd945c4905c8eb9444e23d848683b7492c2"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/computer-content-engineering-services-section": "0.1.0",
+        "@red-cup-engineering/computer-file-engineering-services-section": "0.4.0",
+        "@red-cup-engineering/jsonl-services-section": "0.1.0",
+        "@red-cup-engineering/javascript-node-services-section": "0.3.2"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/uri-services-section",
+      "declaredVersion": "0.1.1",
+      "selectedVersion": "0.1.1",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+uri-services-section@0.1.1/node_modules/@red-cup-engineering/uri-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 987,
+        "gitBlobSha1": "7a89bc4a80fd0ce9d2e78db3b30722d1a0e0d524",
+        "sha256": "ad2294be4d435b8c12871d030a5976686259c15579818e1dd1eb84d0f96e1dc4"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
+        "@red-cup-engineering/json-services-section": "0.4.0"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/yaml-frontmatter-codec-service",
+      "declaredVersion": "0.1.7",
+      "selectedVersion": "0.1.7",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+yaml-frontmatter-codec-service@0.1.7/node_modules/@red-cup-engineering/yaml-frontmatter-codec-service",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 624,
+        "gitBlobSha1": "47c621d4a0343bbf4cb15ac2fbd9e4a26c481e15",
+        "sha256": "becb8f2abd0d4109c7401d3015cc471b8168c8d72ae2042b9973da63cc0568fb"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "yaml": "2.9.1",
+        "@red-cup-engineering/json-services-section": "0.4.0"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/computer-content-address-engineering-services-section",
+      "declaredVersion": "0.2.0",
+      "selectedVersion": "0.2.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+computer-content-address-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-content-address-engineering-services-section",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 1117,
+        "gitBlobSha1": "2639de202f1b410a6b68bbd77a1c3bd1fe5171f1",
+        "sha256": "cff45a5b99d892048b7e50ec4516e435f1c00cbe7d0e316e9307fe10fdc400c4"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/cbor-services-section": "0.1.1",
+        "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
+        "@red-cup-engineering/uri-services-section": "0.1.1"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/npm-package-version-admission-service",
+      "declaredVersion": "0.2.0",
+      "selectedVersion": "0.2.0",
+      "actualPath": "/workspace/scratch/865ae0d088e2/feltos-world-history/node_modules/.pnpm/@red-cup-engineering+npm-package-version-admission-service@0.2.0/node_modules/@red-cup-engineering/npm-package-version-admission-service",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 803,
+        "gitBlobSha1": "ea5b49ecbffc02905a3bdd9af690dbd72cd580b9",
+        "sha256": "95f6621da8ab68123c485521c55f977bf8cefb744c81c7c9a6397aa98475683f"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {}
+    },
+    {
+      "name": "@red-cup-engineering/npm-scoped-package-name-formation-service",
+      "declaredVersion": "0.3.0",
+      "selectedVersion": "0.3.0",
+      "actualPath": "/workspace/scratch/10aea054c5d5/repos/metroplat-before-ledger-provider-baseline/node_modules/.pnpm/@red-cup-engineering+npm-scoped-package-name-formation-service@0.3.0/node_modules/@red-cup-engineering/npm-scoped-package-name-formation-service",
+      "selection": "exact-existing-installed-supplier",
+      "selectedManifest": {
+        "bytes": 1008,
+        "gitBlobSha1": "4fad6b190942eb5ff3194c5fd253b7fd7674570e",
+        "sha256": "712adbafae77e6772fdea7c3a5330b2a916dce39219cdebe151ea6896997851d"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/npm-owner-admission-service": "0.2.0",
+        "@red-cup-engineering/npm-package-name-leaf-admission-service": "0.3.0"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/computer-data-engineering-services-section",
+      "declaredVersion": "0.7.0",
+      "selectedSourceManifestVersion": "0.7.1",
+      "actualPath": "/workspace/scratch/f196441388a2/fabrication-receiving",
+      "selection": "explicit-prospective-source; not-published-0.7.0",
+      "sourceBase": "aa97dbafcb23d6f706edab52784621ee11b26467",
+      "proposal": "dc7a14beadb8884ef2dc424fdf5a209056c6d121",
+      "artifactFabricationBlob": "7f3ea7870a04ad0008b7ba388de3e6b8a0d604b8",
+      "selectedManifest": {
+        "bytes": 3403,
+        "gitBlobSha1": "10e31974646a8386d592fa01b5e67a961cca1e22",
+        "sha256": "3c30450cf17353f7a27f2b2b2703fc7a90c074fa69875b255b99557608828b25"
+      },
+      "manifestGitHead": null,
+      "declaredDependencies": {
+        "@red-cup-engineering/cbor-services-section": "0.1.1",
+        "@red-cup-engineering/cryptographic-computer-data-engineering-services-section": "0.3.1",
+        "@red-cup-engineering/exact-number-data-service": "0.1.1",
+        "@red-cup-engineering/json-services-section": "0.4.0",
+        "@red-cup-engineering/semiotic-content-address": "0.1.0",
+        "@red-cup-engineering/uri-services-section": "0.1.1"
+      }
+    }
+  ],
+  "sharedSourcesModified": false,
+  "networkOrInstallPerformed": false,
+  "qualifiedAt": "2026-10-26T17:31:44.663711+00:00",
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "architecture": "x64"
+  },
+  "explicitHouseRoot": "/workspace/scratch/f196441388a2/reclamation/jsnode-consumer",
+  "houseDiscovery": {
+    "packages": {
+      "@red-cup-engineering/jsnode-package-services-section": ""
+    },
+    "duplicates": {}
+  },
+  "prospectiveDataSource": {
+    "repository": "red-cup-engineering/computer-data-engineering-services-section",
+    "base": "aa97dbafcb23d6f706edab52784621ee11b26467",
+    "proposalPullRequest": 240,
+    "proposalHead": "dc7a14beadb8884ef2dc424fdf5a209056c6d121",
+    "blobs": [
+      {
+        "path": "src/artifact-fabrication.mjs",
+        "bytes": 56673,
+        "gitBlobSha1": "7f3ea7870a04ad0008b7ba388de3e6b8a0d604b8",
+        "sha256": "8638ae63829476778ab52d040bc74a75808f311c6a075eeaea9c1ed72f5eef11"
+      },
+      {
+        "path": "test/artifact-fabrication.test.mjs",
+        "bytes": 38371,
+        "gitBlobSha1": "37d3fc0948a514cdc85e21ce9411c9f5995609c3",
+        "sha256": "3da90c280859cb358690bac693783f469dd81d0f3cd76567d4b65319dd1e9d33"
+      }
+    ]
+  },
+  "parentDataQualification": {
+    "tests": 267,
+    "pass": 267,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "logPath": "/workspace/scratch/f196441388a2/evidence/fabrication-native.tap",
+    "log": {
+      "bytes": 24566,
+      "gitBlobSha1": "399fde38d1bc36bad92075d846fd3b77c2de83a0",
+      "sha256": "af5a738bc4765ade458d81b94ba33147767efc75a4039c8ba45eed21af20f432"
+    },
+    "repeatedByConsumerReceiver": false,
+    "suppliers": {
+      "sourceBase": "aa97dbafcb23d6f706edab52784621ee11b26467",
+      "proposal": "dc7a14beadb8884ef2dc424fdf5a209056c6d121",
+      "nativeSuppliers": [
+        {
+          "name": "@cto.af/wtf8",
+          "version": "0.0.6",
+          "actualPath": "/workspace/scratch/f196441388a2/lspace-cairn/node_modules/.pnpm/@cto.af+wtf8@0.0.6/node_modules/@cto.af/wtf8",
+          "archiveIntegrity": "sha512-xp/zbWLXuh2WBxi9tIc+Jep7BAwLu8ETTI8xN68ks10bxOBMISs/jcu9DBEkOeGXLaTKUbA0Y2Ficx/jmmPABg==",
+          "registry": "https://registry.561.group/@cto.af/wtf8/-/wtf8-0.0.6.tgz"
+        },
+        {
+          "name": "@red-cup-engineering/cbor-services-section",
+          "version": "0.1.1",
+          "actualPath": "/workspace/scratch/f196441388a2/lspace-cairn/node_modules/.pnpm/@red-cup-engineering+cbor-services-section@0.1.1/node_modules/@red-cup-engineering/cbor-services-section",
+          "archiveIntegrity": "sha512-uUsHbXjvaFihU5JavrJpbG44Hdcg2r7zADeWgM6DO6YeIcSsAo4FrYh35pwzAqLpqQbQJrIOsDVzrccyWURu5g==",
+          "registry": "https://registry.561.group/@red-cup-engineering/cbor-services-section/-/cbor-services-section-0.1.1.tgz"
+        },
+        {
+          "name": "@red-cup-engineering/cryptographic-computer-data-engineering-services-section",
+          "version": "0.3.1",
+          "actualPath": "/workspace/scratch/f196441388a2/lspace-cairn/node_modules/.pnpm/@red-cup-engineering+cryptographic-computer-data-engineering-services-section@0.3.1/node_modules/@red-cup-engineering/cryptographic-computer-data-engineering-services-section",
+          "archiveIntegrity": "sha512-5a5fFFLCntjl4f61TGxcUOVGwCyKhjup/k0f4irnsXA/BC5alsZzeij0NPf6NzAW8kAOQ9u72L7tg8L/2ZuhSA==",
+          "registry": "https://registry.561.group/@red-cup-engineering/cryptographic-computer-data-engineering-services-section/-/cryptographic-computer-data-engineering-services-section-0.3.1.tgz"
+        },
+        {
+          "name": "@red-cup-engineering/exact-number-data-service",
+          "version": "0.1.1",
+          "actualPath": "/workspace/scratch/f196441388a2/lspace-cairn/node_modules/.pnpm/@red-cup-engineering+exact-number-data-service@0.1.1/node_modules/@red-cup-engineering/exact-number-data-service",
+          "archiveIntegrity": "sha512-D54dcxY7eqK23lktqbv0HjjNNroY2clDJ1K5TW7pWN2NBeDOGbS53yGv7sAYfToPn3YH8pKrpBVAB1URg8kcuA==",
+          "registry": "https://registry.561.group/@red-cup-engineering/exact-number-data-service/-/exact-number-data-service-0.1.1.tgz"
+        },
+        {
+          "name": "@red-cup-engineering/json-services-section",
+          "version": "0.4.0",
+          "actualPath": "/workspace/scratch/f196441388a2/lspace-cairn/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section",
+          "archiveIntegrity": "sha512-WjToogRIj9qq5VaPQ52Lao8v/rXhSX7umi+rEn0Xysnfv6qAv77llXe68wboADrpQK2micSBS3DSGJWd5CoZkg==",
+          "registry": "https://registry.561.group/@red-cup-engineering/json-services-section/-/json-services-section-0.4.0.tgz"
+        },
+        {
+          "name": "@red-cup-engineering/semiotic-content-address",
+          "version": "0.1.0",
+          "actualPath": "/workspace/scratch/f196441388a2/lspace-cairn/node_modules/.pnpm/@red-cup-engineering+semiotic-content-address@0.1.0/node_modules/@red-cup-engineering/semiotic-content-address",
+          "archiveIntegrity": "sha512-5+Rap5Ya8biH9nRzVl4HadfIuNomBYfxdDtV7Ly35wvTPrEYrglXZRuXY9Mg0vGQXruTrlBzxaAiYQUXvgyIaQ==",
+          "registry": "https://registry.561.group/@red-cup-engineering/semiotic-content-address/-/semiotic-content-address-0.1.0.tgz"
+        },
+        {
+          "name": "@red-cup-engineering/uri-services-section",
+          "version": "0.1.1",
+          "actualPath": "/workspace/scratch/f196441388a2/lspace-cairn/node_modules/.pnpm/@red-cup-engineering+uri-services-section@0.1.1/node_modules/@red-cup-engineering/uri-services-section",
+          "archiveIntegrity": "sha512-y5Ipia5hTOLT/0lzEX+DAC/qtfT7ey17jNT/2dh7r0fqromCUxUOQiJOYaapXXWqe79T1sCEmICjukFuLvizmw==",
+          "registry": "https://registry.561.group/@red-cup-engineering/uri-services-section/-/uri-services-section-0.1.1.tgz"
+        },
+        {
+          "name": "cbor2",
+          "version": "2.4.0",
+          "actualPath": "/workspace/scratch/f196441388a2/lspace-cairn/node_modules/.pnpm/cbor2@2.4.0/node_modules/cbor2",
+          "archiveIntegrity": "sha512-s6+CPoEI6tgwasK2cWMTXt5sy8Yxo4vgRmKgkJSCdKDL/0bHU3aYJoYeHRX7/oywKYA3bxcpqEYkXkrdHe0+0Q==",
+          "registry": "https://registry.561.group/cbor2/-/cbor2-2.4.0.tgz"
+        }
+      ],
+      "metrologicSource": {
+        "path": "lib/metrologic/src/number/finite-capacity.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "953a01e63f35861af53a6e7a89a64eb42be090ee",
+        "size": 7645,
+        "url": "https://api.github.com/repos/red-cup-engineering/computer-data-engineering-services-section/git/blobs/953a01e63f35861af53a6e7a89a64eb42be090ee"
+      }
+    }
+  },
+  "consumerQualification": {
+    "originalFiles": [
+      "test/connected-module-fabrication.test.mjs",
+      "test/project-jsnode-modules.test.mjs",
+      "test/fabrication-records.test.mjs"
+    ],
+    "authoredControls": "consumer-receiving.test.mjs",
+    "tests": 12,
+    "pass": 12,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMilliseconds": 1642.267243,
+    "connectedControlFamilyCountedAsOneTestFile": true,
+    "authoredControlCount": 7,
+    "externalInferenceCalls": 0,
+    "productionSandboxQualification": false,
+    "publishedCandidateQualification": false,
+    "runtimeDeploymentQualification": false
+  },
+  "firstAttempt": {
+    "tests": 12,
+    "pass": 10,
+    "fail": 2,
+    "reason": "Original resolver repository discovery included unrelated receiving trees and selected an incomplete URI source. The supported HOUSE_ROOT binding corrected qualification scope; source and suppliers were not changed.",
+    "retainedLog": "ambient-root-refusal.tap"
+  },
+  "retainedArtifacts": [
+    {
+      "path": "consumer-receiving.test.mjs",
+      "bytes": 6080,
+      "sha256": "32469c2b037c53e8ed718cf3ee9a2318c3cd5bc92670f979e802aaed7084e896",
+      "gitBlobSha1": "18b1687880540aa8f2763bcee5a02906e08cd815"
+    },
+    {
+      "path": "native.tap",
+      "bytes": 3065,
+      "sha256": "9d38874e783ccf1f3b4b142e46961f3045d8bc180c8c1d0733a5b585e02a098e",
+      "gitBlobSha1": "f6cdf25b1b8f17d59f636f05810fc89dcee8eb4d"
+    },
+    {
+      "path": "ambient-root-refusal.tap",
+      "bytes": 7283,
+      "sha256": "76f30af81ae796cb80e7c9dd1e10fed25584afe01f51ed7a0be9aa4ed3605701",
+      "gitBlobSha1": "15348cb21ae3c17d25d1ef8fea656b6b25163a5c"
+    },
+    {
+      "path": "receiving.md",
+      "bytes": 6195,
+      "sha256": "2ee7fd8dc700339bd633056edd1ef02645b6da50d23af0031ef1401c006b8c2c",
+      "gitBlobSha1": "348b67954f621e3b3902a30ad3958cdde864637b"
+    }
+  ]
+}

@@ -11,11 +11,43 @@ class Refusal extends Error {
 
 function refuse(code, message, path = null) { throw new Refusal(code, message, path); }
 function record(value) { return value !== null && typeof value === "object" && !Array.isArray(value) && Object.getPrototypeOf(value) === Object.prototype; }
+// The original Fabrication source budget is finite; a candidate supplied as
+// JavaScript (not only parsed JSON) must not cause unbounded recursion, a
+// cyclic semantic digest or accessor execution before a typed refusal.
+// RFC 8259 permits implementation-specific resource limits. These are the
+// Fabrication admission envelope, not a redefinition of generic JSON.
+const FABRICATION_JSON_DEPTH = 128;
+const FABRICATION_JSON_NODES = 65536;
 function json(value) {
-  if (value === null || ["string", "boolean"].includes(typeof value)) return true;
-  if (typeof value === "number") return Number.isFinite(value);
-  if (Array.isArray(value)) return value.every(json);
-  return record(value) && Object.values(value).every(json);
+  const active = new WeakSet();
+  let remaining = FABRICATION_JSON_NODES;
+  const check = (item, depth) => {
+    if (--remaining < 0 || depth > FABRICATION_JSON_DEPTH) return false;
+    if (item === null || ["string", "boolean"].includes(typeof item)) return true;
+    if (typeof item === "number") return Number.isFinite(item);
+    if (!Array.isArray(item) && !record(item)) return false;
+    if (active.has(item)) return false;
+    // Inspect descriptors instead of invoking a caller's getter. Sparse
+    // arrays and hidden or symbolic fields have no faithful JSON carrier.
+    const descriptors = Object.getOwnPropertyDescriptors(item);
+    const keys = Reflect.ownKeys(descriptors);
+    let fields = keys;
+    if (Array.isArray(item)) {
+      if (item.length > remaining || keys.length !== item.length + 1) return false;
+      fields = keys.filter(key => key !== "length");
+      if (fields.some((key, i) => key !== String(i))) return false;
+    } else if (fields.some(key => typeof key !== "string")) return false;
+    if (fields.length > remaining) return false;
+    active.add(item);
+    const valid = fields.every(key => {
+      const descriptor = descriptors[key];
+      return descriptor.enumerable && Object.hasOwn(descriptor, "value")
+        && check(descriptor.value, depth + 1);
+    });
+    active.delete(item);
+    return valid;
+  };
+  try { return check(value, 0); } catch { return false; }
 }
 function freeze(value) {
   if (Array.isArray(value)) for (const item of value) freeze(item);
@@ -406,7 +438,29 @@ export function findArtifactFabricationEpistemicDebt(candidate) {
   return Object.freeze(debt);
 }
 function admittedSpecification(specification) {
-  if (!record(specification) || specification.type !== "ArtifactFabricationSpecification" || ![1, 2].includes(specification.version) || typeof specification.specificationDigest !== "string") refuse("INVALID_SPECIFICATION", "specification must be an admitted ArtifactFabricationSpecification@1 or @2", "specification");
+  if (!record(specification) || specification.type !== "ArtifactFabricationSpecification"
+      || ![1, 2].includes(specification.version)
+      || typeof specification.specificationDigest !== "string") {
+    refuse("INVALID_SPECIFICATION", "specification must be an admitted ArtifactFabricationSpecification@1 or @2", "specification");
+  }
+  // An asserted type/version/digest and plausible nested IDs are not an
+  // admission: the record may have changed since the digest was computed.
+  // Re-run the same original versioned Data admission to verify every source,
+  // claim, trace, projection, obligation and content digest before either a
+  // realization plan or a receipt can refer to the alleged specification.
+  // V1 remains readable ONLY under its original admitted digest.
+  const { type, specificationDigest, ...body } = specification;
+  const checked = admitArtifactFabricationSpecification(
+    { ...body, type: "ArtifactFabricationSpecificationCandidate" },
+    { admittedDigest: specificationDigest },
+  );
+  if (checked.type !== "ArtifactFabricationSpecification") {
+    refuse("INVALID_SPECIFICATION",
+      `specification must re-admit under its content digest (${checked.code || "refused"})`,
+      "specification");
+  }
+  // This verifies the source record, NOT the existence of a produced artifact,
+  // the evidence locator's bytes, a signed attestation or a recipient's result.
 }
 function refusal(error, type) {
   if (error instanceof Refusal) return freeze({ type, version: 1, code: error.code, message: error.message, path: error.path });
@@ -470,7 +524,7 @@ export function admitArtifactFabricationRealizationPlan(specification, candidate
   } catch (error) { return refusal(error, "ArtifactFabricationRealizationPlanRefusal"); }
 }
 
-/** Admits evidence that realizes every trace of an admitted artifact fabrication specification. */
+/** Structurally admits referenced evidence for each trace; does not dereference or independently verify produced bytes, maker execution, or recipient acceptance. */
 export function admitArtifactFabricationRealizationReceipt(specification, candidate) {
   try {
     admittedSpecification(specification);
