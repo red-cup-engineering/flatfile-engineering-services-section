@@ -98,21 +98,61 @@ mathematical claim or a receipt for a fulfilled paid request.
 
 ## Frontier receiving and its limits
 
-The original full optimization supplies a convex marginal resource envelope.
-The frontier operation projects the requested budgets through that envelope.
-It now includes the full independently checkable endpoint witness at
-`originalOptimum.witness`, retaining the actual primal flows and dual
-potentials instead of only endpoint scalars.
+The same original full optimization supplies the convex marginal envelope and
+one primal/dual certificate for each requested budget. The operation takes
+snapshots of the actual residual allocation when an augmentation crosses a
+requested budget. A snapshot applies the exact affordable fraction of that
+same path to a read-only capacity projection. It neither reruns optimization
+nor changes the optimizer's residual graph. Zero-cost augmentations are
+exhausted before recording a budget-zero allocation. At a breakpoint the next
+path, or the final network-limited allocation, supplies the snapshot. Budget
+order and repeated requests are retained.
 
-`verifyExactResourceMathWork` independently checks that endpoint and reproduces
-the envelope closure and budget arithmetic through the same pure projection
-used by production. It compares the resulting complete work envelope and
-quotes. This reproduction is separate from an independent primal certificate
-for every intermediate budget allocation. The output explicitly reports
-`intermediatePrimalCertificates:false` and
-`sourceTraceIndependentlyVerified:false`, naming `augmentations` and
-`marginalCostFrontier` as source trace fields. A valid endpoint does not certify
-the optimizer's complete execution history.
+Strictly interior snapshots on one augmentation share a positive-residual
+topology. The producer computes one midpoint potential vector for that topology
+and reuses it for its requested partial allocations, including the zero-amount
+subgraph. The unsaturated shortest path retains its marginal cost. This avoids
+repeating dual construction and shortest-path search for each budget; it does
+not replace the independent checks of each complete allocation.
+
+Each `budgetCertificates` entry binds its original request index, canonical
+budget, complete primal allocation and residual potentials. The independent
+`verifyResourceFlowCertificate` checks every such allocation, including
+conservation, capacity, exact cost, budget and residual optimality. The work
+receiver also checks the quote's delivered amount, cost and next marginal
+cost against that certificate. Producer and receiver both refuse a missing,
+duplicated, foreign-budget, malformed or failed certificate. They keep the
+48-node/128-link/32-query and computed-rational limits; there is no optimizer
+fallback in the receiver. The number of captured allocations is bounded by
+the number of requests, rather than by the number of augmentations.
+
+These mathematical bounds are not a small execution-time or response-size
+guarantee. Independent receiving includes a valid 48-node, 128-link, 32-budget
+rational model whose pure Work exceeds three megabytes. A merchant must admit
+its own computational and transport capacity before taking payment; the pure
+library retains its stated rational domain.
+
+The complete unbudgeted certificate remains at `originalOptimum.witness`.
+New work reports `intermediatePrimalCertificates:true` only after all requested
+budget allocations pass their checks. Historical v1 work without
+`budgetCertificates` remains receivable with its former, explicitly weaker
+scope: independently checked endpoint and arithmetic quote reproduction,
+with `intermediatePrimalCertificates:false`. Removing certificates from new
+work without restoring that complete historical contract is refused.
+
+Neither kind independently certifies the complete unqueried frontier or the
+optimizer's execution history. `sourceTraceIndependentlyVerified:false`
+continues to name `augmentations` and `marginalCostFrontier` as source trace
+fields. A verified selected budget is not evidence about an unqueried budget,
+a measured capacity, authorization, customer acceptance or payment.
+
+Required distinguishing cases include rational interior budgets, exact
+breakpoints, zero-cost paths, empty/unreachable demand, budgets above the
+network limit, repeated/out-of-order queries and reverse-arc rerouting. Each
+selected allocation must match the original single-budget objective and pass
+the independent checker. Altered primal/dual data, a mismatched budget/index,
+false checker testimony and a convex forged curve through the same endpoint
+must refuse whenever the forgery changes a selected quote.
 
 The receiver accepts the original pure work object. A downstream evidence
 wrapper must select that object before receiving it; additional assertions are

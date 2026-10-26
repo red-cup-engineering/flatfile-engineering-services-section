@@ -1,0 +1,80 @@
+{
+  "subject": "@red-cup-engineering/metrologic/obstruction/exact-resource-work",
+  "baseCommit": "198b0c26f70fdf4395a9f6a189c2f69751fae5d5",
+  "sourceDirectory": "lib/metrologic",
+  "purpose": "Independently checked requested-budget allocations from one original residual optimization",
+  "sourceFiles": {
+    "src/obstruction/exact-resource-flow.mjs": "ce026edd7920c9105b743c1f395b33707f53d84f9e0cab62505f8fc521a68d03",
+    "src/obstruction/exact-resource-work.mjs": "06fd6e019bda4f5978ad3154d6b265c7548d6a2158a1f5f7493d6ced073cca32",
+    "specifications/exact-resource-work.md": "0e140a754d8ed82a57a34d6977745d6216e6bfd02941c01042caee0475fbf81b",
+    "test/exact-resource-work-receiving.test.mjs": "41949c1b0d07209d33805e7b3d069b1ce3346cca8066d09e05344cc0888c8917",
+    "test/fixtures/exact-resource-work.json": "1cc23a9b4714e191da4b0f0c8c3ddc05bd9e7098654aaa2c7305bf051c184d14",
+    "test/exact-resource-budget-oracle.test.mjs": "d6d297fd55e6c353e92ff2320c5328f8ad34d7e614f04c034ab043fb27d43d22"
+  },
+  "nativeSourceReceiving": {
+    "command": "npm test",
+    "passed": 673,
+    "failed": 0,
+    "skipped": 0,
+    "logSha256": "bb27afd17b72ec474691f2efe4b9113ed98bd394db19fc79f35fb0d989d329c4"
+  },
+  "nativeArchiveReceiving": {
+    "command": "node --test --test-isolation=none --test-reporter=tap test/exact-resource-flow.test.mjs test/exact-resource-work-receiving.test.mjs",
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0,
+    "logSha256": "61275054ba6e752bceb2e9bd141183dde1c87796e311c2b83aec37e6c6ee9502"
+  },
+  "archive": {
+    "name": "@red-cup-engineering/metrologic",
+    "version": "0.14.3-dev.4",
+    "filename": "red-cup-engineering-metrologic-0.14.3-dev.4.tgz",
+    "size": 463376,
+    "unpackedSize": 1815198,
+    "integrity": "sha512-sxRO49CNwJAyoVaAt48PvE4bTpFe8K+PDVod3nMsrOxVpBcmhdytQi2Aew1AutMPA7feyupe9/TyrJldu6b1Og==",
+    "shasum": "3c5370aabdda06476225fbfb4d9fa4c11fa51d10",
+    "entryCount": 211
+  },
+  "independentOracle": {
+    "source": "lib/metrologic/test/exact-resource-budget-oracle.test.mjs",
+    "networks": 240,
+    "assignments": 31645,
+    "feasibleAssignments": 1720,
+    "budgetCertificates": 3120,
+    "serializedWholeReceipts": 240,
+    "extraCases": [
+      "partial reverse-arc rerouting",
+      "colocated free delivery",
+      "lower-budget optimum falsely claimed at a larger budget"
+    ],
+    "method": "Independent BigInt enumeration of feasible integer allocations and continuous interpolation; no optimizer or shared arithmetic used by oracle"
+  },
+  "practicalBoundary": {
+    "observedModel": {
+      "nodes": 48,
+      "links": 128,
+      "budgets": 32,
+      "costDenominatorDigits": 14
+    },
+    "longRationalChainWorkBytes": 3442888,
+    "observedComputeMilliseconds": 8053.149,
+    "observedReplayMilliseconds": 4340.524,
+    "limit": "Host observation, not a production latency guarantee. Merchant capacity admission is independently required; the mathematical library retains its rational domain."
+  },
+  "scope": {
+    "verified": "Each requested-budget and original unbudgeted primal feasibility, minimum cost, and budget-optimal throughput",
+    "notEstablished": [
+      "unqueried frontier correctness",
+      "optimizer execution history",
+      "physical measurements",
+      "integer job allocation",
+      "rights",
+      "cash authority",
+      "customer acceptance",
+      "payment",
+      "immutable publication",
+      "live deployment"
+    ]
+  },
+  "compatibility": "Historical receipts without budget certificates retain their old weaker scope; stripping only new certificates is refused."
+}
