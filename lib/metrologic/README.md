@@ -404,3 +404,7 @@ pnpm test
 ```
 
 Runtime exports load directly from JavaScript ESM source; no TypeScript build is required.
+
+## Python exact-arithmetic consumer
+
+[PyPredCalc](python/pypredcalc/README.md) is the received Python distribution for the historical exact-arithmetic predication SDK. It keeps its public `pypredcalc` imports and native tests. It is an explicitly separate Python implementation under this mathematical Data owner; no equivalence with every current JavaScript operation is asserted.

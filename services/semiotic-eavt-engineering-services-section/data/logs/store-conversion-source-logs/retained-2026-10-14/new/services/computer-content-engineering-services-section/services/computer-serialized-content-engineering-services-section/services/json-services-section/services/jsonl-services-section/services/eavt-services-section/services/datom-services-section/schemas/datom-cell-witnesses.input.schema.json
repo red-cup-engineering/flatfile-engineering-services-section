@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "section": {
+      "type": "object"
+    },
+    "cell": {
+      "type": "object"
+    }
+  },
+  "required": ["section", "cell"],
+  "additionalProperties": false
+}

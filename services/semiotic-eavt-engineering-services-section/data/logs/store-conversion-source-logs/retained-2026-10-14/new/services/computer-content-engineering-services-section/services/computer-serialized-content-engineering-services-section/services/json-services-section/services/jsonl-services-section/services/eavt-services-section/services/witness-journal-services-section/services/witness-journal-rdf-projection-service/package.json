@@ -1,0 +1,37 @@
+{
+  "name": "@lenticule-science/witness-journal-rdf-projection-service",
+  "version": "0.6.1",
+  "type": "module",
+  "description": "Projects strict SEAVT source rows into RDFC-1.0 named graphs and returns the derived graph bytes' opaque NI commitment. It does not own journal custody, trace, charge, or settlement.",
+  "exports": {
+    ".": {
+      "import": "./src/witness-journal-rdf.mjs"
+    },
+    "./http-handler": {
+      "types": "./types/http-handler.d.mts",
+      "import": "./src/http-handler.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "scripts",
+    "types"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@red-cup-engineering/computer-content-address-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-data-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/computer-triplet-serialized-content-engineering-services-section": "workspace:*",
+    "@red-cup-engineering/eavt-services-section": "workspace:*",
+    "@red-cup-engineering/json-services-section": "workspace:*",
+    "@red-cup-engineering/semiotic-eavt-services-section": "workspace:*",
+    "@red-cup-engineering/uri-services-section": "workspace:*",
+    "@red-cup-engineering/witness-journal-document-service": "workspace:*"
+  }
+}

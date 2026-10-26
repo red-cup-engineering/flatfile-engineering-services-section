@@ -1,0 +1,2 @@
+import assert from "node:assert/strict"; import test from "node:test"; import { projectHookBudgetGuard } from "../src/hook-budget-guard.mjs";
+test("pressures only over-budget hook payloads", () => { assert.equal(projectHookBudgetGuard({ payload: { text: "small" }, budgetLimitTokens: 100 }).pressured, false); const over = projectHookBudgetGuard({ payload: { tool_name: "Read", text: "x".repeat(1000) }, budgetLimitTokens: 100 }); assert.equal(over.pressured, true); assert.match(over.advice, /compact projection/u); });

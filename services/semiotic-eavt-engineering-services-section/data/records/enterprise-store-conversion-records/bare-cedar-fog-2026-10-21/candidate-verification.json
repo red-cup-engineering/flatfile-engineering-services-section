@@ -1,0 +1,171 @@
+{
+  "type": "EnterpriseStoreCandidateVerification",
+  "at": "2026-10-21T07:08:23.272Z",
+  "sourceClosureUnchanged": true,
+  "writer": "/gnu/store/mgvc0wl50pmq6s7ivnkylh3qa2s8lwqp-registry-runtime/node_modules/.pnpm/@red-cup-engineering+semiotic-eavt-services-section@0.3.1/node_modules/@red-cup-engineering/semiotic-eavt-services-section",
+  "currentConsumer": "/gnu/store/mgvc0wl50pmq6s7ivnkylh3qa2s8lwqp-registry-runtime/node_modules/.pnpm/@red-cup-engineering+feltos@0.21.9-dev.0_@red-cup-engineering+inference-work-lot-servic_e8e2d0db2b0ed5386e7de8f26ed1e0f4/node_modules/@red-cup-engineering/feltos/src/work/claim-session-store.mjs",
+  "results": [
+    {
+      "name": "causeway-publishing",
+      "candidate": "/home/emsenn/info/lib/emsenn/services/561-group/services/public-services-section/data/state/enterprise-store-state/causeway-publishing-candidate-2026-10-21-qualified-suppliers",
+      "report": "/home/emsenn/info/lib/emsenn/services/561-group/services/public-services-section/data/logs/enterprise-store-conversion-logs/causeway-publishing-2026-10-21-qualified-suppliers.json",
+      "qualified": true,
+      "sourceSegmentsReverified": 123,
+      "types": {
+        "claim-session": {
+          "records": 629,
+          "heads": 69
+        }
+      },
+      "currentFeltosCompleteFold": {
+        "rows": 629,
+        "malformed": 0,
+        "missing": 0,
+        "feeds": 69
+      },
+      "threadNames": [
+        "structured-work-intent-causeway-joy-terran-market-assessment",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-19-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-22-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-23-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-24-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-36-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-37-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-38-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-39-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-40-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-41-bea74344",
+        "structured-work-intent-demand-github-emsenn-bare-cedar-fog-45-bea74344",
+        "structured-work-intent-report-ymepwm8r4rhexlgpf84ibved",
+        "structured-work-intent-request-0iogwnzpwz6g2cufi26dlmdx",
+        "structured-work-intent-request-38x8xzamc6hpccnsz0qwdslr",
+        "structured-work-intent-request-5rj9punutdivwnskpcd2mse1",
+        "structured-work-intent-request-60zun9onwtk8ygytaugnea2i",
+        "structured-work-intent-request-6yk8em2sn0cbwpuwugdvkjij",
+        "structured-work-intent-request-7xzmoxkba4esygncykw5rtkg",
+        "structured-work-intent-request-81ydpbxmihb2ocfrvupnuil4",
+        "structured-work-intent-request-8ematxumw18pwevsn0pdu4sj",
+        "structured-work-intent-request-a6gjvxsju8v92wginkhsqfj8",
+        "structured-work-intent-request-amy0ezdslnmsnauz6e1ojnso",
+        "structured-work-intent-request-bevygkffaylodzpxanx7x0db",
+        "structured-work-intent-request-bk9tybi8dmcsab4iufyifjqw",
+        "structured-work-intent-request-coi1x1lkfteczy91g2i7ndtc",
+        "structured-work-intent-request-cpsztgkvhsz364h31kxkjzvd",
+        "structured-work-intent-request-dzog1tjbj9mryzmegednqx8l",
+        "structured-work-intent-request-f06aamnrvggpdxfdgj31yser",
+        "structured-work-intent-request-fa8pz43wbtkcomkfe51fjjxc",
+        "structured-work-intent-request-frweazzutnf7ikpbkxtvwmsv",
+        "structured-work-intent-request-hh10zuuvcovtkoii50i14we7",
+        "structured-work-intent-request-i32owesdihwbexlzirafiew0",
+        "structured-work-intent-request-imnvpmsz4zkrk0wsdvl7hjo4",
+        "structured-work-intent-request-iqlnrettipt9yzhecimtmoc9",
+        "structured-work-intent-request-ixkvqpdjubbvvloxlmwcswmo",
+        "structured-work-intent-request-lhu4hxrufrm4y4kls8x1jrvx",
+        "structured-work-intent-request-llqthtn2lwsjc1bxuplr5arl",
+        "structured-work-intent-request-lw8gmin05bsyauvaphf6khsb",
+        "structured-work-intent-request-mjrichxcc9ixtzdndwtap13o",
+        "structured-work-intent-request-mqpcs1mjskoswyxq92bglicg",
+        "structured-work-intent-request-mqpqpjpzddwtq9ogtflldsxw",
+        "structured-work-intent-request-mtru3bpee2uwrceysz0zjj19",
+        "structured-work-intent-request-mu3s8c3l3en3ysodrqmcurvq",
+        "structured-work-intent-request-mumn6oflujowk9q6sdiw3pow",
+        "structured-work-intent-request-nuyktlp6es6l7lbxyhpzkp1i",
+        "structured-work-intent-request-qnqxjfgjit05luy6y8pqjogm",
+        "structured-work-intent-request-qrlv1dy1jx2ewzhpwj7twcla",
+        "structured-work-intent-request-rfbcxb1sl7v63haflglj6bo0",
+        "structured-work-intent-request-rjkb4jqwz9efxjhqcic3hmnc",
+        "structured-work-intent-request-sagvavcjpu8qrkxpdyt2dyhu",
+        "structured-work-intent-request-sfowc6f3uoru9kpzjdrhgvyl",
+        "structured-work-intent-request-u6qv1vnbeuoxtdhtsozttzf5",
+        "structured-work-intent-request-ug0p5fn8roa8lvvklaxq1drg",
+        "structured-work-intent-request-uknrtacuxpzpogiq9yg56inm",
+        "structured-work-intent-request-vcpqw5qrnohz2mxgeu76xcru",
+        "structured-work-intent-request-zd96rrqcvfql4g2n4xhuo6wv",
+        "structured-work-intent-request-ztyyowqa3mzonol7ey8mpfev",
+        "structured-work-intent-structured-work-intent-request-a6gjvxsju8v92wginkhsqfj8",
+        "structured-work-intent-verify-white-1gzwpov2gjinguczisjnc0bu-1",
+        "structured-work-intent-verify-white-318o7rq79jnf3feiacukgscx-1",
+        "structured-work-intent-verify-white-dtasb9gdxledpdlimcyqddsg-1",
+        "structured-work-intent-verify-white-dtasb9gdxledpdlimcyqddsg-1-attempt-2",
+        "structured-work-intent-verify-white-dtasb9gdxledpdlimcyqddsg-1-attempt-3",
+        "structured-work-intent-verify-white-ehexaovn45vdvj5sh7ovsd3x-1",
+        "structured-work-intent-verify-white-f1xnbxlptgx1wqzxj24dij2j-1",
+        "structured-work-intent-verify-white-kpdfzqlvolyk01jnnimqcc7i-1",
+        "structured-work-intent-verify-white-o4hdxraiw5ykxjwvgawmtdoq-1",
+        "structured-work-intent-verify-white-yo3npie9qy0rrbxty4fmyiq5-1"
+      ],
+      "sourceOnly": {
+        "enterprise": 6
+      },
+      "referenceDispositions": {
+        "file": ".conversion-reference-dispositions.jsonl",
+        "count": 1896,
+        "unresolvedNamedCitations": 0
+      },
+      "causesDropped": 0,
+      "activation": false
+    },
+    {
+      "name": "codex-node",
+      "candidate": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-systems-engineering-services-section/services/agent-computer-system-engineering-services-section/services/agent-harness-computer-system-engineering-services-section/services/codex-harness-services-section/data/state/enterprise-store-state/codex-node-candidate-2026-10-21",
+      "report": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-systems-engineering-services-section/services/agent-computer-system-engineering-services-section/services/agent-harness-computer-system-engineering-services-section/services/codex-harness-services-section/data/logs/enterprise-store-conversion-logs/codex-node-2026-10-21.json",
+      "qualified": true,
+      "sourceSegmentsReverified": 42,
+      "types": {
+        "claim-session": {
+          "records": 481,
+          "heads": 29
+        }
+      },
+      "currentFeltosCompleteFold": {
+        "rows": 481,
+        "malformed": 0,
+        "missing": 0,
+        "feeds": 29
+      },
+      "threadNames": [
+        "structured-work-intent-aim-wzmvgnae9dfhsal7wdvckjwh",
+        "structured-work-intent-aim-zfivxngl06dvvkeyk5vqzxci",
+        "structured-work-intent-codex-node-assessment-of-broken-link-report-2026-10-02",
+        "structured-work-intent-report-1ud2zek0ssaj9dqcz98terbx",
+        "structured-work-intent-report-jzbngmnuwv9j57drzwrreacp",
+        "structured-work-intent-report-mxdjn6zztcdcocakacdajovs",
+        "structured-work-intent-request-35tb30yicxjwbvpxjop2g79e",
+        "structured-work-intent-request-5xbiwen4ewqbhowr3ijamrta",
+        "structured-work-intent-request-j4fnf78g0eh2kkadh8yafdfi",
+        "structured-work-intent-request-kww9e7plsqu6wx15g10mcqt1",
+        "structured-work-intent-request-qnnn0xcvzznbei9k7ky0jo0o",
+        "structured-work-intent-request-rfuf9jghrsxcwvdyowvhc0nd",
+        "structured-work-intent-request-rhv1dwoylh04jdypqva1k7da",
+        "structured-work-intent-request-shdcdabd7bak11fcpfeagusw",
+        "structured-work-intent-request-sm0lj9no5fzmzcka2ezoxjew",
+        "structured-work-intent-structured-work-intent-assess-taken-demand-35tb30yicxjwbvpxjop2g79e",
+        "structured-work-intent-structured-work-intent-assessing-codex-node-demand-campaign",
+        "structured-work-intent-structured-work-intent-assessing-codex-node-demand-plan",
+        "structured-work-intent-structured-work-intent-assessing-codex-node-demand-project",
+        "structured-work-intent-structured-work-intent-assessing-codex-node-demand-task",
+        "structured-work-intent-structured-work-intent-assessing-codex-node-demand-work-item",
+        "structured-work-intent-structured-work-intent-codex-node-assessment-campaign-aim-zfivxngl06dvvkeyk5vqzxci",
+        "structured-work-intent-structured-work-intent-codex-node-assessment-campaign-codex-node-demand-assessment-v2",
+        "structured-work-intent-structured-work-intent-codex-node-assessment-plan-codex-node-demand-assessment-v2",
+        "structured-work-intent-structured-work-intent-codex-node-assessment-project-codex-node-demand-assessment-v2",
+        "structured-work-intent-structured-work-intent-codex-node-assessment-request-35tb30yicxjwbvpxjop2g79e-v6",
+        "structured-work-intent-structured-work-intent-codex-node-assessment-root-35tb30yicxjwbvpxjop2g79e-v1",
+        "structured-work-intent-structured-work-intent-codex-node-assessment-task-codex-node-demand-assessment-v2",
+        "structured-work-intent-structured-work-intent-codex-node-assessment-work-item-assess-codex-node-demand-v2"
+      ],
+      "sourceOnly": {
+        "enterprise": 6
+      },
+      "referenceDispositions": {
+        "file": ".conversion-reference-dispositions.jsonl",
+        "count": 1670,
+        "unresolvedNamedCitations": 0
+      },
+      "causesDropped": 0,
+      "activation": false
+    }
+  ],
+  "activation": false,
+  "originalsRemainSelected": true
+}

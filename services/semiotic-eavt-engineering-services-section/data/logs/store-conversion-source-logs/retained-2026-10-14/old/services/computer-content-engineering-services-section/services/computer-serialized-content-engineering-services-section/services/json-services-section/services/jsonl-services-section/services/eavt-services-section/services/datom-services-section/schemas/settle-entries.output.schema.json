@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "datoms": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 5,
+        "maxItems": 5
+      }
+    },
+    "kept": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["e", "a", "v", "t"],
+            "properties": {
+              "e": {},
+              "a": {},
+              "v": {},
+              "t": {}
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4
+          }
+        ]
+      }
+    }
+  },
+  "required": ["datoms", "kept"],
+  "additionalProperties": false
+}

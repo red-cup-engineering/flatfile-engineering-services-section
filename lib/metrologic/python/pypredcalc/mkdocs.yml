@@ -1,0 +1,25 @@
+site_name: pypredcalc
+site_description: Pure-math primitives for predication-native computation
+docs_dir: prose/explanation
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - content.code.copy
+
+nav:
+  - Overview: index.md
+  - Algebra: algebra.md
+  - Predication: predication.md
+  - Combinatorics: combinatorics.md
+  - Topology: topology.md
+  - Lattice: lattice.md
+  - Sheaf: sheaf.md
+  - Dynamics: dynamics.md
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.superfences
+  - admonition

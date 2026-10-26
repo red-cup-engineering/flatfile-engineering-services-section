@@ -1,0 +1,42 @@
+[
+  {
+    "name": "@red-cup-engineering/computer-content-address-engineering-services-section",
+    "target": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section",
+    "version": "0.2.0"
+  },
+  {
+    "name": "@red-cup-engineering/computer-data-engineering-services-section",
+    "target": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section",
+    "version": "0.2.3"
+  },
+  {
+    "name": "@red-cup-engineering/computer-file-engineering-services-section",
+    "target": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/computer-file-engineering-services-section",
+    "version": "0.6.5"
+  },
+  {
+    "name": "@red-cup-engineering/cryptographic-computer-data-engineering-services-section",
+    "target": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/cryptographic-computer-data-engineering-services-section",
+    "version": "0.3.1"
+  },
+  {
+    "name": "@red-cup-engineering/eavt-services-section",
+    "target": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/semiotic-eavt-engineering-services-section/data/logs/store-conversion-source-logs/retained-2026-10-14/old/services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/jsonl-services-section/services/eavt-services-section/services/semiotic-eavt-services-section/../..",
+    "version": "0.10.4"
+  },
+  {
+    "name": "@red-cup-engineering/json-schema-services-section",
+    "target": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section/services/json-schema-services-section",
+    "version": "0.5.0"
+  },
+  {
+    "name": "@red-cup-engineering/json-services-section",
+    "target": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/computer-content-engineering-services-section/services/computer-serialized-content-engineering-services-section/services/json-services-section",
+    "version": "0.4.0"
+  },
+  {
+    "name": "@red-cup-engineering/uri-services-section",
+    "target": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/computer-content-engineering-services-section/services/computer-content-address-engineering-services-section/services/uri-services-section",
+    "version": "0.1.1"
+  }
+]

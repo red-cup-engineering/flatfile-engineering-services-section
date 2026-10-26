@@ -1,0 +1,6 @@
+packages:
+  - .
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  - '@red-cup-engineering/semiotic-content-address@0.1.1'
+  - '@red-cup-engineering/signcell@0.11.1'
