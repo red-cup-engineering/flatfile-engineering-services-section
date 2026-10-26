@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { allocateResourceCapacity } from "../src/resource-capacity-allocation.mjs";
+import { allocateResourceCapacity, admitResourceCapacityPortfolio } from "@red-cup-engineering/computer-data-engineering-services-section/resource-capacity-allocation";
 
 const resourceNi = c => "ni:///sha-256;" + c.repeat(43);
 const cpu = resourceNi("A"), ram = resourceNi("B");
@@ -93,4 +93,38 @@ test("bounded vector work rejects missing evidence identities, unsafe benefits a
   for(const input of badInputs){
     assert.throws(()=>allocateResourceCapacity(input),Error);
   }
+});
+
+test("admission and allocation preserve caller ownership while retaining an immutable typed portfolio", () => {
+  const input = { capacities: [resource(cpu, 7), resource(ram, 5)],
+    candidates: [lot("C", 9, 5, 2)] };
+  input.capacities[0].provenance = { annotation: { foo: "caller-only metadata" } };
+  const original = structuredClone(input);
+  const admitted = admitResourceCapacityPortfolio(input);
+  assert.deepEqual(admitted.capacities[0], resource(cpu, 7),
+    "only the original typed capacity fields are admitted");
+  const retained = structuredClone(admitted);
+  allocateResourceCapacity(input);
+  assert.deepEqual(input, original, "pure compute does not change any input value");
+  for (const owned of [input, input.capacities, ...input.capacities,
+    input.capacities[0].provenance, input.capacities[0].provenance.annotation,
+    input.candidates, ...input.candidates,
+    ...input.candidates.flatMap(item => [item.resources, ...item.resources])]) {
+    assert.equal(Object.isFrozen(owned), false, "the caller retains mutable ownership");
+    assert.equal(Object.isExtensible(owned), true);
+  }
+  input.capacities[0].provenance.annotation.foo = "later caller edit";
+  input.capacities[0].quantity = "0";
+  input.capacities.push(resource(resourceNi("F"), 1));
+  input.candidates[0].id = resourceNi("G");
+  input.candidates[0].benefit = 99;
+  input.candidates[0].resources[0].dimensionNi = resourceNi("F");
+  input.candidates[0].resources[0].quantity = "999";
+  input.candidates[0].resources.push(resource(cpu, 1));
+  input.candidates.push(lot("D", 1, 1, 1));
+  assert.deepEqual(admitted, retained, "later caller edits cannot rewrite admitted identities or quantities");
+  assert.equal(Object.isFrozen(admitted.capacities[0]), true);
+  assert.equal(Object.isFrozen(admitted.lots[0]), true);
+  assert.equal(Object.isFrozen(admitted.lots[0].resources), true);
+  assert.ok(admitted.lots[0].resources.every(Object.isFrozen));
 });

@@ -1,4 +1,4 @@
-import { solveFiniteVectorCapacity } from "../lib/metrologic/src/number/finite-capacity.mjs";
+import { solveFiniteVectorCapacity } from "@red-cup-engineering/metrologic/number/finite-capacity";
 
 /**
  * Exact bounded allocation over **nonfungible typed resource dimensions**.
@@ -37,39 +37,50 @@ export function admitResourceCapacityPortfolio({ capacities, candidates } = {}) 
       !Array.isArray(candidates) || candidates.length < 1 || candidates.length > 16) {
     throw new RangeError("bounded capacity allocation admits 1..6 dimensions and 1..16 work lots");
   }
-  const indices = new Map(), available = [];
+  const indices = new Map(), available = [], admittedCapacities = [];
   for (const item of capacities) {
-    if (typeof item?.dimensionNi !== "string" || !NI.test(item.dimensionNi) ||
-        indices.has(item.dimensionNi)) throw new TypeError("capacity needs one unique qualified resource NI");
-    indices.set(item.dimensionNi, indices.size);
-    available.push(quantity(item.quantity));
+    const dimensionNi = item?.dimensionNi;
+    if (typeof dimensionNi !== "string" || !NI.test(dimensionNi) ||
+        indices.has(dimensionNi)) throw new TypeError("capacity needs one unique qualified resource NI");
+    const amount = item.quantity;
+    indices.set(dimensionNi, indices.size);
+    available.push(quantity(amount));
+    admittedCapacities.push(Object.freeze({ dimensionNi, quantity: amount }));
   }
   const seen = new Set(), lots = [], requests = [];
   let benefitSum = 0;
   for (const lot of candidates) {
-    if (typeof lot?.id !== "string" || !NI.test(lot.id) || seen.has(lot.id) ||
-        !Number.isSafeInteger(lot.benefit) || lot.benefit < 1) {
+    const id = lot?.id, benefit = lot?.benefit;
+    if (typeof id !== "string" || !NI.test(id) || seen.has(id) ||
+        !Number.isSafeInteger(benefit) || benefit < 1) {
       throw new TypeError("work lot requires a unique content address and positive safe attention benefit");
     }
-    seen.add(lot.id);
-    benefitSum += lot.benefit;
+    seen.add(id);
+    benefitSum += benefit;
     if (!Number.isSafeInteger(benefitSum)) throw new RangeError("attention benefit aggregate is unsafe");
-    if (!Array.isArray(lot.resources) || !lot.resources.length ||
-        lot.resources.length > indices.size) throw new TypeError("work lot needs a finite typed resource bundle");
+    const resources = lot.resources;
+    if (!Array.isArray(resources) || !resources.length ||
+        resources.length > indices.size) throw new TypeError("work lot needs a finite typed resource bundle");
     const used = new Set(), vector = Array.from({ length: available.length }, () => 0n);
-    for (const resource of lot.resources) {
-      const idx = indices.get(resource?.dimensionNi);
+    const bundle = [];
+    for (const resource of resources) {
+      const dimensionNi = resource?.dimensionNi;
+      const idx = indices.get(dimensionNi);
       if (idx === undefined || used.has(idx)) {
         throw new TypeError("work lot requires known, unique, exactly typed resource dimensions");
       }
       used.add(idx);
-      vector[idx] = quantity(resource.quantity);
+      const amount = resource.quantity;
+      vector[idx] = quantity(amount);
+      bundle.push(Object.freeze({ dimensionNi, quantity: amount }));
     }
-    lots.push(lot);
+    // Freeze only owned admitted values: caller lots and their resource
+    // bundles remain mutable without changing this received portfolio.
+    lots.push({ id, benefit, resources: Object.freeze(bundle) });
     requests.push(vector);
   }
   return Object.freeze({
-    capacities: Object.freeze(capacities.map(item=>Object.freeze({...item}))),
+    capacities: Object.freeze(admittedCapacities),
     lots: Object.freeze(lots.map(item=>Object.freeze(item))),
     available: Object.freeze(available),
     requests: Object.freeze(requests.map(vector=>Object.freeze(vector))),
