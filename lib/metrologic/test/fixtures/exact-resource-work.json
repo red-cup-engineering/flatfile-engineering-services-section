@@ -1,26 +1,289 @@
 {
   "funded": {
-    "nodes": ["lake", "ridge", "hamlet"],
-    "links": [
-      {"id":"a","from":"lake","to":"ridge","capacity":"10","unitResourceCost":"1/5"},
-      {"id":"b","from":"ridge","to":"hamlet","capacity":"10","unitResourceCost":"3/10"}
+    "nodes": [
+      "lake",
+      "ridge",
+      "hamlet"
     ],
-    "sources": [{"node":"lake","capacity":"10"}],
-    "demands": [{"node":"hamlet","amount":"8"}],
+    "links": [
+      {
+        "id": "a",
+        "from": "lake",
+        "to": "ridge",
+        "capacity": "10",
+        "unitResourceCost": "1/5"
+      },
+      {
+        "id": "b",
+        "from": "ridge",
+        "to": "hamlet",
+        "capacity": "10",
+        "unitResourceCost": "3/10"
+      }
+    ],
+    "sources": [
+      {
+        "node": "lake",
+        "capacity": "10"
+      }
+    ],
+    "demands": [
+      {
+        "node": "hamlet",
+        "amount": "8"
+      }
+    ],
     "budget": "2"
   },
   "frontier": {
     "network": {
-      "nodes": ["source", "lowcost", "highercost", "recipient"],
-      "links": [
-        {"id":"first_leg","from":"source","to":"lowcost","capacity":"4","unitResourceCost":"1/5"},
-        {"id":"cheap_delivery","from":"lowcost","to":"recipient","capacity":"4","unitResourceCost":"1/5"},
-        {"id":"second_leg","from":"source","to":"highercost","capacity":"6","unitResourceCost":"1"},
-        {"id":"other_delivery","from":"highercost","to":"recipient","capacity":"6","unitResourceCost":"1"}
+      "nodes": [
+        "source",
+        "lowcost",
+        "highercost",
+        "recipient"
       ],
-      "sources": [{"node":"source","capacity":"10"}],
-      "demands": [{"node":"recipient","amount":"10"}]
+      "links": [
+        {
+          "id": "first_leg",
+          "from": "source",
+          "to": "lowcost",
+          "capacity": "4",
+          "unitResourceCost": "1/5"
+        },
+        {
+          "id": "cheap_delivery",
+          "from": "lowcost",
+          "to": "recipient",
+          "capacity": "4",
+          "unitResourceCost": "1/5"
+        },
+        {
+          "id": "second_leg",
+          "from": "source",
+          "to": "highercost",
+          "capacity": "6",
+          "unitResourceCost": "1"
+        },
+        {
+          "id": "other_delivery",
+          "from": "highercost",
+          "to": "recipient",
+          "capacity": "6",
+          "unitResourceCost": "1"
+        }
+      ],
+      "sources": [
+        {
+          "node": "source",
+          "capacity": "10"
+        }
+      ],
+      "demands": [
+        {
+          "node": "recipient",
+          "amount": "10"
+        }
+      ]
     },
-    "budgets": ["0", "1", "2", "10", "100"]
+    "budgets": [
+      "0",
+      "1",
+      "2",
+      "10",
+      "100"
+    ]
+  },
+  "historicalFrontierWork": {
+    "operation": "exact-resource-frontier",
+    "version": "1",
+    "frontierType": "exact-continuous-budget-to-throughput-pareto-envelope/v1",
+    "resourceBudgetCurrency": "no monetary asset implied; caller selects coherent physical or abstract resource units",
+    "optimizationPasses": 1,
+    "checkedUnbudgetedOriginal": {
+      "verified": true,
+      "claim": "exact primal feasibility, minimum cost at this throughput and budget-optimal delivered volume under fixed linear rational costs",
+      "verifiedDelivered": "10",
+      "verifiedResourceCost": "68/5",
+      "residualAdditionalUnitCost": null,
+      "scope": "algebraic model only: not real hydraulic feasibility, physical datum, policy or rights"
+    },
+    "checkedUnbudgetedReference": {
+      "verified": true,
+      "claim": "exact primal feasibility, minimum cost at this throughput and budget-optimal delivered volume under fixed linear rational costs",
+      "verifiedDelivered": "10",
+      "verifiedResourceCost": "68/5",
+      "residualAdditionalUnitCost": null,
+      "scope": "algebraic model only: not real hydraulic feasibility, physical datum, policy or rights"
+    },
+    "originalOptimum": {
+      "maximumDelivery": "10",
+      "minimumResourceForMaximumDelivery": "68/5",
+      "remainingDemand": "0",
+      "witness": {
+        "delivered": "10",
+        "resourceCost": "68/5",
+        "remainingDemand": "0",
+        "flows": [
+          {
+            "id": "first_leg",
+            "from": "source",
+            "to": "lowcost",
+            "volume": "4"
+          },
+          {
+            "id": "cheap_delivery",
+            "from": "lowcost",
+            "to": "recipient",
+            "volume": "4"
+          },
+          {
+            "id": "second_leg",
+            "from": "source",
+            "to": "highercost",
+            "volume": "6"
+          },
+          {
+            "id": "other_delivery",
+            "from": "highercost",
+            "to": "recipient",
+            "volume": "6"
+          }
+        ],
+        "supplied": [
+          {
+            "node": "source",
+            "volume": "10"
+          }
+        ],
+        "served": [
+          {
+            "node": "recipient",
+            "requested": "10",
+            "delivered": "10"
+          }
+        ],
+        "nextMarginalResourceCost": null,
+        "reducedCostPotentials": [
+          "-2",
+          "-1/5",
+          "-1",
+          "0",
+          "-2",
+          "0"
+        ],
+        "augmentations": 2,
+        "marginalCostFrontier": [
+          {
+            "fromDelivered": "0",
+            "untilDelivered": "4",
+            "fromResourceCost": "0",
+            "untilResourceCost": "8/5",
+            "resourceCostPerDeliveredUnit": "2/5"
+          },
+          {
+            "fromDelivered": "4",
+            "untilDelivered": "10",
+            "fromResourceCost": "8/5",
+            "untilResourceCost": "68/5",
+            "resourceCostPerDeliveredUnit": "2"
+          }
+        ]
+      },
+      "independentResidualPotentials": [
+        "-2",
+        "-1/5",
+        "-1",
+        "0",
+        "-2",
+        "0"
+      ]
+    },
+    "marginalCostFrontier": [
+      {
+        "fromDelivered": "0",
+        "untilDelivered": "4",
+        "fromResourceCost": "0",
+        "untilResourceCost": "8/5",
+        "resourceCostPerDeliveredUnit": "2/5"
+      },
+      {
+        "fromDelivered": "4",
+        "untilDelivered": "10",
+        "fromResourceCost": "8/5",
+        "untilResourceCost": "68/5",
+        "resourceCostPerDeliveredUnit": "2"
+      }
+    ],
+    "budgetQuotes": [
+      {
+        "index": 0,
+        "budget": "0",
+        "maximumDelivery": "0",
+        "minimumResourceForMaximumDelivery": "0",
+        "unspentResource": "0",
+        "nextMarginalResourcePerDeliveredUnit": "2/5",
+        "demandComplete": false,
+        "networkLimited": false,
+        "certificateScope": "exact arithmetic projection of source optimizer's full marginal flow; no independent intermediate primal flow asserted"
+      },
+      {
+        "index": 1,
+        "budget": "1",
+        "maximumDelivery": "5/2",
+        "minimumResourceForMaximumDelivery": "1",
+        "unspentResource": "0",
+        "nextMarginalResourcePerDeliveredUnit": "2/5",
+        "demandComplete": false,
+        "networkLimited": false,
+        "certificateScope": "exact arithmetic projection of source optimizer's full marginal flow; no independent intermediate primal flow asserted"
+      },
+      {
+        "index": 2,
+        "budget": "2",
+        "maximumDelivery": "21/5",
+        "minimumResourceForMaximumDelivery": "2",
+        "unspentResource": "0",
+        "nextMarginalResourcePerDeliveredUnit": "2",
+        "demandComplete": false,
+        "networkLimited": false,
+        "certificateScope": "exact arithmetic projection of source optimizer's full marginal flow; no independent intermediate primal flow asserted"
+      },
+      {
+        "index": 3,
+        "budget": "10",
+        "maximumDelivery": "41/5",
+        "minimumResourceForMaximumDelivery": "10",
+        "unspentResource": "0",
+        "nextMarginalResourcePerDeliveredUnit": "2",
+        "demandComplete": false,
+        "networkLimited": false,
+        "certificateScope": "exact arithmetic projection of source optimizer's full marginal flow; no independent intermediate primal flow asserted"
+      },
+      {
+        "index": 4,
+        "budget": "100",
+        "maximumDelivery": "10",
+        "minimumResourceForMaximumDelivery": "68/5",
+        "unspentResource": "432/5",
+        "nextMarginalResourcePerDeliveredUnit": null,
+        "demandComplete": true,
+        "networkLimited": false,
+        "certificateScope": "exact arithmetic projection of source optimizer's full marginal flow; no independent intermediate primal flow asserted"
+      }
+    ],
+    "claim": "one exact rational shortest-augmentation Pareto envelope, 1-32 derived budgets with one original optimization",
+    "excludedClaims": [
+      "independent intermediate primal certificates",
+      "supply rights",
+      "hydraulic headloss",
+      "nonlinear pressure",
+      "measured source capacity",
+      "spending authorization",
+      "paid customer fulfillment"
+    ],
+    "marketOperation": "original-mathematical-resource-work/v1",
+    "admittedMode": "exact-resource-frontier",
+    "merchantAndPaymentAuthority": "owned by original Market seller; no source operation can authorize cash spending"
   }
 }
