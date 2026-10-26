@@ -422,21 +422,24 @@
   "files": [
     "README.md",
     "src",
-    "scripts",
     "specifications",
     "test/capacity-flow.test.mjs",
     "test/shared-source-capacity-receiving.test.mjs",
     "test/exact-resource-flow.test.mjs",
     "test/exact-resource-work-receiving.test.mjs",
     "test/fixtures/exact-resource-work.json",
-    "test/finite-fluid-circulation.test.mjs"
+    "test/finite-fluid-circulation.test.mjs",
+    "test/settlement.test.mjs",
+    "test/pure-functional-boundary.test.mjs"
   ],
   "receivingTests": [
     "test/capacity-flow.test.mjs",
     "test/shared-source-capacity-receiving.test.mjs",
     "test/exact-resource-flow.test.mjs",
     "test/exact-resource-work-receiving.test.mjs",
-    "test/finite-fluid-circulation.test.mjs"
+    "test/finite-fluid-circulation.test.mjs",
+    "test/settlement.test.mjs",
+    "test/pure-functional-boundary.test.mjs"
   ],
   "sideEffects": false,
   "dependencies": {

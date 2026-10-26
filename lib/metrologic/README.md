@@ -514,6 +514,36 @@ small K(C) orders and a branched counterexample. Machine-facing numbers
 are JSON-safe; encoding, units, network negotiation and authentication
 remain in their proper downstream owners.
 
+## Pure settling operations
+
+The public `./settlement/wire` export supplies `mergeSetOfSettlings` and
+`checkSettlingOrbit` alongside its existing wire readers. Both operations
+receive caller data and reuse the original `readingSettlement` algebra and
+Computer Data FOUR admission. They perform no filesystem, process, clock or
+network operations.
+
+```js
+import { mergeSetOfSettlings, checkSettlingOrbit }
+  from "@red-cup-engineering/metrologic/settlement/wire";
+
+mergeSetOfSettlings([{ a: "potential" }, { a: "active" }]);
+// { a: "stable" }
+checkSettlingOrbit(["absurd", "potential", "stable"], { cell: "a" });
+// { cell: "a", length: 3, monotone: true }
+```
+
+The orbit verdict describes the supplied finite observations in the knowledge
+order. It does not certify future behavior, termination, global monotonicity
+of a generating rule or a physical claim. Wire keys remain the caller's marks;
+SignCell supplies technological cell admission and addressing downstream.
+
+These computations previously lived in unexported `scripts/` modules. Their
+original process-I/O adapter is retired and command payloads are excluded from
+the package. Effectful runtimes own JSON input/output and process status around
+these public operations. The original settlement suite now receives the public
+exports and ships with the package, together with the bounded source/package
+boundary assay already used by the downstream Sign libraries.
+
 ## Development
 
 ```sh
