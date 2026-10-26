@@ -1,0 +1,15 @@
+✔ Int circulation is exact and replayable; no binary64 or callback hides in a witness (2.46337ms)
+✔ finite gradients close, telescope and attest only the current KineticTheory theorem (0.875415ms)
+✔ exact circulation is additive over one sampled finite cochain, not unstable repeated function calls (6.837628ms)
+✔ non-finite, fractional, imprecise, forged and incomplete data cannot mint physics witnesses (0.854353ms)
+✔ the bundled demonstration qualifies its GENERAL and UNIT claims separately (0.536836ms)
+✔ mutating a caller-owned loop after a theorem check cannot falsify its returned witness (0.300431ms)
+✔ accessor-backed or sparse readouts cannot switch cochain values during admission (0.29996ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20.667946
