@@ -521,3 +521,28 @@ pnpm test
 
 Runtime exports load directly from JavaScript ESM source; no TypeScript build is required.
 
+## Exact shared-source allocation
+
+`./obstruction/capacity-flow` also exports `allocateFairSharedSources` and
+`capacityUpgradeResponse`. They consume one explicitly selected unit, original
+capacity-source identities, route identities and canonical nonnegative integer
+atom strings. Each route atom uses one atom of every named source. Exact
+demand-weighted max-min filling constructs a rational ideal; original
+`solveFiniteVectorCapacity` then maximizes feasible whole-atom allocation inside
+each route's floor/ceiling box. This rounding optimum is distinct from an
+unrestricted throughput optimum. A finite search budget may return a feasible
+incumbent and explicitly decline an optimality claim.
+
+The response operation computes first and mixed second finite differences of
+that same allocator under declared source-capacity increments. Positive, zero
+and negative interactions describe that specified mathematical policy, not a
+physical constitutive law, a market price, an observed capacity upgrade or a
+reservation. Source truth, admissible Work, actual execution and recipient
+acceptance remain with their original owners.
+
+The original `test/capacity-flow.test.mjs` retains maximum-flow/minimum-cut and
+new source-allocation cases. `test/shared-source-capacity-receiving.test.mjs`
+retains independently specified allocation/response cases, including the
+distinction between the fair rounding box and unrestricted throughput. Both
+are packaged and declared in `receivingTests`; the complete existing native
+mathematical suite remains the source gate.
