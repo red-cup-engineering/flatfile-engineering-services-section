@@ -1,0 +1,36 @@
+{
+  "name": "@red-cup-engineering/computer-l-space-data-engineering-services-section",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "L-Space data: marks and the valuation-free relations between them, each named by its semiotic content address, the address-only store that keeps them, and JSON read into relations and rendered back out.",
+  "keywords": [
+    "l-space",
+    "semiotic-content-address",
+    "computer-data",
+    "561-group"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/computer-l-space-data-engineering-services-section.git"
+  },
+  "engines": {
+    "node": ">=22.2"
+  },
+  "exports": {
+    ".": "./src/l-space.mjs",
+    "./relate-json": "./src/relate-json.mjs",
+    "./store": "./src/store.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@red-cup-engineering/computer-content-address-engineering-services-section": "0.2.1"
+  }
+}

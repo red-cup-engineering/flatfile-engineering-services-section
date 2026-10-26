@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://561.group/ns/seavt/carriers/json-named/v2",
+  "title": "SEAVT named JSON/SEN carrier profile v2",
+  "description": "An opt-in, named, JSON-Lines-carried projection of an admitted SEAVT row. Exactly one JSON bridge image or closed SEN term per coordinate; semantic SEN admission and calendar checks remain with the original upstream evaluators. Legacy v1 is a separate unmodified profile.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "carrierProfile",
+    "filedAt"
+  ],
+  "properties": {
+    "carrierProfile": {
+      "const": "seavt-row-json-carrier/2"
+    },
+    "filedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "witnessTime": {
+      "description": "Original EAVT witness coordinate when distinct from filedAt; source-qualified by SEAVT admission."
+    },
+    "entityJson": {
+      "description": "JSON value whose original SEN bridge image is the entity coordinate."
+    },
+    "entityTerm": {
+      "$ref": "#/$defs/senTerm"
+    },
+    "attributeJson": {
+      "description": "JSON value whose original SEN bridge image is the attribute coordinate."
+    },
+    "attributeTerm": {
+      "$ref": "#/$defs/senTerm"
+    },
+    "valueJson": {
+      "description": "JSON value whose original SEN bridge image is the value coordinate."
+    },
+    "valueTerm": {
+      "$ref": "#/$defs/senTerm"
+    }
+  },
+  "allOf": [
+    {
+      "oneOf": [
+        {
+          "required": [
+            "entityJson"
+          ]
+        },
+        {
+          "required": [
+            "entityTerm"
+          ]
+        }
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "required": [
+            "attributeJson"
+          ]
+        },
+        {
+          "required": [
+            "attributeTerm"
+          ]
+        }
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "required": [
+            "valueJson"
+          ]
+        },
+        {
+          "required": [
+            "valueTerm"
+          ]
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "senTerm": {
+      "type": "array",
+      "minItems": 2,
+      "description": "An original closed, inferable SEN term; validate through the upstream seavtRow reader, not an invented nested-term grammar."
+    }
+  }
+}

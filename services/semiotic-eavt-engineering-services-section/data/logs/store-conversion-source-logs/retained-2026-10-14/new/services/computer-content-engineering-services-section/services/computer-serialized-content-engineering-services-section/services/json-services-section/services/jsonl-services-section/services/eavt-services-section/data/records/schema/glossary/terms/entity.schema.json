@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "glossary/terms/entity",
+  "title": "entity",
+  "description": "An EAVT entity: any JSON-shaped value used as a row's e (subject). EAVT does not restrict an entity's shape beyond that — a string identifier is conventional, but any JSON value is admitted; identity is content (compared by canonical encoding, never by reference)."
+}

@@ -1,0 +1,976 @@
+{
+  "kind": "proper-data-owner-pinned-source-intake",
+  "ownerSection": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section",
+  "parentRepository": "red-cup-engineering/computer-engineering-services-section",
+  "parentCommit": "5de9602ce72774479c8796d99fdfaf86cf24aa55",
+  "parentDeclarationBlob": "c553198c8f3f630e964b874b5ffb5e2597c783d1",
+  "sourceRepository": "red-cup-engineering/semiotic-eavt-services-section",
+  "repositoryId": 1421254238,
+  "private": true,
+  "basePR16Head": "7ed422c4594776c7928c6578a0caefe06bf9fefa",
+  "actualCommitTree": "8d02457ca4a40262612cc6f3ac78dec2959ee5ce",
+  "completeTree": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2658d7d1b31848c3b71960543cb0368e56cd4c7",
+      "size": 14,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/c2658d7d1b31848c3b71960543cb0368e56cd4c7"
+    },
+    {
+      "path": ".npmrc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a1f8151935f5a483c368cd930c26519cb3663cf",
+      "size": 37,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/0a1f8151935f5a483c368cd930c26519cb3663cf"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f24c5e2fea40d07f4d416cd245e6e91b643664e2",
+      "size": 6840,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/f24c5e2fea40d07f4d416cd245e6e91b643664e2"
+    },
+    {
+      "path": "SOURCE-PROVENANCE.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "915a91a9750633bc89e75d1a090de5178bb94706",
+      "size": 4380,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/915a91a9750633bc89e75d1a090de5178bb94706"
+    },
+    {
+      "path": "content",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3f38a17069be97af81a30dac8854f1b8c38f84bd",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/3f38a17069be97af81a30dac8854f1b8c38f84bd"
+    },
+    {
+      "path": "content/text",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a7e6d75eb1e69e436100ee776c29995831cb1273",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/a7e6d75eb1e69e436100ee776c29995831cb1273"
+    },
+    {
+      "path": "content/text/documents",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cdcb864ce561cd9dd2c84ae41b9bb9e6c686c812",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/cdcb864ce561cd9dd2c84ae41b9bb9e6c686c812"
+    },
+    {
+      "path": "content/text/documents/specifications",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5ca8cc64e4f46eca1a4f36c2270346229194afb8",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/5ca8cc64e4f46eca1a4f36c2270346229194afb8"
+    },
+    {
+      "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "643af49759baf53cc7af798110d90d5fd5d52d9b",
+      "size": 6117,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/643af49759baf53cc7af798110d90d5fd5d52d9b"
+    },
+    {
+      "path": "content/text/documents/specifications/native-checkpoint.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "54287c4efc2de281fee87a0fab1dde64d51a9697",
+      "size": 7946,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/54287c4efc2de281fee87a0fab1dde64d51a9697"
+    },
+    {
+      "path": "content/text/documents/specifications/seavt-log-carrier.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ccd31a59a7e4f1f104569905365ac004b47f8090",
+      "size": 8892,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/ccd31a59a7e4f1f104569905365ac004b47f8090"
+    },
+    {
+      "path": "content/text/documents/specifications/store-conversion.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "98793346c95d2c43823c658470752c6c2b167681",
+      "size": 15678,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/98793346c95d2c43823c658470752c6c2b167681"
+    },
+    {
+      "path": "content/text/documents/specifications/store-migration-map.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "599d97e5c4d8617c6e2d6700c0d739a54d8a3e44",
+      "size": 89627,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/599d97e5c4d8617c6e2d6700c0d739a54d8a3e44"
+    },
+    {
+      "path": "content/text/documents/specifications/store.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "88e4cfe318f4f7b7bdf63a3e78b138a603bee829",
+      "size": 41553,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/88e4cfe318f4f7b7bdf63a3e78b138a603bee829"
+    },
+    {
+      "path": "data",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0079acf6343cebaccabb5f92a10722320207f030",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/0079acf6343cebaccabb5f92a10722320207f030"
+    },
+    {
+      "path": "data/schemas",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f387f75f201d3c326d91c92e3b162afad57aae41",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/f387f75f201d3c326d91c92e3b162afad57aae41"
+    },
+    {
+      "path": "data/schemas/seavt-named-carrier.schema.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "61e41e1152e8c4cf2f98fc01ac6d9fae0cea9059",
+      "size": 2321,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/61e41e1152e8c4cf2f98fc01ac6d9fae0cea9059"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d35d45ca1167e3c0cf931b5a1c80da9648cf4f7",
+      "size": 2762,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/7d35d45ca1167e3c0cf931b5a1c80da9648cf4f7"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9b59210c791529f4b6fb89f283179b7017e50e92",
+      "size": 17621,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/9b59210c791529f4b6fb89f283179b7017e50e92"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b411a9bdd92b3c6325b39e459ce77d22201f0ddd",
+      "size": 167,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/b411a9bdd92b3c6325b39e459ce77d22201f0ddd"
+    },
+    {
+      "path": "scripts",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "75181dea9604a326a5d8ffef34d9f9469e43e25d",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/75181dea9604a326a5d8ffef34d9f9469e43e25d"
+    },
+    {
+      "path": "scripts/check-current-state.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9c7e7b30195e040afa8ff4d007a0305e9ea6759",
+      "size": 4585,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/e9c7e7b30195e040afa8ff4d007a0305e9ea6759"
+    },
+    {
+      "path": "scripts/compact-seavt-logs.mjs",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "36604df16c1565157d4b74b8da0ae2900846eefe",
+      "size": 1644,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/36604df16c1565157d4b74b8da0ae2900846eefe"
+    },
+    {
+      "path": "scripts/export-otlp.mjs",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "793d31d944ba6c9c9321017f6466da5edb1269f3",
+      "size": 1287,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/793d31d944ba6c9c9321017f6466da5edb1269f3"
+    },
+    {
+      "path": "scripts/seal-logs.mjs",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "94de8497f85d2054bf8894c68644fcd68b7549f2",
+      "size": 1743,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/94de8497f85d2054bf8894c68644fcd68b7549f2"
+    },
+    {
+      "path": "scripts/seavt-volume.mjs",
+      "mode": "100755",
+      "type": "blob",
+      "sha": "d54328bd2708ed6231d5a20cc560b40442312cb2",
+      "size": 3480,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/d54328bd2708ed6231d5a20cc560b40442312cb2"
+    },
+    {
+      "path": "src",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0d02dc78943e2e54cedf73c7f9310f2be84eb069",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/0d02dc78943e2e54cedf73c7f9310f2be84eb069"
+    },
+    {
+      "path": "src/admit-seavt-row.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a3709f241d6a8868b9898ea1c779e06a01595322",
+      "size": 4182,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/a3709f241d6a8868b9898ea1c779e06a01595322"
+    },
+    {
+      "path": "src/bind-json-template.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd9a570946153fe023f52a5719ab0f4c4a830232",
+      "size": 1321,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/cd9a570946153fe023f52a5719ab0f4c4a830232"
+    },
+    {
+      "path": "src/causal-resource-head.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "32d59e7373ff94402c3681974ee39ab0e5353e55",
+      "size": 5722,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/32d59e7373ff94402c3681974ee39ab0e5353e55"
+    },
+    {
+      "path": "src/checkpoint.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "db4f014749f68f41d125e7003ebac5a9749429c9",
+      "size": 8584,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/db4f014749f68f41d125e7003ebac5a9749429c9"
+    },
+    {
+      "path": "src/clock.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4e8f7213725997780a1cda4a2153986b6f708a4d",
+      "size": 3838,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/4e8f7213725997780a1cda4a2153986b6f708a4d"
+    },
+    {
+      "path": "src/compact-logs.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f8cad1a602faff552ddd127b26745f4a05fab009",
+      "size": 7365,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/f8cad1a602faff552ddd127b26745f4a05fab009"
+    },
+    {
+      "path": "src/exchange.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23f215f821ed2ad43cc1d593bd1517be1ef70a14",
+      "size": 6677,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/23f215f821ed2ad43cc1d593bd1517be1ef70a14"
+    },
+    {
+      "path": "src/identity",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "45742787b43550a0e1607a59f61b2c8480bf1292",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/45742787b43550a0e1607a59f61b2c8480bf1292"
+    },
+    {
+      "path": "src/identity/artifact.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f83f53eec9cab5ef5a665a8103283241603f44da",
+      "size": 2486,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/f83f53eec9cab5ef5a665a8103283241603f44da"
+    },
+    {
+      "path": "src/identity/index.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d822d5639ef82d498ea76983fada33d44a25dc37",
+      "size": 350,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/d822d5639ef82d498ea76983fada33d44a25dc37"
+    },
+    {
+      "path": "src/identity/text-document.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "69b7cb86fbf656ef2ce7c750bf1dc8f78e695d39",
+      "size": 2619,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/69b7cb86fbf656ef2ce7c750bf1dc8f78e695d39"
+    },
+    {
+      "path": "src/layout.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4ea6c226ecbc8a7f8d11533e08af06fd60e0442c",
+      "size": 5264,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/4ea6c226ecbc8a7f8d11533e08af06fd60e0442c"
+    },
+    {
+      "path": "src/log-budget.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1752be75c24a9643c847b78732b5e43fc6a052f0",
+      "size": 4887,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/1752be75c24a9643c847b78732b5e43fc6a052f0"
+    },
+    {
+      "path": "src/normalize-seavt-row.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "46dd7e9f0d5955c1cbc72f0ca049a114f272b2b6",
+      "size": 1413,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/46dd7e9f0d5955c1cbc72f0ca049a114f272b2b6"
+    },
+    {
+      "path": "src/profile.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7aab5f012e9d24f7ccafec7af32644df3fdc0f29",
+      "size": 288,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/7aab5f012e9d24f7ccafec7af32644df3fdc0f29"
+    },
+    {
+      "path": "src/sealed-log.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63f714eac8a50765e128ce2f0e618d8c43bb1e40",
+      "size": 7325,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/63f714eac8a50765e128ce2f0e618d8c43bb1e40"
+    },
+    {
+      "path": "src/seavt-carrier.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3fbc9e71b8304980184bd70191bdb4342db57879",
+      "size": 7577,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/3fbc9e71b8304980184bd70191bdb4342db57879"
+    },
+    {
+      "path": "src/seavt-log.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "23a39fe432e849bcb94952a40671282fbe71a7d3",
+      "size": 2380,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/23a39fe432e849bcb94952a40671282fbe71a7d3"
+    },
+    {
+      "path": "src/store-core.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8da33aadfd0f6c2a212f914a210dfb2d4761f565",
+      "size": 29072,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/8da33aadfd0f6c2a212f914a210dfb2d4761f565"
+    },
+    {
+      "path": "src/store.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c09373855fcfd00b93e7e27c506fcec4df07aa54",
+      "size": 1079,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/c09373855fcfd00b93e7e27c506fcec4df07aa54"
+    },
+    {
+      "path": "src/telemetry-store.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ced9cdc50fee9ac7891cc85097dd103aba33294b",
+      "size": 7450,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/ced9cdc50fee9ac7891cc85097dd103aba33294b"
+    },
+    {
+      "path": "src/telemetry.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c217d448f160a3cdafbce475522bc25e2f53e41b",
+      "size": 8413,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/c217d448f160a3cdafbce475522bc25e2f53e41b"
+    },
+    {
+      "path": "src/volume.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f980b58cb718057fbde4a9cea19bb8b437c04105",
+      "size": 7338,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/f980b58cb718057fbde4a9cea19bb8b437c04105"
+    },
+    {
+      "path": "test",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "f7c1334145f7382b5969479e0f4256dd8d0c5863",
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/trees/f7c1334145f7382b5969479e0f4256dd8d0c5863"
+    },
+    {
+      "path": "test/absent-head-claim.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2dfe3fbb2abff00ad874b0127151c2afb3757a9",
+      "size": 6604,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/c2dfe3fbb2abff00ad874b0127151c2afb3757a9"
+    },
+    {
+      "path": "test/artifact-allocation.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77b0b44e48410d5c0282f971fa630d7941421573",
+      "size": 2828,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/77b0b44e48410d5c0282f971fa630d7941421573"
+    },
+    {
+      "path": "test/causal-resource-head.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1ef7becc470405a9dd3281b6ec8d7edbf0b3dfe4",
+      "size": 5018,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/1ef7becc470405a9dd3281b6ec8d7edbf0b3dfe4"
+    },
+    {
+      "path": "test/check-current-state.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7864022534866588e113aae37d726c501d615e5d",
+      "size": 3006,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/7864022534866588e113aae37d726c501d615e5d"
+    },
+    {
+      "path": "test/checkpoint.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "523f6e4a5e7666c067bd6931fb900ec7b6c18b37",
+      "size": 9800,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/523f6e4a5e7666c067bd6931fb900ec7b6c18b37"
+    },
+    {
+      "path": "test/clock.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d711273713401d84b24e1744e82fb65e05cf83b3",
+      "size": 2408,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/d711273713401d84b24e1744e82fb65e05cf83b3"
+    },
+    {
+      "path": "test/compact-carrier.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2dfed09623a710b69b5942b2a0376715266872a9",
+      "size": 18943,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/2dfed09623a710b69b5942b2a0376715266872a9"
+    },
+    {
+      "path": "test/deep-list-admission.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bfe4db29a4706e8d14a4caa5e181a93bd28e5df6",
+      "size": 1229,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/bfe4db29a4706e8d14a4caa5e181a93bd28e5df6"
+    },
+    {
+      "path": "test/head-complete-publication.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9b1e1eceec36bebda610aeccc05cfcd673dc0ec3",
+      "size": 7458,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/9b1e1eceec36bebda610aeccc05cfcd673dc0ec3"
+    },
+    {
+      "path": "test/named-carrier.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5bb8fc56bf8715d7a1781aeef61eac78940f143f",
+      "size": 5998,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/5bb8fc56bf8715d7a1781aeef61eac78940f143f"
+    },
+    {
+      "path": "test/sealed-log.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a00931f5692d0e36b6e8b3b852542e925e455d15",
+      "size": 4573,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/a00931f5692d0e36b6e8b3b852542e925e455d15"
+    },
+    {
+      "path": "test/seavt-carriers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1cda5761d22769f262eb7a12016a28d9fb36b7c4",
+      "size": 2465,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/1cda5761d22769f262eb7a12016a28d9fb36b7c4"
+    },
+    {
+      "path": "test/signcell-seavt.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ef1bee84cec89e2dadefa4a6c2535ffafef916db",
+      "size": 5458,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/ef1bee84cec89e2dadefa4a6c2535ffafef916db"
+    },
+    {
+      "path": "test/store-memory.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f4d71ac61be888ee31349f1fb647d635178cc2f8",
+      "size": 4245,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/f4d71ac61be888ee31349f1fb647d635178cc2f8"
+    },
+    {
+      "path": "test/store-strict-descriptor.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "42fc90be88b78d23e4b9fce9ef80d6ea9934c7e0",
+      "size": 1744,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/42fc90be88b78d23e4b9fce9ef80d6ea9934c7e0"
+    },
+    {
+      "path": "test/store-strict-discovery.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2de5211826e58170dd17b2d8c622712b9cd51a2d",
+      "size": 7935,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/2de5211826e58170dd17b2d8c622712b9cd51a2d"
+    },
+    {
+      "path": "test/store.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cda3aeab889fa1f773a0a5b7a049893ea2779407",
+      "size": 23108,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/cda3aeab889fa1f773a0a5b7a049893ea2779407"
+    },
+    {
+      "path": "test/strict-publication.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1b904c72ba7632e04a261badaad55237a0d33d49",
+      "size": 13332,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/1b904c72ba7632e04a261badaad55237a0d33d49"
+    },
+    {
+      "path": "test/telemetry.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b41a6f86c2e0cd6b2e78e9c79aa7f0207fdfb237",
+      "size": 12097,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-services-section/git/blobs/b41a6f86c2e0cd6b2e78e9c79aa7f0207fdfb237"
+    }
+  ],
+  "sourceRows": [
+    {
+      "path": ".npmrc",
+      "blob": "0a1f8151935f5a483c368cd930c26519cb3663cf",
+      "mode": "100644",
+      "bytes": 37,
+      "sha256": "8de08949bab508293e0d9aa76a511469ee2d306b1f6140a8f60c0d1de8b17fe2"
+    },
+    {
+      "path": "README.md",
+      "blob": "f24c5e2fea40d07f4d416cd245e6e91b643664e2",
+      "mode": "100644",
+      "bytes": 6840,
+      "sha256": "145d1b196b41735757ba3a894d84026abeba884ad4bb64f27b6437f2b6f22ba7"
+    },
+    {
+      "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+      "blob": "643af49759baf53cc7af798110d90d5fd5d52d9b",
+      "mode": "100644",
+      "bytes": 6117,
+      "sha256": "a71e60915209a4dfdcdcff36927d27905cfa7c78bb6192efc4a758631e2850c2"
+    },
+    {
+      "path": "content/text/documents/specifications/native-checkpoint.md",
+      "blob": "54287c4efc2de281fee87a0fab1dde64d51a9697",
+      "mode": "100644",
+      "bytes": 7946,
+      "sha256": "d75d391024d83fc99502bebe930566b839f4df58f954248ed9d73db9654d7e41"
+    },
+    {
+      "path": "content/text/documents/specifications/seavt-log-carrier.md",
+      "blob": "ccd31a59a7e4f1f104569905365ac004b47f8090",
+      "mode": "100644",
+      "bytes": 8892,
+      "sha256": "70bd80247d119fdeaface824e5f8861fc60ca68c4db162fb9f9b5800dcb15bee"
+    },
+    {
+      "path": "content/text/documents/specifications/store-conversion.md",
+      "blob": "98793346c95d2c43823c658470752c6c2b167681",
+      "mode": "100644",
+      "bytes": 15678,
+      "sha256": "40727e609f1c84c69a0e6405868fbc10dfbc680024d1b2412b63e6ecf3712c40"
+    },
+    {
+      "path": "content/text/documents/specifications/store-migration-map.md",
+      "blob": "599d97e5c4d8617c6e2d6700c0d739a54d8a3e44",
+      "mode": "100644",
+      "bytes": 89627,
+      "sha256": "c6c58684db08b470c44e1f1ad25a60a1d16fb4ff03a07a07ef509de48d94d5d7"
+    },
+    {
+      "path": "content/text/documents/specifications/store.md",
+      "blob": "88e4cfe318f4f7b7bdf63a3e78b138a603bee829",
+      "mode": "100644",
+      "bytes": 41553,
+      "sha256": "06fd43abc335c667476b96c354528617b3d38848bb70051d6fa83eee5a52210e"
+    },
+    {
+      "path": "data/schemas/seavt-named-carrier.schema.json",
+      "blob": "61e41e1152e8c4cf2f98fc01ac6d9fae0cea9059",
+      "mode": "100644",
+      "bytes": 2321,
+      "sha256": "7f8b31e3ea83a4d67de07f56cc0ef4151708ba9311dc9c6c8f24188a815fce17"
+    },
+    {
+      "path": "package.json",
+      "blob": "7d35d45ca1167e3c0cf931b5a1c80da9648cf4f7",
+      "mode": "100644",
+      "bytes": 2762,
+      "sha256": "8f0f9949b54345d9d671ab8bfa3e78dcc3733692eb3722b2c80cddd083c3b073"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "blob": "9b59210c791529f4b6fb89f283179b7017e50e92",
+      "mode": "100644",
+      "bytes": 17621,
+      "sha256": "aa7d982ef8e8758f3665d9c402c66ec373fccb98cb9ce58dc417b62ac9e44d00"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "blob": "b411a9bdd92b3c6325b39e459ce77d22201f0ddd",
+      "mode": "100644",
+      "bytes": 167,
+      "sha256": "a40f7f6fa8b499c9a73d0fb9813b7f1d55f6905cbbe1f64d2fa7aae83d9191ba"
+    },
+    {
+      "path": "scripts/check-current-state.mjs",
+      "blob": "e9c7e7b30195e040afa8ff4d007a0305e9ea6759",
+      "mode": "100644",
+      "bytes": 4585,
+      "sha256": "eb2b19e8138b1787f8135c19ca003ded81612251d299a56b02a062d63c0c087c"
+    },
+    {
+      "path": "scripts/compact-seavt-logs.mjs",
+      "blob": "36604df16c1565157d4b74b8da0ae2900846eefe",
+      "mode": "100755",
+      "bytes": 1644,
+      "sha256": "d9999fef261d53c2506808efd3b726a0bacf8b5de7d028510ab996dbb35c100b"
+    },
+    {
+      "path": "scripts/export-otlp.mjs",
+      "blob": "793d31d944ba6c9c9321017f6466da5edb1269f3",
+      "mode": "100755",
+      "bytes": 1287,
+      "sha256": "74b37e54292e92079a1d7a728d0823dcd969a29d5c3b0cfaf2337e4ee3b0cbba"
+    },
+    {
+      "path": "scripts/seal-logs.mjs",
+      "blob": "94de8497f85d2054bf8894c68644fcd68b7549f2",
+      "mode": "100755",
+      "bytes": 1743,
+      "sha256": "4e85fc19f3db42ba62ff07887df29df3f806311b87f8ef61666ce1797405d458"
+    },
+    {
+      "path": "scripts/seavt-volume.mjs",
+      "blob": "d54328bd2708ed6231d5a20cc560b40442312cb2",
+      "mode": "100755",
+      "bytes": 3480,
+      "sha256": "ae414da0ebb583060973ab2e725e355de32e892e885671976c816be9fed155ad"
+    },
+    {
+      "path": "src/admit-seavt-row.mjs",
+      "blob": "a3709f241d6a8868b9898ea1c779e06a01595322",
+      "mode": "100644",
+      "bytes": 4182,
+      "sha256": "fa1c46c08ab2407cded951ed051e39ab2237ca7f6ed2940a80609e73ae0484cd"
+    },
+    {
+      "path": "src/bind-json-template.mjs",
+      "blob": "cd9a570946153fe023f52a5719ab0f4c4a830232",
+      "mode": "100644",
+      "bytes": 1321,
+      "sha256": "df9051d7d19aaa8b1547624ba38a6441d260f319e2c19c756a8a26fe02884794"
+    },
+    {
+      "path": "src/causal-resource-head.mjs",
+      "blob": "32d59e7373ff94402c3681974ee39ab0e5353e55",
+      "mode": "100644",
+      "bytes": 5722,
+      "sha256": "7c02eb45ece78595bbdd061f467c476581a5fa86117838292ee6fa52f64fbc53"
+    },
+    {
+      "path": "src/checkpoint.mjs",
+      "blob": "db4f014749f68f41d125e7003ebac5a9749429c9",
+      "mode": "100644",
+      "bytes": 8584,
+      "sha256": "16952c707c8e6a15f355a7f7d31516036bbc2ccba2a3b77d29dc48a325af37fa"
+    },
+    {
+      "path": "src/clock.mjs",
+      "blob": "4e8f7213725997780a1cda4a2153986b6f708a4d",
+      "mode": "100644",
+      "bytes": 3838,
+      "sha256": "169b766d85e010006ecbcc8b976b9d0a421f66c7463f3ca663e26bef63dc68ca"
+    },
+    {
+      "path": "src/compact-logs.mjs",
+      "blob": "f8cad1a602faff552ddd127b26745f4a05fab009",
+      "mode": "100644",
+      "bytes": 7365,
+      "sha256": "9d905420d6b38fd8a18c49c8a152b5dea6d2b808f2d7e55b19b1009eb03fa962"
+    },
+    {
+      "path": "src/exchange.mjs",
+      "blob": "23f215f821ed2ad43cc1d593bd1517be1ef70a14",
+      "mode": "100644",
+      "bytes": 6677,
+      "sha256": "062b4d5eb9074cc9257234ea015c8427ef2fea982dbdd49d6e791bd27a9a122e"
+    },
+    {
+      "path": "src/identity/artifact.mjs",
+      "blob": "f83f53eec9cab5ef5a665a8103283241603f44da",
+      "mode": "100644",
+      "bytes": 2486,
+      "sha256": "44ae1f495f0eca46516a51efc4573bbb652a97a0ffa43023e39812c177c396da"
+    },
+    {
+      "path": "src/identity/index.mjs",
+      "blob": "d822d5639ef82d498ea76983fada33d44a25dc37",
+      "mode": "100644",
+      "bytes": 350,
+      "sha256": "eed654efba0a25dbaf396357a753152aa13b4fa4836491a4be56931aea620240"
+    },
+    {
+      "path": "src/identity/text-document.mjs",
+      "blob": "69b7cb86fbf656ef2ce7c750bf1dc8f78e695d39",
+      "mode": "100644",
+      "bytes": 2619,
+      "sha256": "151ba810b7ccdd9f2c0ae5bf2800392a81736b9ff8968bc57035e32920c7911a"
+    },
+    {
+      "path": "src/layout.mjs",
+      "blob": "4ea6c226ecbc8a7f8d11533e08af06fd60e0442c",
+      "mode": "100644",
+      "bytes": 5264,
+      "sha256": "ab9594a0ea1d97c8b4f794286580e2d25c23fa7b777dcf76b55cf6a01b6a7e78"
+    },
+    {
+      "path": "src/log-budget.mjs",
+      "blob": "1752be75c24a9643c847b78732b5e43fc6a052f0",
+      "mode": "100644",
+      "bytes": 4887,
+      "sha256": "3161a4395928aa1845bafa608701020fb586287f9ced32c47e5386e8536cc450"
+    },
+    {
+      "path": "src/normalize-seavt-row.mjs",
+      "blob": "46dd7e9f0d5955c1cbc72f0ca049a114f272b2b6",
+      "mode": "100644",
+      "bytes": 1413,
+      "sha256": "bc8c6c35880119bb24304c0a482a60302bc0072fa9ad1a4c80e610cbda939cdd"
+    },
+    {
+      "path": "src/profile.mjs",
+      "blob": "7aab5f012e9d24f7ccafec7af32644df3fdc0f29",
+      "mode": "100644",
+      "bytes": 288,
+      "sha256": "8e78bd50934af13b3e3e56c00cd6ff07de1d5755335d581a03acb92a8713698b"
+    },
+    {
+      "path": "src/sealed-log.mjs",
+      "blob": "63f714eac8a50765e128ce2f0e618d8c43bb1e40",
+      "mode": "100644",
+      "bytes": 7325,
+      "sha256": "7b2182c28afbba8ceab08779a7267671098ade02e3d4783a2e3167aa41d738da"
+    },
+    {
+      "path": "src/seavt-carrier.mjs",
+      "blob": "3fbc9e71b8304980184bd70191bdb4342db57879",
+      "mode": "100644",
+      "bytes": 7577,
+      "sha256": "bf2c4132fe1d54a651cfb5c9b197a18547500f71039a980e4526af4296d3ed6d"
+    },
+    {
+      "path": "src/seavt-log.mjs",
+      "blob": "23a39fe432e849bcb94952a40671282fbe71a7d3",
+      "mode": "100644",
+      "bytes": 2380,
+      "sha256": "3bda945fe472b391690064c7316c7e00f59d2bf10f2b99530bfafd382e4a08c6"
+    },
+    {
+      "path": "src/store-core.mjs",
+      "blob": "8da33aadfd0f6c2a212f914a210dfb2d4761f565",
+      "mode": "100644",
+      "bytes": 29072,
+      "sha256": "6ea7f8d2ea13d276cd6070dd8d1f7b4caba7d299ab21309d0dd4695ecd3095c8"
+    },
+    {
+      "path": "src/store.mjs",
+      "blob": "c09373855fcfd00b93e7e27c506fcec4df07aa54",
+      "mode": "100644",
+      "bytes": 1079,
+      "sha256": "74b0bdf37ca358a8114f29523bd739b772c2eb4bff7913f52ad0fc267a626eff"
+    },
+    {
+      "path": "src/telemetry-store.mjs",
+      "blob": "ced9cdc50fee9ac7891cc85097dd103aba33294b",
+      "mode": "100644",
+      "bytes": 7450,
+      "sha256": "9105a3914ff6ef11de76546cf719495edaafaadd44cff75e17e17fec65e8c0db"
+    },
+    {
+      "path": "src/telemetry.mjs",
+      "blob": "c217d448f160a3cdafbce475522bc25e2f53e41b",
+      "mode": "100644",
+      "bytes": 8413,
+      "sha256": "f126207b2cc54fd789abb3344770043fb5b9f3ee01f92c715ce8be9a2d84b266"
+    },
+    {
+      "path": "src/volume.mjs",
+      "blob": "f980b58cb718057fbde4a9cea19bb8b437c04105",
+      "mode": "100644",
+      "bytes": 7338,
+      "sha256": "f8f8e21ba6c4b1c3c24dcf76c84bba9ab89643369ff3c5b47c61df7896cbf294"
+    },
+    {
+      "path": "test/absent-head-claim.test.mjs",
+      "blob": "c2dfe3fbb2abff00ad874b0127151c2afb3757a9",
+      "mode": "100644",
+      "bytes": 6604,
+      "sha256": "e2ed6288f9b5bac7ab91e79c00bd989f72536e78e394c9ecc3f650d3dcd1a0a2"
+    },
+    {
+      "path": "test/artifact-allocation.test.mjs",
+      "blob": "77b0b44e48410d5c0282f971fa630d7941421573",
+      "mode": "100644",
+      "bytes": 2828,
+      "sha256": "990601594779795ad818631886b31fa1002d549271f8e2ac8b48e73638682179"
+    },
+    {
+      "path": "test/causal-resource-head.test.mjs",
+      "blob": "1ef7becc470405a9dd3281b6ec8d7edbf0b3dfe4",
+      "mode": "100644",
+      "bytes": 5018,
+      "sha256": "5af572023130d3c8a2f22e2aaf6acb154ffa38034edf0e326a3dbbcc80eb46dd"
+    },
+    {
+      "path": "test/check-current-state.test.mjs",
+      "blob": "7864022534866588e113aae37d726c501d615e5d",
+      "mode": "100644",
+      "bytes": 3006,
+      "sha256": "d73f70edbb3e1908ba2b416c0183c7b496210f1f0792ab14edc98c36cc8bdbd5"
+    },
+    {
+      "path": "test/checkpoint.test.mjs",
+      "blob": "523f6e4a5e7666c067bd6931fb900ec7b6c18b37",
+      "mode": "100644",
+      "bytes": 9800,
+      "sha256": "e386ed554dfb98e3060e88b631587a0b84a41b55d266df1c30d3b5e95c03313a"
+    },
+    {
+      "path": "test/clock.test.mjs",
+      "blob": "d711273713401d84b24e1744e82fb65e05cf83b3",
+      "mode": "100644",
+      "bytes": 2408,
+      "sha256": "88ee90855bd963e0e83be3fdb9128b375096384bdd9c3d63f0856799f5d49138"
+    },
+    {
+      "path": "test/compact-carrier.test.mjs",
+      "blob": "2dfed09623a710b69b5942b2a0376715266872a9",
+      "mode": "100644",
+      "bytes": 18943,
+      "sha256": "dbac4bb9e9fb6b4347a715f4d67896acb5b9536fd6efdac737773e56970cc936"
+    },
+    {
+      "path": "test/deep-list-admission.test.mjs",
+      "blob": "bfe4db29a4706e8d14a4caa5e181a93bd28e5df6",
+      "mode": "100644",
+      "bytes": 1229,
+      "sha256": "a6aedb801ac9974c85b32a963a6bcf999977de894b317a00b736b0d5fe60d818"
+    },
+    {
+      "path": "test/head-complete-publication.test.mjs",
+      "blob": "9b1e1eceec36bebda610aeccc05cfcd673dc0ec3",
+      "mode": "100644",
+      "bytes": 7458,
+      "sha256": "4bfccb7df1c5cff1cdae636061b4944966247b132dee338af5df2c9c86a7dcf7"
+    },
+    {
+      "path": "test/named-carrier.test.mjs",
+      "blob": "5bb8fc56bf8715d7a1781aeef61eac78940f143f",
+      "mode": "100644",
+      "bytes": 5998,
+      "sha256": "cde72ea1ccd57b308c0972f8e2e648cbefb45fb93bde542ef78f79ff905955c5"
+    },
+    {
+      "path": "test/sealed-log.test.mjs",
+      "blob": "a00931f5692d0e36b6e8b3b852542e925e455d15",
+      "mode": "100644",
+      "bytes": 4573,
+      "sha256": "6817353fd19d2c98cfcd9877dc0ae4f53d96c5eb5b8e766131e6938bc68fa706"
+    },
+    {
+      "path": "test/seavt-carriers.test.mjs",
+      "blob": "1cda5761d22769f262eb7a12016a28d9fb36b7c4",
+      "mode": "100644",
+      "bytes": 2465,
+      "sha256": "31ea941261363c5b0945a66ebbd150b8a29281de06160cbd4b5485bed626683e"
+    },
+    {
+      "path": "test/signcell-seavt.test.mjs",
+      "blob": "ef1bee84cec89e2dadefa4a6c2535ffafef916db",
+      "mode": "100644",
+      "bytes": 5458,
+      "sha256": "2576065c47514152d975cf35ed9b71f8e4c477b5f5c7f30497b6bd9b9eba5576"
+    },
+    {
+      "path": "test/store-memory.test.mjs",
+      "blob": "f4d71ac61be888ee31349f1fb647d635178cc2f8",
+      "mode": "100644",
+      "bytes": 4245,
+      "sha256": "2a6342b518340c951ccb2c02fd6cb8c9d73d23f017347d7a9d22ad18b427002f"
+    },
+    {
+      "path": "test/store-strict-descriptor.test.mjs",
+      "blob": "42fc90be88b78d23e4b9fce9ef80d6ea9934c7e0",
+      "mode": "100644",
+      "bytes": 1744,
+      "sha256": "dce79ace0a00632bdc02ee7e63c9f076069e55ac144ebc986c98ce0beda49f02"
+    },
+    {
+      "path": "test/store-strict-discovery.test.mjs",
+      "blob": "2de5211826e58170dd17b2d8c622712b9cd51a2d",
+      "mode": "100644",
+      "bytes": 7935,
+      "sha256": "475c2236c822b4bb6fa872f0b1fc0dfe6e79f1c67cfa81cbef22ca2540bef8d2"
+    },
+    {
+      "path": "test/store.test.mjs",
+      "blob": "cda3aeab889fa1f773a0a5b7a049893ea2779407",
+      "mode": "100644",
+      "bytes": 23108,
+      "sha256": "6d0f0fd55073ee9e1bdffb7a02c94f91d08cb491d89a8711c61cf88def8b7ca0"
+    },
+    {
+      "path": "test/strict-publication.test.mjs",
+      "blob": "1b904c72ba7632e04a261badaad55237a0d33d49",
+      "mode": "100644",
+      "bytes": 13332,
+      "sha256": "7153f813e2910b509e41cfbdb8fcf734d37cdf10122e966c8a2727c6b41b6dee"
+    },
+    {
+      "path": "test/telemetry.test.mjs",
+      "blob": "b41a6f86c2e0cd6b2e78e9c79aa7f0207fdfb237",
+      "mode": "100644",
+      "bytes": 12097,
+      "sha256": "82ec14810431d04d646cd8ce0e81f3050355597b4bbbe8e7f95de65a1ea81eca"
+    }
+  ],
+  "currentDataSource": "24b7edd899caf71064c886065ae64f9873181d7e",
+  "currentDataHasChildDeclaration": false,
+  "historicalLocalChild": "services/semiotic-eavt-engineering-services-section, oldsource0.1.5/originalorigin redirects to same ID; not current selected projection",
+  "scope": "Source stage under actual declared containing Data SSE typed logs only. No primary/mount/repository creation, installation, test or host effect; current child composition/mounted source remains unreceived."
+}

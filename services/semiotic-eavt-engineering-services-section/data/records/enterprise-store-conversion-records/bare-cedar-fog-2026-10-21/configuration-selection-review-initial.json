@@ -1,0 +1,52 @@
+{
+  "type": "EnterpriseRootConfigurationSelectionReview",
+  "at": "2026-10-21T07:13:57.268Z",
+  "sourceCommit": "a95d9dc",
+  "oneOffBranch": "codex/bcf-enterprise-store-conversion",
+  "legacyIdentityCommit": "6b173e1",
+  "activation": false,
+  "selectionApplied": false,
+  "donorsRemainSelected": true,
+  "candidateVerification": "candidate-verification.json",
+  "qualifiedSourceClosure": "qualified-source-closure.json",
+  "results": [
+    {
+      "enterprise": "causeway-publishing",
+      "candidate": "/home/emsenn/info/lib/emsenn/services/561-group/services/public-services-section/data/state/enterprise-store-state/causeway-publishing-candidate-2026-10-21-qualified-suppliers",
+      "book": "/home/emsenn/info/lib/emsenn/services/561-group/services/public-services-section/data/state/enterprise-store-state/causeway-publishing-candidate-2026-10-21-qualified-suppliers/data/records/ledger-records/causeway-publishing.beancount",
+      "auxiliaryFiles": 1,
+      "bytes": 178,
+      "allAuxiliaryHashesVerified": true,
+      "proposedAuthoredDataRoot": "lib/emsenn/services/561-group/services/public-services-section/data/state/enterprise-store-state/causeway-publishing-candidate-2026-10-21-qualified-suppliers",
+      "rootFormulaVerified": true
+    },
+    {
+      "enterprise": "codex-node",
+      "candidate": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-systems-engineering-services-section/services/agent-computer-system-engineering-services-section/services/agent-harness-computer-system-engineering-services-section/services/codex-harness-services-section/data/state/enterprise-store-state/codex-node-candidate-2026-10-21",
+      "book": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-systems-engineering-services-section/services/agent-computer-system-engineering-services-section/services/agent-harness-computer-system-engineering-services-section/services/codex-harness-services-section/data/state/enterprise-store-state/codex-node-candidate-2026-10-21/data/records/ledger-records/codex-node.beancount",
+      "auxiliaryFiles": 7633,
+      "bytes": 1538170540,
+      "allAuxiliaryHashesVerified": true,
+      "artifactMapping": {
+        "sourceRelative": "data/state/codex-tasks",
+        "currentRelative": "data/state/codex-tasks-state",
+        "directories": 1537,
+        "receiving": "Every primary task directory resolved through installed codexTaskArtifactDirectory; byte hashes and original mtime retained",
+        "nestedOriginalOnly": "Six files below data/state/data retained exactly as original custody; no current task or queue authority manufactured"
+      },
+      "nativeCurrentQueueRecords": 0,
+      "proposedAuthoredDataRoot": "lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-systems-engineering-services-section/services/agent-computer-system-engineering-services-section/services/agent-harness-computer-system-engineering-services-section/services/codex-harness-services-section/data/state/enterprise-store-state/codex-node-candidate-2026-10-21",
+      "rootFormulaVerified": true
+    }
+  ],
+  "selectionGates": [
+    "Independent receiving of exact candidate, source closure, original donor and auxiliary receipts",
+    "Recheck full donor stamps and segment hashes immediately before any selection; source change refuses selection",
+    "Admit original-only six enterprise setting witnesses per donor and six nested Codex artifact files as preserved historical custody, without fabricating current authority",
+    "Select through authored enterprise dataRoot using actual runtime repositoryRoot; materialize agency source through normal release receiving",
+    "Observe next ordinary intake and execution loops plus actual work taking/allocation; successful schedule receipts alone do not prove execution",
+    "Keep donors and rollback selection available until sustained useful ordinary operation is received"
+  ],
+  "sourceOnlyOriginalCustodyRetired": false,
+  "operatorStopOrRestart": false
+}

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "glossary/terms/value",
+  "title": "value",
+  "description": "An EAVT value: a row's v (object) — any JSON-shaped value asserted of the entity under the attribute. First-class in the coordinate (part of the (predicate,object) cell a fold groups by), never hidden in the row's charge. A value of exactly null is reserved: a row {e,a,v:null,t} is a retraction tombstone, not an assertion."
+}

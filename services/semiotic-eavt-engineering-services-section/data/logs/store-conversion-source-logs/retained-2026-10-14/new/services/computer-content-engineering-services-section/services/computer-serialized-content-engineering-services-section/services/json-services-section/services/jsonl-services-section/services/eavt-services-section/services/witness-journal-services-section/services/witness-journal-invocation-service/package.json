@@ -1,0 +1,30 @@
+{
+  "name": "@red-cup-engineering/witness-journal-invocation-service",
+  "version": "0.1.1",
+  "type": "module",
+  "description": "Witnesses one scripted invocation (caller, verb, args, action, value, time) into the caller's dated witness journal, best-effort and never throwing. Extracted from relating's services/invocation-ledger, which fused this namespace/date-path law to the generic entry and log laws now owned by witness-journal-entry-service and witness-journal-log-service.",
+  "exports": {
+    ".": {
+      "import": "./src/index.mjs"
+    },
+    "./hook-document": "./src/record-hook-document.mjs",
+    "./scripts/record-hook-document.mjs": "./scripts/record-hook-document.mjs"
+  },
+  "bin": {
+    "feed-name-for": "./scripts/feed-name-for.mjs",
+    "invocation-entry": "./scripts/invocation-entry.mjs",
+    "witness-invocation": "./scripts/witness-invocation.mjs",
+    "read-invocations": "./scripts/read-invocations.mjs",
+    "project-invocations": "./scripts/project-invocations.mjs",
+    "record-hook-document": "./scripts/record-hook-document.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@red-cup-engineering/eavt-services-section": "workspace:*"
+  }
+}

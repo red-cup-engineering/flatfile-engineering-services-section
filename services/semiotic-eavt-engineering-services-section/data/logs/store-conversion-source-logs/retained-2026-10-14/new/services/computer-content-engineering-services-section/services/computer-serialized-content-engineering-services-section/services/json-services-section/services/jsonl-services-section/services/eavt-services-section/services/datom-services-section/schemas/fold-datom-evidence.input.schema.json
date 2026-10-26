@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["e", "a", "v", "tx", "op"],
+    "properties": {
+      "e": {},
+      "a": {},
+      "v": {},
+      "tx": {},
+      "op": {
+        "enum": ["assert", "retract"]
+      }
+    },
+    "additionalProperties": false
+  }
+}

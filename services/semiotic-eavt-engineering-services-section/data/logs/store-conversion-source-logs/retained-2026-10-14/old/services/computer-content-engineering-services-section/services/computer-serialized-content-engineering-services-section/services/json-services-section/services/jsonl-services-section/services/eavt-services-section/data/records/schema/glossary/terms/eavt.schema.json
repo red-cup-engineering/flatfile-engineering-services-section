@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "glossary/terms/eavt",
+  "title": "eavt",
+  "description": "One generic EAVT row: exactly JSON fields e, a, v, and t. Generic EAVT preserves each coordinate as JSON; domain-specific attribute naming and time ordering are separate laws. Negation/contradiction are read from a fold across rows, never a polarity field on the row. SEAVT is a strict downstream specialization whose e, a, and v are closed RMN terms.",
+  "type": "object",
+  "required": ["e", "a", "v", "t"],
+  "additionalProperties": false,
+  "properties": {
+    "e": true,
+    "a": true,
+    "v": true,
+    "t": true
+  }
+}
