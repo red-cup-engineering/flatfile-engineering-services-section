@@ -1,0 +1,26 @@
+{
+  "funded": {
+    "nodes": ["lake", "ridge", "hamlet"],
+    "links": [
+      {"id":"a","from":"lake","to":"ridge","capacity":"10","unitResourceCost":"1/5"},
+      {"id":"b","from":"ridge","to":"hamlet","capacity":"10","unitResourceCost":"3/10"}
+    ],
+    "sources": [{"node":"lake","capacity":"10"}],
+    "demands": [{"node":"hamlet","amount":"8"}],
+    "budget": "2"
+  },
+  "frontier": {
+    "network": {
+      "nodes": ["source", "lowcost", "highercost", "recipient"],
+      "links": [
+        {"id":"first_leg","from":"source","to":"lowcost","capacity":"4","unitResourceCost":"1/5"},
+        {"id":"cheap_delivery","from":"lowcost","to":"recipient","capacity":"4","unitResourceCost":"1/5"},
+        {"id":"second_leg","from":"source","to":"highercost","capacity":"6","unitResourceCost":"1"},
+        {"id":"other_delivery","from":"highercost","to":"recipient","capacity":"6","unitResourceCost":"1"}
+      ],
+      "sources": [{"node":"source","capacity":"10"}],
+      "demands": [{"node":"recipient","amount":"10"}]
+    },
+    "budgets": ["0", "1", "2", "10", "100"]
+  }
+}
