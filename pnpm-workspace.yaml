@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - '@red-cup-engineering/metrologic@0.14.3-dev.1325'
