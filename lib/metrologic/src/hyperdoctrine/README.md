@@ -128,3 +128,20 @@ The predecessor documentation referred to outdated package names,
 charge objects not accepted by the current readings, and accidentally
 reversed adjunction symbols. These are retired descriptions, not new
 compatibility interfaces. The source history remains available in Git.
+
+## Inert finite mapping admission (2026-10-27)
+
+Original `finiteIndexMorphismFromTable` now captures a single immutable
+source, target and entire table before checking totality. Previously
+`Object.entries(table)` validation and later `table[key]` construction
+could admit different valid images from one getter-backed source. No
+semantic hashing or replacement FOUR algebra is introduced.
+
+The original `evaluateFiniteQuantifierProgram` now captures every stage
+and calls the same admitted mapping owner before running any `∃/∀`
+adjoint. Empty fibers, historical v1 JSON, the 256 FOUR assignments and
+finite alternation retain their previous semantics. Accessors, hidden
+fields, sparse/decorated arrays and inherited records refuse without
+executing ordinary getters. Literal `__proto__` remains a data key.
+Proxy descriptor traps require host isolation. Native schema tests are
+enrolled for receiving, which still needs installed supplier qualification.
