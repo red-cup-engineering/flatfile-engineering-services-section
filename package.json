@@ -66,5 +66,6 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "test:receiving": "node --test test/resource-capacity-allocation.test.mjs"
-  }
+  },
+  "packageManager": "pnpm@11.19.0"
 }
