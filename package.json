@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/computer-data-engineering-services-section",
-  "version": "0.7.1",
+  "version": "0.7.2-dev.1405",
   "private": false,
   "type": "module",
   "description": "Root for data concepts ordered by the prerequisites their services require: FOUR, exact numbers, the closure regimes, and the statics of the semiotic expression notation (its grammar, typing judgment, JSON bridge and the semantic identity of JSON content). Its lib holds Metrologic, the data layer's mathematics.",
@@ -58,10 +58,15 @@
   "files": [
     "bin",
     "src",
-    "test/resource-capacity-allocation.test.mjs"
+    "test/resource-capacity-allocation.test.mjs",
+    "docs",
+    "test/generative-proof-path-reader.test.mjs",
+    "test/semiotic-expression-notation-proof-path-witness.test.mjs"
   ],
   "receivingTests": [
-    "test/resource-capacity-allocation.test.mjs"
+    "test/resource-capacity-allocation.test.mjs",
+    "test/generative-proof-path-reader.test.mjs",
+    "test/semiotic-expression-notation-proof-path-witness.test.mjs"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs",
