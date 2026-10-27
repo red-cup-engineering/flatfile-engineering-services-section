@@ -145,3 +145,15 @@ fields, sparse/decorated arrays and inherited records refuse without
 executing ordinary getters. Literal `__proto__` remains a data key.
 Proxy descriptor traps require host isolation. Native schema tests are
 enrolled for receiving, which still needs installed supplier qualification.
+
+## Collision-free finite source pullback squares
+
+Original `pullbackSquare` formerly joined the names `j` and `i`
+with a NUL separator. Since schema-valid index strings may themselves
+contain NUL, different pairs could collapse to the same `K` key and
+one projection could select the wrong fiber. The square now uses an
+injective length-prefixed *local pair index*, and builds its two projection
+morphisms through the SAME admitted `finiteIndexMorphismFromTable`.
+This is not an SCA content address or an external witness. Native
+Beck–Chevalley negative controls now include arbitrary source-string
+delimiters and verify both FOUR orders.
