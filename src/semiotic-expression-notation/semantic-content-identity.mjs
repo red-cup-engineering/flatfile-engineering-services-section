@@ -433,3 +433,35 @@ export function identifyProofPathedJsonSemanticContent({ objectKind, value, proo
 export function identifyProofPathedBytesSemanticContent({ objectKind, bytes, mediaType = "application/octet-stream", proofPathWitnessRoot } = {}) {
   return identifyBytesSemanticContent({ objectKind, bytes, mediaType, witnessRoot: canonicalNi(proofPathWitnessRoot, "proofPathWitnessRoot") });
 }
+
+export function readGenerativeProofPath({ sourceKey, targetKey, path } = {}) {
+  sourceKey = canonicalProofPathCoordinate(sourceKey, 'sourceKey');
+  targetKey = canonicalProofPathCoordinate(targetKey, 'targetKey');
+  path = canonicalProofPathCoordinate(path, 'path');
+
+  if (
+    sourceKey === '' ||
+    targetKey === '' ||
+    path.length > 32768 ||
+    !proofPathMatchesEndpoints(path, sourceKey, targetKey)
+  ) {
+    throw semanticContentRefusal('malformed-proof-path-witness', 'Malformed generative proof path witness.');
+  }
+
+  const parts = path.split('/');
+  const steps = [];
+  let from = sourceKey;
+
+  for (let index = 1; index < parts.length; index += 3) {
+    const generator = parts[index];
+    const to = decodeCanonicalProofPathSegment(parts[index + 2]);
+    steps.push(Object.freeze({ from, generator, to }));
+    from = to;
+  }
+
+  return Object.freeze({
+    sourceKey,
+    targetKey,
+    steps: Object.freeze(steps)
+  });
+}

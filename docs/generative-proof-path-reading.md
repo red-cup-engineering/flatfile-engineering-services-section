@@ -1,0 +1,3 @@
+The existing Data SEN semantic-content-identity export now supplies readGenerativeProofPath. It reuses the original canonical UTF-8 path grammar, fixed library segment and licensed generator names, preserves exact NFC coordinates, returns immutable decoded steps, and refuses paths above32768 UTF-16 units. Payload text is not normalized by this boundary.
+
+An identity route has no steps. Canonical path spelling and endpoint agreement do not establish that an edge exists or has the declared generator action. Code must reconstruct the committed finite structure and qualify every claimed edge. The original typed SEN envelope, proof-path witness identity, witness root and proof profile remain the identity owners; the reader introduces no address scheme.
