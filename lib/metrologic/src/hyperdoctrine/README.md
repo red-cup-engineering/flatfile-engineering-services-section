@@ -157,3 +157,21 @@ morphisms through the SAME admitted `finiteIndexMorphismFromTable`.
 This is not an SCA content address or an external witness. Native
 Beck–Chevalley negative controls now include arbitrary source-string
 delimiters and verify both FOUR orders.
+
+## Exhaustive finite FOUR adjunction witness (27 October 2026)
+
+The existing `test/hyperdoctrine/exhaustive-two-point-laws.test.mjs`
+uses only the original Computer Data FOUR, Metrologic `orderOps`,
+`finiteIndexMorphismFromTable`, `reindex`, `existsAlong`,
+`forallAlong`, `meetFiber`, `leqFiber` and `pullbackSquare`.
+It exhausts all complete readings and all total finite functions over
+source/target carriers of 0, 1 or 2 indices under BOTH knowledge and
+truth orders, including empty preimages and NUL-bearing source names.
+
+The 2,506 adjunction/Frobenius valuation configurations and 1,150
+Beck–Chevalley valuation configurations pass with no counterexamples.
+This is a deterministic, exact *finite* conformance witness, not a Lean
+proof of an unbounded categorical theorem, a provenance signature, an
+installed package consumer or validation of external observation rights.
+The stochastic existing tests remain distinct, and this new source
+test is enrolled in the standalone package receiving manifest.
