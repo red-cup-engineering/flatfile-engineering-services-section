@@ -1,6 +1,0 @@
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "askEavtTraceCellOutput",
-  "type": "object",
-  "description": "An EavtTraceCellAnswer record, or an EavtTraceAbsent datum when the file does not exist."
-}

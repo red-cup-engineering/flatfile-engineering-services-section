@@ -1,9 +1,0 @@
-{
-  "name": "@red-cup-engineering/render-markdown-block-html-service",
-  "version": "0.1.2",
-  "type": "module",
-  "exports": "./scripts/render-markdown-block-html.mjs",
-  "dependencies": {
-    "@red-cup-engineering/render-markdown-inline-html-service": "0.1.2"
-  }
-}
