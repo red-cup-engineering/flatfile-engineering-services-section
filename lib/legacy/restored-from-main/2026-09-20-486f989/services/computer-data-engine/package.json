@@ -1,0 +1,63 @@
+{
+  "name": "@red-cup-engineering/computer-data-engine",
+  "version": "0.11.2",
+  "type": "module",
+  "description": "The computer-data platform module: content identity (ni:, canonical CBOR, canonical JSON), JSON values and codecs, JSON Schema data types and validation, Result, statements, things, resources, and the typed operation wire messages.",
+  "license": "UNLICENSED",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./types": {
+      "types": "./dist/schema.d.mts",
+      "import": "./dist/schema.mjs"
+    },
+    "./validation": {
+      "types": "./dist/validation.d.mts",
+      "import": "./dist/validation.mjs"
+    },
+    "./mark": {
+      "types": "./dist/mark.d.mts",
+      "import": "./dist/mark.mjs"
+    },
+    "./specifications/*": "./specifications/*",
+    "./package.json": "./package.json",
+    "./identity": {
+      "types": "./dist/identity/index.d.mts",
+      "import": "./dist/identity/index.mjs"
+    },
+    "./text": {
+      "types": "./dist/text.d.mts",
+      "import": "./dist/text.mjs"
+    },
+    "./contracts": {
+      "types": "./dist/contracts.d.mts",
+      "import": "./dist/contracts.mjs"
+    }
+  },
+  "files": [
+    "dist",
+    "specifications"
+  ],
+  "scripts": {
+    "check": "tsc -p tsconfig.check.json",
+    "build": "tsc -p tsconfig.json",
+    "pretest": "npm run build",
+    "test": "node --test test/*.test.mts test/*.test.mjs",
+    "prepack": "npm run build"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "dependencies": {
+    "@red-cup-engineering/typed-resource-classification-kernel-service": "0.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "typescript": "5.9.3"
+  },
+  "sideEffects": false
+}

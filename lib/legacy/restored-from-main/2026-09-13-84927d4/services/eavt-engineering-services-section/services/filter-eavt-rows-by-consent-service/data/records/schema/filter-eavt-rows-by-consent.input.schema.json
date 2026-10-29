@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "filterEavtRowsByConsentInput",
+  "type": "object",
+  "description": "A record with rows and an audience name."
+}

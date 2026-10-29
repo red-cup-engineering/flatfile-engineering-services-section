@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "countEavtRelationNerveInput",
+  "type": "object",
+  "description": "A record with rows and the relation attribute."
+}

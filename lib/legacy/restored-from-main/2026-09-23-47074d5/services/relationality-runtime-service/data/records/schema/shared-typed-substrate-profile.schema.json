@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "science/philosophy/relationality/shared-typed-substrate-profile",
+  "title": "Shared typed substrate scientific profile",
+  "description": "A source-linked, deliberately narrow profile for the type-engine migration. It records only the settled Thing, Relation, Identity, and mathematical Graph sources; it records other requested names as contextual specializations or refusals rather than making them universal meanings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile",
+    "version",
+    "typeEngineBinding",
+    "releaseTrustContract",
+    "settledTerms",
+    "identityKinds",
+    "graphProjection",
+    "contextualSpecializations",
+    "refusals"
+  ],
+  "properties": {
+    "profile": { "const": "shared-typed-substrate" },
+    "version": { "const": 1 },
+    "typeEngineBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package", "entrypoint", "schema"],
+      "properties": {
+        "package": { "const": "@red-cup-engineering/computer-data-engine" },
+        "entrypoint": { "const": "./types" },
+        "schema": { "const": "schema/shared-typed-substrate-profile.schema.json" }
+      }
+    },
+    "releaseTrustContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "consumer"],
+      "properties": {
+        "schema": { "const": "schema/artifact-release-trust-receipt.schema.json" },
+        "consumer": { "const": "ArtifactRelease" }
+      }
+    },
+    "settledTerms": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/settledTerm" },
+      "allOf": [
+        { "contains": { "properties": { "name": { "const": "Thing" } }, "required": ["name"] } },
+        { "contains": { "properties": { "name": { "const": "Relation" } }, "required": ["name"] } },
+        { "contains": { "properties": { "name": { "const": "Identity" } }, "required": ["name"] } },
+        { "contains": { "properties": { "name": { "const": "Graph" } }, "required": ["name"] } }
+      ]
+    },
+    "identityKinds": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": { "enum": ["entity", "content", "assertion", "evidence"] },
+      "allOf": [
+        { "contains": { "const": "entity" } },
+        { "contains": { "const": "content" } },
+        { "contains": { "const": "assertion" } },
+        { "contains": { "const": "evidence" } }
+      ]
+    },
+    "graphProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "source", "derivedFrom"],
+      "properties": {
+        "status": { "const": "derived-projection" },
+        "source": { "type": "string", "minLength": 1 },
+        "derivedFrom": { "const": "Relation" }
+      }
+    },
+    "contextualSpecializations": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/$defs/contextualSpecialization" },
+      "allOf": [
+        { "contains": { "properties": { "term": { "const": "Cell" } }, "required": ["term"] } },
+        { "contains": { "properties": { "term": { "const": "Actor" } }, "required": ["term"] } },
+        { "contains": { "properties": { "term": { "const": "Resource" } }, "required": ["term"] } },
+        { "contains": { "properties": { "term": { "const": "Message" } }, "required": ["term"] } },
+        { "contains": { "properties": { "term": { "const": "Channel" } }, "required": ["term"] } }
+      ]
+    },
+    "refusals": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/$defs/refusal" }
+    }
+  },
+  "$defs": {
+    "settledTerm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "source", "admission"],
+      "properties": {
+        "name": { "enum": ["Thing", "Relation", "Identity", "Graph"] },
+        "source": { "type": "string", "minLength": 1 },
+        "admission": { "enum": ["admitted", "source-present-unadmitted"] }
+      }
+    },
+    "contextualSpecialization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term", "context", "source", "admission"],
+      "properties": {
+        "term": { "enum": ["Cell", "Actor", "Resource", "Message", "Channel"] },
+        "context": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "admission": { "enum": ["admitted", "source-present-unadmitted", "planned"] }
+      }
+    },
+    "refusal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term", "claim", "reason"],
+      "properties": {
+        "term": { "enum": ["Cell", "Actor", "Resource", "Message", "Channel"] },
+        "claim": { "const": "universal-canonical-meaning" },
+        "reason": { "enum": ["multiple-contextual-sources", "no-admitted-science-source", "source-is-planned"] }
+      }
+    }
+  }
+}

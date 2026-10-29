@@ -1,0 +1,552 @@
+{
+    "type": "MarkdownJsnodeOperationPackageFabricationReceipt",
+    "version": 1,
+    "sourceDigest": "sha256:17d348b7fcaa8dff76eaf3ba23895dd43bc2b466b3382ba5ff0afdbb51368bf9",
+    "specificationDigest": "sha256:074bb2fcae2e80347188fc6fa3814b7536020ddf0d32abf7b68cfccc3b01a3f1",
+    "artifactSpecification": {
+        "type": "ArtifactFabricationSpecification",
+        "version": 1,
+        "source": {
+            "type": "ArtifactFabricationSource",
+            "version": 1,
+            "identity": {
+                "type": "ArtifactFabricationSourceIdentity",
+                "id": "ask-eavt-cell"
+            },
+            "provenance": {
+                "type": "ArtifactFabricationSourceProvenance",
+                "locator": "/home/emsenn/info/lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-services-section/services/eavt-engineering-services-section/services/ask-eavt-cell-service/data/records/2026-09-04-ask-eavt-cell-work-order.md",
+                "digest": "sha256:17d348b7fcaa8dff76eaf3ba23895dd43bc2b466b3382ba5ff0afdbb51368bf9",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 1,
+                    "endLine": 106
+                }
+            }
+        },
+        "artifact": {
+            "type": "FabricatedArtifactIdentity",
+            "version": 1,
+            "id": "ask-eavt-cell",
+            "kind": "jsnode-operation-package"
+        },
+        "requirements": [
+            {
+                "type": "ArtifactFabricationRequirement",
+                "version": 1,
+                "id": "stratified-answer",
+                "statement": "The operation returns an EavtCellAnswer record for one entity over a row array: the asserted and saturated row counts and the settled section (affirmed, denied, contradicted cells), optionally restricted to one attribute.",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 3,
+                    "endLine": 3
+                }
+            },
+            {
+                "type": "ArtifactFabricationRequirement",
+                "version": 1,
+                "id": "contested-flag",
+                "statement": "The answer carries contested true exactly when the settled section holds at least one contradicted cell.",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 4,
+                    "endLine": 4
+                }
+            },
+            {
+                "type": "ArtifactFabricationRequirement",
+                "version": 1,
+                "id": "proof-tree",
+                "statement": "The answer carries proofTree, eavt's resolveProofTree resolved from the entity over the same rows (root, content-addressed nodes, edges, missing, cycles, depth), so a reader can follow the path and not only the endpoint.",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 5,
+                    "endLine": 5
+                }
+            },
+            {
+                "type": "ArtifactFabricationRequirement",
+                "version": 1,
+                "id": "regime-tagged-answer",
+                "statement": "The answer carries closure, eavt's stratify closure field ({saturation, transfer, kappa, regime}) unchanged, and a top-level regime equal to closure.regime, so a reader sees the proof kind of the answer directly.",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 6,
+                    "endLine": 6
+                }
+            }
+        ],
+        "prohibitions": [
+            {
+                "type": "ArtifactFabricationProhibition",
+                "version": 1,
+                "id": "missing-entity-refusal",
+                "statement": "The operation must refuse requests whose entity is not a nonempty string or whose rows is not an array.",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 8,
+                    "endLine": 8
+                }
+            }
+        ],
+        "openQuestions": [],
+        "constraints": [
+            {
+                "type": "ArtifactFabricationConstraint",
+                "version": 1,
+                "id": "eavt-braided-tower",
+                "kind": "law",
+                "authority": "561 Group org layering, EAVT custody",
+                "revision": "2026-08-30",
+                "locator": ".claude/rules/org-layering.md",
+                "applicability": "Applies to every read of an eavt trace: asserted, saturated, and settled are separate derived passes, never one lumped fold.",
+                "statement": "The answer reports the three strata as eavt's stratify computes them and never stores or invents a stratum field.",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 10,
+                    "endLine": 10
+                }
+            },
+            {
+                "type": "ArtifactFabricationConstraint",
+                "version": 1,
+                "id": "closure-ordinal-regime",
+                "kind": "law",
+                "authority": "Obsmetrologia",
+                "revision": "Closure/Regime.lean",
+                "locator": "Closure/Regime.lean (strict kappa < omega, Scott kappa = omega, transfinite-bounded omega < kappa < omega_1, aperiodic kappa >= omega_1)",
+                "applicability": "Applies to every EavtCellAnswer's proof-kind tag.",
+                "statement": "The answer passes through stratify's closure and regime exactly; a finite trace's fold always reaches its fixed point in finitely many passes, so regime is always \"strict\" here and the operation never invents an aperiodic classification.",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 11,
+                    "endLine": 11
+                }
+            },
+            {
+                "type": "ArtifactFabricationConstraint",
+                "version": 1,
+                "id": "node-esm-operation",
+                "kind": "standard",
+                "authority": "Node.js",
+                "revision": "v24.2.0+",
+                "locator": "https://nodejs.org/docs/v24/api/esm.html",
+                "applicability": "Applies to the .mjs operation, its import.meta.main guard, and downstream package-birth assays.",
+                "statement": "The package uses one executable ESM operation source file that is eligible for downstream staged package-birth assays.",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 13,
+                    "endLine": 13
+                }
+            }
+        ],
+        "projections": [
+            {
+                "type": "ArtifactFabricationProjection",
+                "version": 1,
+                "id": "jsnode-operation-package",
+                "target": "@red-cup-engineering/jsnode-operation-package-specification-admission-service",
+                "configuration": {
+                    "type": "JsnodeOperationPackageSpecificationCandidate",
+                    "version": 1,
+                    "packageName": "@red-cup-engineering/ask-eavt-cell-service",
+                    "packageVersion": "0.3.0",
+                    "license": "MIT",
+                    "operation": {
+                        "type": "JavascriptNodeOperationSource",
+                        "path": "scripts/ask-eavt-cell.mjs",
+                        "text": "#!/usr/bin/env node\nimport { resolveProofTree, section, stratify } from \"@red-cup-engineering/eavt\";\n\n/**\n * Answers one cell question over an eavt row array with the entity's asserted and saturated counts, its settled section, its proof tree, and the closure/regime of the answer's fold.\n * @param {object} request A record with rows, an entity, and an optional attribute.\n * @returns {object} An EavtCellAnswer record.\n * @throws {TypeError} When entity is not a nonempty string or rows is not an array.\n */\nexport function askEavtCell(request) {\n  if (typeof request?.entity !== \"string\" || request.entity.length === 0 || !Array.isArray(request?.rows)) {\n    throw new TypeError(\"entity and rows are required\");\n  }\n  const attribute = typeof request.attribute === \"string\" ? request.attribute : null;\n  const strata = stratify(request.entity, request.rows, { converse: {} });\n  const settled = section(strata.settled);\n  const keep = (cells) => cells.filter((cell) => attribute === null || cell.predicate === attribute).map((cell) => ({ predicate: cell.predicate, object: cell.object }));\n  const answer = { affirmed: keep(settled.affirmed), denied: keep(settled.denied), contradicted: keep(settled.contradicted) };\n  return {\n    type: \"EavtCellAnswer\",\n    entity: request.entity,\n    attribute,\n    asserted: strata.asserted.filter((row) => attribute === null || row.a === attribute).length,\n    saturated: strata.saturated.filter((row) => attribute === null || row.a === attribute).length,\n    settled: answer,\n    contested: answer.contradicted.length > 0,\n    proofTree: resolveProofTree({ rows: request.rows, root: request.entity }),\n    closure: strata.closure,\n    regime: strata.closure.regime,\n  };\n}\n\nif (import.meta.main) {\n  if (process.argv.includes(\"--help\")) {\n    process.stdout.write(\"askEavtCell \u2014 Answers one cell question over an eavt row array with the entity's asserted and saturated counts, its settled section, its proof tree, and the closure/regime of the answer's fold.\\n\");\n  } else {\n    let text = \"\";\n    for await (const chunk of process.stdin) text += chunk;\n    for (const line of text.split(\"\\n\")) {\n      if (line.length > 0) process.stdout.write(`${JSON.stringify(askEavtCell(JSON.parse(line)))}\\n`);\n    }\n  }\n}\n"
+                    },
+                    "tests": [
+                        {
+                            "type": "JavascriptNodeOperationTestSource",
+                            "path": "test/ask-eavt-cell.test.mjs",
+                            "text": "import assert from \"node:assert/strict\";\nimport test from \"node:test\";\nimport { askEavtCell } from \"../scripts/ask-eavt-cell.mjs\";\ntest(\"answers one affirmed cell\", () => {\n  const answer = askEavtCell({ rows: [{ e: \"x\", a: \"is\", v: \"y\", t: 1 }], entity: \"x\", attribute: \"is\" });\n  assert.deepEqual(answer.settled.affirmed, [{ predicate: \"is\", object: \"y\" }]);\n  assert.equal(answer.asserted, 1);\n  assert.equal(answer.contested, false);\n});\ntest(\"flags a contested cell through a converse declaration\", () => {\n  const rows = [{ e: \"is\", a: \"has-converse\", v: \"is-not\", t: 0 }, { e: \"x\", a: \"is\", v: \"y\", t: 1 }, { e: \"x\", a: \"is-not\", v: \"y\", t: 2 }];\n  const answer = askEavtCell({ rows, entity: \"x\" });\n  assert.equal(answer.contested, true);\n  assert.deepEqual(answer.settled.contradicted, [{ predicate: \"is\", object: \"y\" }]);\n});\ntest(\"carries the proof tree resolved from the entity\", () => {\n  const answer = askEavtCell({ rows: [{ e: \"x\", a: \"is\", v: \"y\", t: 1 }], entity: \"x\" });\n  assert.equal(answer.proofTree.root, \"x\");\n  assert.deepEqual(answer.proofTree.missing, []);\n  assert.deepEqual(askEavtCell({ rows: [], entity: \"zzz\" }).proofTree.missing, [\"zzz\"]);\n});\ntest(\"carries closure and a top-level regime equal to closure.regime\", () => {\n  const answer = askEavtCell({ rows: [{ e: \"x\", a: \"is\", v: \"y\", t: 1 }], entity: \"x\" });\n  assert.deepEqual(answer.closure, { saturation: 1, transfer: 1, kappa: 1, regime: \"strict\" });\n  assert.equal(answer.regime, \"strict\");\n  assert.equal(answer.regime, answer.closure.regime);\n});\ntest(\"refuses a missing entity\", () => assert.throws(() => askEavtCell({ rows: [] }), /entity and rows are required/u));\n"
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "type": "JavascriptNodeOperationExample",
+                            "name": "answers one affirmed cell",
+                            "input": {
+                                "rows": [
+                                    {
+                                        "e": "x",
+                                        "a": "is",
+                                        "v": "y",
+                                        "t": 1
+                                    }
+                                ],
+                                "entity": "x",
+                                "attribute": "is"
+                            },
+                            "output": {
+                                "type": "EavtCellAnswer",
+                                "entity": "x",
+                                "attribute": "is",
+                                "asserted": 1,
+                                "saturated": 1,
+                                "settled": {
+                                    "affirmed": [
+                                        {
+                                            "predicate": "is",
+                                            "object": "y"
+                                        }
+                                    ],
+                                    "denied": [],
+                                    "contradicted": []
+                                },
+                                "contested": false,
+                                "proofTree": {
+                                    "root": "x",
+                                    "nodes": {
+                                        "x": {
+                                            "e": "x",
+                                            "a": "is",
+                                            "v": "y",
+                                            "t": 1
+                                        }
+                                    },
+                                    "edges": [],
+                                    "missing": [],
+                                    "cycles": [],
+                                    "depth": 0
+                                },
+                                "closure": {
+                                    "saturation": 1,
+                                    "transfer": 1,
+                                    "kappa": 1,
+                                    "regime": "strict"
+                                },
+                                "regime": "strict"
+                            }
+                        }
+                    ],
+                    "dependencies": {
+                        "@red-cup-engineering/eavt": "0.8.0"
+                    },
+                    "devDependencies": {}
+                },
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 17,
+                    "endLine": 100
+                }
+            }
+        ],
+        "acceptanceObligations": [
+            {
+                "type": "ArtifactFabricationAcceptanceObligation",
+                "version": 1,
+                "id": "jsnode-package-assays",
+                "kind": "assay",
+                "statement": "The existing JSNode package-birth pipeline must admit, stage, test, pack, install, and assay the projected package.",
+                "sourceSpan": {
+                    "type": "ArtifactFabricationSourceSpan",
+                    "startLine": 67,
+                    "endLine": 100
+                }
+            }
+        ],
+        "traceability": [
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "stratified-answer",
+                "constraintIds": [
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            },
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "contested-flag",
+                "constraintIds": [
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            },
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "proof-tree",
+                "constraintIds": [
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            },
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "regime-tagged-answer",
+                "constraintIds": [
+                    "closure-ordinal-regime",
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            },
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "missing-entity-refusal",
+                "constraintIds": [
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            }
+        ],
+        "specificationDigest": "sha256:074bb2fcae2e80347188fc6fa3814b7536020ddf0d32abf7b68cfccc3b01a3f1"
+    },
+    "jsnodeOperationPackageCreationReceipt": {
+        "type": "JsnodeOperationPackageCreationReceipt",
+        "version": 1,
+        "packageName": "@red-cup-engineering/ask-eavt-cell-service",
+        "packageVersion": "0.3.0",
+        "destination": "/tmp/claude-1000/-home-emsenn-info/c47c4faf-5aba-4a06-b95b-6aeb98ff98db/scratchpad/ask-eavt-cell-service",
+        "filesDigest": "sha256:640c39b2821ce3b0ec832ff7b05d279e53cd3e62e7daadc71bf672319d02edbb",
+        "files": [
+            {
+                "type": "TextFileMaterialization",
+                "version": 1,
+                "path": "package.json",
+                "mode": 420,
+                "digest": "sha256:5118b1d7c0cda4404820484d926a129eed8dccc65f0f04b7541204e6cc9411ad"
+            },
+            {
+                "type": "TextFileMaterialization",
+                "version": 1,
+                "path": "README.md",
+                "mode": 420,
+                "digest": "sha256:859c9b0d50b68f097c5001eb1cee7478cc6573a1154c1f475f189fe10c12ebc2"
+            },
+            {
+                "type": "TextFileMaterialization",
+                "version": 1,
+                "path": "scripts/ask-eavt-cell.mjs",
+                "mode": 493,
+                "digest": "sha256:9a3b2af37a590542ec18474482e658573c7a894e25ae36011a04bc20e6b7cdbe"
+            },
+            {
+                "type": "TextFileMaterialization",
+                "version": 1,
+                "path": "test/ask-eavt-cell-faces.test.mjs",
+                "mode": 420,
+                "digest": "sha256:6031b6de88ca85f90cbbf124c30d305c45062616abb1b718b08cf4873891887f"
+            },
+            {
+                "type": "TextFileMaterialization",
+                "version": 1,
+                "path": "test/ask-eavt-cell.test.mjs",
+                "mode": 420,
+                "digest": "sha256:756d8b46f6cd82ab914264f71958353f8d06539b4117c94506ab6fa3a17eb362"
+            }
+        ],
+        "assays": [
+            {
+                "type": "JsnodeOperationPackageAssay",
+                "version": 1,
+                "name": "staged-dependency-installation",
+                "status": "passed"
+            },
+            {
+                "type": "JsnodeOperationPackageAssay",
+                "version": 1,
+                "name": "syntax",
+                "status": "passed"
+            },
+            {
+                "type": "JsnodeOperationPackageAssay",
+                "version": 1,
+                "name": "the-rule",
+                "status": "passed",
+                "scripts": 1,
+                "lines": 44
+            },
+            {
+                "type": "JsnodeOperationPackageAssay",
+                "version": 1,
+                "name": "tests",
+                "status": "passed",
+                "paths": [
+                    "test/ask-eavt-cell-faces.test.mjs",
+                    "test/ask-eavt-cell.test.mjs"
+                ]
+            },
+            {
+                "type": "JsnodeOperationPackageAssay",
+                "version": 1,
+                "name": "pack",
+                "status": "passed",
+                "filename": "red-cup-engineering-ask-eavt-cell-service-0.3.0.tgz",
+                "digest": "sha256:4af827097b938bb30989b9e0413a7f5e8da41cc9477a4beb2d22f337118b41b6"
+            },
+            {
+                "type": "JsnodeOperationPackageAssay",
+                "version": 1,
+                "name": "clean-installation",
+                "status": "passed",
+                "javascriptFiles": 1,
+                "reachableJavascriptFiles": 1
+            },
+            {
+                "type": "JsnodeOperationPackageAssay",
+                "version": 1,
+                "name": "import-face",
+                "status": "passed",
+                "examples": 1
+            },
+            {
+                "type": "JsnodeOperationPackageAssay",
+                "version": 1,
+                "name": "command-face",
+                "status": "passed",
+                "examples": 1
+            },
+            {
+                "type": "JsnodeOperationPackageAssay",
+                "version": 1,
+                "name": "help",
+                "status": "passed"
+            }
+        ]
+    },
+    "artifactFabricationRealizationReceipt": {
+        "type": "ArtifactFabricationRealizationReceipt",
+        "version": 1,
+        "artifactId": "ask-eavt-cell",
+        "specificationDigest": "sha256:074bb2fcae2e80347188fc6fa3814b7536020ddf0d32abf7b68cfccc3b01a3f1",
+        "realizations": [
+            {
+                "type": "ArtifactFabricationRealizationEvidence",
+                "version": 1,
+                "projectionId": "jsnode-operation-package",
+                "evidence": {
+                    "type": "ArtifactFabricationEvidence",
+                    "locator": "/tmp/claude-1000/-home-emsenn-info/c47c4faf-5aba-4a06-b95b-6aeb98ff98db/scratchpad/ask-eavt-cell-service",
+                    "digest": "sha256:24c1b5d2e1d6fa3e001c1adc10e5ba297e4bb68afe2cb5ecf65f10a0e08a88b3"
+                }
+            }
+        ],
+        "acceptances": [
+            {
+                "type": "ArtifactFabricationRealizationEvidence",
+                "version": 1,
+                "acceptanceObligationId": "jsnode-package-assays",
+                "evidence": {
+                    "type": "ArtifactFabricationEvidence",
+                    "locator": "/tmp/claude-1000/-home-emsenn-info/c47c4faf-5aba-4a06-b95b-6aeb98ff98db/scratchpad/ask-eavt-cell-service",
+                    "digest": "sha256:24c1b5d2e1d6fa3e001c1adc10e5ba297e4bb68afe2cb5ecf65f10a0e08a88b3"
+                }
+            }
+        ],
+        "traceability": [
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "stratified-answer",
+                "constraintIds": [
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            },
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "contested-flag",
+                "constraintIds": [
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            },
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "proof-tree",
+                "constraintIds": [
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            },
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "regime-tagged-answer",
+                "constraintIds": [
+                    "closure-ordinal-regime",
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            },
+            {
+                "type": "ArtifactFabricationTrace",
+                "version": 1,
+                "requirementId": "missing-entity-refusal",
+                "constraintIds": [
+                    "eavt-braided-tower",
+                    "node-esm-operation"
+                ],
+                "projectionIds": [
+                    "jsnode-operation-package"
+                ],
+                "acceptanceObligationIds": [
+                    "jsnode-package-assays"
+                ]
+            }
+        ]
+    }
+}

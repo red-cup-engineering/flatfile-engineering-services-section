@@ -1,0 +1,55 @@
+{
+  "specversion": "1.0",
+  "id": "ee-2026-09-05-a1",
+  "source": "urn:red-cup-engineering:energy-exchange-record-services-section",
+  "type": "group.561.energy.exchange.v1",
+  "time": "2026-09-05T00:00:00Z",
+  "datacontenttype": "application/json",
+  "data": {
+    "id": "ni:///sha-256;hwS8YQPMpxlttQoauP1v-luJHmq1nCNNwZ0tmy5zvVA",
+    "kind": "energy-exchange",
+    "period": {
+      "start": "2026-08-01T00:00:00Z",
+      "end": "2026-08-31T23:59:59Z"
+    },
+    "commodity": "KWH",
+    "quantity": "412.5",
+    "from": {
+      "id": "urn:example:household-a",
+      "role": "producer"
+    },
+    "to": {
+      "id": "urn:example:utility-co",
+      "role": "grid"
+    },
+    "place": {
+      "lat": 44.9778,
+      "lon": -93.265,
+      "utilityId": "urn:example:utility-co"
+    },
+    "witnesses": [
+      {
+        "kind": "meter",
+        "value": "412.5",
+        "source": "urn:example:household-a-inverter-export-2026-08",
+        "asOf": "2026-09-01T00:00:00Z"
+      },
+      {
+        "kind": "utility-statement",
+        "value": "412.5",
+        "source": "https://utility-co.example/statements/2026-08",
+        "asOf": "2026-09-03T00:00:00Z"
+      }
+    ],
+    "price": {
+      "amount": "0.11",
+      "commodity": "USD",
+      "perUnit": true
+    },
+    "settlement": {
+      "status": "settled",
+      "mismatch": null,
+      "settledAt": "2026-09-03T00:00:00Z"
+    }
+  }
+}

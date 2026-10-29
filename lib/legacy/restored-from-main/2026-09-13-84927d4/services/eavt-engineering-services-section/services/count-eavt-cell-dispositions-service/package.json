@@ -1,0 +1,30 @@
+{
+  "name": "@red-cup-engineering/count-eavt-cell-dispositions-service",
+  "version": "0.1.0",
+  "description": "Counts the witnesses and acknowledgers of one entity's asserted cells, read from rows about each claim row's content id.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "exports": "./scripts/count-eavt-cell-dispositions.mjs",
+  "bin": {
+    "count-eavt-cell-dispositions": "scripts/count-eavt-cell-dispositions.mjs"
+  },
+  "files": [
+    "scripts",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {
+    "@red-cup-engineering/eavt": "0.10.0",
+    "@red-cup-engineering/javascript-node-services-section": "0.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "check": "node --check scripts/count-eavt-cell-dispositions.mjs",
+    "test": "node --test test/*.test.mjs",
+    "pack:dry-run": "npm pack --dry-run --ignore-scripts"
+  },
+  "engines": {
+    "node": ">=24.2.0"
+  }
+}

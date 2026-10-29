@@ -1,0 +1,30 @@
+{
+  "name": "@red-cup-engineering/project-json-record-key-service",
+  "version": "0.1.0",
+  "description": "Projects a JSON record onto an explicit finite set of top-level keys, composing",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "exports": "./scripts/project-json-record-key.mjs",
+  "bin": {
+    "project-json-record-key": "scripts/project-json-record-key.mjs"
+  },
+  "files": [
+    "scripts",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {
+    "@red-cup-engineering/javascript-node-services-section": "0.2.0",
+    "@red-cup-engineering/json-record-key-projection-service": "0.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "check": "node --check scripts/project-json-record-key.mjs",
+    "test": "node --test test/*.test.mjs",
+    "pack:dry-run": "npm pack --dry-run --ignore-scripts"
+  },
+  "engines": {
+    "node": ">=24.2.0"
+  }
+}

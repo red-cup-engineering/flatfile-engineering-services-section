@@ -1,0 +1,30 @@
+{
+  "name": "@red-cup-engineering/count-eavt-trace-contested-cells-service",
+  "version": "0.1.1",
+  "description": "Reads one eavt trace file and counts the cells it settles as contradicted, or reports the trace absent.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "exports": "./scripts/count-eavt-trace-contested-cells.mjs",
+  "bin": {
+    "count-eavt-trace-contested-cells": "scripts/count-eavt-trace-contested-cells.mjs"
+  },
+  "files": [
+    "scripts",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {
+    "@red-cup-engineering/count-eavt-contested-cells-service": "0.2.0",
+    "@red-cup-engineering/eavt": "0.10.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "check": "node --check scripts/count-eavt-trace-contested-cells.mjs",
+    "test": "node --test test/*.test.mjs",
+    "pack:dry-run": "npm pack --dry-run --ignore-scripts"
+  },
+  "engines": {
+    "node": ">=24.2.0"
+  }
+}

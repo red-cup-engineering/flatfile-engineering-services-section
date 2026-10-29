@@ -1,0 +1,46 @@
+{
+  "id": "ni:///sha-256;D-eG2-lgLhOhlncUb8vOXNtsPf0aLH6A-Qws8CTLdcE",
+  "kind": "energy-exchange",
+  "period": {
+    "start": "2026-08-01T00:00:00Z",
+    "end": "2026-08-31T23:59:59Z"
+  },
+  "commodity": "PROPANE_GAL",
+  "quantity": "150",
+  "from": {
+    "id": "did:example:propane-co",
+    "role": "producer"
+  },
+  "to": {
+    "id": "urn:example:household-c",
+    "role": "consumer"
+  },
+  "place": {
+    "lat": 47.455,
+    "lon": -95.5822
+  },
+  "witnesses": [
+    {
+      "kind": "bank-row",
+      "value": "150",
+      "source": "urn:example:household-c-bank-statement-2026-08",
+      "asOf": "2026-08-15T00:00:00Z"
+    },
+    {
+      "kind": "bank-row",
+      "value": "150",
+      "source": "urn:example:household-c-bank-statement-2026-08-corrected",
+      "asOf": "2026-08-20T00:00:00Z"
+    }
+  ],
+  "price": {
+    "amount": "2.79",
+    "commodity": "USD",
+    "perUnit": true
+  },
+  "settlement": {
+    "status": "posted",
+    "mismatch": null,
+    "settledAt": null
+  }
+}

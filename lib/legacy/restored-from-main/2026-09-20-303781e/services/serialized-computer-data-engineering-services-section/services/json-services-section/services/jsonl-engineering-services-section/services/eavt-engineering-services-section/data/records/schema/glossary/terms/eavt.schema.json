@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "glossary/terms/eavt",
+  "title": "eavt",
+  "description": "One EAVT row: a positive predication cell {e,a,v,t} asserting that entity e stands in attribute a to value v, witnessed by transaction t. Exactly these four fields and nothing else — negation/contradiction are read off the fold across rows, never a polarity field on the row itself. Identity is content: the RFC 6920 ni: URI of the row's RFC 8949 canonical CBOR encoding. SEAVT — EAVT where each e, a, and v is meant to be RMN — is a distinct, downstream lineage (witness-journal/semiotic custody), not this schema.",
+  "type": "object",
+  "required": ["e", "a", "v", "t"],
+  "additionalProperties": false,
+  "properties": {
+    "e": { "$ref": "./entity.schema.json" },
+    "a": { "$ref": "./attribute.schema.json" },
+    "v": { "$ref": "./value.schema.json" },
+    "t": { "$ref": "./timestamp.schema.json" }
+  }
+}

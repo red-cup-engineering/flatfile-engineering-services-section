@@ -1,0 +1,39 @@
+{
+  "name": "@lenticule-science/hierarchical-circuit-equivalence-assay",
+  "version": "0.6.0",
+  "type": "module",
+  "description": "Independent bounded FOUR hierarchical-circuit behavior and sovereign-assembly equivalence assay die.",
+  "files": [
+    "README.md",
+    "bin/",
+    "content/agent-card-signing/",
+    "content/agent-cards/",
+    "scripts/",
+    "src/"
+  ],
+  "exports": {
+    ".": "./src/assay.mjs",
+    "./client": "./src/client.mjs",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "hierarchical-circuit-equivalence-assay": "./bin/serve-hierarchical-circuit-equivalence-assay-a2a"
+  },
+  "scripts": {
+    "check": "node --check src/assay.mjs && node --check src/client.mjs && node --check src/record-journal.mjs && node --check scripts/execute-a2a-task.mjs && node --check scripts/server.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@a2a-js/sdk": "1.0.0-beta.0",
+    "@red-cup-engineering/a2a-contracted-agent-service": "0.5.0",
+    "@red-cup-engineering/a2a-rmn-part-service": "0.2.0",
+    "@red-cup-engineering/a2a-rmn-task-client-service": "0.5.0",
+    "@red-cup-engineering/hierarchical-circuit-law": "0.1.6",
+    "@red-cup-engineering/relation-model-notation-cbor-codec": "0.1.0",
+    "@red-cup-engineering/relational-value-graph-service": "0.1.1",
+    "@red-cup-engineering/eavt": "0.10.4"
+  }
+}

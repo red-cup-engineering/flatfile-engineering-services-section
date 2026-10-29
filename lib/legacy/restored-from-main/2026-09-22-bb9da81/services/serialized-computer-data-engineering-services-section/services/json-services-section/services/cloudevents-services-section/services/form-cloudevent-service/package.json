@@ -1,0 +1,28 @@
+{
+  "name": "@red-cup-engineering/form-cloudevent-service",
+  "version": "0.1.0",
+  "description": "Forms one CloudEvent 1.0 record from caller-owned attributes without minting anything.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "exports": "./scripts/form-cloudevent.mjs",
+  "bin": {
+    "form-cloudevent": "scripts/form-cloudevent.mjs"
+  },
+  "files": [
+    "scripts",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "check": "node --check scripts/form-cloudevent.mjs",
+    "test": "node --test test/*.test.mjs",
+    "verify": "npm run check && npm test && npm run pack:dry-run",
+    "pack:dry-run": "npm pack --dry-run --ignore-scripts"
+  },
+  "engines": {
+    "node": ">=24.2.0"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "relating",
+  "title": "Relating",
+  "description": "The philosophical primitive of the relationality framework: the directed act that constitutes its terms, holding including and excluding together in productive opposition rather than connecting things that already exist (ontology.ttl `rel:Relating`; content/text/glossary/terms/relating.md). Identified in the mathematical layer with predication. Root of the semiotic agents stack: relating → (communicating, knowing, playing) → animating → (socializing, computing, gaming) → organizing.",
+  "type": "object",
+  "required": ["kind", "subject", "object"],
+  "properties": {
+    "kind": { "const": "relating" },
+    "subject": {
+      "description": "The subject-side term the act of relating constitutes. Structurally distinct from the object-side even when the predicate's effect is symmetric — relating is directed, never symmetric by default."
+    },
+    "object": {
+      "description": "The object-side term the act of relating constitutes."
+    }
+  },
+  "additionalProperties": false
+}

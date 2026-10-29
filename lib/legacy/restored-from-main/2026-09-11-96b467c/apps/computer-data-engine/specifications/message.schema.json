@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.561.group/computer/message.schema.json",
+  "title": "Message",
+  "description": "An immutable, canonical-CBOR encoded envelope carrying a Thing or relational-field document. JSON is a view codec, never a semantic authority.",
+  "type": "object",
+  "required": ["version", "id", "protocol", "from", "to", "content", "encoding"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"const": 1},
+    "id": {"type": "string", "pattern": "^ni:///sha-256;[A-Za-z0-9_-]+$"},
+    "protocol": {"type": "string", "minLength": 1},
+    "from": {"$ref": "actor.schema.json"},
+    "to": {"$ref": "actor.schema.json"},
+    "content": {"oneOf": [{"$ref": "thing.schema.json"}, {"$ref": "relational-field.schema.json"}]},
+    "encoding": {"const": "application/rmn+cbor"}
+  }
+}
