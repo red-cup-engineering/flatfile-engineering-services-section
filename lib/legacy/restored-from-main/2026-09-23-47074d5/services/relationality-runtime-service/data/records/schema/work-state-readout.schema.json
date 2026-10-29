@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "science/philosophy/relationality/work-state-readout",
+  "title": "Bounded work-state readout",
+  "description": "A typed readout contract for the existing work rail. Intent, allocation, dependency/frontier, evidence, completion, refusal, and readout are distinct records. A reconstruction is not an admitted intent, an allocation is not completion, and evidence is not acceptance or completion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "asOf", "intents", "allocations", "dependencies", "frontier", "evidence", "completions", "refusals"],
+  "properties": {
+    "kind": { "const": "metroplat.work-state-readout" },
+    "asOf": { "type": "string", "format": "date-time" },
+    "intents": { "type": "array", "items": { "$ref": "#/$defs/intent" } },
+    "allocations": { "type": "array", "items": { "$ref": "#/$defs/allocation" } },
+    "dependencies": { "type": "array", "items": { "$ref": "#/$defs/dependency" } },
+    "frontier": { "type": "array", "items": { "$ref": "#/$defs/frontier" } },
+    "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+    "completions": { "type": "array", "items": { "$ref": "#/$defs/completion" } },
+    "refusals": { "type": "array", "items": { "$ref": "#/$defs/refusal" } }
+  },
+  "$defs": {
+    "intent": { "type": "object", "additionalProperties": false, "required": ["kind", "id", "admission"], "properties": { "kind": { "const": "structured-intent" }, "id": { "type": "string", "minLength": 1 }, "admission": { "enum": ["admitted", "unadmitted-reconstruction"] } } },
+    "allocation": { "type": "object", "additionalProperties": false, "required": ["kind", "id", "intent", "scope", "office", "duty", "actor"], "properties": { "kind": { "const": "allocation" }, "id": { "type": "string", "minLength": 1 }, "intent": { "type": "string", "minLength": 1 }, "scope": { "type": "string", "pattern": "^task:" }, "office": { "type": "string", "minLength": 1 }, "duty": { "type": "string", "minLength": 1 }, "actor": { "type": "string", "minLength": 1 } } },
+    "dependency": { "type": "object", "additionalProperties": false, "required": ["kind", "from", "to"], "properties": { "kind": { "const": "dependency" }, "from": { "type": "string", "minLength": 1 }, "to": { "type": "string", "minLength": 1 } } },
+    "frontier": { "type": "object", "additionalProperties": false, "required": ["kind", "scope", "state"], "properties": { "kind": { "const": "frontier" }, "scope": { "type": "string", "pattern": "^task:" }, "state": { "enum": ["ready", "blocked", "unallocated"] } } },
+    "evidence": { "type": "object", "additionalProperties": false, "required": ["kind", "id", "subject"], "properties": { "kind": { "const": "evidence" }, "id": { "type": "string", "minLength": 1 }, "subject": { "type": "string", "minLength": 1 } } },
+    "completion": { "type": "object", "additionalProperties": false, "required": ["kind", "scope", "evidence"], "properties": { "kind": { "const": "completion" }, "scope": { "type": "string", "pattern": "^task:" }, "evidence": { "type": "string", "minLength": 1 } } },
+    "refusal": { "type": "object", "additionalProperties": false, "required": ["kind", "scope", "reason", "evidence"], "properties": { "kind": { "const": "refusal" }, "scope": { "type": "string", "pattern": "^task:" }, "reason": { "type": "string", "minLength": 1 }, "evidence": { "type": "string", "minLength": 1 } } }
+  }
+}

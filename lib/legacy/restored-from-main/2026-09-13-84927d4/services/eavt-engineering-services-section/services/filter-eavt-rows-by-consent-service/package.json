@@ -1,0 +1,27 @@
+{
+  "name": "@red-cup-engineering/filter-eavt-rows-by-consent-service",
+  "version": "0.1.0",
+  "description": "Filters eavt rows to the entities whose latest consent row admits the audience, withholding the rest and reporting only their count.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "exports": "./scripts/filter-eavt-rows-by-consent.mjs",
+  "bin": {
+    "filter-eavt-rows-by-consent": "scripts/filter-eavt-rows-by-consent.mjs"
+  },
+  "files": [
+    "scripts",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "check": "node --check scripts/filter-eavt-rows-by-consent.mjs",
+    "test": "node --test test/*.test.mjs",
+    "pack:dry-run": "npm pack --dry-run --ignore-scripts"
+  },
+  "engines": {
+    "node": ">=24.2.0"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@red-cup-engineering/transfer-eavt-trace-service",
+  "version": "0.1.0",
+  "description": "Computes the Δ nucleus (Fix(Δ), the transfer-stable converse-closed sub-fiber) for one subject over an {e,a,v,t} trace, composing",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "exports": "./scripts/transfer-eavt-trace.mjs",
+  "bin": {
+    "transfer-eavt-trace": "scripts/transfer-eavt-trace.mjs"
+  },
+  "files": [
+    "scripts",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {
+    "@red-cup-engineering/eavt": "0.10.0",
+    "@red-cup-engineering/javascript-node-services-section": "0.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "check": "node --check scripts/transfer-eavt-trace.mjs",
+    "test": "node --test test/*.test.mjs",
+    "pack:dry-run": "npm pack --dry-run --ignore-scripts"
+  },
+  "engines": {
+    "node": ">=24.2.0"
+  }
+}

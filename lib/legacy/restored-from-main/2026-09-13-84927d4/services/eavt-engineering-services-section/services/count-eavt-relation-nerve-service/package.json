@@ -1,0 +1,27 @@
+{
+  "name": "@red-cup-engineering/count-eavt-relation-nerve-service",
+  "version": "0.1.0",
+  "description": "Computes the vertex and edge counts, components (H0), cycle rank (H1), and Euler characteristic of one relation attribute's bipartite graph over eavt rows.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "exports": "./scripts/count-eavt-relation-nerve.mjs",
+  "bin": {
+    "count-eavt-relation-nerve": "scripts/count-eavt-relation-nerve.mjs"
+  },
+  "files": [
+    "scripts",
+    "README.md",
+    "package.json"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "check": "node --check scripts/count-eavt-relation-nerve.mjs",
+    "test": "node --test test/*.test.mjs",
+    "pack:dry-run": "npm pack --dry-run --ignore-scripts"
+  },
+  "engines": {
+    "node": ">=24.2.0"
+  }
+}

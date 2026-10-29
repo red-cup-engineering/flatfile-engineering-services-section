@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "relating/reflexing",
+  "title": "Reflexing",
+  "description": "The primitive act of turning back upon itself: reflex(S) = relating(S, S), one instantaneous self-application (ontology.ttl `rel:Reflexing`). Reflexing is the ENGINE; Differentiating is its product. Distinguished from Reflecting, which holds the reflexive relation open across a sequence (R(0) := S, R(n+1) := reflex(R(n))) rather than applying it once.",
+  "type": "object",
+  "required": ["kind", "subject"],
+  "properties": {
+    "kind": { "const": "reflexing" },
+    "subject": {
+      "description": "The S in reflex(S) = relating(S, S): the one term the act applies to itself, occupying both the subject-side and the object-side of the relating it produces."
+    }
+  },
+  "additionalProperties": false
+}

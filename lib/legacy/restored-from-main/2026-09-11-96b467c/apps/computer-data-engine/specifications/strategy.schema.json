@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.561.group/computer/strategy.schema.json",
+  "title": "Strategy",
+  "description": "A typed policy from admitted game positions to operations. It is a semantic object, not a free-form agent prompt or role label.",
+  "type": "object",
+  "required": ["id", "actor", "positionType", "operation"],
+  "additionalProperties": false,
+  "properties": {"id": {"type": "string", "minLength": 1}, "actor": {"$ref": "actor.schema.json"}, "positionType": {"type": "string", "minLength": 1}, "operation": {"$ref": "operation.schema.json"}}
+}

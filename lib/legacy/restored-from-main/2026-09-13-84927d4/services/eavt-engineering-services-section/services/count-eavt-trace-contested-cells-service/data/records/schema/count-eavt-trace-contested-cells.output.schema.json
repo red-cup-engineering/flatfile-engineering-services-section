@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "countEavtTraceContestedCellsOutput",
+  "type": "object",
+  "description": "An EavtTraceContestedCellsCount record, or an EavtTraceAbsent datum when the file does not exist."
+}

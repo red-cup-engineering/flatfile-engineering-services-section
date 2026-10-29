@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.561.group/computer/rmn-cbor-envelope.schema.json",
+  "title": "RMN CBOR Envelope",
+  "description": "The network wire binding for a Message. The semantic payload is an RMN term or relational-field document; its canonical CBOR bytes produce the RFC 6920 ni message identity.",
+  "type": "object",
+  "required": ["message", "mediaType", "identity"],
+  "additionalProperties": false,
+  "properties": {"message": {"$ref": "message.schema.json"}, "mediaType": {"const": "application/rmn+cbor"}, "identity": {"$ref": "ni.schema.json"}}
+}

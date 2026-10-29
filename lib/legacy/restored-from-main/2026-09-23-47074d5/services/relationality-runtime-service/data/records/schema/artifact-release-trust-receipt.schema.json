@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "science/philosophy/relationality/artifact-release-trust-receipt",
+  "title": "Artifact release trust receipt",
+  "description": "A release-trust contract for ArtifactRelease. Each identity and each observation is separately carried. Schema validity does not establish registry publication, installation, or receiver acceptance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "sourceIdentity", "artifactContentIdentity", "manifestExportClaimIdentity", "registryObservation", "installationObservation", "receiverAcceptance", "evidenceWitnessIdentity"],
+  "properties": {
+    "kind": { "const": "artifact-release-trust-receipt" },
+    "sourceIdentity": { "$ref": "#/$defs/identity" },
+    "artifactContentIdentity": { "$ref": "#/$defs/identity" },
+    "manifestExportClaimIdentity": { "$ref": "#/$defs/identity" },
+    "registryObservation": { "$ref": "#/$defs/observation" },
+    "installationObservation": { "$ref": "#/$defs/observation" },
+    "receiverAcceptance": { "$ref": "#/$defs/acceptance" },
+    "evidenceWitnessIdentity": { "$ref": "#/$defs/witness" }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "enum": ["source", "content", "assertion", "evidence"] },
+        "value": { "type": "string", "minLength": 1 },
+        "scheme": { "type": "string", "minLength": 1 }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "observer", "observed", "outcome", "evidenceIdentity"],
+      "properties": {
+        "kind": { "const": "observation" },
+        "observer": { "type": "string", "minLength": 1 },
+        "observed": { "type": "string", "minLength": 1 },
+        "outcome": { "enum": ["observed", "refused", "unavailable"] },
+        "evidenceIdentity": { "$ref": "#/$defs/evidenceIdentity" }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "receiver", "outcome", "evidenceIdentity"],
+      "properties": {
+        "kind": { "const": "receiver-acceptance" },
+        "receiver": { "type": "string", "minLength": 1 },
+        "outcome": { "enum": ["accepted", "refused", "unavailable"] },
+        "evidenceIdentity": { "$ref": "#/$defs/evidenceIdentity" }
+      }
+    },
+    "witness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "const": "evidence" },
+        "value": { "type": "string", "minLength": 1 },
+        "scheme": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidenceIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": { "const": "evidence" },
+        "value": { "type": "string", "minLength": 1 },
+        "scheme": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

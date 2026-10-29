@@ -1,0 +1,12 @@
+import type { Result } from "./type-system.mjs";
+import type { SemanticCell, SemanticGraph, edge, relation } from "./generated/semantic-carriers.mjs";
+export type SignGraphRelation = relation;
+export type SemanticGraphRelation = SignGraphRelation;
+export type SignGraphEdge = edge["edge"];
+export type SemanticGraphEdge = SignGraphEdge;
+export type SignGraph = SemanticGraph;
+export type SemanticGraphRefusal = Readonly<{ code: string; message: string }>;
+export declare function createSignGraph(input: Readonly<{ cells: readonly SemanticCell[]; relations: readonly SemanticGraphRelation[]; edges: readonly SemanticGraphEdge[] }>): Result<SemanticGraph, SemanticGraphRefusal>;
+export declare function edgesFrom(graph: SemanticGraph, subject: SemanticCell | SemanticGraphEdge["subject"]): readonly edge[];
+export declare function mergeSignGraphs(...graphs: readonly SemanticGraph[]): Result<SemanticGraph, SemanticGraphRefusal>;
+export type { SemanticGraph } from "./generated/semantic-carriers.mjs";
