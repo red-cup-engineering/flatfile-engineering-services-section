@@ -1,0 +1,10 @@
+✓ Lockfile passes supply-chain policies (verified 24s ago)
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +46
+++++++++++++++++++++++++++++++++++++++++++++++
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /root/.local/share/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 46, reused 45, downloaded 0, added 41
+[ERR_PNPM_NO_OFFLINE_TARBALL] A package is missing from the store but cannot download it in offline mode. The missing package may be downloaded from https://registry.561.group/@red-cup-engineering/signcell/-/signcell-0.13.1-dev.198.tgz.

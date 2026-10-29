@@ -10,7 +10,6 @@ import path from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import * as store from '../src/store.mjs';
 import {checkRoot} from '../src/layout.mjs';
-import {semanticAddress} from '@red-cup-engineering/computer-content-address-engineering-services-section/semiotic-content-address';
 
 function directory(root) {
   assert.ok(typeof root === 'string' && path.isAbsolute(root) && path.normalize(root) === root, 'absolute state root required');
@@ -26,14 +25,16 @@ export function checkNativeTypes(root, types) {
   directory(root); checkRoot(root);
   assert.ok(Array.isArray(types) && types.length > 0 && types.length <= 32);
   const counts = {};
+  const verification = store.recordVerification(root);
+  try {
   for (const type of types) {
     let records = 0, heads = 0;
-    for (const {address, record} of store.each(root, type, {strict: true})) {
-      assert.equal(semanticAddress(record).id, address); assert.ok(store.get(root, type, address)); records++;
-    }
+    // Strict discovery already admits each canonical byte identity and its
+    // bucket placement. Exhaust it; a second hash and bucket lookup add no law.
+    for (const _record of store.each(root, type, {strict: true, verification})) records++;
     for (const {head} of store.heads(root, type, {strict: true})) {
       heads++;
-      for (const step of store.walk(root, type, head.frontier, {limit: 100000})) assert.ok(!step.missing && !step.truncated, 'current causal state is incomplete');
+      for (const step of store.walk(root, type, head.frontier, {limit: 100000, verifyOnly: true, verification})) assert.ok(!step.missing && !step.truncated && step.verified === true, 'current causal state is incomplete');
     }
     // Empty types and absent heads are lawful native states. In particular an
     // ActivityPub actor may have no followers, inbox or outbox history. These
@@ -41,6 +42,7 @@ export function checkNativeTypes(root, types) {
     counts[type] = {records, heads};
   }
   return counts;
+  } finally { verification.close(); }
 }
 export async function checkCurrentState(plan) {
   assert.equal(plan.version, 1);

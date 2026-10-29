@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: sv12-level1-flags: received reserved bits remain evidence while new contexts emit sampled only
+ok 1 - sv12-level1-flags: received reserved bits remain evidence while new contexts emit sampled only
+  ---
+  duration_ms: 28.286091
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 189.576206

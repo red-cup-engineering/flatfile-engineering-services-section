@@ -1,0 +1,19 @@
+{
+  "installedPath": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell",
+  "version": "0.13.1-dev.198",
+  "gitHead": "1abcd4a218618408284014af35169459c8170a02",
+  "verifiedArchivePath": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/package",
+  "matchedFiles": 44,
+  "mismatches": [],
+  "archiveIdentity": {
+    "url": "https://registry.561.group/@red-cup-engineering/signcell/-/signcell-0.13.1-dev.198.tgz",
+    "integrity": "sha512-0ZhJJxrGa/hSMBTx64D+M1Qeo68oJMYy/Jiq3gA7k0pInXqYQs0ISCFzlY0Dkimi2GoGuETl1ghfJKmSPO9T1w==",
+    "archive_sha256": "3057fcc98f8283927ea09e1b8accc8c73c19e5f6a49bbe0b5e2bf2e8562f9212",
+    "archive_bytes": 104141,
+    "entries": 44,
+    "files": 44,
+    "archive_path": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/signcell-0.13.1-dev.198.tgz",
+    "package_path": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/package",
+    "safe_paths_verified": true
+  }
+}

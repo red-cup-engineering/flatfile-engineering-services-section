@@ -41,10 +41,10 @@ Every site is one of these. The store functions are those of `store.md` section 
 | form | the current API | becomes |
 |---|---|---|
 | **S1** | the semantic-record handle: `createSemanticRecordJournal({root, objectKind})`, `createSettlementStore`, `querySettlementRecords`, `querySemanticRecords`, `querySemanticRecordCategories`, `recordSemanticRecord`, `semanticRecordFeed`, and the handle's `.record`, `.query`, `.queryCategories`, `.records` | The construction line is deleted; `root` and `type` go to each call. `.record({category, record, recordedAt, told, relation, causes, origin})` becomes `put(root, type, {...record, causes, told?})` where `told` is a member only when it is not `{for:true, against:false}`, `origin` is the member `by` where the record does not already carry its author, and `recordedAt` is the member `at` where the record does not carry its time. A `relation` is dropped unless a reader reads it; a reader's relation is a field of the record. `.query({category})` becomes `each(root, type)` for a reader of every record of the type, `walk(root, type, readHead(root, type, name).frontier)` for a reader of a thread, or `readLog` for a reader by time. The old query returned `{id, record, causes}`; `each` and `walk` return `{address, record}` and `causes` is in the record. |
-| **S2** | the cursor reads: `.readSince`, `readSemanticRecordsSince`, `journalCursorStart`, `iterateSemanticRecordsThroughDate`, `semanticRecordRevisionThroughDate`, `queryJournalDay`, `kindFeeds`, `tailKindFeeds` | `readLog(root, type, date, {from})`. The cursor is the reader's `(date, next)`. A revision is the head's frontier (equal frontiers are equal readings). |
+| **S2** | the cursor reads: `.readSince`, `readSemanticRecordsSince`, `journalCursorStart`, `iterateSemanticRecordsThroughDate`, `semanticRecordRevisionThroughDate`, `queryJournalDay`, `kindFeeds`, `tailKindFeeds` | `readLog(root, type, date, {from})`. The cursor is the reader's `(date, next)`. A head frontier can key the same complete extensional thread reading under the conditions in section 2.1; it is not by itself an occurrence-history or archive-availability identity. |
 | **S3** | EAVT feed files and side logs: `appendSeavtEntries`, `readSeavtEntries`, `readSeavtEntriesAtPath`, `iterateSeavtEntriesThroughDate`, `readSeavtEntriesThroughDate`, `admitJsonlOnce`, `readAdmittingJsonl`, `appendDurably` | `append(root, type, {at, ...fields})` and `readLog`. A row is written as the plain fields its readers read (`{at, e, a, v}` with `e`, `a`, `v` plain JSON, not SEN terms); a reader that wants terms applies `jsonToTerm` after reading. A side file written by hand beside the store is written with `append` or `put` and deleted. |
 | **S4** | the facade's write: `openJournal(root)`, `FilesystemJournal`, `.appendRows(action, rows, {at, subject, caller, eventCauses, rootName})`, `.appendEvents` | For each row, `extend(root, type, subject, {e, a, v, t}, {causes: eventCauses})` where `type` is the plain name of `action` (the feed) and `subject` is the thread. A row that has no thread and no reader by time is `put(root, type, {e, a, v, t})`. |
-| **S5** | thread reads: `journal.scanCausalSubject(root, subject, through, init, fold, {withSource})`, `journal.revisionOfSubject`, `journal.readAsOf` | `walk(root, type, readHead(root, type, subject).frontier)` with the fold applied to each record, causes first when the fold needs it (collect, reverse). `withSource` is dropped: a record's source is its address. `revisionOfSubject` is the head's frontier. |
+| **S5** | thread reads: `journal.scanCausalSubject(root, subject, through, init, fold, {withSource})`, `journal.revisionOfSubject`, `journal.readAsOf` | `walk(root, type, readHead(root, type, subject).frontier)` with the fold applied to each record, causes first when the fold needs it (collect, reverse). The retired subject reader's `withSource` supplies the first admitted partition path (earliest admitted path per witness), separately from the causal event passed to the fold. Replace a content lookup with the record address, but retain consumed source-path/filing information, its path-selection/date-cut semantics and original event/cause evidence. A head frontier keys only the scoped reading in section 2.1. |
 | **S6** | feed reads: `journal.feed`, `.sourceStatus`, `.scan`, `.scanFrom`, `.positionBefore`, `.scanAll`, `.listFeeds`, `.dateStatus`, `.describe`, `.logArtifact`, `.read` | `readLog(root, type, date, {from})`, `logDates(root, type)`; `sourceStatus` is `logDates` containing the date; `positionBefore` is the byte position `next` that a reader keeps or `max(0, size - bytes)` from `fs.statSync` on the log file at the next line start; a feed handle is `(type, date)`. |
 | **S7** | territory scans: `journal.scanCausal`, `.scanCausalAll`, `.scanCausalThroughDate`, `.scanCausalTerritory`, `.scanTerritory`, `.revisionThroughDate`, `.discoverRoots`, `.admissionSpan`, `.enclosingRoot` | There is no scan across types and dates in causal order. A reader that folded a territory reads `heads(root, type)` and `walk`s each, or `each(root, type)` for a type, or `readLog` over a date range for a time reader. `discoverRoots` and `enclosingRoot` are path arithmetic on `layout`. `admissionSpan` is deleted. |
 | **S8** | reading and writing bytes by address: `journal.readWitness`, `.readArtifact`, `.readPacket`, `.storePacket`, `.readWitness(`, `.readArtifact(` | `get(root, type, address)` for a record; content custody `get`/`putIfAbsent` by `ni:` address for bytes. A witness is a record. |
@@ -59,6 +59,133 @@ Every site is one of these. The store functions are those of `store.md` section 
 **Choosing the type.** The type of a site is the plain name of what the old call recorded. From the old `(objectKind, category)`: drop the namespace (everything up to the last dot) and the version (`.v1`) and the suffix `-record` or `.record` from the kind; where one kind held several categories, the category names the type (`claim`, `move`, `source-evidence`) with the short kind as prefix when the category alone is not a kind of thing; a category that carried an instance (a peer's name, a day) becomes a field. Examples: `forecasting.forecast-record` / `forecasting.forecast` is `forecast`; `forecasting.calibration-record` is `forecast-calibration`; `personal.financial-dispatch` / `dispatch` is `financial-dispatch`; `561-group.kalshi.desk.v1` with categories `decision`, `fill`, `order-intent`, `refusal` is `kalshi-decision`, `kalshi-fill`, `kalshi-order-intent`, `kalshi-refusal`; `red-cup-engineering.news-property-newsroom-day.v1` with `claim`, `source-evidence`, `manuscript-candidate` is `newsroom-claim`, `newsroom-source-evidence`, `newsroom-manuscript-candidate`; `knowing.claims` / `claim` is `claim`; `work-arena-move` / `move` is `work-arena-move`; `enterprise` with `contact`, `order`, ... is `enterprise-contact`, `enterprise-order`, ...; `metroplat.clock.schedule` is `clock-schedule`; `federated-work-admission` with the disposition as category is `federated-work-admission` with a `disposition` field. A site whose old category named an instance (`work-replication`'s `category: peer`) is not a type; section 4 says what it becomes.
 
 **Records or logs.** A site that recorded something the world must remember is a `put`. A site that also has a reader by time adds one `append` of `{at, of, ...}` with the fields that reader reads. A site whose data is read only as a current value is `writeHead`. A site whose written data no call site in this map reads is deleted: the write goes, and its readers with it.
+
+### 2.1 Source-sensitive receiving: S1, S2 and S5
+
+This qualifies the existing migration forms for [SEAVT issue #17][source-position-work]
+and the actual [Content Work issue #20][content-work] / [Newsroom PR8][newsroom-intake]
+consumer. It does not reinstate the retired journal, create a second store or
+specify external-event equivalence. The old `withSource` path is not a performed
+act identifier. Its replacement must answer the particular reader's question,
+not erase event evidence because both were called "source".
+
+The retired `scanCausalSubject` retains the earliest admitted path for a repeated
+witness, so a copied later partition does not move its original date. In contrast,
+`scanCausalThroughDate` retains the last source copy and `scanCausalAll` refuses one
+witness in two admitted feeds. Preserve the actual reader's rule, not a generic
+origin field. These source facts were checked in retained
+`computer-system-engine/src/journal/journal.mjs`, Git blob
+`6ff3f2282cc5555caf7eaaa19fa81b1f7d0b6a74`; its upstream commit binding is unresolved.
+
+**When frontier reuse is earned.** Keep the equal-frontier optimization for a
+fixed root/type, complete content-address-verified cause closure, fixed fold/schema and
+parameters (including the same subject/date/admission cut), and the availability
+that reading requires. Fully exhaust strict discovery and refuse a missing or
+truncated required walk. `store.md` already distinguishes a point head read from
+a snapshot: unchanged heads do not prove unchanged availability of their causes.
+An unchanged head whose missing cause has now arrived has a different complete
+reading. This does not invalidate reuse of an already-complete extensional fold.
+
+**Retain the distinctions the next reader needs.**
+
+- S1 retains the admitted complete record, its original typed evidence and any
+  consumed source/filing fields; its NI names that content, not every occurrence
+  of it. Equal canonical retries remain idempotent. Logs' `(date,next)` and
+  `appended`'s bucket/inode/offset cursor locate storage reads, not causal acts.
+- The existing `seavtOfSignCell` / `signCellOfSeavt` retain an already-admitted
+  native SignCell, both witness sides, stable triple address and supplied absolute
+  observation clock. `appendSeavtRow` / `readSeavtRows` carry that row through the
+  incumbent store. Clock admission does not authenticate its source or cause.
+  SignChain's `logOfSeavtRows` is an existing consumer of these rows: it requires
+  measured cells and nondecreasing observation clocks, and preserves each
+  original `(cell address, side, witness)` once across cumulative snapshots.
+  A Newsroom `SourceArrival` or generated typed mark is not thereby a measured
+  native cell, and re-reading it must not manufacture a new witness.
+- A genuine SignCraft `H` supplies addressed revision bodies with original
+  `parents`, `source` and ordered `cells`. `historyRawOccurrences` reads a cell's
+  original `(revisionId,cellIndex)`, not its payload NI. Retain those bodies and,
+  when checkpointed, the checkpoint and required original archive revisions.
+  Keep their intrinsic identities separate from the store record addresses
+  used to retrieve them. Two equal cells at different original indices remain
+  two occurrences. A checkpoint with the same heads can initially have unresolved
+  occurrence positions and later recover them from an available validated archive;
+  head equality alone cannot cache that occurrence-sensitive answer.
+  `captureHistoryOccurrences` can fix one operation's read frame, retaining the
+  full cells, occurrence positions, frontier/schema and observed archive resolution.
+  Its frame identity is neither a frontier nor a new persistent history authority.
+
+**Choose the existing projection, do not silently change policy.**
+
+| Actual question | Existing operator and required input | Limit |
+|---|---|---|
+| Which addressed story did this broker item first establish? | Newsroom `projectArrivalsToStore`: admit/retain the full arrival, read its first-story head, then project the named immutable record | Keep PR8's item identity and first-story policy; changed arrivals remain retained, not promoted |
+| What resource observations have the latest supplied source time? | `createCausalResourceHead.receive/read`, with the admitted resource subject, policy-matching SEAVT row and already committed native witness cause | Retains older observations and equal-time alternatives, but is neither a causal order nor a replacement for the first-story head |
+| Which original source occurrences and causal parents does H retain? | `restoreHistory` or `continueHistory` on genuine revisions, optional `bindHistoryArchive`, then `historyRawOccurrences` | Missing source positions or ancestry remain unresolved; do not infer them from either preceding projection |
+
+**Bounded producer-to-consumer sequence.**
+
+1. The Newsroom producer continues to admit the complete SourceArrival and retain
+   it through `recordNewsroom` / immutable body custody before first-story
+   projection. The current carrier supplies an item key and observation fields,
+   not a qualified native SignCell witness, original H parent frontier or PPA
+   generator proof. Keep those missing bindings explicit; do not generate them
+   from title equality, arrival order, an address, or a timestamp.
+2. For a producer that actually supplies a native witnessed SignCell, preserve
+   the complete cell and original clock through the existing SEAVT bridge. A
+   telling consumer may use `logOfSeavtRows` under its stated ordering contract;
+   this is not a construction of H's causal parents.
+3. For a producer that actually supplies H revisions, retain the exact source
+   bodies in the existing record/custody machinery and admit their original
+   addresses and parents with `restoreHistory` / `continueHistory`. The receiving
+   design must specify the retrieval binding to those bodies before implementing
+   it. Do not replay `each`, `appended` or time-sorted rows with `observeHistory`
+   or `replayHistory`: those operators declare every current head a parent of
+   the next observation and would invent causality from enumeration order.
+4. Issue #17's file-leg consumer may select an occurrence only from an earned PPA
+   coordinate. The existing structuration owner requires `resourceType`, `root`,
+   `target` and generator `witnesses`; it refuses an unearned route. Supply the
+   original source-position binding and independently admitted generator evidence,
+   not an NI or filepath relabelled as a coordinate. The parent PPA identity
+   adapter and optional POSIX rendering have separate roles. Neither currently
+   supplies the missing Newsroom-to-H interpretation.
+
+**Migration and receiving conditions.** Before selecting this binding, extend
+the original owner/consumer tests with: an equal-payload/different-source-position
+case; exact replay without another witness; independent for/against preservation;
+changed arrival with unchanged first-story fields; older and simultaneous source
+times without invented causality; the same frontier with a missing then available
+cause/archive; malformed revision identity or parent refusal; and earned/unearned
+PPA selection with bounded missing/truncated reads. Reordering storage enumeration
+must not change supplied causal parents. Existing bytes and source identities stay
+in custody; this section authorizes no conversion, default flip or duplicate index.
+
+PR16's opt-in named SEAVT v2 preserves the same row and separates `filedAt` from
+`witnessTime`; it does not add occurrence evidence or causal edges. Qualify exact
+supplier artifacts and the ordinary consumer closure separately before runtime
+adoption. Newsroom's selected SEAVT 0.1.1 artifact-to-source binding and its eight
+PR8 runtime cases remain unqualified here. The scientific bridge from
+`Articulating.Beneath` to object-language predication remains [Obsmetrologia 79][science-bridge];
+storage roundtrips, authentic H positions and PPA route checks cannot discharge
+that theorem, external-event equivalence or source-independent reporting.
+
+Source contracts: SEAVT `85713b9d49d3701af6d517f57288378d4c5129e5`,
+`src/admit-seavt-row.mjs`, `src/causal-resource-head.mjs`, `src/seavt-log.mjs`;
+[SignChain log][signchain-log] at `a520ef19749f555646371f19244bbfe11135335d`;
+[SignCraft history][signcraft-history] at `9eb2124fdd8c7582035b13557ff2600a17039842`;
+[PPA structuration][ppa-leaf] at `972b4c523dc4dcd708535a58152d11b7f4655e4c`;
+[PPA file-leg identity][ppa-parent] at `22d99f9b1b10a00175de4e5e1b65d02f272175eb`;
+[named-row candidate][named-row] at `ebf9c01df3289a1a390a90fe8deb3e7a2799f671`.
+These are source design references, not declarations of installed compatibility.
+
+[source-position-work]: https://github.com/red-cup-engineering/semiotic-eavt-services-section/issues/17
+[content-work]: https://github.com/red-cup-engineering/computer-content-engineering-services-section/issues/20#issuecomment-6270868017
+[newsroom-intake]: https://github.com/red-cup-engineering/content-mill-newsroom-services-section/blob/52b494842ca02e6a242e465958702b59067ec00a/specifications/arrival-address-projection.md
+[signchain-log]: https://github.com/red-cup-engineering/signchain/blob/a520ef19749f555646371f19244bbfe11135335d/src/log.mjs
+[signcraft-history]: https://github.com/red-cup-engineering/signcraft/blob/9eb2124fdd8c7582035b13557ff2600a17039842/src/history.mjs
+[ppa-leaf]: https://github.com/red-cup-engineering/proof-path-structuration-service/blob/972b4c523dc4dcd708535a58152d11b7f4655e4c/src/index.mts
+[ppa-parent]: https://github.com/red-cup-engineering/proof-pathing-services-section/blob/22d99f9b1b10a00175de4e5e1b65d02f272175eb/lib/identity.mjs
+[named-row]: https://github.com/red-cup-engineering/semiotic-eavt-services-section/blob/ebf9c01df3289a1a390a90fe8deb3e7a2799f671/content/text/documents/specifications/seavt-log-carrier.md
+[science-bridge]: https://github.com/lenticule-science/obsmetrologia/issues/79
 
 ## 3. Counts
 

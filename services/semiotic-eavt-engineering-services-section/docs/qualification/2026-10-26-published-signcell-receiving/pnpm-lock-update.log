@@ -1,0 +1,13 @@
+✓ Lockfile passes supply-chain policies (verified 24m ago)
+@red-cup-engineering/computer-data-engineering-services-section is linked to /workspace/scratch/455c183ed200/seavt/node_modules from /workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-data-engineering-services-section
+@red-cup-engineering/computer-file-engineering-services-section is linked to /workspace/scratch/455c183ed200/seavt/node_modules from /workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+computer-file-engineering-services-section@0.5.0/node_modules/@red-cup-engineering/computer-file-engineering-services-section
+@red-cup-engineering/eavt-services-section is linked to /workspace/scratch/455c183ed200/seavt/node_modules from /workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+eavt-services-section@0.11.1/node_modules/@red-cup-engineering/eavt-services-section
+@red-cup-engineering/signcell is linked to /workspace/scratch/455c183ed200/seavt/node_modules from /workspace/scratch/455c183ed200/signcell
+@red-cup-engineering/computer-content-address-engineering-services-section is linked to /workspace/scratch/455c183ed200/seavt/node_modules from /workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+computer-content-address-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-content-address-engineering-services-section
+@red-cup-engineering/json-services-section is linked to /workspace/scratch/455c183ed200/seavt/node_modules from /workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section
+@red-cup-engineering/uri-services-section is linked to /workspace/scratch/455c183ed200/seavt/node_modules from /workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+uri-services-section@0.1.1/node_modules/@red-cup-engineering/uri-services-section
+@red-cup-engineering/json-schema-services-section is linked to /workspace/scratch/455c183ed200/seavt/node_modules from /workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 46, reused 0, downloaded 0, added 0, done
+
+Done in 559ms using pnpm v11.25.0

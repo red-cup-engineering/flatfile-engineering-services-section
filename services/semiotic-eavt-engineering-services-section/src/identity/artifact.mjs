@@ -24,22 +24,30 @@ export function isArtifactRef(reference) {
   return isNiUri(reference);
 }
 
-/** Canonicalize a runtime value within the resource envelope and name it. */
-export function addressArtifact(value) {
-  const canonical = canonicalizeJson(value, JSON_RESOURCE_ENVELOPE);
+/** A trusted consumer may allocate bytes; every other admission limit remains. */
+function artifactEnvelope({ maxBytes = JSON_RESOURCE_ENVELOPE.maxCanonicalBytes } = {}) {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) {
+    throw new TypeError("artifact maxBytes must be a positive safe integer");
+  }
+  return { ...JSON_RESOURCE_ENVELOPE, maxSourceBytes: maxBytes, maxCanonicalBytes: maxBytes };
+}
+
+/** Canonicalize a runtime value within the allocated envelope and name it. */
+export function addressArtifact(value, options) {
+  const canonical = canonicalizeJson(value, artifactEnvelope(options));
   return Object.freeze({ ref: artifactId(canonical.value), canonical });
 }
 
 /** Admit JSON source text strictly and name the value it denotes. */
-export function admitArtifact(source) {
-  const canonical = admitCanonicalJson(source, JSON_RESOURCE_ENVELOPE);
+export function admitArtifact(source, options) {
+  const canonical = admitCanonicalJson(source, artifactEnvelope(options));
   return Object.freeze({ ref: artifactId(canonical.value), canonical });
 }
 
 /** Admit source text and require that it is the artifact `reference` names. */
-export function verifyArtifact(reference, source) {
+export function verifyArtifact(reference, source, options) {
   if (!isArtifactRef(reference)) throw refusal("reference-syntax", "$", "artifact reference must be one RFC 6920 SHA-256 ni URI");
-  const artifact = admitArtifact(source);
+  const artifact = admitArtifact(source, options);
   if (artifact.ref !== reference) throw refusal("digest-mismatch", "$", `artifact names ${artifact.ref}, not ${reference}`);
   return artifact;
 }

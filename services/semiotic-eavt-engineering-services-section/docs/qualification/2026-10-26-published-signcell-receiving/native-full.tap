@@ -1,0 +1,1336 @@
+TAP version 13
+# Subtest: ordinary: paused absent writer cannot replace another initial claim
+ok 1 - ordinary: paused absent writer cannot replace another initial claim
+  ---
+  duration_ms: 354.841799
+  type: 'test'
+  ...
+# Subtest: ordinary: duplicate initial claim refuses, including identical bytes
+ok 2 - ordinary: duplicate initial claim refuses, including identical bytes
+  ---
+  duration_ms: 226.927284
+  type: 'test'
+  ...
+# Subtest: ordinary: temporary EEXIST without a destination is not HeadConflict
+ok 3 - ordinary: temporary EEXIST without a destination is not HeadConflict
+  ---
+  duration_ms: 125.183871
+  type: 'test'
+  ...
+# Subtest: ordinary: post-link failure refuses while retaining the uncertain claim
+ok 4 - ordinary: post-link failure refuses while retaining the uncertain claim
+  ---
+  duration_ms: 250.435731
+  type: 'test'
+  ...
+# Subtest: ordinary: malformed destination appearing at publication remains refused
+ok 5 - ordinary: malformed destination appearing at publication remains refused
+  ---
+  duration_ms: 147.182046
+  type: 'test'
+  ...
+# Subtest: ordinary: redirect destination appearing at publication remains refused
+ok 6 - ordinary: redirect destination appearing at publication remains refused
+  ---
+  duration_ms: 129.008794
+  type: 'test'
+  ...
+# Subtest: strict: paused absent writer cannot replace another initial claim
+ok 7 - strict: paused absent writer cannot replace another initial claim
+  ---
+  duration_ms: 312.798212
+  type: 'test'
+  ...
+# Subtest: strict: duplicate initial claim refuses, including identical bytes
+ok 8 - strict: duplicate initial claim refuses, including identical bytes
+  ---
+  duration_ms: 205.173326
+  type: 'test'
+  ...
+# Subtest: strict: temporary EEXIST without a destination is not HeadConflict
+ok 9 - strict: temporary EEXIST without a destination is not HeadConflict
+  ---
+  duration_ms: 139.046262
+  type: 'test'
+  ...
+# Subtest: strict: post-link failure refuses while retaining the uncertain claim
+ok 10 - strict: post-link failure refuses while retaining the uncertain claim
+  ---
+  duration_ms: 216.003453
+  type: 'test'
+  ...
+# Subtest: strict: malformed destination appearing at publication remains refused
+ok 11 - strict: malformed destination appearing at publication remains refused
+  ---
+  duration_ms: 118.16472
+  type: 'test'
+  ...
+# Subtest: strict: redirect destination appearing at publication remains refused
+ok 12 - strict: redirect destination appearing at publication remains refused
+  ---
+  duration_ms: 124.581552
+  type: 'test'
+  ...
+# Subtest: expected-frontier replacement and no-check replacement retain their contracts
+ok 13 - expected-frontier replacement and no-check replacement retain their contracts
+  ---
+  duration_ms: 8.988544
+  type: 'test'
+  ...
+# Subtest: explicit bytes admit and verify complete large artifacts without changing identity or defaults
+ok 14 - explicit bytes admit and verify complete large artifacts without changing identity or defaults
+  ---
+  duration_ms: 204.027886
+  type: 'test'
+  ...
+# Subtest: byte allocation is finite and retains strict structural and value admission
+ok 15 - byte allocation is finite and retains strict structural and value admission
+  ---
+  duration_ms: 18.032141
+  type: 'test'
+  ...
+# Subtest: canonical and source byte allocations accept equality and refuse the next byte
+ok 16 - canonical and source byte allocations accept equality and refuse the next byte
+  ---
+  duration_ms: 1.750728
+  type: 'test'
+  ...
+# Subtest: a first-class original film resource requires its real SCA cause and keeps a stable subject
+ok 17 - a first-class original film resource requires its real SCA cause and keeps a stable subject
+  ---
+  duration_ms: 35.434035
+  type: 'test'
+  ...
+# Subtest: later source-time supersedes current view but never destroys earlier evidence
+ok 18 - later source-time supersedes current view but never destroys earlier evidence
+  ---
+  duration_ms: 35.409809
+  type: 'test'
+  ...
+# Subtest: equivalent timestamps retain contradictory source claims as a bounded FOUR-compatible frontier
+ok 19 - equivalent timestamps retain contradictory source claims as a bounded FOUR-compatible frontier
+  ---
+  duration_ms: 35.926054
+  type: 'test'
+  ...
+# Subtest: malformed or forged evidence and inconsistent resource heads cannot become current
+ok 20 - malformed or forged evidence and inconsistent resource heads cannot become current
+  ---
+  duration_ms: 11.497641
+  type: 'test'
+  ...
+# Subtest: empty native types are usable but never proof of a historical transfer
+ok 21 - empty native types are usable but never proof of a historical transfer
+  ---
+  duration_ms: 63.734261
+  type: 'test'
+  ...
+# Subtest: an absent target is not silently created by validation
+ok 22 - an absent target is not silently created by validation
+  ---
+  duration_ms: 4.611603
+  type: 'test'
+  ...
+# Subtest: current native records and heads need no historical provider or conversion journal
+ok 23 - current native records and heads need no historical provider or conversion journal
+  ---
+  duration_ms: 31.580039
+  type: 'test'
+  ...
+# Subtest: a missing causal record prevents current-state acceptance
+ok 24 - a missing causal record prevents current-state acceptance
+  ---
+  duration_ms: 18.938472
+  type: 'test'
+  ...
+# Subtest: malformed appended native rows cannot hide behind a good record prefix
+ok 25 - malformed appended native rows cannot hide behind a good record prefix
+  ---
+  duration_ms: 5.063321
+  type: 'test'
+  ...
+# Subtest: a legacy layout is refused even when valid current records also exist
+ok 26 - a legacy layout is refused even when valid current records also exist
+  ---
+  duration_ms: 4.554908
+  type: 'test'
+  ...
+# Subtest: CP-1..7: exact native round trip includes unheaded rows and original timestamp, excludes logs
+ok 27 - CP-1..7: exact native round trip includes unheaded rows and original timestamp, excludes logs
+  ---
+  duration_ms: 133.260507
+  type: 'test'
+  ...
+# Subtest: CP-6: missing unheaded cause and external reference survive exact capture with distinct obligations
+ok 28 - CP-6: missing unheaded cause and external reference survive exact capture with distinct obligations
+  ---
+  duration_ms: 39.882048
+  type: 'test'
+  ...
+# Subtest: CP-1,5,8: refuse missing quiescence, duplicate types, overlap and occupied destination
+ok 29 - CP-1,5,8: refuse missing quiescence, duplicate types, overlap and occupied destination
+  ---
+  duration_ms: 17.120532
+  type: 'test'
+  ...
+# Subtest: CP-3,5: malformed records and nonnative extra files refuse certification
+ok 30 - CP-3,5: malformed records and nonnative extra files refuse certification
+  ---
+  duration_ms: 13.34851
+  type: 'test'
+  ...
+# Subtest: CP-5: extra selected file cannot silently disappear
+ok 31 - CP-5: extra selected file cannot silently disappear
+  ---
+  duration_ms: 33.686952
+  type: 'test'
+  ...
+# Subtest: CP-2: linked selected directory refused
+ok 32 - CP-2: linked selected directory refused
+  ---
+  duration_ms: 8.990016
+  type: 'test'
+  ...
+# Subtest: CP-7: byte tampering and unrelated checkpoint files fail read-only verify
+ok 33 - CP-7: byte tampering and unrelated checkpoint files fail read-only verify
+  ---
+  duration_ms: 45.531574
+  type: 'test'
+  ...
+# Subtest: CP-1,3: explicitly declared empty native type is lawful
+ok 34 - CP-1,3: explicitly declared empty native type is lawful
+  ---
+  duration_ms: 24.30623
+  type: 'test'
+  ...
+# Subtest: CP-4: concurrent source change at native publication boundary refuses success
+ok 35 - CP-4: concurrent source change at native publication boundary refuses success
+  ---
+  duration_ms: 28.920356
+  type: 'test'
+  ...
+# Subtest: CP-8: interrupted write retains original and partial destination, fresh retry succeeds
+ok 36 - CP-8: interrupted write retains original and partial destination, fresh retry succeeds
+  ---
+  duration_ms: 61.001754
+  type: 'test'
+  ...
+# Subtest: CP-8: uncertainty after completed head publication can be resolved by read-only verification
+ok 37 - CP-8: uncertainty after completed head publication can be resolved by read-only verification
+  ---
+  duration_ms: 20.403686
+  type: 'test'
+  ...
+# Subtest: CP-3: malformed head is refused before any publication
+ok 38 - CP-3: malformed head is refused before any publication
+  ---
+  duration_ms: 6.880339
+  type: 'test'
+  ...
+# Subtest: CP-6: selected cross-type causes establish closure, missing frontier remains an obligation
+ok 39 - CP-6: selected cross-type causes establish closure, missing frontier remains an obligation
+  ---
+  duration_ms: 33.715054
+  type: 'test'
+  ...
+# Subtest: CP-2: selected file links refuse capture
+ok 40 - CP-2: selected file links refuse capture
+  ---
+  duration_ms: 6.346507
+  type: 'test'
+  ...
+# Subtest: CP-4: oversized source refuses before unbounded content allocation or publication
+ok 41 - CP-4: oversized source refuses before unbounded content allocation or publication
+  ---
+  duration_ms: 11.114556
+  type: 'test'
+  ...
+# Subtest: CP-5: multiple records sharing a bucket preserve native line order exactly
+ok 42 - CP-5: multiple records sharing a bucket preserve native line order exactly
+  ---
+  duration_ms: 47.301732
+  type: 'test'
+  ...
+# Subtest: calendar admission rejects normalized impossible dates
+ok 43 - calendar admission rejects normalized impossible dates
+  ---
+  duration_ms: 1.7719
+  type: 'test'
+  ...
+# Subtest: exact source clocks order nanoseconds without millisecond truncation
+ok 44 - exact source clocks order nanoseconds without millisecond truncation
+  ---
+  duration_ms: 5.538094
+  type: 'test'
+  ...
+# Subtest: source-clock admission agrees with the Lean missing-clock and monotonic laws
+ok 45 - source-clock admission agrees with the Lean missing-clock and monotonic laws
+  ---
+  duration_ms: 0.714723
+  type: 'test'
+  ...
+# Subtest: property: the JSON carrier of a bridge image re-admits term-equal, through serialization, for random JSON
+ok 46 - property: the JSON carrier of a bridge image re-admits term-equal, through serialization, for random JSON
+  ---
+  duration_ms: 652.817184
+  type: 'test'
+  ...
+# Subtest: object keys are carried in the bridge's sorted order, and a differently ordered object is the same row
+ok 47 - object keys are carried in the bridge's sorted order, and a differently ordered object is the same row
+  ---
+  duration_ms: 0.630857
+  type: 'test'
+  ...
+# Subtest: numbers: integers, floats, exponents and extremes survive; -0 and non-finite are not JSON values
+ok 48 - numbers: integers, floats, exponents and extremes survive; -0 and non-finite are not JSON values
+  ---
+  duration_ms: 1.927554
+  type: 'test'
+  ...
+# Subtest: a term outside the bridge's image keeps its full spine and is never altered
+ok 49 - a term outside the bridge's image keeps its full spine and is never altered
+  ---
+  duration_ms: 1.381033
+  type: 'test'
+  ...
+# Subtest: readers accept every form: full spine, JSON, a mixture, and a row from before the carrier
+ok 50 - readers accept every form: full spine, JSON, a mixture, and a row from before the carrier
+  ---
+  duration_ms: 1.967354
+  type: 'test'
+  ...
+# Subtest: t differing from at is kept; t equal to at is not stored twice; a bare date files at midnight
+ok 51 - t differing from at is kept; t equal to at is not stored twice; a bare date files at midnight
+  ---
+  duration_ms: 1.151218
+  type: 'test'
+  ...
+# Subtest: filing and replay refuse impossible calendar days instead of normalizing them
+ok 52 - filing and replay refuse impossible calendar days instead of normalizing them
+  ---
+  duration_ms: 1.439641
+  type: 'test'
+  ...
+# Subtest: the carrier is much smaller than the spine serialization
+ok 53 - the carrier is much smaller than the spine serialization
+  ---
+  duration_ms: 1.378138
+  type: 'test'
+  ...
+# Subtest: appendSeavtRow / readSeavtRows: day logs, the first append of a new day seals the days before it, reads stay continuous
+ok 54 - appendSeavtRow / readSeavtRows: day logs, the first append of a new day seals the days before it, reads stay continuous
+  ---
+  duration_ms: 150.155394
+  type: 'test'
+  ...
+# Subtest: a row larger than a gzip block seals and reads back whole
+ok 55 - a row larger than a gzip block seals and reads back whole
+  ---
+  duration_ms: 29.010662
+  type: 'test'
+  ...
+# Subtest: journal batches stop on their first refused write without processing later ledger rows
+ok 56 - journal batches stop on their first refused write without processing later ledger rows
+  ---
+  duration_ms: 2.553162
+  type: 'test'
+  ...
+# Subtest: SEAVT batch resumes later days after one capped day, even when days are interleaved
+ok 57 - SEAVT batch resumes later days after one capped day, even when days are interleaved
+  ---
+  duration_ms: 9.233362
+  type: 'test'
+  ...
+# Subtest: the guard refuses past the hard cap, logs once, and leaves a marker
+ok 58 - the guard refuses past the hard cap, logs once, and leaves a marker
+  ---
+  duration_ms: 12.472924
+  type: 'test'
+  ...
+# Subtest: the budget file is validated, per root, with defaults
+ok 59 - the budget file is validated, per root, with defaults
+  ---
+  duration_ms: 5.290142
+  type: 'test'
+  ...
+# Subtest: seavt-volume: census per feed per day, ranking, and --check exits nonzero over budget
+ok 60 - seavt-volume: census per feed per day, ranking, and --check exits nonzero over budget
+  ---
+  duration_ms: 361.746657
+  type: 'test'
+  ...
+# Subtest: an old raw day is reported as unsealed
+ok 61 - an old raw day is reported as unsealed
+  ---
+  duration_ms: 75.112451
+  type: 'test'
+  ...
+# Subtest: compact-seavt-logs: spine logs become sealed compact segments, verified, with the source kept unless --remove
+ok 62 - compact-seavt-logs: spine logs become sealed compact segments, verified, with the source kept unless --remove
+  ---
+  duration_ms: 78.487179
+  type: 'test'
+  ...
+# Subtest: compact-seavt-logs --remove deletes only a verified source
+ok 63 - compact-seavt-logs --remove deletes only a verified source
+  ---
+  duration_ms: 12.304583
+  type: 'test'
+  ...
+# Subtest: SEAVT admits and preserves 8132 native witness identities
+ok 64 - SEAVT admits and preserves 8132 native witness identities
+  ---
+  duration_ms: 361.825159
+  type: 'test'
+  ...
+# Subtest: SEAVT admits and preserves 20000 native witness identities
+ok 65 - SEAVT admits and preserves 20000 native witness identities
+  ---
+  duration_ms: 495.014838
+  type: 'test'
+  ...
+# Subtest: ordinary: replacement publishes the complete frontier beyond one I/O chunk
+ok 66 - ordinary: replacement publishes the complete frontier beyond one I/O chunk
+  ---
+  duration_ms: 144.128913
+  type: 'test'
+  ...
+# Subtest: ordinary: write-error before publication preserves the exact old head
+ok 67 - ordinary: write-error before publication preserves the exact old head
+  ---
+  duration_ms: 148.019864
+  type: 'test'
+  ...
+# Subtest: ordinary: sync-error before publication preserves the exact old head
+ok 68 - ordinary: sync-error before publication preserves the exact old head
+  ---
+  duration_ms: 136.882094
+  type: 'test'
+  ...
+# Subtest: ordinary: failure after rename retains the complete but uncertain new head
+ok 69 - ordinary: failure after rename retains the complete but uncertain new head
+  ---
+  duration_ms: 189.253916
+  type: 'test'
+  ...
+# Subtest: ordinary: arrival-style extension keeps all independent frontier members
+ok 70 - ordinary: arrival-style extension keeps all independent frontier members
+  ---
+  duration_ms: 283.460564
+  type: 'test'
+  ...
+# Subtest: strict: replacement publishes the complete frontier beyond one I/O chunk
+ok 71 - strict: replacement publishes the complete frontier beyond one I/O chunk
+  ---
+  duration_ms: 126.139476
+  type: 'test'
+  ...
+# Subtest: strict: write-error before publication preserves the exact old head
+ok 72 - strict: write-error before publication preserves the exact old head
+  ---
+  duration_ms: 99.350098
+  type: 'test'
+  ...
+# Subtest: strict: sync-error before publication preserves the exact old head
+ok 73 - strict: sync-error before publication preserves the exact old head
+  ---
+  duration_ms: 128.638939
+  type: 'test'
+  ...
+# Subtest: strict: failure after rename retains the complete but uncertain new head
+ok 74 - strict: failure after rename retains the complete but uncertain new head
+  ---
+  duration_ms: 176.401522
+  type: 'test'
+  ...
+# Subtest: strict: arrival-style extension keeps all independent frontier members
+ok 75 - strict: arrival-style extension keeps all independent frontier members
+  ---
+  duration_ms: 227.291671
+  type: 'test'
+  ...
+# Subtest: expected-frontier conflict does not publish or change the old head
+ok 76 - expected-frontier conflict does not publish or change the old head
+  ---
+  duration_ms: 110.482121
+  type: 'test'
+  ...
+# Subtest: ordinary replacement preserves Unicode head names and original umask-derived mode
+ok 77 - ordinary replacement preserves Unicode head names and original umask-derived mode
+  ---
+  duration_ms: 36.125172
+  type: 'test'
+  ...
+# Subtest: a sealed day reads back the same lines at the same cursors, and the open day stays open
+ok 78 - a sealed day reads back the same lines at the same cursors, and the open day stays open
+  ---
+  duration_ms: 453.729229
+  type: 'test'
+  ...
+# Subtest: a sealed segment is ordinary gzip: its bytes are the day's bytes
+ok 79 - a sealed segment is ordinary gzip: its bytes are the day's bytes
+  ---
+  duration_ms: 26.562717
+  type: 'test'
+  ...
+# Subtest: a late line for a sealed day is a tail after the seal, and sealing again adds the next segment
+ok 80 - a late line for a sealed day is a tail after the seal, and sealing again adds the next segment
+  ---
+  duration_ms: 8.747352
+  type: 'test'
+  ...
+# Subtest: a seal interrupted after writing its segment is finished without copying the day twice
+ok 81 - a seal interrupted after writing its segment is finished without copying the day twice
+  ---
+  duration_ms: 13.088599
+  type: 'test'
+  ...
+# Subtest: an unterminated last line is sealed terminated, and still skipped
+ok 82 - an unterminated last line is sealed terminated, and still skipped
+  ---
+  duration_ms: 8.017315
+  type: 'test'
+  ...
+# Subtest: JSON template pointers retain escaped keys, literal percent characters, and root values
+ok 83 - JSON template pointers retain escaped keys, literal percent characters, and root values
+  ---
+  duration_ms: 1.915175
+  type: 'test'
+  ...
+# Subtest: SEAVT preserves typed SEN coordinate syntax while normalizing only EAVT carrier shape
+ok 84 - SEAVT preserves typed SEN coordinate syntax while normalizing only EAVT carrier shape
+  ---
+  duration_ms: 6.077714
+  type: 'test'
+  ...
+# Subtest: one SignCell is one native SEN-typed SEAVT observation under its actual SCA address
+ok 85 - one SignCell is one native SEN-typed SEAVT observation under its actual SCA address
+  ---
+  duration_ms: 8.412679
+  type: 'test'
+  ...
+# Subtest: SCA triple identity remains stable as SignCell evidence accumulates
+ok 86 - SCA triple identity remains stable as SignCell evidence accumulates
+  ---
+  duration_ms: 20.3159
+  type: 'test'
+  ...
+# Subtest: time is a SEAVT witnessing dimension, not a silent substitute for identity
+ok 87 - time is a SEAVT witnessing dimension, not a silent substitute for identity
+  ---
+  duration_ms: 5.051323
+  type: 'test'
+  ...
+# Subtest: forged SCA address, wrong SEN attribute, or non-cell JSON cannot impersonate a SignCell
+ok 88 - forged SCA address, wrong SEN attribute, or non-cell JSON cannot impersonate a SignCell
+  ---
+  duration_ms: 8.588673
+  type: 'test'
+  ...
+# Subtest: SEAVT does not turn an unverified source allegation into affirmative testimony
+ok 89 - SEAVT does not turn an unverified source allegation into affirmative testimony
+  ---
+  duration_ms: 1.202666
+  type: 'test'
+  ...
+# Subtest: the native projection is the existing seavtOfJson bridge, not a parallel serialization
+ok 90 - the native projection is the existing seavtOfJson bridge, not a parallel serialization
+  ---
+  duration_ms: 1.696887
+  type: 'test'
+  ...
+# Subtest: SEAVT source time is a real calendar instant, not Date.parse rollover
+ok 91 - SEAVT source time is a real calendar instant, not Date.parse rollover
+  ---
+  duration_ms: 18.93836
+  type: 'test'
+  ...
+# Subtest: SEAVT clock ordering retains fractional precision and timezone equality
+ok 92 - SEAVT clock ordering retains fractional precision and timezone equality
+  ---
+  duration_ms: 0.660351
+  type: 'test'
+  ...
+# Subtest: appended without a cursor reads every record, as each does
+ok 93 - appended without a cursor reads every record, as each does
+  ---
+  duration_ms: 205.094688
+  type: 'test'
+  ...
+# Subtest: appended with a cursor reads only records put since, and nothing when nothing was
+ok 94 - appended with a cursor reads only records put since, and nothing when nothing was
+  ---
+  duration_ms: 46.411585
+  type: 'test'
+  ...
+# Subtest: appended leaves a line not yet terminated for the next call
+ok 95 - appended leaves a line not yet terminated for the next call
+  ---
+  duration_ms: 3.844792
+  type: 'test'
+  ...
+# Subtest: appended says reset when a bucket shrank, was replaced or is gone
+ok 96 - appended says reset when a bucket shrank, was replaced or is gone
+  ---
+  duration_ms: 5.137453
+  type: 'test'
+  ...
+# Subtest: appended refuses a cursor it did not make
+ok 97 - appended refuses a cursor it did not make
+  ---
+  duration_ms: 8.489505
+  type: 'test'
+  ...
+# Subtest: a new record moves its type's witness; a repeated put does not
+ok 98 - a new record moves its type's witness; a repeated put does not
+  ---
+  duration_ms: 67.322843
+  type: 'test'
+  ...
+# Subtest: another type's witness does not move
+ok 99 - another type's witness does not move
+  ---
+  duration_ms: 64.761719
+  type: 'test'
+  ...
+# Subtest: the witness checks its root and type name
+ok 100 - the witness checks its root and type name
+  ---
+  duration_ms: 0.403996
+  type: 'test'
+  ...
+# Subtest: ST-14: what a process retains after store calls does not grow with the store
+ok 101 - ST-14: what a process retains after store calls does not grow with the store
+  ---
+  duration_ms: 5411.933534
+  type: 'test'
+  ...
+# Subtest: ST-14: a walk holds only its visited addresses
+ok 102 - ST-14: a walk holds only its visited addresses
+  ---
+  duration_ms: 457.214121
+  type: 'test'
+  ...
+# Subtest: strict record refuses symlink swapped at the actual open/read boundary
+ok 103 - strict record refuses symlink swapped at the actual open/read boundary
+  ---
+  duration_ms: 189.779596
+  type: 'test'
+  ...
+# Subtest: strict record refuses fifo swapped at the actual open/read boundary
+ok 104 - strict record refuses fifo swapped at the actual open/read boundary
+  ---
+  duration_ms: 270.393968
+  type: 'test'
+  ...
+# Subtest: strict head refuses symlink swapped at the actual open/read boundary
+ok 105 - strict head refuses symlink swapped at the actual open/read boundary
+  ---
+  duration_ms: 158.104564
+  type: 'test'
+  ...
+# Subtest: strict head refuses fifo swapped at the actual open/read boundary
+ok 106 - strict head refuses fifo swapped at the actual open/read boundary
+  ---
+  duration_ms: 178.613603
+  type: 'test'
+  ...
+# Subtest: strict discovery agrees on complete records and heads and genuine absence
+ok 107 - strict discovery agrees on complete records and heads and genuine absence
+  ---
+  duration_ms: 91.085337
+  type: 'test'
+  ...
+# Subtest: strict heads refuse malformed JSON and invalid frontiers without changing permissive defaults
+ok 108 - strict heads refuse malformed JSON and invalid frontiers without changing permissive defaults
+  ---
+  duration_ms: 3.303349
+  type: 'test'
+  ...
+# Subtest: strict records refuse malformed and hash-invalid content
+ok 109 - strict records refuse malformed and hash-invalid content
+  ---
+  duration_ms: 7.216053
+  type: 'test'
+  ...
+# Subtest: strict records refuse incomplete and overlong lines without quoting their contents
+ok 110 - strict records refuse incomplete and overlong lines without quoting their contents
+  ---
+  duration_ms: 13.420488
+  type: 'test'
+  ...
+# Subtest: partial strict iteration never certifies the yielded prefix as complete
+ok 111 - partial strict iteration never certifies the yielded prefix as complete
+  ---
+  duration_ms: 4.732154
+  type: 'test'
+  ...
+# Subtest: strict heads refuse nonregular entries and symbolic leaf links
+ok 112 - strict heads refuse nonregular entries and symbolic leaf links
+  ---
+  duration_ms: 3.142768
+  type: 'test'
+  ...
+# Subtest: strict discovery propagates unavailable paths instead of empty ENOTDIR evidence
+ok 113 - strict discovery propagates unavailable paths instead of empty ENOTDIR evidence
+  ---
+  duration_ms: 1.572291
+  type: 'test'
+  ...
+# Subtest: named head replacement and missing records stay observable independently
+ok 114 - named head replacement and missing records stay observable independently
+  ---
+  duration_ms: 11.731652
+  type: 'test'
+  ...
+# Subtest: walk reports a cause removed after traversal rather than silently omitting its evidence
+ok 115 - walk reports a cause removed after traversal rather than silently omitting its evidence
+  ---
+  duration_ms: 18.725641
+  type: 'test'
+  ...
+# Subtest: strict record discovery refuses directory and symbolic leaf entries
+ok 116 - strict record discovery refuses directory and symbolic leaf entries
+  ---
+  duration_ms: 4.866075
+  type: 'test'
+  ...
+# Subtest: an unreadable directory traversal preserves the filesystem error code
+ok 117 - an unreadable directory traversal preserves the filesystem error code
+  ---
+  duration_ms: 2.575837
+  type: 'test'
+  ...
+# Subtest: a second-process replacement during enumeration requires the consumer final named-head check
+ok 118 - a second-process replacement during enumeration requires the consumer final named-head check
+  ---
+  duration_ms: 176.324407
+  type: 'test'
+  ...
+# Subtest: a settlement's exchange enumerates every head in decoded-name order, independent of directory insertion order
+ok 119 - a settlement's exchange enumerates every head in decoded-name order, independent of directory insertion order
+  ---
+  duration_ms: 21.595981
+  type: 'test'
+  ...
+# Subtest: federated directory heads fail closed on corrupt or noncanonical evidence, not an incomplete successful census
+ok 120 - federated directory heads fail closed on corrupt or noncanonical evidence, not an incomplete successful census
+  ---
+  duration_ms: 11.69363
+  type: 'test'
+  ...
+# Subtest: a proven address with altered content is refused after the genuine line was proven
+ok 121 - a proven address with altered content is refused after the genuine line was proven
+  ---
+  duration_ms: 38.83469
+  type: 'test'
+  ...
+# Subtest: repeated reads of the same records agree with the first
+ok 122 - repeated reads of the same records agree with the first
+  ---
+  duration_ms: 64.772079
+  type: 'test'
+  ...
+# Subtest: the held verdicts have a fixed bound
+ok 123 - the held verdicts have a fixed bound
+  ---
+  duration_ms: 0.25268
+  type: 'test'
+  ...
+# Subtest: store log date paths admit only actual calendar days
+ok 124 - store log date paths admit only actual calendar days
+  ---
+  duration_ms: 2.103518
+  type: 'test'
+  ...
+# Subtest: ST-1: a record is filed where ni-path-v1 computes, over the conformance vectors
+ok 125 - ST-1: a record is filed where ni-path-v1 computes, over the conformance vectors
+  ---
+  duration_ms: 9.19875
+  type: 'test'
+  ...
+# Subtest: a record reads back as put, in one plain readable line
+ok 126 - a record reads back as put, in one plain readable line
+  ---
+  duration_ms: 8.09335
+  type: 'test'
+  ...
+# Subtest: ST-2: the files of a settlement are the three kinds and nothing else
+ok 127 - ST-2: the files of a settlement are the three kinds and nothing else
+  ---
+  duration_ms: 15.092989
+  type: 'test'
+  ...
+# Subtest: ST-3: put of a held record writes nothing
+ok 128 - ST-3: put of a held record writes nothing
+  ---
+  duration_ms: 4.920036
+  type: 'test'
+  ...
+# Subtest: ST-4: a cut tail becomes a line of its own before the next write
+ok 129 - ST-4: a cut tail becomes a line of its own before the next write
+  ---
+  duration_ms: 199.961295
+  type: 'test'
+  ...
+# Subtest: ST-5: get returns only a line that hashes to its id, skipping bad lines
+ok 130 - ST-5: get returns only a line that hashes to its id, skipping bad lines
+  ---
+  duration_ms: 45.334148
+  type: 'test'
+  ...
+# Subtest: ST-6: admission is the line; causes are not read
+ok 131 - ST-6: admission is the line; causes are not read
+  ---
+  duration_ms: 9.563677
+  type: 'test'
+  ...
+# Subtest: ST-7 and ST-8: a walk yields effects first, marks what is missing, and stops at its limit
+ok 132 - ST-7 and ST-8: a walk yields effects first, marks what is missing, and stops at its limit
+  ---
+  duration_ms: 26.460975
+  type: 'test'
+  ...
+# Subtest: a walk crosses types by {type, id}
+ok 133 - a walk crosses types by {type, id}
+  ---
+  duration_ms: 15.68706
+  type: 'test'
+  ...
+# Subtest: ST-9 and ST-10: a head is replaced under its lock, and expect is checked first
+ok 134 - ST-9 and ST-10: a head is replaced under its lock, and expect is checked first
+  ---
+  duration_ms: 20.679665
+  type: 'test'
+  ...
+# Subtest: a head name is percent-encoded and listed back by name
+ok 135 - a head name is percent-encoded and listed back by name
+  ---
+  duration_ms: 5.541009
+  type: 'test'
+  ...
+# Subtest: extend puts a record with its causes and advances the head
+ok 136 - extend puts a record with its causes and advances the head
+  ---
+  duration_ms: 22.984035
+  type: 'test'
+  ...
+# Subtest: ST-11: a log line is one write to the day of its at, never rewritten
+ok 137 - ST-11: a log line is one write to the day of its at, never rewritten
+  ---
+  duration_ms: 2.576708
+  type: 'test'
+  ...
+# Subtest: ST-12: an oversized record or log line is refused
+ok 138 - ST-12: an oversized record or log line is refused
+  ---
+  duration_ms: 3.629729
+  type: 'test'
+  ...
+# Subtest: ST-13: a type must be plain lowercase words joined by hyphens
+ok 139 - ST-13: a type must be plain lowercase words joined by hyphens
+  ---
+  duration_ms: 5.404823
+  type: 'test'
+  ...
+# Subtest: ST-15: importing the store starts no timer or watcher and reads no file
+ok 140 - ST-15: importing the store starts no timer or watcher and reads no file
+  ---
+  duration_ms: 152.964618
+  type: 'test'
+  ...
+# Subtest: ST-16: pull stops at an address the local store has, and converges heads
+ok 141 - ST-16: pull stops at an address the local store has, and converges heads
+  ---
+  duration_ms: 32.092349
+  type: 'test'
+  ...
+# Subtest: pull merges diverged threads into the maximal frontier
+ok 142 - pull merges diverged threads into the maximal frontier
+  ---
+  duration_ms: 65.379111
+  type: 'test'
+  ...
+# Subtest: one log: a channel's unchanged frontier still transports an explicit closure
+ok 143 - one log: a channel's unchanged frontier still transports an explicit closure
+  ---
+  duration_ms: 13.474669
+  type: 'test'
+  ...
+# Subtest: one log: a channel message and its cross-type ledger consequence travel with causal custody
+ok 144 - one log: a channel message and its cross-type ledger consequence travel with causal custody
+  ---
+  duration_ms: 11.640546
+  type: 'test'
+  ...
+# Subtest: one log: a missing predecessor never becomes a converged channel head
+ok 145 - one log: a missing predecessor never becomes a converged channel head
+  ---
+  duration_ms: 11.39734
+  type: 'test'
+  ...
+# Subtest: one log: forged peer payloads and changing parent reads cannot publish a ledger head
+ok 146 - one log: forged peer payloads and changing parent reads cannot publish a ledger head
+  ---
+  duration_ms: 18.34473
+  type: 'test'
+  ...
+# Subtest: ST-17: a root holding the earlier layout is refused on every operation
+ok 147 - ST-17: a root holding the earlier layout is refused on every operation
+  ---
+  duration_ms: 2.199492
+  type: 'test'
+  ...
+# Subtest: ST-17: a file named as the earlier layout is not the earlier layout
+ok 148 - ST-17: a file named as the earlier layout is not the earlier layout
+  ---
+  duration_ms: 2.544761
+  type: 'test'
+  ...
+# Subtest: ST-18: only the store's core writes files; layout and exchange do not
+ok 149 - ST-18: only the store's core writes files; layout and exchange do not
+  ---
+  duration_ms: 0.48628
+  type: 'test'
+  ...
+# Subtest: each yields every record of a type once, in bucket order
+ok 150 - each yields every record of a type once, in bucket order
+  ---
+  duration_ms: 114.516032
+  type: 'test'
+  ...
+# Subtest: bounded head preserves original JSON-owner BOM refusal
+ok 151 - bounded head preserves original JSON-owner BOM refusal
+  ---
+  duration_ms: 6.149862
+  type: 'test'
+  ...
+# Subtest: strict put and existing-address retry establish the whole ancestry without a second append
+ok 152 - strict put and existing-address retry establish the whole ancestry without a second append
+  ---
+  duration_ms: 14.97417
+  type: 'test'
+  ...
+# Subtest: strict root may be a descendant of an explicit durable anchor, never implicitly its own anchor
+ok 153 - strict root may be a descendant of an explicit durable anchor, never implicitly its own anchor
+  ---
+  duration_ms: 9.941294
+  type: 'test'
+  ...
+# Subtest: strict store refusals precede data and lock-parent creation
+ok 154 - strict store refusals precede data and lock-parent creation
+  ---
+  duration_ms: 3.180595
+  type: 'test'
+  ...
+# Subtest: strict existing bucket refuses symlink before read/append
+ok 155 - strict existing bucket refuses symlink before read/append
+  ---
+  duration_ms: 5.397493
+  type: 'test'
+  ...
+# Subtest: strict existing bucket refuses fifo before read/append
+ok 156 - strict existing bucket refuses fifo before read/append
+  ---
+  duration_ms: 8.069525
+  type: 'test'
+  ...
+# Subtest: strict existing bucket refuses directory before read/append
+ok 157 - strict existing bucket refuses directory before read/append
+  ---
+  duration_ms: 3.360605
+  type: 'test'
+  ...
+# Subtest: strict bucket actual-descriptor device mismatch refuses before writing
+ok 158 - strict bucket actual-descriptor device mismatch refuses before writing
+  ---
+  duration_ms: 3.906875
+  type: 'test'
+  ...
+# Subtest: short append is one refused write; retry preserves fragment and full record identity
+ok 159 - short append is one refused write; retry preserves fragment and full record identity
+  ---
+  duration_ms: 8.762254
+  type: 'test'
+  ...
+# Subtest: record fsync failure is uncertain; retry reestablishes already-visible record barriers
+ok 160 - record fsync failure is uncertain; retry reestablishes already-visible record barriers
+  ---
+  duration_ms: 9.91822
+  type: 'test'
+  ...
+# Subtest: strict heads preserve at/closed, expectation refusal and original umask-derived mode
+ok 161 - strict heads preserve at/closed, expectation refusal and original umask-derived mode
+  ---
+  duration_ms: 26.699302
+  type: 'test'
+  ...
+# Subtest: strict head head leaf redirection refuses before modifying target
+ok 162 - strict head head leaf redirection refuses before modifying target
+  ---
+  duration_ms: 1.659621
+  type: 'test'
+  ...
+# Subtest: strict head lock leaf redirection refuses before modifying target
+ok 163 - strict head lock leaf redirection refuses before modifying target
+  ---
+  duration_ms: 1.720042
+  type: 'test'
+  ...
+# Subtest: strict head partial-temp failure never claims a completed transaction
+ok 164 - strict head partial-temp failure never claims a completed transaction
+  ---
+  duration_ms: 14.535521
+  type: 'test'
+  ...
+# Subtest: strict head temp-sync failure never claims a completed transaction
+ok 165 - strict head temp-sync failure never claims a completed transaction
+  ---
+  duration_ms: 8.837007
+  type: 'test'
+  ...
+# Subtest: strict head rename failure never claims a completed transaction
+ok 166 - strict head rename failure never claims a completed transaction
+  ---
+  duration_ms: 12.67664
+  type: 'test'
+  ...
+# Subtest: strict head after-rename-sync failure never claims a completed transaction
+ok 167 - strict head after-rename-sync failure never claims a completed transaction
+  ---
+  duration_ms: 10.88457
+  type: 'test'
+  ...
+# Subtest: uncertain terminal publication cannot clean claim until record and head barriers are repeated
+ok 168 - uncertain terminal publication cannot clean claim until record and head barriers are repeated
+  ---
+  duration_ms: 36.806706
+  type: 'test'
+  ...
+# Subtest: strict extend orders durable record before durable head and leaves no persistent auxiliary authority
+ok 169 - strict extend orders durable record before durable head and leaves no persistent auxiliary authority
+  ---
+  duration_ms: 10.841786
+  type: 'test'
+  ...
+# Subtest: bounded head admits exactly 8192 bytes including UTF-8 and refuses one byte over
+ok 170 - bounded head admits exactly 8192 bytes including UTF-8 and refuses one byte over
+  ---
+  duration_ms: 3.781266
+  type: 'test'
+  ...
+# Subtest: bounded head refuses invalid budgets before allocation and propagates ordinary absence
+ok 171 - bounded head refuses invalid budgets before allocation and propagates ordinary absence
+  ---
+  duration_ms: 1.493943
+  type: 'test'
+  ...
+# Subtest: bounded head refuses malformed UTF-8 and malformed JSON
+ok 172 - bounded head refuses malformed UTF-8 and malformed JSON
+  ---
+  duration_ms: 1.947764
+  type: 'test'
+  ...
+# Subtest: bounded head refuses symlink without blocking
+ok 173 - bounded head refuses symlink without blocking
+  ---
+  duration_ms: 1.203006
+  type: 'test'
+  ...
+# Subtest: bounded head refuses fifo without blocking
+ok 174 - bounded head refuses fifo without blocking
+  ---
+  duration_ms: 5.02229
+  type: 'test'
+  ...
+# Subtest: bounded head refuses directory without blocking
+ok 175 - bounded head refuses directory without blocking
+  ---
+  duration_ms: 1.775225
+  type: 'test'
+  ...
+# Subtest: bounded head max+1 descriptor read catches growth after stat and preserves short reads
+ok 176 - bounded head max+1 descriptor read catches growth after stat and preserves short reads
+  ---
+  duration_ms: 2.380795
+  type: 'test'
+  ...
+# Subtest: sv11-positive: real stderr credential redaction reaches the receipt headline
+ok 177 - sv11-positive: real stderr credential redaction reaches the receipt headline
+  ---
+  duration_ms: 134.415851
+  type: 'test'
+  ...
+# Subtest: sv11-alternate: stdout fallback uses its bounded sanitized source tail
+ok 178 - sv11-alternate: stdout fallback uses its bounded sanitized source tail
+  ---
+  duration_ms: 99.567335
+  type: 'test'
+  ...
+# Subtest: sv11-refusal: absent tails and successful output do not manufacture headline detail
+ok 179 - sv11-refusal: absent tails and successful output do not manufacture headline detail
+  ---
+  duration_ms: 46.739357
+  type: 'test'
+  ...
+# Subtest: sv12-positive: nested spans and child environments retain admitted vendor state
+ok 180 - sv12-positive: nested spans and child environments retain admitted vendor state
+  ---
+  duration_ms: 12.497452
+  type: 'test'
+  ...
+# Subtest: sv12-refusal: discarded or absent vendor state never returns from an injection base
+ok 181 - sv12-refusal: discarded or absent vendor state never returns from an injection base
+  ---
+  duration_ms: 9.152811
+  type: 'test'
+  ...
+# Subtest: sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+ok 182 - sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+  ---
+  duration_ms: 189.386856
+  type: 'test'
+  ...
+# Subtest: sv13-alternate: custody adds neither witness nor event time and owns the retained input
+ok 183 - sv13-alternate: custody adds neither witness nor event time and owns the retained input
+  ---
+  duration_ms: 26.840604
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+ok 184 - sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+  ---
+  duration_ms: 28.264572
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+ok 185 - sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+  ---
+  duration_ms: 36.147246
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: an unwritable original store propagates without a receipt
+ok 186 - sv13-refusal: an unwritable original store propagates without a receipt
+  ---
+  duration_ms: 7.530605
+  type: 'test'
+  ...
+# Subtest: sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+ok 187 - sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+  ---
+  duration_ms: 75.403169
+  type: 'test'
+  ...
+# Subtest: sv8-alternate: multiple channels retain each channel's causal export order
+ok 188 - sv8-alternate: multiple channels retain each channel's causal export order
+  ---
+  duration_ms: 58.562276
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+ok 189 - sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+  ---
+  duration_ms: 19.755518
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+ok 190 - sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+  ---
+  duration_ms: 36.162168
+  type: 'test'
+  ...
+# Subtest: sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+ok 191 - sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+  ---
+  duration_ms: 38.965157
+  type: 'test'
+  ...
+# Subtest: sv9-alternate: an absent trace differs from an admitted empty frontier
+ok 192 - sv9-alternate: an absent trace differs from an admitted empty frontier
+  ---
+  duration_ms: 7.643615
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+ok 193 - sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+  ---
+  duration_ms: 21.512095
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: malformed causal reference and non-Message records remain explicit
+ok 194 - sv9-refusal: malformed causal reference and non-Message records remain explicit
+  ---
+  duration_ms: 21.536692
+  type: 'test'
+  ...
+# Subtest: sv10-positive: source readmission owns nested message and channel data
+ok 195 - sv10-positive: source readmission owns nested message and channel data
+  ---
+  duration_ms: 10.112141
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: missing or malformed channel is incomplete source custody
+ok 196 - sv10-refusal: missing or malformed channel is incomplete source custody
+  ---
+  duration_ms: 14.077493
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: foreign trace context and invalid source clock do not become observations
+ok 197 - sv10-refusal: foreign trace context and invalid source clock do not become observations
+  ---
+  duration_ms: 11.64394
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: invalid caller fields are rejected before advancing a trace
+ok 198 - sv10-refusal: invalid caller fields are rejected before advancing a trace
+  ---
+  duration_ms: 8.379069
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+ok 199 - sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+  ---
+  duration_ms: 2.639372
+  type: 'test'
+  ...
+# Subtest: sv1-positive
+ok 200 - sv1-positive
+  ---
+  duration_ms: 7.893902
+  type: 'test'
+  ...
+# Subtest: sv1-alternate
+ok 201 - sv1-alternate
+  ---
+  duration_ms: 3.364952
+  type: 'test'
+  ...
+# Subtest: sv1-refusal
+ok 202 - sv1-refusal
+  ---
+  duration_ms: 3.217701
+  type: 'test'
+  ...
+# Subtest: sv2-positive
+ok 203 - sv2-positive
+  ---
+  duration_ms: 32.185679
+  type: 'test'
+  ...
+# Subtest: sv2-alternate
+ok 204 - sv2-alternate
+  ---
+  duration_ms: 34.734164
+  type: 'test'
+  ...
+# Subtest: sv2-refusal
+ok 205 - sv2-refusal
+  ---
+  duration_ms: 9.899582
+  type: 'test'
+  ...
+# Subtest: sv3-positive
+ok 206 - sv3-positive
+  ---
+  duration_ms: 16.287551
+  type: 'test'
+  ...
+# Subtest: sv3-alternate
+ok 207 - sv3-alternate
+  ---
+  duration_ms: 7.892999
+  type: 'test'
+  ...
+# Subtest: sv3-refusal
+ok 208 - sv3-refusal
+  ---
+  duration_ms: 3.458532
+  type: 'test'
+  ...
+# Subtest: sv4-positive
+ok 209 - sv4-positive
+  ---
+  duration_ms: 71.646919
+  type: 'test'
+  ...
+# Subtest: sv4-alternate
+ok 210 - sv4-alternate
+  ---
+  duration_ms: 40.109194
+  type: 'test'
+  ...
+# Subtest: sv4-refusal
+ok 211 - sv4-refusal
+  ---
+  duration_ms: 5.969993
+  type: 'test'
+  ...
+# Subtest: sv5-positive
+ok 212 - sv5-positive
+  ---
+  duration_ms: 257.847372
+  type: 'test'
+  ...
+# Subtest: sv5-alternate
+ok 213 - sv5-alternate
+  ---
+  duration_ms: 167.180919
+  type: 'test'
+  ...
+# Subtest: sv5-refusal
+ok 214 - sv5-refusal
+  ---
+  duration_ms: 98.006201
+  type: 'test'
+  ...
+# Subtest: sv6-positive
+ok 215 - sv6-positive
+  ---
+  duration_ms: 24.045328
+  type: 'test'
+  ...
+# Subtest: sv6-alternate
+ok 216 - sv6-alternate
+  ---
+  duration_ms: 16.460401
+  type: 'test'
+  ...
+# Subtest: sv6-refusal
+ok 217 - sv6-refusal
+  ---
+  duration_ms: 18.7978
+  type: 'test'
+  ...
+# Subtest: sv7-positive: generic event retains body, caller clock, trace and actual receipt
+ok 218 - sv7-positive: generic event retains body, caller clock, trace and actual receipt
+  ---
+  duration_ms: 9.734965
+  type: 'test'
+  ...
+# Subtest: sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+ok 219 - sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+  ---
+  duration_ms: 11.402538
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+ok 220 - sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+  ---
+  duration_ms: 4.341067
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: an unwritable store propagates instead of returning a receipt
+ok 221 - sv7-refusal: an unwritable store propagates instead of returning a receipt
+  ---
+  duration_ms: 2.376168
+  type: 'test'
+  ...
+1..221
+# tests 221
+# suites 0
+# pass 221
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7113.535897

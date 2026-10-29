@@ -1,0 +1,235 @@
+{
+  "status": "qualified-against-published-signcell",
+  "observedAt": "2026-10-26T19:46:40.389215+00:00",
+  "repository": "red-cup-engineering/semiotic-eavt-engineering-services-section",
+  "baseSource": "1a615414a6b0db1ee993417e12e687e37b9a223d",
+  "candidatePR": "https://github.com/red-cup-engineering/semiotic-eavt-engineering-services-section/pull/29",
+  "priorSourceReceipt": "../2026-10-26-cell-event-source/receipt.json",
+  "runtime": {
+    "node": "v24.22.1",
+    "pnpm": "11.25.0"
+  },
+  "supplier": {
+    "installedPath": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell",
+    "version": "0.13.1-dev.198",
+    "gitHead": "1abcd4a218618408284014af35169459c8170a02",
+    "verifiedArchivePath": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/package",
+    "matchedFiles": 44,
+    "mismatches": [],
+    "archiveIdentity": {
+      "url": "https://registry.561.group/@red-cup-engineering/signcell/-/signcell-0.13.1-dev.198.tgz",
+      "integrity": "sha512-0ZhJJxrGa/hSMBTx64D+M1Qeo68oJMYy/Jiq3gA7k0pInXqYQs0ISCFzlY0Dkimi2GoGuETl1ghfJKmSPO9T1w==",
+      "archive_sha256": "3057fcc98f8283927ea09e1b8accc8c73c19e5f6a49bbe0b5e2bf2e8562f9212",
+      "archive_bytes": 104141,
+      "entries": 44,
+      "files": 44,
+      "archive_path": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/signcell-0.13.1-dev.198.tgz",
+      "package_path": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/package",
+      "safe_paths_verified": true
+    }
+  },
+  "sourceMapping": {
+    "publishedGitHead": "1abcd4a218618408284014af35169459c8170a02",
+    "qualifiedRuntimeAncestor": "ce026a96e3c1ad20a3fa1f358af7d1eda4c56899",
+    "evidence": "The actual installed manifest names the published gitHead. Independent archive verification by standards_contract records all29 source files identical to the qualified source; only the real published failure-test fixture and publisher version/gitHead differ. See /workspace/scratch/455c183ed200/evidence/published-signcell-198/source-and-provider-verification.json."
+  },
+  "dependencyChanges": {
+    "manifestDependencyChanges": {
+      "@red-cup-engineering/signcell": {
+        "before": "0.11.1",
+        "after": "0.13.1-dev.198"
+      }
+    },
+    "lockImporterChanges": {
+      "@red-cup-engineering/signcell": {
+        "before": {
+          "specifier": "0.11.1",
+          "version": "0.11.1"
+        },
+        "after": {
+          "specifier": "0.13.1-dev.198",
+          "version": "0.13.1-dev.198"
+        }
+      }
+    },
+    "lockAddedPackages": [
+      "@red-cup-engineering/computer-data-engineering-services-section@0.7.1",
+      "@red-cup-engineering/computer-serialized-content-engineering-services-section@0.1.0",
+      "@red-cup-engineering/metrologic@0.14.3-dev.3",
+      "@red-cup-engineering/semiotic-eavt-services-section@0.3.2",
+      "@red-cup-engineering/signcell@0.13.1-dev.198",
+      "@rgrove/parse-xml@5.0.0",
+      "@scure/base@2.4.0",
+      "http-structured-fields@1.0.0",
+      "whatwg-mimetype@5.0.0"
+    ],
+    "removed": {
+      "packages": [],
+      "snapshots": []
+    },
+    "changedExisting": {
+      "packages": [],
+      "snapshots": []
+    },
+    "workspaceSha256": "434a70f9efd25de49642f3de3e3d606be6e942e35f97c8cb45f2b6ea07d98ebc",
+    "lockSha256": "e19c9b1c1308fe21a5ed009fbee77ada7b5e9ec723970f4c7575dda2f60eb36b",
+    "packageSha256": "d0eb39a69750ca314fdc7e24206bcfec5ed257345b387890e938220c1a7585b8"
+  },
+  "lockGeneration": {
+    "command": "pnpm install --lockfile-only --ignore-scripts --frozen-lockfile=false --reporter=append-only --fetch-retries=0 --fetch-timeout=20000",
+    "outerTimeoutSeconds": 60,
+    "exitCode": 0,
+    "log": "pnpm-lock-update.log",
+    "handEditedLock": false
+  },
+  "installation": {
+    "command": "pnpm install --frozen-lockfile --ignore-scripts --reporter=append-only --fetch-retries=0 --fetch-timeout=20000",
+    "outerTimeoutSeconds": 60,
+    "exitCode": 0,
+    "packages": 46,
+    "reused": 45,
+    "downloaded": 1,
+    "log": "frozen-install.log",
+    "sourceOverrides": false,
+    "newStore": false,
+    "offlineAttempt": "frozen-offline-attempt.log records the one missing actual supplier archive before bounded network receiving.",
+    "existingSourceComposition": "The earlier small symlink installation was preserved separately as node_modules-source-composition; it was not used by these tests."
+  },
+  "nativeFull": {
+    "command": "node --test --test-reporter=tap test/*.test.mjs",
+    "workingDirectory": "/workspace/scratch/455c183ed200/seavt",
+    "authority": "approved native sandbox escalation for existing subprocess/concurrent store fixtures",
+    "exitCode": 0,
+    "tests": 221,
+    "pass": 221,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "log": "native-full.tap"
+  },
+  "packagedReceiving": {
+    "command": "node --test --test-reporter=tap test/telemetry.test.mjs test/telemetry-trace-integrity.test.mjs test/telemetry-boundaries.test.mjs test/telemetry-cell-events.test.mjs",
+    "workingDirectory": "/workspace/scratch/455c183ed200/evidence/seavt-published-cohort/package",
+    "authority": "approved native sandbox escalation for existing subprocess fixtures",
+    "exitCode": 0,
+    "tests": 45,
+    "pass": 45,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "log": "packed-receiving.tap",
+    "artifact": {
+      "kind": "local-SEAVT-package-receiving",
+      "publishedSEAVT": false,
+      "archivePath": "/workspace/scratch/455c183ed200/evidence/seavt-published-cohort/red-cup-engineering-semiotic-eavt-services-section-0.3.2.tgz",
+      "packagePath": "/workspace/scratch/455c183ed200/evidence/seavt-published-cohort/package",
+      "archiveSha256": "ac1fda77a5eeddcbf9b156e118db201be194cfac4f0db936434ab4cf1d647ccd",
+      "archiveIntegrity": "sha512-N31QVFQLmOd+j/syP/IpeIn3wwAuS4zPXllGfvs+pmyA6ZUQnMZ1+exqGRgi37eFqj7akkOntWNNTXID9/FXYQ==",
+      "archiveBytes": 59823,
+      "sourceMatchedFiles": 33,
+      "receivingTests": [
+        "test/telemetry.test.mjs",
+        "test/telemetry-trace-integrity.test.mjs",
+        "test/telemetry-boundaries.test.mjs",
+        "test/telemetry-cell-events.test.mjs"
+      ],
+      "providerClosure": "/workspace/scratch/455c183ed200/seavt/node_modules",
+      "providerComposition": "Actual frozen registry installation from this candidate pnpm-lock.yaml, not source overrides."
+    }
+  },
+  "qualificationScope": "The candidate full source suite and every shipped receiving test executed against the actual frozen registry dependency closure. The packed SEAVT archive matches33 source files. All44 installed SignCell archive files match the independently verified published artifact. No implementation change was needed for this release adoption.",
+  "remainingEffects": {
+    "SEAVTSourceMerge": false,
+    "SEAVTPublication": false,
+    "DownstreamRuntimeActivation": false,
+    "independentCollectorReceiving": false,
+    "next": "Root reviews and integrates the supplier pin plus generated lock into PR29. The existing publisher then publishes the landed SEAVT candidate and downstream owners receive that actual immutable version before activation."
+  },
+  "sourceHashes": {
+    "src/telemetry.mjs": "eaa48a97c40a72b0d0534ec373a260ca02b1ca274d7fd46f1302e944ad6abd44",
+    "test/telemetry-boundaries.test.mjs": "c957737c6cf760c197ca4c4ac38fc4a86e028e227ef8379da27c5616bff54574",
+    "test/telemetry-cell-events.test.mjs": "9c1ef2bfdb1f7ac55db20e0e47a14e68be7847d85cb027d720831c7c1f871027",
+    "test/telemetry-trace-integrity.test.mjs": "9b326d568e5585dc33684bda2c3ebb572373d92857af8a914f565563aed932b5"
+  },
+  "artifacts": [
+    {
+      "path": "dependency-audit.json",
+      "bytes": 1282,
+      "sha256": "f00974f4ec465d3feb405e8231057aedb579069fe9871a077453121fcb8b79eb"
+    },
+    {
+      "path": "frozen-install.log",
+      "bytes": 1030,
+      "sha256": "49a48f043eaeb4cf8e33f29a6f3723c72664cb08e34e37ad0bee7a45afd45404"
+    },
+    {
+      "path": "frozen-offline-attempt.log",
+      "bytes": 726,
+      "sha256": "a27a543a2db3d9be700b5f0516d4634b9921bebddd3272b1c2b2a1f840b9135f"
+    },
+    {
+      "path": "installed-signcell-identity.json",
+      "bytes": 1042,
+      "sha256": "d36c5d0894764037c28a9d55deb8dacb097f267b109c21743b7b69f399ef4d39"
+    },
+    {
+      "path": "lock-before.yaml",
+      "bytes": 17621,
+      "sha256": "aa7d982ef8e8758f3665d9c402c66ec373fccb98cb9ce58dc417b62ac9e44d00"
+    },
+    {
+      "path": "native-full.tap",
+      "bytes": 46158,
+      "sha256": "91bb6b7d3329b2e371b7156a01f4f9048788085d41cca3860b3caaaf29e967f7"
+    },
+    {
+      "path": "pack-sandbox.json",
+      "bytes": 247,
+      "sha256": "fe9cad16a55b49f8c8f127fd8dcc0f4fbade16a4715b287ffa77ce67fd8afa9c"
+    },
+    {
+      "path": "pack.json",
+      "bytes": 3864,
+      "sha256": "0eb1a9f9a143d10ff07e8e7f7fee6cf5d00f8b5b502dfa360e4c84d6946552f7"
+    },
+    {
+      "path": "pack.log",
+      "bytes": 99,
+      "sha256": "7125f194612fcff2f454c05d848e7cb71facc1967b4d5017e25b34fdee3ba74f"
+    },
+    {
+      "path": "package-before.json",
+      "bytes": 2988,
+      "sha256": "5bd3a697b0b47767e06dfc8362d168d0cbf4a7ab74b82a9c088b9230ce3ed740"
+    },
+    {
+      "path": "packed-artifact.json",
+      "bytes": 957,
+      "sha256": "e69e22709db0def8359ad66c25d3c444ebf51b11ab815672b83c1f415ba840cf"
+    },
+    {
+      "path": "packed-receiving.tap",
+      "bytes": 8135,
+      "sha256": "972af4053e094942b88f1c2a8a9cb95773e3a739f09fccab05f5b3fb25e57c9e"
+    },
+    {
+      "path": "pnpm-lock-update.log",
+      "bytes": 2510,
+      "sha256": "0e05b1e87b438897d89519f803b96d7b3dc9fce36ef7e76daa888de8eb89f4ab"
+    }
+  ],
+  "supplierReceiving": {
+    "receiptPath": "/workspace/scratch/455c183ed200/signcell/data/records/measurements/2026-10-26-signcell-198-published-receiving.json",
+    "receiptSha256": "368707fa8585876c8b843d6a683dd0bd9107a59802794ad2ebc3e03d2ea5d394",
+    "source": "Independent standards_contract qualification of actual published archive",
+    "tests": 116,
+    "pass": 116,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "archiveFilesUnchangedAfterTests": 44
+  }
+}

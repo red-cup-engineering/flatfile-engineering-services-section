@@ -1,0 +1,1321 @@
+TAP version 13
+# Subtest: ordinary: paused absent writer cannot replace another initial claim
+ok 1 - ordinary: paused absent writer cannot replace another initial claim
+  ---
+  duration_ms: 264.610156
+  type: 'test'
+  ...
+# Subtest: ordinary: duplicate initial claim refuses, including identical bytes
+ok 2 - ordinary: duplicate initial claim refuses, including identical bytes
+  ---
+  duration_ms: 217.900052
+  type: 'test'
+  ...
+# Subtest: ordinary: temporary EEXIST without a destination is not HeadConflict
+ok 3 - ordinary: temporary EEXIST without a destination is not HeadConflict
+  ---
+  duration_ms: 106.423244
+  type: 'test'
+  ...
+# Subtest: ordinary: post-link failure refuses while retaining the uncertain claim
+ok 4 - ordinary: post-link failure refuses while retaining the uncertain claim
+  ---
+  duration_ms: 208.132933
+  type: 'test'
+  ...
+# Subtest: ordinary: malformed destination appearing at publication remains refused
+ok 5 - ordinary: malformed destination appearing at publication remains refused
+  ---
+  duration_ms: 99.460047
+  type: 'test'
+  ...
+# Subtest: ordinary: redirect destination appearing at publication remains refused
+ok 6 - ordinary: redirect destination appearing at publication remains refused
+  ---
+  duration_ms: 111.744555
+  type: 'test'
+  ...
+# Subtest: strict: paused absent writer cannot replace another initial claim
+ok 7 - strict: paused absent writer cannot replace another initial claim
+  ---
+  duration_ms: 226.139288
+  type: 'test'
+  ...
+# Subtest: strict: duplicate initial claim refuses, including identical bytes
+ok 8 - strict: duplicate initial claim refuses, including identical bytes
+  ---
+  duration_ms: 218.524187
+  type: 'test'
+  ...
+# Subtest: strict: temporary EEXIST without a destination is not HeadConflict
+ok 9 - strict: temporary EEXIST without a destination is not HeadConflict
+  ---
+  duration_ms: 115.689641
+  type: 'test'
+  ...
+# Subtest: strict: post-link failure refuses while retaining the uncertain claim
+ok 10 - strict: post-link failure refuses while retaining the uncertain claim
+  ---
+  duration_ms: 152.174273
+  type: 'test'
+  ...
+# Subtest: strict: malformed destination appearing at publication remains refused
+ok 11 - strict: malformed destination appearing at publication remains refused
+  ---
+  duration_ms: 77.524326
+  type: 'test'
+  ...
+# Subtest: strict: redirect destination appearing at publication remains refused
+ok 12 - strict: redirect destination appearing at publication remains refused
+  ---
+  duration_ms: 79.659166
+  type: 'test'
+  ...
+# Subtest: expected-frontier replacement and no-check replacement retain their contracts
+ok 13 - expected-frontier replacement and no-check replacement retain their contracts
+  ---
+  duration_ms: 23.055042
+  type: 'test'
+  ...
+# Subtest: explicit bytes admit and verify complete large artifacts without changing identity or defaults
+not ok 14 - explicit bytes admit and verify complete large artifacts without changing identity or defaults
+  ---
+  duration_ms: 22.417355
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/artifact-allocation.test.mjs:10:1'
+  failureType: 'testCodeFailure'
+  error: 'canonical-limit at $[10]: canonical JSON exceeds 1048576 bytes'
+  code: 'canonical-limit'
+  name: 'TypeError'
+  stack: |-
+    fail (file:///workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section/scripts/canonical-json.mjs:77:17)
+    chargeCanonical (file:///workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section/scripts/canonical-json.mjs:107:5)
+    projectValue (file:///workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section/scripts/canonical-json.mjs:142:9)
+    canonicalizeJson (file:///workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section/scripts/canonical-json.mjs:488:21)
+    addressArtifact (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/src/identity/artifact.mjs:29:21)
+    TestContext.<anonymous> (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/artifact-allocation.test.mjs:12:21)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.start (node:internal/test_runner/test:1262:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+# Subtest: byte allocation is finite and retains strict structural and value admission
+not ok 15 - byte allocation is finite and retains strict structural and value admission
+  ---
+  duration_ms: 2.494283
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/artifact-allocation.test.mjs:21:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/artifact-allocation.test.mjs:23:12)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: canonical and source byte allocations accept equality and refuse the next byte
+not ok 16 - canonical and source byte allocations accept equality and refuse the next byte
+  ---
+  duration_ms: 4.41719
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/artifact-allocation.test.mjs:36:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    limitRefusal (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/artifact-allocation.test.mjs:7:38)
+    TestContext.<anonymous> (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/artifact-allocation.test.mjs:43:3)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: a first-class original film resource requires its real SCA cause and keeps a stable subject
+ok 17 - a first-class original film resource requires its real SCA cause and keeps a stable subject
+  ---
+  duration_ms: 36.509414
+  type: 'test'
+  ...
+# Subtest: later source-time supersedes current view but never destroys earlier evidence
+ok 18 - later source-time supersedes current view but never destroys earlier evidence
+  ---
+  duration_ms: 26.653152
+  type: 'test'
+  ...
+# Subtest: equivalent timestamps retain contradictory source claims as a bounded FOUR-compatible frontier
+ok 19 - equivalent timestamps retain contradictory source claims as a bounded FOUR-compatible frontier
+  ---
+  duration_ms: 17.604831
+  type: 'test'
+  ...
+# Subtest: malformed or forged evidence and inconsistent resource heads cannot become current
+ok 20 - malformed or forged evidence and inconsistent resource heads cannot become current
+  ---
+  duration_ms: 21.184244
+  type: 'test'
+  ...
+# Subtest: empty native types are usable but never proof of a historical transfer
+ok 21 - empty native types are usable but never proof of a historical transfer
+  ---
+  duration_ms: 4.396749
+  type: 'test'
+  ...
+# Subtest: an absent target is not silently created by validation
+ok 22 - an absent target is not silently created by validation
+  ---
+  duration_ms: 0.786861
+  type: 'test'
+  ...
+# Subtest: current native records and heads need no historical provider or conversion journal
+ok 23 - current native records and heads need no historical provider or conversion journal
+  ---
+  duration_ms: 12.438448
+  type: 'test'
+  ...
+# Subtest: a missing causal record prevents current-state acceptance
+ok 24 - a missing causal record prevents current-state acceptance
+  ---
+  duration_ms: 5.767797
+  type: 'test'
+  ...
+# Subtest: malformed appended native rows cannot hide behind a good record prefix
+ok 25 - malformed appended native rows cannot hide behind a good record prefix
+  ---
+  duration_ms: 6.411633
+  type: 'test'
+  ...
+# Subtest: a legacy layout is refused even when valid current records also exist
+ok 26 - a legacy layout is refused even when valid current records also exist
+  ---
+  duration_ms: 5.058091
+  type: 'test'
+  ...
+# Subtest: CP-1..7: exact native round trip includes unheaded rows and original timestamp, excludes logs
+ok 27 - CP-1..7: exact native round trip includes unheaded rows and original timestamp, excludes logs
+  ---
+  duration_ms: 76.738286
+  type: 'test'
+  ...
+# Subtest: CP-6: missing unheaded cause and external reference survive exact capture with distinct obligations
+ok 28 - CP-6: missing unheaded cause and external reference survive exact capture with distinct obligations
+  ---
+  duration_ms: 46.952588
+  type: 'test'
+  ...
+# Subtest: CP-1,5,8: refuse missing quiescence, duplicate types, overlap and occupied destination
+ok 29 - CP-1,5,8: refuse missing quiescence, duplicate types, overlap and occupied destination
+  ---
+  duration_ms: 7.317321
+  type: 'test'
+  ...
+# Subtest: CP-3,5: malformed records and nonnative extra files refuse certification
+ok 30 - CP-3,5: malformed records and nonnative extra files refuse certification
+  ---
+  duration_ms: 8.070243
+  type: 'test'
+  ...
+# Subtest: CP-5: extra selected file cannot silently disappear
+ok 31 - CP-5: extra selected file cannot silently disappear
+  ---
+  duration_ms: 29.505953
+  type: 'test'
+  ...
+# Subtest: CP-2: linked selected directory refused
+ok 32 - CP-2: linked selected directory refused
+  ---
+  duration_ms: 9.493988
+  type: 'test'
+  ...
+# Subtest: CP-7: byte tampering and unrelated checkpoint files fail read-only verify
+ok 33 - CP-7: byte tampering and unrelated checkpoint files fail read-only verify
+  ---
+  duration_ms: 30.364446
+  type: 'test'
+  ...
+# Subtest: CP-1,3: explicitly declared empty native type is lawful
+ok 34 - CP-1,3: explicitly declared empty native type is lawful
+  ---
+  duration_ms: 7.499366
+  type: 'test'
+  ...
+# Subtest: CP-4: concurrent source change at native publication boundary refuses success
+ok 35 - CP-4: concurrent source change at native publication boundary refuses success
+  ---
+  duration_ms: 30.107046
+  type: 'test'
+  ...
+# Subtest: CP-8: interrupted write retains original and partial destination, fresh retry succeeds
+ok 36 - CP-8: interrupted write retains original and partial destination, fresh retry succeeds
+  ---
+  duration_ms: 36.877172
+  type: 'test'
+  ...
+# Subtest: CP-8: uncertainty after completed head publication can be resolved by read-only verification
+ok 37 - CP-8: uncertainty after completed head publication can be resolved by read-only verification
+  ---
+  duration_ms: 42.311177
+  type: 'test'
+  ...
+# Subtest: CP-3: malformed head is refused before any publication
+ok 38 - CP-3: malformed head is refused before any publication
+  ---
+  duration_ms: 18.482429
+  type: 'test'
+  ...
+# Subtest: CP-6: selected cross-type causes establish closure, missing frontier remains an obligation
+ok 39 - CP-6: selected cross-type causes establish closure, missing frontier remains an obligation
+  ---
+  duration_ms: 59.614782
+  type: 'test'
+  ...
+# Subtest: CP-2: selected file links refuse capture
+ok 40 - CP-2: selected file links refuse capture
+  ---
+  duration_ms: 7.264263
+  type: 'test'
+  ...
+# Subtest: CP-4: oversized source refuses before unbounded content allocation or publication
+ok 41 - CP-4: oversized source refuses before unbounded content allocation or publication
+  ---
+  duration_ms: 5.318005
+  type: 'test'
+  ...
+# Subtest: CP-5: multiple records sharing a bucket preserve native line order exactly
+ok 42 - CP-5: multiple records sharing a bucket preserve native line order exactly
+  ---
+  duration_ms: 50.839086
+  type: 'test'
+  ...
+# Subtest: calendar admission rejects normalized impossible dates
+ok 43 - calendar admission rejects normalized impossible dates
+  ---
+  duration_ms: 1.872671
+  type: 'test'
+  ...
+# Subtest: exact source clocks order nanoseconds without millisecond truncation
+ok 44 - exact source clocks order nanoseconds without millisecond truncation
+  ---
+  duration_ms: 3.610468
+  type: 'test'
+  ...
+# Subtest: source-clock admission agrees with the Lean missing-clock and monotonic laws
+ok 45 - source-clock admission agrees with the Lean missing-clock and monotonic laws
+  ---
+  duration_ms: 0.685539
+  type: 'test'
+  ...
+# file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/src/seavt-carrier.mjs:25
+# import { isAbsoluteSeavtClock, isSeavtCalendarDate, utcFilingInstant } from "./clock.mjs";
+#                                ^^^^^^^^^^^^^^^^^^^
+# SyntaxError: The requested module './clock.mjs' does not provide an export named 'isSeavtCalendarDate'
+#     at \#asyncInstantiate (node:internal/modules/esm/module_job:455:21)
+#     at async ModuleJob.run (node:internal/modules/esm/module_job:553:5)
+#     at async node:internal/modules/esm/loader:647:26
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+# Node.js v24.22.1
+# Subtest: test/compact-carrier.test.mjs
+not ok 7 - test/compact-carrier.test.mjs
+  ---
+  duration_ms: 192.878328
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/compact-carrier.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: SEAVT admits and preserves 8132 native witness identities
+ok 47 - SEAVT admits and preserves 8132 native witness identities
+  ---
+  duration_ms: 274.530449
+  type: 'test'
+  ...
+# Subtest: SEAVT admits and preserves 20000 native witness identities
+ok 48 - SEAVT admits and preserves 20000 native witness identities
+  ---
+  duration_ms: 552.491623
+  type: 'test'
+  ...
+# Subtest: ordinary: replacement publishes the complete frontier beyond one I/O chunk
+ok 49 - ordinary: replacement publishes the complete frontier beyond one I/O chunk
+  ---
+  duration_ms: 163.080031
+  type: 'test'
+  ...
+# Subtest: ordinary: write-error before publication preserves the exact old head
+ok 50 - ordinary: write-error before publication preserves the exact old head
+  ---
+  duration_ms: 146.66861
+  type: 'test'
+  ...
+# Subtest: ordinary: sync-error before publication preserves the exact old head
+ok 51 - ordinary: sync-error before publication preserves the exact old head
+  ---
+  duration_ms: 121.59886
+  type: 'test'
+  ...
+# Subtest: ordinary: failure after rename retains the complete but uncertain new head
+ok 52 - ordinary: failure after rename retains the complete but uncertain new head
+  ---
+  duration_ms: 116.697323
+  type: 'test'
+  ...
+# Subtest: ordinary: arrival-style extension keeps all independent frontier members
+ok 53 - ordinary: arrival-style extension keeps all independent frontier members
+  ---
+  duration_ms: 194.653448
+  type: 'test'
+  ...
+# Subtest: strict: replacement publishes the complete frontier beyond one I/O chunk
+ok 54 - strict: replacement publishes the complete frontier beyond one I/O chunk
+  ---
+  duration_ms: 153.205676
+  type: 'test'
+  ...
+# Subtest: strict: write-error before publication preserves the exact old head
+ok 55 - strict: write-error before publication preserves the exact old head
+  ---
+  duration_ms: 125.880246
+  type: 'test'
+  ...
+# Subtest: strict: sync-error before publication preserves the exact old head
+ok 56 - strict: sync-error before publication preserves the exact old head
+  ---
+  duration_ms: 138.777807
+  type: 'test'
+  ...
+# Subtest: strict: failure after rename retains the complete but uncertain new head
+ok 57 - strict: failure after rename retains the complete but uncertain new head
+  ---
+  duration_ms: 173.138281
+  type: 'test'
+  ...
+# Subtest: strict: arrival-style extension keeps all independent frontier members
+ok 58 - strict: arrival-style extension keeps all independent frontier members
+  ---
+  duration_ms: 176.750499
+  type: 'test'
+  ...
+# Subtest: expected-frontier conflict does not publish or change the old head
+ok 59 - expected-frontier conflict does not publish or change the old head
+  ---
+  duration_ms: 91.224403
+  type: 'test'
+  ...
+# Subtest: ordinary replacement preserves Unicode head names and original umask-derived mode
+ok 60 - ordinary replacement preserves Unicode head names and original umask-derived mode
+  ---
+  duration_ms: 19.697472
+  type: 'test'
+  ...
+# Subtest: a 0-byte segment write refuses without retiring its original day
+ok 61 - a 0-byte segment write refuses without retiring its original day
+  ---
+  duration_ms: 15.153903
+  type: 'test'
+  ...
+# Subtest: a 1-byte segment write refuses without retiring its original day
+ok 62 - a 1-byte segment write refuses without retiring its original day
+  ---
+  duration_ms: 5.392153
+  type: 'test'
+  ...
+# Subtest: a sealed day reads back the same lines at the same cursors, and the open day stays open
+ok 63 - a sealed day reads back the same lines at the same cursors, and the open day stays open
+  ---
+  duration_ms: 343.393096
+  type: 'test'
+  ...
+# Subtest: a sealed segment is ordinary gzip: its bytes are the day's bytes
+ok 64 - a sealed segment is ordinary gzip: its bytes are the day's bytes
+  ---
+  duration_ms: 16.742798
+  type: 'test'
+  ...
+# Subtest: a late line for a sealed day is a tail after the seal, and sealing again adds the next segment
+ok 65 - a late line for a sealed day is a tail after the seal, and sealing again adds the next segment
+  ---
+  duration_ms: 6.939726
+  type: 'test'
+  ...
+# Subtest: a seal interrupted after writing its segment is finished without copying the day twice
+ok 66 - a seal interrupted after writing its segment is finished without copying the day twice
+  ---
+  duration_ms: 15.141705
+  type: 'test'
+  ...
+# Subtest: an unterminated last line is sealed terminated, and still skipped
+ok 67 - an unterminated last line is sealed terminated, and still skipped
+  ---
+  duration_ms: 3.824319
+  type: 'test'
+  ...
+# Subtest: JSON template pointers retain escaped keys, literal percent characters, and root values
+ok 68 - JSON template pointers retain escaped keys, literal percent characters, and root values
+  ---
+  duration_ms: 2.444909
+  type: 'test'
+  ...
+# Subtest: SEAVT preserves typed SEN coordinate syntax while normalizing only EAVT carrier shape
+ok 69 - SEAVT preserves typed SEN coordinate syntax while normalizing only EAVT carrier shape
+  ---
+  duration_ms: 8.489562
+  type: 'test'
+  ...
+# Subtest: one SignCell is one native SEN-typed SEAVT observation under its actual SCA address
+ok 70 - one SignCell is one native SEN-typed SEAVT observation under its actual SCA address
+  ---
+  duration_ms: 23.478541
+  type: 'test'
+  ...
+# Subtest: SCA triple identity remains stable as SignCell evidence accumulates
+ok 71 - SCA triple identity remains stable as SignCell evidence accumulates
+  ---
+  duration_ms: 13.650737
+  type: 'test'
+  ...
+# Subtest: time is a SEAVT witnessing dimension, not a silent substitute for identity
+ok 72 - time is a SEAVT witnessing dimension, not a silent substitute for identity
+  ---
+  duration_ms: 5.718053
+  type: 'test'
+  ...
+# Subtest: forged SCA address, wrong SEN attribute, or non-cell JSON cannot impersonate a SignCell
+ok 73 - forged SCA address, wrong SEN attribute, or non-cell JSON cannot impersonate a SignCell
+  ---
+  duration_ms: 6.307156
+  type: 'test'
+  ...
+# Subtest: SEAVT does not turn an unverified source allegation into affirmative testimony
+ok 74 - SEAVT does not turn an unverified source allegation into affirmative testimony
+  ---
+  duration_ms: 1.155895
+  type: 'test'
+  ...
+# Subtest: the native projection is the existing seavtOfJson bridge, not a parallel serialization
+ok 75 - the native projection is the existing seavtOfJson bridge, not a parallel serialization
+  ---
+  duration_ms: 1.720742
+  type: 'test'
+  ...
+# Subtest: SEAVT source time is a real calendar instant, not Date.parse rollover
+ok 76 - SEAVT source time is a real calendar instant, not Date.parse rollover
+  ---
+  duration_ms: 8.0418
+  type: 'test'
+  ...
+# Subtest: SEAVT clock ordering retains fractional precision and timezone equality
+ok 77 - SEAVT clock ordering retains fractional precision and timezone equality
+  ---
+  duration_ms: 0.522975
+  type: 'test'
+  ...
+# file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/store-appended.test.mjs:6
+# import { appended, each, put } from "../src/store.mjs";
+#          ^^^^^^^^
+# SyntaxError: The requested module '../src/store.mjs' does not provide an export named 'appended'
+#     at \#asyncInstantiate (node:internal/modules/esm/module_job:455:21)
+#     at async ModuleJob.run (node:internal/modules/esm/module_job:553:5)
+#     at async node:internal/modules/esm/loader:647:26
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+# Node.js v24.22.1
+# Subtest: test/store-appended.test.mjs
+not ok 13 - test/store-appended.test.mjs
+  ---
+  duration_ms: 119.30043
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/store-appended.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/store-change-witness.test.mjs:8
+# import { appended, put, recordsChangeWitness } from "../src/store.mjs";
+#          ^^^^^^^^
+# SyntaxError: The requested module '../src/store.mjs' does not provide an export named 'appended'
+#     at \#asyncInstantiate (node:internal/modules/esm/module_job:455:21)
+#     at async ModuleJob.run (node:internal/modules/esm/module_job:553:5)
+#     at async node:internal/modules/esm/loader:647:26
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+# Node.js v24.22.1
+# Subtest: test/store-change-witness.test.mjs
+not ok 14 - test/store-change-witness.test.mjs
+  ---
+  duration_ms: 133.998404
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/store-change-witness.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: ST-14: what a process retains after store calls does not grow with the store
+ok 80 - ST-14: what a process retains after store calls does not grow with the store
+  ---
+  duration_ms: 5488.993667
+  type: 'test'
+  ...
+# Subtest: ST-14: a walk holds only its visited addresses
+ok 81 - ST-14: a walk holds only its visited addresses
+  ---
+  duration_ms: 413.366279
+  type: 'test'
+  ...
+# Subtest: strict record refuses symlink swapped at the actual open/read boundary
+ok 82 - strict record refuses symlink swapped at the actual open/read boundary
+  ---
+  duration_ms: 146.894404
+  type: 'test'
+  ...
+# Subtest: strict record refuses fifo swapped at the actual open/read boundary
+ok 83 - strict record refuses fifo swapped at the actual open/read boundary
+  ---
+  duration_ms: 123.376162
+  type: 'test'
+  ...
+# Subtest: strict head refuses symlink swapped at the actual open/read boundary
+ok 84 - strict head refuses symlink swapped at the actual open/read boundary
+  ---
+  duration_ms: 110.10564
+  type: 'test'
+  ...
+# Subtest: strict head refuses fifo swapped at the actual open/read boundary
+ok 85 - strict head refuses fifo swapped at the actual open/read boundary
+  ---
+  duration_ms: 136.090238
+  type: 'test'
+  ...
+# Subtest: strict discovery agrees on complete records and heads and genuine absence
+ok 86 - strict discovery agrees on complete records and heads and genuine absence
+  ---
+  duration_ms: 16.705252
+  type: 'test'
+  ...
+# Subtest: strict heads refuse malformed JSON and invalid frontiers without changing permissive defaults
+ok 87 - strict heads refuse malformed JSON and invalid frontiers without changing permissive defaults
+  ---
+  duration_ms: 2.128315
+  type: 'test'
+  ...
+# Subtest: strict records refuse malformed and hash-invalid content
+ok 88 - strict records refuse malformed and hash-invalid content
+  ---
+  duration_ms: 6.04998
+  type: 'test'
+  ...
+# Subtest: strict records refuse incomplete and overlong lines without quoting their contents
+ok 89 - strict records refuse incomplete and overlong lines without quoting their contents
+  ---
+  duration_ms: 4.020213
+  type: 'test'
+  ...
+# Subtest: partial strict iteration never certifies the yielded prefix as complete
+ok 90 - partial strict iteration never certifies the yielded prefix as complete
+  ---
+  duration_ms: 3.009306
+  type: 'test'
+  ...
+# Subtest: strict heads refuse nonregular entries and symbolic leaf links
+ok 91 - strict heads refuse nonregular entries and symbolic leaf links
+  ---
+  duration_ms: 2.688275
+  type: 'test'
+  ...
+# Subtest: strict discovery propagates unavailable paths instead of empty ENOTDIR evidence
+ok 92 - strict discovery propagates unavailable paths instead of empty ENOTDIR evidence
+  ---
+  duration_ms: 0.995464
+  type: 'test'
+  ...
+# Subtest: named head replacement and missing records stay observable independently
+ok 93 - named head replacement and missing records stay observable independently
+  ---
+  duration_ms: 6.627256
+  type: 'test'
+  ...
+# Subtest: walk reports a cause removed after traversal rather than silently omitting its evidence
+ok 94 - walk reports a cause removed after traversal rather than silently omitting its evidence
+  ---
+  duration_ms: 10.582749
+  type: 'test'
+  ...
+# Subtest: strict record discovery refuses directory and symbolic leaf entries
+ok 95 - strict record discovery refuses directory and symbolic leaf entries
+  ---
+  duration_ms: 3.294354
+  type: 'test'
+  ...
+# Subtest: an unreadable directory traversal preserves the filesystem error code
+ok 96 - an unreadable directory traversal preserves the filesystem error code
+  ---
+  duration_ms: 0.788573
+  type: 'test'
+  ...
+# Subtest: a second-process replacement during enumeration requires the consumer final named-head check
+ok 97 - a second-process replacement during enumeration requires the consumer final named-head check
+  ---
+  duration_ms: 110.882302
+  type: 'test'
+  ...
+# Subtest: a settlement's exchange enumerates every head in decoded-name order, independent of directory insertion order
+ok 98 - a settlement's exchange enumerates every head in decoded-name order, independent of directory insertion order
+  ---
+  duration_ms: 26.889811
+  type: 'test'
+  ...
+# Subtest: federated directory heads fail closed on corrupt or noncanonical evidence, not an incomplete successful census
+ok 99 - federated directory heads fail closed on corrupt or noncanonical evidence, not an incomplete successful census
+  ---
+  duration_ms: 5.367416
+  type: 'test'
+  ...
+# file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/store-verified-lines.test.mjs:10
+# import { VERIFIED_LINES_MAX } from "../src/store-core.mjs";
+#          ^^^^^^^^^^^^^^^^^^
+# SyntaxError: The requested module '../src/store-core.mjs' does not provide an export named 'VERIFIED_LINES_MAX'
+#     at \#asyncInstantiate (node:internal/modules/esm/module_job:455:21)
+#     at async ModuleJob.run (node:internal/modules/esm/module_job:553:5)
+#     at async node:internal/modules/esm/loader:647:26
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+# Node.js v24.22.1
+# Subtest: test/store-verified-lines.test.mjs
+not ok 18 - test/store-verified-lines.test.mjs
+  ---
+  duration_ms: 140.713417
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/test/store-verified-lines.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: ST-1: a record is filed where ni-path-v1 computes, over the conformance vectors
+ok 101 - ST-1: a record is filed where ni-path-v1 computes, over the conformance vectors
+  ---
+  duration_ms: 8.44846
+  type: 'test'
+  ...
+# Subtest: a record reads back as put, in one plain readable line
+ok 102 - a record reads back as put, in one plain readable line
+  ---
+  duration_ms: 5.417051
+  type: 'test'
+  ...
+# Subtest: ST-2: the files of a settlement are the three kinds and nothing else
+ok 103 - ST-2: the files of a settlement are the three kinds and nothing else
+  ---
+  duration_ms: 10.762793
+  type: 'test'
+  ...
+# Subtest: ST-3: put of a held record writes nothing
+ok 104 - ST-3: put of a held record writes nothing
+  ---
+  duration_ms: 3.488296
+  type: 'test'
+  ...
+# Subtest: ST-4: a cut tail becomes a line of its own before the next write
+ok 105 - ST-4: a cut tail becomes a line of its own before the next write
+  ---
+  duration_ms: 181.533111
+  type: 'test'
+  ...
+# Subtest: ST-5: get returns only a line that hashes to its id, skipping bad lines
+ok 106 - ST-5: get returns only a line that hashes to its id, skipping bad lines
+  ---
+  duration_ms: 2.888085
+  type: 'test'
+  ...
+# Subtest: ST-6: admission is the line; causes are not read
+ok 107 - ST-6: admission is the line; causes are not read
+  ---
+  duration_ms: 2.937078
+  type: 'test'
+  ...
+# Subtest: ST-7 and ST-8: a walk yields effects first, marks what is missing, and stops at its limit
+ok 108 - ST-7 and ST-8: a walk yields effects first, marks what is missing, and stops at its limit
+  ---
+  duration_ms: 18.607837
+  type: 'test'
+  ...
+# Subtest: a walk crosses types by {type, id}
+ok 109 - a walk crosses types by {type, id}
+  ---
+  duration_ms: 5.079223
+  type: 'test'
+  ...
+# Subtest: ST-9 and ST-10: a head is replaced under its lock, and expect is checked first
+ok 110 - ST-9 and ST-10: a head is replaced under its lock, and expect is checked first
+  ---
+  duration_ms: 8.462491
+  type: 'test'
+  ...
+# Subtest: a head name is percent-encoded and listed back by name
+ok 111 - a head name is percent-encoded and listed back by name
+  ---
+  duration_ms: 4.18495
+  type: 'test'
+  ...
+# Subtest: extend puts a record with its causes and advances the head
+ok 112 - extend puts a record with its causes and advances the head
+  ---
+  duration_ms: 17.048767
+  type: 'test'
+  ...
+# Subtest: ST-11: a log line is one write to the day of its at, never rewritten
+ok 113 - ST-11: a log line is one write to the day of its at, never rewritten
+  ---
+  duration_ms: 2.241314
+  type: 'test'
+  ...
+# Subtest: ST-12: an oversized record or log line is refused
+ok 114 - ST-12: an oversized record or log line is refused
+  ---
+  duration_ms: 5.629089
+  type: 'test'
+  ...
+# Subtest: ST-13: a type must be plain lowercase words joined by hyphens
+ok 115 - ST-13: a type must be plain lowercase words joined by hyphens
+  ---
+  duration_ms: 3.247083
+  type: 'test'
+  ...
+# Subtest: ST-15: importing the store starts no timer or watcher and reads no file
+ok 116 - ST-15: importing the store starts no timer or watcher and reads no file
+  ---
+  duration_ms: 115.247087
+  type: 'test'
+  ...
+# Subtest: ST-16: pull stops at an address the local store has, and converges heads
+ok 117 - ST-16: pull stops at an address the local store has, and converges heads
+  ---
+  duration_ms: 22.325357
+  type: 'test'
+  ...
+# Subtest: pull merges diverged threads into the maximal frontier
+ok 118 - pull merges diverged threads into the maximal frontier
+  ---
+  duration_ms: 44.027202
+  type: 'test'
+  ...
+# Subtest: ST-17: a root holding the earlier layout is refused on every operation
+ok 119 - ST-17: a root holding the earlier layout is refused on every operation
+  ---
+  duration_ms: 1.654914
+  type: 'test'
+  ...
+# Subtest: ST-18: only the store's core writes files; layout and exchange do not
+ok 120 - ST-18: only the store's core writes files; layout and exchange do not
+  ---
+  duration_ms: 0.372779
+  type: 'test'
+  ...
+# Subtest: each yields every record of a type once, in bucket order
+ok 121 - each yields every record of a type once, in bucket order
+  ---
+  duration_ms: 86.029161
+  type: 'test'
+  ...
+# Subtest: bounded head preserves original JSON-owner BOM refusal
+ok 122 - bounded head preserves original JSON-owner BOM refusal
+  ---
+  duration_ms: 4.652313
+  type: 'test'
+  ...
+# Subtest: strict put and existing-address retry establish the whole ancestry without a second append
+ok 123 - strict put and existing-address retry establish the whole ancestry without a second append
+  ---
+  duration_ms: 15.747924
+  type: 'test'
+  ...
+# Subtest: strict root may be a descendant of an explicit durable anchor, never implicitly its own anchor
+ok 124 - strict root may be a descendant of an explicit durable anchor, never implicitly its own anchor
+  ---
+  duration_ms: 6.668218
+  type: 'test'
+  ...
+# Subtest: strict store refusals precede data and lock-parent creation
+ok 125 - strict store refusals precede data and lock-parent creation
+  ---
+  duration_ms: 1.631959
+  type: 'test'
+  ...
+# Subtest: strict existing bucket refuses symlink before read/append
+ok 126 - strict existing bucket refuses symlink before read/append
+  ---
+  duration_ms: 5.427426
+  type: 'test'
+  ...
+# Subtest: strict existing bucket refuses fifo before read/append
+ok 127 - strict existing bucket refuses fifo before read/append
+  ---
+  duration_ms: 6.75616
+  type: 'test'
+  ...
+# Subtest: strict existing bucket refuses directory before read/append
+ok 128 - strict existing bucket refuses directory before read/append
+  ---
+  duration_ms: 1.815886
+  type: 'test'
+  ...
+# Subtest: strict bucket actual-descriptor device mismatch refuses before writing
+ok 129 - strict bucket actual-descriptor device mismatch refuses before writing
+  ---
+  duration_ms: 1.82257
+  type: 'test'
+  ...
+# Subtest: short append is one refused write; retry preserves fragment and full record identity
+ok 130 - short append is one refused write; retry preserves fragment and full record identity
+  ---
+  duration_ms: 5.786931
+  type: 'test'
+  ...
+# Subtest: record fsync failure is uncertain; retry reestablishes already-visible record barriers
+ok 131 - record fsync failure is uncertain; retry reestablishes already-visible record barriers
+  ---
+  duration_ms: 6.03625
+  type: 'test'
+  ...
+# Subtest: strict heads preserve at/closed, expectation refusal and original umask-derived mode
+ok 132 - strict heads preserve at/closed, expectation refusal and original umask-derived mode
+  ---
+  duration_ms: 14.84517
+  type: 'test'
+  ...
+# Subtest: strict head head leaf redirection refuses before modifying target
+ok 133 - strict head head leaf redirection refuses before modifying target
+  ---
+  duration_ms: 1.061664
+  type: 'test'
+  ...
+# Subtest: strict head lock leaf redirection refuses before modifying target
+ok 134 - strict head lock leaf redirection refuses before modifying target
+  ---
+  duration_ms: 0.525418
+  type: 'test'
+  ...
+# Subtest: ordinary head partial-temp failure never claims a completed transaction
+ok 135 - ordinary head partial-temp failure never claims a completed transaction
+  ---
+  duration_ms: 18.358022
+  type: 'test'
+  ...
+# Subtest: ordinary head temp-sync failure never claims a completed transaction
+ok 136 - ordinary head temp-sync failure never claims a completed transaction
+  ---
+  duration_ms: 8.723531
+  type: 'test'
+  ...
+# Subtest: ordinary head rename failure never claims a completed transaction
+ok 137 - ordinary head rename failure never claims a completed transaction
+  ---
+  duration_ms: 8.207329
+  type: 'test'
+  ...
+# Subtest: ordinary head after-rename-sync failure never claims a completed transaction
+ok 138 - ordinary head after-rename-sync failure never claims a completed transaction
+  ---
+  duration_ms: 7.005023
+  type: 'test'
+  ...
+# Subtest: strict head partial-temp failure never claims a completed transaction
+ok 139 - strict head partial-temp failure never claims a completed transaction
+  ---
+  duration_ms: 4.61703
+  type: 'test'
+  ...
+# Subtest: strict head temp-sync failure never claims a completed transaction
+ok 140 - strict head temp-sync failure never claims a completed transaction
+  ---
+  duration_ms: 6.297992
+  type: 'test'
+  ...
+# Subtest: strict head rename failure never claims a completed transaction
+ok 141 - strict head rename failure never claims a completed transaction
+  ---
+  duration_ms: 6.625283
+  type: 'test'
+  ...
+# Subtest: strict head after-rename-sync failure never claims a completed transaction
+ok 142 - strict head after-rename-sync failure never claims a completed transaction
+  ---
+  duration_ms: 6.963802
+  type: 'test'
+  ...
+# Subtest: ordinary large head never publishes a short write as an acknowledged frontier
+ok 143 - ordinary large head never publishes a short write as an acknowledged frontier
+  ---
+  duration_ms: 98.987754
+  type: 'test'
+  ...
+# Subtest: uncertain terminal publication cannot clean claim until record and head barriers are repeated
+ok 144 - uncertain terminal publication cannot clean claim until record and head barriers are repeated
+  ---
+  duration_ms: 12.077136
+  type: 'test'
+  ...
+# Subtest: strict extend orders durable record before durable head and leaves no persistent auxiliary authority
+ok 145 - strict extend orders durable record before durable head and leaves no persistent auxiliary authority
+  ---
+  duration_ms: 8.020096
+  type: 'test'
+  ...
+# Subtest: bounded head admits exactly 8192 bytes including UTF-8 and refuses one byte over
+ok 146 - bounded head admits exactly 8192 bytes including UTF-8 and refuses one byte over
+  ---
+  duration_ms: 1.840362
+  type: 'test'
+  ...
+# Subtest: bounded head refuses invalid budgets before allocation and propagates ordinary absence
+ok 147 - bounded head refuses invalid budgets before allocation and propagates ordinary absence
+  ---
+  duration_ms: 0.703296
+  type: 'test'
+  ...
+# Subtest: bounded head refuses malformed UTF-8 and malformed JSON
+ok 148 - bounded head refuses malformed UTF-8 and malformed JSON
+  ---
+  duration_ms: 1.040292
+  type: 'test'
+  ...
+# Subtest: bounded head refuses symlink without blocking
+ok 149 - bounded head refuses symlink without blocking
+  ---
+  duration_ms: 0.7396
+  type: 'test'
+  ...
+# Subtest: bounded head refuses fifo without blocking
+ok 150 - bounded head refuses fifo without blocking
+  ---
+  duration_ms: 5.060685
+  type: 'test'
+  ...
+# Subtest: bounded head refuses directory without blocking
+ok 151 - bounded head refuses directory without blocking
+  ---
+  duration_ms: 0.589064
+  type: 'test'
+  ...
+# Subtest: bounded head max+1 descriptor read catches growth after stat and preserves short reads
+ok 152 - bounded head max+1 descriptor read catches growth after stat and preserves short reads
+  ---
+  duration_ms: 1.955534
+  type: 'test'
+  ...
+# Subtest: sv11-positive: real stderr credential redaction reaches the receipt headline
+ok 153 - sv11-positive: real stderr credential redaction reaches the receipt headline
+  ---
+  duration_ms: 120.387136
+  type: 'test'
+  ...
+# Subtest: sv11-alternate: stdout fallback uses its bounded sanitized source tail
+ok 154 - sv11-alternate: stdout fallback uses its bounded sanitized source tail
+  ---
+  duration_ms: 71.622553
+  type: 'test'
+  ...
+# Subtest: sv11-refusal: absent tails and successful output do not manufacture headline detail
+ok 155 - sv11-refusal: absent tails and successful output do not manufacture headline detail
+  ---
+  duration_ms: 44.849372
+  type: 'test'
+  ...
+# Subtest: sv12-positive: nested spans and child environments retain admitted vendor state
+ok 156 - sv12-positive: nested spans and child environments retain admitted vendor state
+  ---
+  duration_ms: 6.184242
+  type: 'test'
+  ...
+# Subtest: sv12-refusal: discarded or absent vendor state never returns from an injection base
+ok 157 - sv12-refusal: discarded or absent vendor state never returns from an injection base
+  ---
+  duration_ms: 12.34664
+  type: 'test'
+  ...
+# Subtest: sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+ok 158 - sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+  ---
+  duration_ms: 170.993914
+  type: 'test'
+  ...
+# Subtest: sv13-alternate: custody adds neither witness nor event time and owns the retained input
+ok 159 - sv13-alternate: custody adds neither witness nor event time and owns the retained input
+  ---
+  duration_ms: 29.217401
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+ok 160 - sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+  ---
+  duration_ms: 20.399626
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+ok 161 - sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+  ---
+  duration_ms: 39.166372
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: an unwritable original store propagates without a receipt
+ok 162 - sv13-refusal: an unwritable original store propagates without a receipt
+  ---
+  duration_ms: 5.147696
+  type: 'test'
+  ...
+# Subtest: sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+ok 163 - sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+  ---
+  duration_ms: 65.395914
+  type: 'test'
+  ...
+# Subtest: sv8-alternate: multiple channels retain each channel's causal export order
+ok 164 - sv8-alternate: multiple channels retain each channel's causal export order
+  ---
+  duration_ms: 46.674711
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+ok 165 - sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+  ---
+  duration_ms: 11.932909
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+ok 166 - sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+  ---
+  duration_ms: 15.717459
+  type: 'test'
+  ...
+# Subtest: sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+ok 167 - sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+  ---
+  duration_ms: 25.689195
+  type: 'test'
+  ...
+# Subtest: sv9-alternate: an absent trace differs from an admitted empty frontier
+ok 168 - sv9-alternate: an absent trace differs from an admitted empty frontier
+  ---
+  duration_ms: 2.575786
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+ok 169 - sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+  ---
+  duration_ms: 8.64189
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: malformed causal reference and non-Message records remain explicit
+ok 170 - sv9-refusal: malformed causal reference and non-Message records remain explicit
+  ---
+  duration_ms: 7.565003
+  type: 'test'
+  ...
+# Subtest: sv10-positive: source readmission owns nested message and channel data
+ok 171 - sv10-positive: source readmission owns nested message and channel data
+  ---
+  duration_ms: 12.288463
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: missing or malformed channel is incomplete source custody
+ok 172 - sv10-refusal: missing or malformed channel is incomplete source custody
+  ---
+  duration_ms: 10.38072
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: foreign trace context and invalid source clock do not become observations
+ok 173 - sv10-refusal: foreign trace context and invalid source clock do not become observations
+  ---
+  duration_ms: 11.829885
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: invalid caller fields are rejected before advancing a trace
+ok 174 - sv10-refusal: invalid caller fields are rejected before advancing a trace
+  ---
+  duration_ms: 9.850084
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+ok 175 - sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+  ---
+  duration_ms: 2.239321
+  type: 'test'
+  ...
+# Subtest: sv1-positive
+ok 176 - sv1-positive
+  ---
+  duration_ms: 5.119468
+  type: 'test'
+  ...
+# Subtest: sv1-alternate
+ok 177 - sv1-alternate
+  ---
+  duration_ms: 2.781349
+  type: 'test'
+  ...
+# Subtest: sv1-refusal
+ok 178 - sv1-refusal
+  ---
+  duration_ms: 3.074905
+  type: 'test'
+  ...
+# Subtest: sv2-positive
+ok 179 - sv2-positive
+  ---
+  duration_ms: 38.014039
+  type: 'test'
+  ...
+# Subtest: sv2-alternate
+ok 180 - sv2-alternate
+  ---
+  duration_ms: 21.271014
+  type: 'test'
+  ...
+# Subtest: sv2-refusal
+ok 181 - sv2-refusal
+  ---
+  duration_ms: 5.35052
+  type: 'test'
+  ...
+# Subtest: sv3-positive
+ok 182 - sv3-positive
+  ---
+  duration_ms: 4.699664
+  type: 'test'
+  ...
+# Subtest: sv3-alternate
+ok 183 - sv3-alternate
+  ---
+  duration_ms: 2.956057
+  type: 'test'
+  ...
+# Subtest: sv3-refusal
+ok 184 - sv3-refusal
+  ---
+  duration_ms: 0.470757
+  type: 'test'
+  ...
+# Subtest: sv4-positive
+ok 185 - sv4-positive
+  ---
+  duration_ms: 39.73849
+  type: 'test'
+  ...
+# Subtest: sv4-alternate
+ok 186 - sv4-alternate
+  ---
+  duration_ms: 33.873798
+  type: 'test'
+  ...
+# Subtest: sv4-refusal
+ok 187 - sv4-refusal
+  ---
+  duration_ms: 5.806255
+  type: 'test'
+  ...
+# Subtest: sv5-positive
+ok 188 - sv5-positive
+  ---
+  duration_ms: 267.489246
+  type: 'test'
+  ...
+# Subtest: sv5-alternate
+ok 189 - sv5-alternate
+  ---
+  duration_ms: 132.662735
+  type: 'test'
+  ...
+# Subtest: sv5-refusal
+ok 190 - sv5-refusal
+  ---
+  duration_ms: 104.140724
+  type: 'test'
+  ...
+# Subtest: sv6-positive
+ok 191 - sv6-positive
+  ---
+  duration_ms: 25.122515
+  type: 'test'
+  ...
+# Subtest: sv6-alternate
+ok 192 - sv6-alternate
+  ---
+  duration_ms: 16.339102
+  type: 'test'
+  ...
+# Subtest: sv6-refusal
+ok 193 - sv6-refusal
+  ---
+  duration_ms: 18.901598
+  type: 'test'
+  ...
+# Subtest: sv6-completion: incomplete reports remain addressed, unreadable observations
+ok 194 - sv6-completion: incomplete reports remain addressed, unreadable observations
+  ---
+  duration_ms: 48.061997
+  type: 'test'
+  ...
+# Subtest: sv6-producer: explicit JUnit count projection survives the native message
+ok 195 - sv6-producer: explicit JUnit count projection survives the native message
+  ---
+  duration_ms: 32.842131
+  type: 'test'
+  ...
+# Subtest: sv6-byte-custody: invalid UTF-8 is retained exactly and cannot become a readable report
+ok 196 - sv6-byte-custody: invalid UTF-8 is retained exactly and cannot become a readable report
+  ---
+  duration_ms: 39.836288
+  type: 'test'
+  ...
+# Subtest: sv6-attribute-custody: caller context cannot manufacture or contradict report observations
+ok 197 - sv6-attribute-custody: caller context cannot manufacture or contradict report observations
+  ---
+  duration_ms: 41.140585
+  type: 'test'
+  ...
+# Subtest: sv7-positive: generic event retains body, caller clock, trace and actual receipt
+ok 198 - sv7-positive: generic event retains body, caller clock, trace and actual receipt
+  ---
+  duration_ms: 8.987119
+  type: 'test'
+  ...
+# Subtest: sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+ok 199 - sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+  ---
+  duration_ms: 12.939149
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+ok 200 - sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+  ---
+  duration_ms: 8.559095
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: an unwritable store propagates instead of returning a receipt
+ok 201 - sv7-refusal: an unwritable store propagates instead of returning a receipt
+  ---
+  duration_ms: 3.21144
+  type: 'test'
+  ...
+1..201
+# tests 201
+# suites 0
+# pass 194
+# fail 7
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6593.064559

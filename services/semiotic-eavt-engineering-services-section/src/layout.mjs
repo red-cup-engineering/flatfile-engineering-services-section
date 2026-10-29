@@ -8,14 +8,17 @@
  * The directory names come from eavt-services-section (`dataKindDirectoryName`, the tier table) and
  * the bucket from the content address section (`niBucketPath`); this module reproduces neither.
  */
-import { existsSync } from "node:fs";
+import { statSync } from "node:fs";
 import { join } from "node:path";
 import { dataKindDirectoryName, dataTierPathSegment } from "@red-cup-engineering/eavt-services-section/data-artifact-address";
 import { niBucketPath } from "@red-cup-engineering/computer-content-address-engineering-services-section/ni-path";
 import { isNiUri } from "@red-cup-engineering/uri-services-section/ni-uri";
+import { isSeavtCalendarDate, isAbsoluteSeavtClock } from "./clock.mjs";
 
 export const RECORD_BYTES_MAX = 65_536;
 export const LOG_LINE_BYTES_MAX = 4_096;
+/** A SEAVT row line (a row's coordinates are data, not a few fields): larger rows are records, named by address. */
+export const SEAVT_ROW_BYTES_MAX = 1_048_576;
 export const NI_PATH_VERSION = "ni-path-v1";
 export const LEGACY_STORE_PATHS = Object.freeze(["data/state/log-state", "data/journals"]);
 
@@ -37,17 +40,22 @@ export function checkTypeName(type) {
   return type;
 }
 
-const DATE = /^\d{4}-\d{2}-\d{2}$/u;
 export function checkDate(date) {
-  if (typeof date !== "string" || !DATE.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`))) throw new StoreError("log-date", `not a calendar date: ${JSON.stringify(date)}`);
+  if (!isSeavtCalendarDate(date))
+    throw new StoreError("log-date", "not a calendar date: " + JSON.stringify(date));
   return date;
 }
+
+/** Whether a root holds the earlier layout at `legacy`. The layout is a directory (state, or a journal store): a file of that name is a note or a stray, not a store, and a dangling link holds nothing. */
+const holdsDirectory = (root, legacy) => {
+  try { return statSync(join(root, legacy)).isDirectory(); } catch (error) { if (error.code === "ENOENT" || error.code === "ENOTDIR") return false; throw error; }
+};
 
 /** ST-17: a root that still holds the earlier layout is refused, naming the conversion. */
 export function checkRoot(root) {
   if (typeof root !== "string" || root.length === 0) throw new StoreError("root", "the settlement root must be a path");
   for (const legacy of LEGACY_STORE_PATHS) {
-    if (existsSync(join(root, legacy))) throw new LegacyStoreRefused(`${root} holds ${legacy}, the earlier store layout; convert it first (store-conversion.md)`);
+    if (holdsDirectory(root, legacy)) throw new LegacyStoreRefused(`${root} holds ${legacy}, the earlier store layout; convert it first (store-conversion.md)`);
   }
   return root;
 }

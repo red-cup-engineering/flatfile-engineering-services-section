@@ -1,0 +1,272 @@
+TAP version 13
+# Subtest: store log date paths admit only actual calendar days
+not ok 1 - store log date paths admit only actual calendar days
+  ---
+  duration_ms: 1.488314
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:27:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception (StoreError).'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:31:12)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.start (node:internal/test_runner/test:1262:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+# Subtest: ST-1: a record is filed where ni-path-v1 computes, over the conformance vectors
+ok 2 - ST-1: a record is filed where ni-path-v1 computes, over the conformance vectors
+  ---
+  duration_ms: 6.242209
+  type: 'test'
+  ...
+# Subtest: a record reads back as put, in one plain readable line
+ok 3 - a record reads back as put, in one plain readable line
+  ---
+  duration_ms: 3.818882
+  type: 'test'
+  ...
+# Subtest: ST-2: the files of a settlement are the three kinds and nothing else
+ok 4 - ST-2: the files of a settlement are the three kinds and nothing else
+  ---
+  duration_ms: 6.343451
+  type: 'test'
+  ...
+# Subtest: ST-3: put of a held record writes nothing
+ok 5 - ST-3: put of a held record writes nothing
+  ---
+  duration_ms: 5.505253
+  type: 'test'
+  ...
+# Subtest: ST-4: a cut tail becomes a line of its own before the next write
+ok 6 - ST-4: a cut tail becomes a line of its own before the next write
+  ---
+  duration_ms: 120.033757
+  type: 'test'
+  ...
+# Subtest: ST-5: get returns only a line that hashes to its id, skipping bad lines
+ok 7 - ST-5: get returns only a line that hashes to its id, skipping bad lines
+  ---
+  duration_ms: 2.101504
+  type: 'test'
+  ...
+# Subtest: ST-6: admission is the line; causes are not read
+ok 8 - ST-6: admission is the line; causes are not read
+  ---
+  duration_ms: 2.806072
+  type: 'test'
+  ...
+# Subtest: ST-7 and ST-8: a walk yields effects first, marks what is missing, and stops at its limit
+ok 9 - ST-7 and ST-8: a walk yields effects first, marks what is missing, and stops at its limit
+  ---
+  duration_ms: 8.058735
+  type: 'test'
+  ...
+# Subtest: a walk crosses types by {type, id}
+ok 10 - a walk crosses types by {type, id}
+  ---
+  duration_ms: 3.346493
+  type: 'test'
+  ...
+# Subtest: ST-9 and ST-10: a head is replaced under its lock, and expect is checked first
+ok 11 - ST-9 and ST-10: a head is replaced under its lock, and expect is checked first
+  ---
+  duration_ms: 6.970472
+  type: 'test'
+  ...
+# Subtest: a head name is percent-encoded and listed back by name
+ok 12 - a head name is percent-encoded and listed back by name
+  ---
+  duration_ms: 3.042066
+  type: 'test'
+  ...
+# Subtest: extend puts a record with its causes and advances the head
+ok 13 - extend puts a record with its causes and advances the head
+  ---
+  duration_ms: 8.440839
+  type: 'test'
+  ...
+# Subtest: ST-11: a log line is one write to the day of its at, never rewritten
+ok 14 - ST-11: a log line is one write to the day of its at, never rewritten
+  ---
+  duration_ms: 1.816636
+  type: 'test'
+  ...
+# Subtest: ST-12: an oversized record or log line is refused
+ok 15 - ST-12: an oversized record or log line is refused
+  ---
+  duration_ms: 3.517309
+  type: 'test'
+  ...
+# Subtest: ST-13: a type must be plain lowercase words joined by hyphens
+ok 16 - ST-13: a type must be plain lowercase words joined by hyphens
+  ---
+  duration_ms: 1.869586
+  type: 'test'
+  ...
+# Subtest: ST-15: importing the store starts no timer or watcher and reads no file
+ok 17 - ST-15: importing the store starts no timer or watcher and reads no file
+  ---
+  duration_ms: 83.736304
+  type: 'test'
+  ...
+# Subtest: ST-16: pull stops at an address the local store has, and converges heads
+ok 18 - ST-16: pull stops at an address the local store has, and converges heads
+  ---
+  duration_ms: 17.281377
+  type: 'test'
+  ...
+# Subtest: pull merges diverged threads into the maximal frontier
+ok 19 - pull merges diverged threads into the maximal frontier
+  ---
+  duration_ms: 25.693864
+  type: 'test'
+  ...
+# Subtest: one log: a channel's unchanged frontier still transports an explicit closure
+not ok 20 - one log: a channel's unchanged frontier still transports an explicit closure
+  ---
+  duration_ms: 8.27541
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:293:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+    -   1,
+        0,
+    +   0,
+        false
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 1
+    1: 0
+    2: false
+  actual:
+    0: 0
+    1: 0
+    2: false
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:301:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: one log: a channel message and its cross-type ledger consequence travel with causal custody
+ok 21 - one log: a channel message and its cross-type ledger consequence travel with causal custody
+  ---
+  duration_ms: 12.209996
+  type: 'test'
+  ...
+# Subtest: one log: a missing predecessor never becomes a converged channel head
+not ok 22 - one log: a missing predecessor never becomes a converged channel head
+  ---
+  duration_ms: 6.807657
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:317:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+    +   1,
+    +   1,
+    +   false
+    -   0,
+    -   0,
+    -   true
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 0
+    1: 0
+    2: true
+  actual:
+    0: 1
+    1: 1
+    2: false
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:323:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: one log: forged peer payloads and changing parent reads cannot publish a ledger head
+not ok 23 - one log: forged peer payloads and changing parent reads cannot publish a ledger head
+  ---
+  duration_ms: 7.20961
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:332:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:345:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: ST-17: a root holding the earlier layout is refused on every operation
+ok 24 - ST-17: a root holding the earlier layout is refused on every operation
+  ---
+  duration_ms: 1.658489
+  type: 'test'
+  ...
+# Subtest: ST-17: a file named as the earlier layout is not the earlier layout
+not ok 25 - ST-17: a file named as the earlier layout is not the earlier layout
+  ---
+  duration_ms: 0.342334
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:379:1'
+  failureType: 'testCodeFailure'
+  error: '/tmp/store-6k5fmd holds data/journals, the earlier store layout; convert it first (store-conversion.md)'
+  code: 'legacy-store'
+  name: 'LegacyStoreRefused'
+  stack: |-
+    checkRoot (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/src/layout.mjs:50:47)
+    put (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/latest-main/src/store-core.mjs:134:3)
+    TestContext.<anonymous> (file:///workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/prior-contracts-on-main/test/store.test.mjs:383:19)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    Test.postRun (node:internal/test_runner/test:1542:19)
+    Test.run (node:internal/test_runner/test:1467:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: ST-18: only the store's core writes files; layout and exchange do not
+ok 26 - ST-18: only the store's core writes files; layout and exchange do not
+  ---
+  duration_ms: 0.458708
+  type: 'test'
+  ...
+# Subtest: each yields every record of a type once, in bucket order
+ok 27 - each yields every record of a type once, in bucket order
+  ---
+  duration_ms: 46.029765
+  type: 'test'
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 22
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 525.795114

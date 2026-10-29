@@ -1,0 +1,181 @@
+[
+  {
+    "id": "@red-cup-engineering/semiotic-eavt-services-section@0.3.2",
+    "name": "@red-cup-engineering/semiotic-eavt-services-section",
+    "version": "0.3.2",
+    "size": 61874,
+    "unpackedSize": 214924,
+    "shasum": "0cef2906cce0f63f81b98be776141623d117f142",
+    "integrity": "sha512-ocObIAL+fd4JYz+BTpmgbGunOgbZSI9FAB3nucSlYEjpU4N9e/gWsbRwBils0duHvPgvgsQFi6xF5hMQu3i/nA==",
+    "filename": "red-cup-engineering-semiotic-eavt-services-section-0.3.2.tgz",
+    "files": [
+      {
+        "path": "README.md",
+        "size": 8382,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 2998,
+        "mode": 420
+      },
+      {
+        "path": "scripts/check-current-state.mjs",
+        "size": 4585,
+        "mode": 420
+      },
+      {
+        "path": "scripts/compact-seavt-logs.mjs",
+        "size": 1644,
+        "mode": 493
+      },
+      {
+        "path": "scripts/export-otlp.mjs",
+        "size": 1287,
+        "mode": 493
+      },
+      {
+        "path": "scripts/seal-logs.mjs",
+        "size": 1743,
+        "mode": 493
+      },
+      {
+        "path": "scripts/seavt-volume.mjs",
+        "size": 3480,
+        "mode": 493
+      },
+      {
+        "path": "src/admit-seavt-row.mjs",
+        "size": 4182,
+        "mode": 420
+      },
+      {
+        "path": "src/bind-json-template.mjs",
+        "size": 1321,
+        "mode": 420
+      },
+      {
+        "path": "src/causal-resource-head.mjs",
+        "size": 5722,
+        "mode": 420
+      },
+      {
+        "path": "src/checkpoint.mjs",
+        "size": 8584,
+        "mode": 420
+      },
+      {
+        "path": "src/clock.mjs",
+        "size": 3838,
+        "mode": 420
+      },
+      {
+        "path": "src/compact-logs.mjs",
+        "size": 7365,
+        "mode": 420
+      },
+      {
+        "path": "src/exchange.mjs",
+        "size": 6677,
+        "mode": 420
+      },
+      {
+        "path": "src/identity/artifact.mjs",
+        "size": 2486,
+        "mode": 420
+      },
+      {
+        "path": "src/identity/index.mjs",
+        "size": 350,
+        "mode": 420
+      },
+      {
+        "path": "src/identity/text-document.mjs",
+        "size": 2619,
+        "mode": 420
+      },
+      {
+        "path": "src/layout.mjs",
+        "size": 5264,
+        "mode": 420
+      },
+      {
+        "path": "src/log-budget.mjs",
+        "size": 4887,
+        "mode": 420
+      },
+      {
+        "path": "src/normalize-seavt-row.mjs",
+        "size": 1413,
+        "mode": 420
+      },
+      {
+        "path": "src/profile.mjs",
+        "size": 288,
+        "mode": 420
+      },
+      {
+        "path": "src/sealed-log.mjs",
+        "size": 7480,
+        "mode": 420
+      },
+      {
+        "path": "src/seavt-carrier.mjs",
+        "size": 5223,
+        "mode": 420
+      },
+      {
+        "path": "src/seavt-log.mjs",
+        "size": 2316,
+        "mode": 420
+      },
+      {
+        "path": "src/store-core.mjs",
+        "size": 33664,
+        "mode": 420
+      },
+      {
+        "path": "src/store.mjs",
+        "size": 1111,
+        "mode": 420
+      },
+      {
+        "path": "src/telemetry-store.mjs",
+        "size": 13124,
+        "mode": 420
+      },
+      {
+        "path": "src/telemetry.mjs",
+        "size": 11782,
+        "mode": 420
+      },
+      {
+        "path": "src/volume.mjs",
+        "size": 7338,
+        "mode": 420
+      },
+      {
+        "path": "test/telemetry-boundaries.test.mjs",
+        "size": 7304,
+        "mode": 420
+      },
+      {
+        "path": "test/telemetry-cell-events.test.mjs",
+        "size": 10025,
+        "mode": 420
+      },
+      {
+        "path": "test/telemetry-trace-integrity.test.mjs",
+        "size": 15937,
+        "mode": 420
+      },
+      {
+        "path": "test/telemetry.test.mjs",
+        "size": 20505,
+        "mode": 420
+      }
+    ],
+    "entryCount": 33,
+    "bundled": []
+  }
+]

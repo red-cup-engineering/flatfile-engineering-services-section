@@ -1,0 +1,21 @@
+✓ Lockfile passes supply-chain policies (verified 7s ago)
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +47
++++++++++++++++++++++++++++++++++++++++++++++++
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: /root/.local/share/pnpm/store/v11
+  Virtual store is at:             node_modules/.pnpm
+Progress: resolved 47, reused 46, downloaded 1, added 47, done
+
+dependencies:
++ @red-cup-engineering/computer-content-address-engineering-services-section 0.2.0
++ @red-cup-engineering/computer-data-engineering-services-section 0.2.0
++ @red-cup-engineering/computer-file-engineering-services-section 0.5.0
++ @red-cup-engineering/eavt-services-section 0.11.1
++ @red-cup-engineering/json-schema-services-section 0.5.0
++ @red-cup-engineering/json-services-section 0.4.0
++ @red-cup-engineering/signcell 0.13.1-dev.206
++ @red-cup-engineering/uri-services-section 0.1.1
+
+Done in 793ms using pnpm v11.25.0

@@ -1,0 +1,41 @@
+{
+  "recordedAt": "2026-10-27T01:04:50.482206+00:00",
+  "initialObservedReceipt": {
+    "path": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/receiving.json",
+    "bytes": 202651,
+    "sha256": "a501e42cd6377ee8c3a917dec646f96d99bd63119b84334bb20c6ac71d47ba27",
+    "gitBlob": "ac41e8ff96d790e5521d342447c4a0dc3705cbb3"
+  },
+  "initialReceiptReconstruction": {
+    "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/supplier-receiving-initial-reconstructed.json",
+    "bytes": 202651,
+    "sha256": "a501e42cd6377ee8c3a917dec646f96d99bd63119b84334bb20c6ac71d47ba27",
+    "gitBlob": "ac41e8ff96d790e5521d342447c4a0dc3705cbb3",
+    "method": "Reverse only the supplier-confirmed four metadata amendments, restore providerClosure from preserved providers-before.json excluding files, and require the exact SHA256 observed before SEAVT installation.",
+    "originalObservedSha256Matched": true
+  },
+  "finalReceipt": {
+    "path": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/receiving.json",
+    "bytes": 85461,
+    "sha256": "fed71f6b222227ce69567e8017af9edfc156f822881e9bffaef7acc7edb69c46",
+    "gitBlob": "defd5b9dd1d2092594b38e1433d5ddd59a542f4a"
+  },
+  "amendments": [
+    "Expanded archivePath, packagePath and receiving.cwd from original evidence/... paths to absolute paths.",
+    "Added registryObservationHistory for the seven preserved registry observations.",
+    "Added receiverOrchestration explaining the index-only PosixPath shadowing correction and one actual receiving execution.",
+    "Replaced the inline providerClosure.edges array with selectionEdgeCount, fullBeforeAfterInventories bindings and selectionEdgesUnchanged; full edges remain in preserved before/after inventories."
+  ],
+  "receivingExecutionChanged": false,
+  "archivePackageProvidersAndRawTapChanged": false,
+  "sameReceivingStartedAt": "2026-10-27T00:57:46.989773+00:00",
+  "sameReceivingTotals": {
+    "tests": 139,
+    "pass": 139,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "scope": "Supporting receipt metadata revision only; the initial observation and finalized evidence are recorded separately, with no byte-stability claim for that JSON."
+}

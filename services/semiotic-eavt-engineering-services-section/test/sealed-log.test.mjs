@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
 import { appendFileSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -15,9 +17,29 @@ function store(t) {
   return root;
 }
 const write = (root, day, count, extra = "") => {
-  for (let i = 0; i < count; i += 1) append(root, TYPE, { at: `${day}T00:00:${String(i % 60).padStart(2, "0")}.000Z`, i, padding: `${extra}${"x".repeat(i % 200)}` });
+  for (let i = 0; i < count; i += 1) append(root, TYPE, { at: `${day}T00:00:${String(i % 60).padStart(2, "0")}.000Z`, i, padding: `${extra}${"x".repeat(i % 200)}` }, { seal: false });
 };
 const read = (root, day, from = 0) => [...readLog(root, TYPE, day, { from })];
+
+for(const written of [0,1])test(`a ${written}-byte segment write refuses without retiring its original day`,t=>{
+ const root=store(t),day="2026-10-15",directory=logsDirectory(root,TYPE);
+ write(root,day,20);const original=readFileSync(join(directory,day+'.jsonl')),before=read(root,day);
+ const open=fs.openSync,writeBlock=fs.writeSync,paths=new Map();let injected=false;
+ fs.openSync=(file,...args)=>{const fd=open(file,...args);paths.set(fd,file);return fd;};
+ fs.writeSync=(fd,bytes,...args)=>{
+  if(!String(paths.get(fd)).endsWith('.jsonl.gz.partial'))return writeBlock(fd,bytes,...args);
+  injected=true;return writeBlock(fd,bytes,0,written);
+ };
+ syncBuiltinESMExports();
+ try{assert.throws(()=>sealLogs(root,TYPE,{before:"2026-10-16"}),error=>error.code==='short-write');}
+ finally{fs.openSync=open;fs.writeSync=writeBlock;syncBuiltinESMExports();}
+ assert.equal(injected,true);
+ assert.deepEqual(readFileSync(join(directory,day+'.jsonl.sealing')),original);
+ assert.equal(readdirSync(directory).some(name=>name.endsWith('.jsonl.gz')||name.endsWith('.partial')),false);
+ assert.deepEqual(read(root,day),before);
+ assert.equal(sealLogs(root,TYPE,{before:"2026-10-16"}).length,1);
+ assert.deepEqual(read(root,day),before);
+});
 
 test("a sealed day reads back the same lines at the same cursors, and the open day stays open", (t) => {
   const root = store(t);

@@ -16,9 +16,11 @@
  */
 import { closeSync, fsyncSync, openSync, readSync, renameSync, statSync, unlinkSync, writeSync } from "node:fs";
 import { BGZF_BLOCK_DATA_MAX as BLOCK_DATA_MAX, bgzfBlock as block, bgzfBlocks } from "@red-cup-engineering/computer-file-engineering-services-section/bgzf";
-import { StoreCorruption } from "./layout.mjs";
+import { StoreCorruption, StoreError } from "./layout.mjs";
 
 const NEWLINE = 0x0a;
+/** A line longer than this in a segment is passed over (a block holds 64 KiB; a line may span blocks). */
+export const SEGMENT_LINE_BYTES_MAX = 1_048_576 + 1_024;
 const SEGMENT = /^(\d{4}-\d{2}-\d{2})\.(\d+)-(\d+)\.jsonl\.gz$/u;
 
 /** A day's sealed segments in a directory listing, ordered and checked contiguous from 0. */
@@ -42,20 +44,25 @@ function* blocks(file) {
 }
 
 /** A segment's lines from day position `from`: `{text, next}` with day positions. */
-export function* segmentLines(file, start, from) {
-  let at = start;
+export function* segmentLines(file, start, from, { lineBytesMax = SEGMENT_LINE_BYTES_MAX } = {}) {
+  let at = start, lineStart = start, carry = [], held = 0, skipping = false;
   for (const data of blocks(file)) {
     const end = at + data.length;
-    if (end > from) {
-      for (let i = Math.max(0, from - at); i < data.length;) {
-        const newline = data.indexOf(NEWLINE, i);
-        if (newline < 0) throw new StoreCorruption(`${file} has a block that does not end at a line end`);
-        yield { text: data.subarray(i, newline).toString("utf8"), next: at + newline + 1 };
-        i = newline + 1;
+    for (let i = 0; i < data.length;) {
+      const newline = data.indexOf(NEWLINE, i);
+      const stop = newline < 0 ? data.length : newline;
+      if (!skipping) {
+        held += stop - i;
+        if (held > lineBytesMax) { skipping = true; carry = []; held = 0; } else carry.push(data.subarray(i, stop));
       }
+      if (newline < 0) break;
+      if (!skipping && lineStart >= from) yield { text: Buffer.concat(carry, held).toString("utf8"), next: at + newline + 1 };
+      carry = []; held = 0; skipping = false; lineStart = at + newline + 1;
+      i = newline + 1;
     }
     at = end;
   }
+  if (held > 0 || skipping) throw new StoreCorruption(`${file} ends inside a line`);
 }
 
 /** Write `source` (an uncompressed day file) as the segment starting at day position `start` in `directory`.
@@ -71,9 +78,14 @@ export function writeSegment(directory, date, source, start) {
       pending = Buffer.concat([pending, chunk.subarray(0, read)]);
       if (done && pending.length > 0 && pending[pending.length - 1] !== NEWLINE) pending = Buffer.concat([pending, Buffer.from([NEWLINE])]);
       while (pending.length >= BLOCK_DATA_MAX || (done && pending.length > 0)) {
-        const cut = pending.subarray(0, BLOCK_DATA_MAX).lastIndexOf(NEWLINE);
-        if (cut < 0) throw new StoreCorruption(`${source} has a line longer than a block`);
-        writeSync(output, block(pending.subarray(0, cut + 1)));
+        // A block ends at a line end when it can; a line longer than a block spans whole blocks.
+        const head = pending.subarray(0, BLOCK_DATA_MAX);
+        let cut = head.lastIndexOf(NEWLINE);
+        if (cut < 0) cut = head.length - 1;
+        if (cut < 0) throw new StoreCorruption(`${source} has an empty block`);
+        const compressed = block(pending.subarray(0, cut + 1));
+        if (writeSync(output, compressed) !== compressed.length)
+          throw new StoreError("short-write", `short write to ${temporary}`);
         length += cut + 1;
         pending = pending.subarray(cut + 1);
       }

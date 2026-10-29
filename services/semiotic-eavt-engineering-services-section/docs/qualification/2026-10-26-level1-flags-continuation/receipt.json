@@ -1,0 +1,275 @@
+{
+  "kind": "seavt.level1-flags-source-continuation/v1",
+  "observedAt": "2026-10-26T21:21:51.603761+00:00",
+  "repository": "red-cup-engineering/semiotic-eavt-engineering-services-section",
+  "baseCommit": "389951f15e0ffb57ee29f8d71ef1a16a4904ce3d",
+  "baseTree": "12619e0220f650a9abeb94f68de15d1bb176e166",
+  "status": "distinguishing downstream regression prepared; actual corrected SignCell release adoption remains pending",
+  "intake": {
+    "openPullRequests": [
+      {
+        "number": 21,
+        "title": "Notice: fail closed on corrupt incremental SEAVT records without discarding authorized cursor performance",
+        "head": "d2021f9ede5b7a895f51a2c88c9e5a0cd3764c31",
+        "branch": "fix/appended-strict-observability-20261023"
+      },
+      {
+        "number": 20,
+        "title": "Qualify source-sensitive store readings and migration",
+        "head": "5353a4dee6a2d7eeb505fcd1853a99e564d69668",
+        "branch": "codex/qualify-source-sensitive-store-reading"
+      },
+      {
+        "number": 19,
+        "title": "Avoid per-line Buffer copies for complete SEAVT record and log lines",
+        "head": "574be121de508e040ea0cced0c6952c6ac01511e",
+        "branch": "perf/zero-copy-complete-scanlines-20261021"
+      },
+      {
+        "number": 16,
+        "title": "Add opt-in, explicitly named SEAVT JSON/SEN carrier v2 while retaining compact v1 logs",
+        "head": "ebf9c01df3289a1a390a90fe8deb3e7a2799f671",
+        "branch": "feat/named-seavt-json-carrier-v2-20261020"
+      }
+    ],
+    "openIssues": [
+      {
+        "number": 17,
+        "title": "Receive proof-path-addressed SignGraph graph queries on the existing flat-file SEAVT store"
+      },
+      {
+        "number": 15,
+        "title": "Version named JSON/SEN SEAVT carriers without breaking compact logs or source receipts"
+      }
+    ],
+    "developmentBranchesCompared": 6,
+    "assessment": "No current reserved-flag correction was found. Existing store performance, strict append, named-carrier, and source-sensitive reading work remains separate. The diverged local-source branch removes telemetry and down-selects older suppliers; it is not adopted over current main. This continuation changes only the current original SV12 requirement and one existing telemetry receiving case."
+  },
+  "changes": [
+    {
+      "path": "test/telemetry-boundaries.test.mjs",
+      "original": {
+        "bytes": 5675,
+        "sha256": "c957737c6cf760c197ca4c4ac38fc4a86e028e227ef8379da27c5616bff54574",
+        "gitBlob": "2b4b311553955460efb33343a844e9260beb7a3a"
+      },
+      "candidate": {
+        "bytes": 7304,
+        "sha256": "a7469d66791de9bb445e2061037b9cc7d5fb17fa4a089b938fce3383eb9dedac",
+        "gitBlob": "5f65188f4bfd949448469f39c5c2e2081663e0eb"
+      }
+    },
+    {
+      "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+      "original": {
+        "bytes": 18580,
+        "sha256": "d5d684f63d50d33fc5abca47b7a4d52723bb39bf9bf288762ad642ef720fc569",
+        "gitBlob": "7556dba704c6d1f5eba28b72af33452cb75f7cee"
+      },
+      "candidate": {
+        "bytes": 19011,
+        "sha256": "b43f311ca85d97fd1144a9bd84ec17333f326d4846b7680d426e32c1c7966897",
+        "gitBlob": "68396a1d9fc4d3e8914720b669c72e7bf09a53c1"
+      }
+    }
+  ],
+  "requirement": {
+    "owner": "SV12 in content/text/documents/specifications/2026-10-19-observability-seavt.md",
+    "rule": "Preserve received raw flags as evidence; newly constructed Level1 observing contexts and child environments preserve only the sampled bit. Existing SignCell owns that derivation.",
+    "normativeSource": "https://www.w3.org/TR/2021/REC-trace-context-1-20211123/#other-flags",
+    "receivingCase": "sv12-level1-flags: received reserved bits remain evidence while new contexts emit sampled only",
+    "caseCoverage": [
+      "A frozen original incoming environment retains its complete81 byte and vendor state.",
+      "Original SignCell extraction retains numeric129 and wire81.",
+      "The real openTelemetry observing handle joins the same trace with original parent id and sampled-only1 flags.",
+      "Its emitted traceparent and fresh child-process environment carry01, preserve vendor state and unrelated variables, and never mutate the input.",
+      "A real recordEvent append and readTrace retain observing-context flags1."
+    ]
+  },
+  "baseline": {
+    "package": "/workspace/scratch/455c183ed200/evidence/published-seavt-200/package",
+    "version": "0.3.3-dev.200",
+    "gitHead": "389951f15e0ffb57ee29f8d71ef1a16a4904ce3d",
+    "signcellVersion": "0.13.1-dev.198",
+    "result": "The new case fails specifically with AssertionError129 !==1 at the observing-context assertion, not at import or dependency resolution.",
+    "issuedPackageMembersRecheckedUnchanged": 33,
+    "run": {
+      "mode": "baseline",
+      "command": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern=sv12-level1-flags",
+        "test/telemetry-boundaries.test.mjs"
+      ],
+      "cwd": "/workspace/scratch/455c183ed200/evidence/seavt-level1-regression/baseline",
+      "observedAt": "2026-10-26T21:20:41.176712+00:00",
+      "exitCode": 1,
+      "counts": {
+        "tests": 1,
+        "suites": 0,
+        "pass": 0,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 142.055221
+      },
+      "stderr": "",
+      "tap": "docs/qualification/2026-10-26-level1-flags-continuation/baseline-200.tap",
+      "tapIdentity": {
+        "bytes": 1149,
+        "sha256": "ceb2a59eb1dc7270fca6434f49e2a4092c77fb64e27e5ad2fdfc7ba9798965a0",
+        "gitBlob": "46a85753e800d9aa603d515de5e4fcd90869f622"
+      }
+    }
+  },
+  "candidateSourceComposition": {
+    "directory": "/workspace/scratch/455c183ed200/evidence/seavt-level1-regression/source",
+    "supplierSourceDirectory": "/workspace/scratch/455c183ed200/signcell",
+    "supplierMergedCommit": "db194e835880bec7f3df5861cf5fbdb631550501",
+    "supplierFiles": {
+      "src/trace-context.mjs": {
+        "bytes": 9463,
+        "sha256": "f33e9393eb1d50bf58d653e0c7f1b47a3f2e1e48131b8a20cc70e15525651001",
+        "gitBlob": "b2ee3e01c3b8815b8acdd75ee64b4de36f6f9fb4"
+      },
+      "src/cloud-events.mjs": {
+        "bytes": 13622,
+        "sha256": "4ade9d8d7149ddfcc372a09519b0ceb9907ad0432740692a046460c515692250",
+        "gitBlob": "099ab59df76d35a9455198b59b2514dbb09b604d"
+      }
+    },
+    "method": "Original SEAVT implementation files hardlinked into an isolated composition, with seven exact original direct providers retained and only its SignCell link selecting the corrected original source. New receiving case copied byte-for-byte. No installed or issued provider is edited.",
+    "publishedSupplierQualification": false,
+    "run": {
+      "mode": "source",
+      "command": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern=sv12-level1-flags",
+        "test/telemetry-boundaries.test.mjs"
+      ],
+      "cwd": "/workspace/scratch/455c183ed200/evidence/seavt-level1-regression/source",
+      "observedAt": "2026-10-26T21:20:41.360344+00:00",
+      "exitCode": 0,
+      "counts": {
+        "tests": 1,
+        "suites": 0,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 189.576206
+      },
+      "stderr": "",
+      "tap": "docs/qualification/2026-10-26-level1-flags-continuation/source-composition.tap",
+      "tapIdentity": {
+        "bytes": 379,
+        "sha256": "ffb81629b039a73a78fd36a111c2ef64a6cf3d378efe8eb35a1305c976813fee",
+        "gitBlob": "d71c093191988d87b367b51168db89c9f61a9793"
+      }
+    }
+  },
+  "providerSelection": [
+    {
+      "name": "@red-cup-engineering/computer-content-address-engineering-services-section",
+      "declared": "0.2.0",
+      "actualBaselineProvider": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+computer-content-address-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-content-address-engineering-services-section",
+      "manifestSha256": "cff45a5b99d892048b7e50ec4516e435f1c00cbe7d0e316e9307fe10fdc400c4",
+      "candidate": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+computer-content-address-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-content-address-engineering-services-section",
+      "sourceOverride": false
+    },
+    {
+      "name": "@red-cup-engineering/computer-data-engineering-services-section",
+      "declared": "0.2.0",
+      "actualBaselineProvider": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+      "manifestSha256": "d054adc1d03cd518eff79b3e25e3cacaf2ec914e45dde17df80e9196c8063e3c",
+      "candidate": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+      "sourceOverride": false
+    },
+    {
+      "name": "@red-cup-engineering/computer-file-engineering-services-section",
+      "declared": "0.5.0",
+      "actualBaselineProvider": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+computer-file-engineering-services-section@0.5.0/node_modules/@red-cup-engineering/computer-file-engineering-services-section",
+      "manifestSha256": "7e5f6bf7264b7506c04ef7557057a977bac16c8e387548515506be3cad3968dd",
+      "candidate": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+computer-file-engineering-services-section@0.5.0/node_modules/@red-cup-engineering/computer-file-engineering-services-section",
+      "sourceOverride": false
+    },
+    {
+      "name": "@red-cup-engineering/eavt-services-section",
+      "declared": "0.11.1",
+      "actualBaselineProvider": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+eavt-services-section@0.11.1/node_modules/@red-cup-engineering/eavt-services-section",
+      "manifestSha256": "8755bc1d5dde952ab334073d43ba599de456b57a199e3e2554f03a999f9a6c65",
+      "candidate": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+eavt-services-section@0.11.1/node_modules/@red-cup-engineering/eavt-services-section",
+      "sourceOverride": false
+    },
+    {
+      "name": "@red-cup-engineering/json-schema-services-section",
+      "declared": "0.5.0",
+      "actualBaselineProvider": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section",
+      "manifestSha256": "e2e9018c1e2b1cf8bb90072932cae24d26f4f9748fad812627a09a8429d1c2e7",
+      "candidate": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section",
+      "sourceOverride": false
+    },
+    {
+      "name": "@red-cup-engineering/json-services-section",
+      "declared": "0.4.0",
+      "actualBaselineProvider": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section",
+      "manifestSha256": "1b5945abba04ed87ad57a2a97586ee03b4742d8539fe43c2fabdec1161c181be",
+      "candidate": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section",
+      "sourceOverride": false
+    },
+    {
+      "name": "@red-cup-engineering/signcell",
+      "declared": "0.13.1-dev.198",
+      "actualBaselineProvider": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell",
+      "manifestSha256": "77c8230fdb639048b8ebc6d30ca3f0f6911f3ec19b17677985010af8836520e5",
+      "candidate": "/workspace/scratch/455c183ed200/signcell",
+      "sourceOverride": true
+    },
+    {
+      "name": "@red-cup-engineering/uri-services-section",
+      "declared": "0.1.1",
+      "actualBaselineProvider": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+uri-services-section@0.1.1/node_modules/@red-cup-engineering/uri-services-section",
+      "manifestSha256": "ad2294be4d435b8c12871d030a5976686259c15579818e1dd1eb84d0f96e1dc4",
+      "candidate": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+uri-services-section@0.1.1/node_modules/@red-cup-engineering/uri-services-section",
+      "sourceOverride": false
+    }
+  ],
+  "unchangedOriginalFiles": {
+    "package.json": {
+      "bytes": 2998,
+      "sha256": "724c5e161b612985b64fcdcf6866a0d0c402741f8a514742e85143c47075567c",
+      "gitBlob": "01db502db87da9ef1dca1cd0f24059d7186cd426"
+    },
+    "pnpm-lock.yaml": {
+      "bytes": 21806,
+      "sha256": "e19c9b1c1308fe21a5ed009fbee77ada7b5e9ec723970f4c7575dda2f60eb36b",
+      "gitBlob": "784c1323a250fd329c46bcf9a203d27e5270cae9"
+    },
+    "pnpm-workspace.yaml": {
+      "bytes": 415,
+      "sha256": "434a70f9efd25de49642f3de3e3d606be6e942e35f97c8cb45f2b6ea07d98ebc",
+      "gitBlob": "8cdacf87fb14da978a0b3121731ef89f7b4673b3"
+    },
+    "src/telemetry.mjs": {
+      "bytes": 11782,
+      "sha256": "93c6e2769f9fac263e334ac6fb221a82961e5cf52de8ad0eb2615384499fe333",
+      "gitBlob": "67a2c0e5878f6c02797f82fbd816bb3d01ffde97"
+    },
+    "src/telemetry-store.mjs": {
+      "bytes": 13124,
+      "sha256": "c977e86d1b8a99116bcf4de76ee65fa67d6ce83419798045b5568595d854cf39",
+      "gitBlob": "727c721b4afa7393f4cdc5fa7a67455a7ce75f79"
+    }
+  },
+  "manifestPolicy": "The original declared SignCell0.13.1-dev.198 pin, package version, all other pins, native lock and workspace policy remain unchanged. No future version is invented; root will adopt and receive the actual issued correction.",
+  "limits": [
+    "One focused case was run against each composition; no full native or packaged gate is claimed for this pending continuation.",
+    "Candidate source composition is not an issued SignCell or SEAVT artifact, install, merge or deployment.",
+    "Only the existing test and its governing requirement change production-owner content; no parallel propagator, journal or codec is added."
+  ]
+}

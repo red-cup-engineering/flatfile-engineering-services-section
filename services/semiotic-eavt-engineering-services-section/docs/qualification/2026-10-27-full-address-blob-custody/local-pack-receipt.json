@@ -1,0 +1,267 @@
+{
+  "kind": "seavt.local-blob-custody-artifact/v1",
+  "source": "/tmp/logging-538c-blob-custody",
+  "command": [
+    "npm",
+    "pack",
+    "--ignore-scripts",
+    "--offline",
+    "--json",
+    "--pack-destination",
+    "/dev/shm/logging-538c/packages/seavt-blob-candidate/archives",
+    "--cache",
+    "/dev/shm/logging-538c/packages/seavt-blob-candidate/npm-cache",
+    "--update-notifier=false"
+  ],
+  "packExit": 0,
+  "archive": "/dev/shm/logging-538c/packages/seavt-blob-candidate/archives/red-cup-engineering-semiotic-eavt-services-section-0.3.2.tgz",
+  "archiveBytes": 63892,
+  "archiveSha256": "c218b662c584c7a07c3387f4a7e54c95403751fda01b3c4ae3ffb0f0d6d70225",
+  "archiveIntegrity": "sha512-yokUF8XiE82GtRqVVKGnXuWuCEYP7RlkXYUsVHl3GTSOZb6P5Al4Qa7dTthV1eMYz9jguYguMSRW4MU7HyhIEw==",
+  "archiveShasum": "d26abf105a5ab296a963054ca3acd90b520e2260",
+  "packageRoot": "/dev/shm/logging-538c/packages/seavt-blob-candidate/unpacked/package",
+  "memberCount": 33,
+  "members": [
+    {
+      "path": "package.json",
+      "bytes": 2998,
+      "sha256": "7af038db7cf5a59167c74f681cdf3e084438673a758e374b717a214b507cdf45",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "README.md",
+      "bytes": 8382,
+      "sha256": "d08c8e8cf5a75a593b0ed80e2d5e6f67c51046d8667984cfe6b58135dc54b07b",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/admit-seavt-row.mjs",
+      "bytes": 4182,
+      "sha256": "fa1c46c08ab2407cded951ed051e39ab2237ca7f6ed2940a80609e73ae0484cd",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/identity/artifact.mjs",
+      "bytes": 2486,
+      "sha256": "44ae1f495f0eca46516a51efc4573bbb652a97a0ffa43023e39812c177c396da",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/bind-json-template.mjs",
+      "bytes": 1321,
+      "sha256": "df9051d7d19aaa8b1547624ba38a6441d260f319e2c19c756a8a26fe02884794",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/causal-resource-head.mjs",
+      "bytes": 5722,
+      "sha256": "7c02eb45ece78595bbdd061f467c476581a5fa86117838292ee6fa52f64fbc53",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "scripts/check-current-state.mjs",
+      "bytes": 4585,
+      "sha256": "eb2b19e8138b1787f8135c19ca003ded81612251d299a56b02a062d63c0c087c",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/checkpoint.mjs",
+      "bytes": 8584,
+      "sha256": "16952c707c8e6a15f355a7f7d31516036bbc2ccba2a3b77d29dc48a325af37fa",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/clock.mjs",
+      "bytes": 3838,
+      "sha256": "169b766d85e010006ecbcc8b976b9d0a421f66c7463f3ca663e26bef63dc68ca",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/compact-logs.mjs",
+      "bytes": 7365,
+      "sha256": "9d905420d6b38fd8a18c49c8a152b5dea6d2b808f2d7e55b19b1009eb03fa962",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "scripts/compact-seavt-logs.mjs",
+      "bytes": 1644,
+      "sha256": "d9999fef261d53c2506808efd3b726a0bacf8b5de7d028510ab996dbb35c100b",
+      "archiveMode": 493,
+      "sourceMode": 493
+    },
+    {
+      "path": "src/exchange.mjs",
+      "bytes": 6677,
+      "sha256": "062b4d5eb9074cc9257234ea015c8427ef2fea982dbdd49d6e791bd27a9a122e",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "scripts/export-otlp.mjs",
+      "bytes": 1287,
+      "sha256": "74b37e54292e92079a1d7a728d0823dcd969a29d5c3b0cfaf2337e4ee3b0cbba",
+      "archiveMode": 493,
+      "sourceMode": 493
+    },
+    {
+      "path": "src/identity/index.mjs",
+      "bytes": 350,
+      "sha256": "eed654efba0a25dbaf396357a753152aa13b4fa4836491a4be56931aea620240",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/layout.mjs",
+      "bytes": 5264,
+      "sha256": "ab9594a0ea1d97c8b4f794286580e2d25c23fa7b777dcf76b55cf6a01b6a7e78",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/log-budget.mjs",
+      "bytes": 4887,
+      "sha256": "3161a4395928aa1845bafa608701020fb586287f9ced32c47e5386e8536cc450",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/normalize-seavt-row.mjs",
+      "bytes": 1413,
+      "sha256": "bc8c6c35880119bb24304c0a482a60302bc0072fa9ad1a4c80e610cbda939cdd",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/profile.mjs",
+      "bytes": 288,
+      "sha256": "8e78bd50934af13b3e3e56c00cd6ff07de1d5755335d581a03acb92a8713698b",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "scripts/seal-logs.mjs",
+      "bytes": 1743,
+      "sha256": "4e85fc19f3db42ba62ff07887df29df3f806311b87f8ef61666ce1797405d458",
+      "archiveMode": 493,
+      "sourceMode": 493
+    },
+    {
+      "path": "src/sealed-log.mjs",
+      "bytes": 7480,
+      "sha256": "8e8acf5f36587ffe9e79304bec93048fdc5dbb3406291d0f2f010f58a5ffa03d",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/seavt-carrier.mjs",
+      "bytes": 5223,
+      "sha256": "7a5877125dee581a00ca0117d217dd8ac1a230b6009926071e6b1bc2652fffd1",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/seavt-log.mjs",
+      "bytes": 2316,
+      "sha256": "bdf7425f6a0c8771ce738407c2c96e8ae9f8f53a6f31c191c890cdd35e3e59b9",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "scripts/seavt-volume.mjs",
+      "bytes": 3480,
+      "sha256": "ae414da0ebb583060973ab2e725e355de32e892e885671976c816be9fed155ad",
+      "archiveMode": 493,
+      "sourceMode": 493
+    },
+    {
+      "path": "src/store-core.mjs",
+      "bytes": 33664,
+      "sha256": "1f2f502848a18171629f4713245689ba7846e8ddae46f1f5b51ccf6cc7e1cf4c",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/store.mjs",
+      "bytes": 1111,
+      "sha256": "1a06de61357b90c5f44494a022e985f249a8264eb583ac0d940c9fb587e51f22",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "test/telemetry-boundaries.test.mjs",
+      "bytes": 7304,
+      "sha256": "a7469d66791de9bb445e2061037b9cc7d5fb17fa4a089b938fce3383eb9dedac",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "test/telemetry-cell-events.test.mjs",
+      "bytes": 10025,
+      "sha256": "9c1ef2bfdb1f7ac55db20e0e47a14e68be7847d85cb027d720831c7c1f871027",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/telemetry-store.mjs",
+      "bytes": 14429,
+      "sha256": "fb26248c78a9e3d084fcd3a8821b0be0e6ee635b099c5e1c4e939497d36b40f7",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "test/telemetry-trace-integrity.test.mjs",
+      "bytes": 15937,
+      "sha256": "042310b531fb3aa8ce2b191187012b3a05deb651b2cb60ae34b3f76ce2cce1c9",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/telemetry.mjs",
+      "bytes": 11782,
+      "sha256": "93c6e2769f9fac263e334ac6fb221a82961e5cf52de8ad0eb2615384499fe333",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "test/telemetry.test.mjs",
+      "bytes": 27923,
+      "sha256": "60bfc93fc6ca0ccd87354ef0d6e11e31271cfe24e4d3bded88c43c9990db0038",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/identity/text-document.mjs",
+      "bytes": 2619,
+      "sha256": "151ba810b7ccdd9f2c0ae5bf2800392a81736b9ff8968bc57035e32920c7911a",
+      "archiveMode": 420,
+      "sourceMode": 420
+    },
+    {
+      "path": "src/volume.mjs",
+      "bytes": 7338,
+      "sha256": "f8f8e21ba6c4b1c3c24dcf76c84bba9ab89643369ff3c5b47c61df7896cbf294",
+      "archiveMode": 420,
+      "sourceMode": 420
+    }
+  ],
+  "sourceExact": true,
+  "receivingTests": [
+    "test/telemetry.test.mjs",
+    "test/telemetry-trace-integrity.test.mjs",
+    "test/telemetry-boundaries.test.mjs",
+    "test/telemetry-cell-events.test.mjs"
+  ],
+  "dependenciesPath": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules",
+  "signcell": "0.13.1-dev.217",
+  "publication": false
+}

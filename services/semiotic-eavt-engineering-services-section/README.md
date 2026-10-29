@@ -69,10 +69,20 @@ records, mutable named heads, and chronological logs. Its
 governs layout, memory and failure assumptions; do not install
 another EAVT ledger or witness engine to publish the same data.
 
+## Compact rows, sealing and budgets
+
+[Specification](content/text/documents/specifications/seavt-log-carrier.md).
+`appendSeavtRow(root, feed, row, {guard})` and `readSeavtRows` (from
+`@red-cup-engineering/semiotic-eavt-services-section/seavt-log`) write and
+read rows as a plain JSON carrier, exact because the SEN bridge is injective;
+the first append of a day seals the days before it; `seavt-volume ROOT`,
+`seavt-volume ROOT --check` and `logGuard` report and enforce per-feed
+daily byte budgets; `compact-seavt-logs` converts older spine logs.
+
 ## Executable receiving
 
-Run the existing package tests in a workspace where its declared
-`workspace:*` dependencies are installed:
+Run the existing package tests with the exact suppliers declared in its
+manifest and lockfile installed:
 
 ```sh
 node --test test/seavt-carriers.test.mjs test/signcell-seavt.test.mjs test/clock.test.mjs test/causal-resource-head.test.mjs
@@ -84,7 +94,48 @@ stable predication identity, distinct event times, source-calendar
 and submillisecond order, forged-identity refusal, immutable older
 observations, and same-time conflicting source reports. Tests
 remain source-level evidence until executed at the exact installed
-revision. The [L-Space engineering LLD](https://github.com/red-cup-engineering/capability-cell-fabrication-services-section/blob/main/specifications/l-space-lld.md)
+revision. The [L-Space engineering LLD](https://github.com/red-cup-engineering/capability-cell-fabrication-engineering-services-section/blob/main/specifications/l-space-lld.md)
 requires a separate real provider/source observation and receiving
 office before the Group claims installed or customer-accepted
 behavior. No new source manifest or certificate is needed.
+
+## Telemetry
+
+`telemetry-store` keeps SignCell's channels and messages in the store and the whole of any output as content-addressed blobs
+(`data/blobs/telemetry/`); a trace is one thread named by its trace id, so a message's store address is its SignCell message
+address. `telemetry` is a process's handle on a trace: it continues the `TRACEPARENT` it was started with or starts a root,
+gives every child process a fresh span through `childEnvironment()`, and records finished commands, errors and test runs
+(`recordCommand`, `recordError`, `recordTestRun`) and explicitly supplied events (`recordEvent`) from the results the producer's own executor returned; it never spawns.
+The shared SignCell supplier owns all OTLP, W3C trace-context and native
+CloudEvents admission and projection. This handle preserves received
+`tracestate` through spans and child environments. Command receipt headlines
+come from the same sanitized, bounded record retained in the journal.
+
+`handle.recordCellEvent({ event })` observes a SignCell native claim CloudEvent
+on the handle's actual channel and trace. The existing atomic `appendMessage`
+supplies the current causal frontier and the final observation address. Its
+frozen receipt is `{address, traceId, eventId, eventSource, record}`; each
+coordinate comes from the retained message and admitted envelope. Calling it
+again at the same clock produces a new causally linked observation while
+preserving the original event's `(source, id)`, time, cell and both witness
+lanes. Receipt adds no testimony that the embedded claim is true.
+
+The whole original claim envelope remains in the structured OTLP body, so
+`cellEventOfMessage(record)` and `cellFromCloudEvent(event)` from SignCell's
+`./cloud-events` export recover the original native claim after readback.
+Malformed or over-bound events refuse without advancing the head; the handle
+does not shorten, retry, or replace them. Use `readTrace` to require a complete
+causal cut before treating a returned history as complete.
+
+`scripts/export-otlp.mjs ROOT` prints OTLP/JSON, one `ExportLogsServiceRequest` per line, for a Collector's file receiver. See
+`content/text/documents/specifications/2026-10-19-observability-seavt.md`; the requirements, design and architecture are in SignCell.
+The package ships its telemetry and causal-integrity receiving tests in
+`receivingTests`, including real durable claim-event append/read/export cases.
+## Explicit artifact byte allocation
+
+Artifact addressing, JSON-source admission and reference verification accept an
+optional `{ maxBytes }` allocation. The default remains 1 MiB. A trusted consumer
+may select a positive safe integer byte budget; the same budget governs source
+and canonical JSON. All existing depth, node, member, array, key, string and
+strict JSON limits remain. Allocation changes admission capacity, never semantic
+identity. Use the same allocation when verifying an artifact received under it.

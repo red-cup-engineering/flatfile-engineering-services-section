@@ -1,0 +1,18 @@
+{
+  "kind": "local-SEAVT-package-receiving",
+  "publishedSEAVT": false,
+  "archivePath": "/workspace/scratch/455c183ed200/evidence/seavt-published-cohort/red-cup-engineering-semiotic-eavt-services-section-0.3.2.tgz",
+  "packagePath": "/workspace/scratch/455c183ed200/evidence/seavt-published-cohort/package",
+  "archiveSha256": "ac1fda77a5eeddcbf9b156e118db201be194cfac4f0db936434ab4cf1d647ccd",
+  "archiveIntegrity": "sha512-N31QVFQLmOd+j/syP/IpeIn3wwAuS4zPXllGfvs+pmyA6ZUQnMZ1+exqGRgi37eFqj7akkOntWNNTXID9/FXYQ==",
+  "archiveBytes": 59823,
+  "sourceMatchedFiles": 33,
+  "receivingTests": [
+    "test/telemetry.test.mjs",
+    "test/telemetry-trace-integrity.test.mjs",
+    "test/telemetry-boundaries.test.mjs",
+    "test/telemetry-cell-events.test.mjs"
+  ],
+  "providerClosure": "/workspace/scratch/455c183ed200/seavt/node_modules",
+  "providerComposition": "Actual frozen registry installation from this candidate pnpm-lock.yaml, not source overrides."
+}

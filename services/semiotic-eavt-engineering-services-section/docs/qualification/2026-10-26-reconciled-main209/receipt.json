@@ -1,0 +1,252 @@
+{
+  "status": "reconciled-current-main-and-qualified-published-supplier",
+  "observedAt": "2026-10-26T19:50:04.388078+00:00",
+  "repository": "red-cup-engineering/semiotic-eavt-engineering-services-section",
+  "candidatePR": "https://github.com/red-cup-engineering/semiotic-eavt-engineering-services-section/pull/29",
+  "reconciledMain": "20901d6291632d96cd034d6527e69c137d0faec4",
+  "mainTree": "494612c59bfeead1a49cc47077ee9fd81b018d9b",
+  "originalSharedBase": "1a615414a6b0db1ee993417e12e687e37b9a223d",
+  "reconciliation": {
+    "main": "20901d6291632d96cd034d6527e69c137d0faec4",
+    "mainParent": [
+      "1a615414a6b0db1ee993417e12e687e37b9a223d"
+    ],
+    "mainTree": "494612c59bfeead1a49cc47077ee9fd81b018d9b",
+    "changedMainPaths": [
+      {
+        "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+        "mainBlob": "57e379888600cb1982bfc3965bdb2c26692667a4",
+        "priorCandidateBlob": "0aec8f2eee92add1d457bd4c678197cc2a11e015",
+        "combinedBlob": "7556dba704c6d1f5eba28b72af33452cb75f7cee"
+      },
+      {
+        "path": "package.json",
+        "mainBlob": "e0d32940ad882097e06f874f40f74484c83ca59d",
+        "priorCandidateBlob": "ad88bc6d595b9940ab529309d00b1ba5522b9e79",
+        "combinedBlob": "01db502db87da9ef1dca1cd0f24059d7186cd426"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "mainBlob": "784c1323a250fd329c46bcf9a203d27e5270cae9",
+        "priorCandidateBlob": "784c1323a250fd329c46bcf9a203d27e5270cae9",
+        "combinedBlob": "784c1323a250fd329c46bcf9a203d27e5270cae9"
+      },
+      {
+        "path": "src/telemetry.mjs",
+        "mainBlob": "99ef4f626f4df3bbc3e9ba4bb5ca86113ad46314",
+        "priorCandidateBlob": "8134a1ff3680b3903aaedf74732e956f3b7aa99f",
+        "combinedBlob": "67a2c0e5878f6c02797f82fbd816bb3d01ffde97"
+      },
+      {
+        "path": "test/telemetry-trace-integrity.test.mjs",
+        "mainBlob": "a7e54fbaf8fd00cec8021c67fad149068ed0f783",
+        "priorCandidateBlob": "7e2a5daf228f81c73481db9de4be356dee50ce14",
+        "combinedBlob": "a7e54fbaf8fd00cec8021c67fad149068ed0f783"
+      },
+      {
+        "path": "test/telemetry.test.mjs",
+        "mainBlob": "de156cbd99eb72d0db8e118c133e084a8a0bdee0",
+        "priorCandidateBlob": "7e43d049927c9d8f7ffab267a7631d8aad2d5c4b",
+        "combinedBlob": "de156cbd99eb72d0db8e118c133e084a8a0bdee0"
+      }
+    ],
+    "decisions": [
+      "Clean three-way merge of telemetry implementation and specification from exact original base1a615.",
+      "Adopt current-main telemetry tests and stronger raw-store corruption fixture exactly.",
+      "Retain all four packaged receiving suites and adopt current-main Node>=24.2.0 engine.",
+      "Current-main lock equals the already-generated and frozen-installed candidate lock byte for byte."
+    ],
+    "historicalReceiptsPreserved": true
+  },
+  "combinedSource": {
+    "currentMain": "20901d6291632d96cd034d6527e69c137d0faec4",
+    "currentMainTree": "494612c59bfeead1a49cc47077ee9fd81b018d9b",
+    "missingMainPaths": [],
+    "sourceChangesAgainstCurrentMain": [
+      {
+        "path": "README.md",
+        "mainBlob": "7d198b05becc24cb99b66a5848557bb83c90e9dd",
+        "combinedBlob": "c4db89929c3b8fda9d46ef35ede0765c52da7473",
+        "sha256": "d08c8e8cf5a75a593b0ed80e2d5e6f67c51046d8667984cfe6b58135dc54b07b"
+      },
+      {
+        "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+        "mainBlob": "57e379888600cb1982bfc3965bdb2c26692667a4",
+        "combinedBlob": "7556dba704c6d1f5eba28b72af33452cb75f7cee",
+        "sha256": "d5d684f63d50d33fc5abca47b7a4d52723bb39bf9bf288762ad642ef720fc569"
+      },
+      {
+        "path": "package.json",
+        "mainBlob": "e0d32940ad882097e06f874f40f74484c83ca59d",
+        "combinedBlob": "01db502db87da9ef1dca1cd0f24059d7186cd426",
+        "sha256": "724c5e161b612985b64fcdcf6866a0d0c402741f8a514742e85143c47075567c"
+      },
+      {
+        "path": "src/telemetry.mjs",
+        "mainBlob": "99ef4f626f4df3bbc3e9ba4bb5ca86113ad46314",
+        "combinedBlob": "67a2c0e5878f6c02797f82fbd816bb3d01ffde97",
+        "sha256": "93c6e2769f9fac263e334ac6fb221a82961e5cf52de8ad0eb2615384499fe333"
+      },
+      {
+        "path": "test/telemetry-boundaries.test.mjs",
+        "mainBlob": null,
+        "combinedBlob": "2b4b311553955460efb33343a844e9260beb7a3a",
+        "sha256": "c957737c6cf760c197ca4c4ac38fc4a86e028e227ef8379da27c5616bff54574"
+      },
+      {
+        "path": "test/telemetry-cell-events.test.mjs",
+        "mainBlob": null,
+        "combinedBlob": "a4d5a7ea955be90f56998d235108e5a8f7731b8c",
+        "sha256": "9c1ef2bfdb1f7ac55db20e0e47a14e68be7847d85cb027d720831c7c1f871027"
+      }
+    ]
+  },
+  "preservedMainBehavior": [
+    "Complete TAP/JUnit reading through original SignCell reader, with explicit reportOptions and retained JUnit count basis.",
+    "Exact report byte custody; invalid UTF-8 is retained as unreadable rather than rewritten before addressing.",
+    "Report-owned attributes replace contradictory caller attributes, retaining unrelated caller context.",
+    "Both current-main telemetry test files exactly, including independent raw-store corruption receiving plus producer rejection.",
+    "Node>=24.2.0 and exact published SignCell0.13.1-dev.198 dependency closure."
+  ],
+  "preservedCandidateBehavior": [
+    "recordCellEvent uses the original SignCell claim profile and existing appendMessage journal with no added witness or truth judgment.",
+    "Admitted tracestate survives nested handles and child environments.",
+    "Command receipt headline reads the retained sanitized bounded record.",
+    "Four telemetry suites ship as package receiving tests."
+  ],
+  "supplier": {
+    "installedPath": "/workspace/scratch/455c183ed200/seavt/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.198/node_modules/@red-cup-engineering/signcell",
+    "version": "0.13.1-dev.198",
+    "gitHead": "1abcd4a218618408284014af35169459c8170a02",
+    "verifiedArchivePath": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/package",
+    "matchedFiles": 44,
+    "mismatches": [],
+    "archiveIdentity": {
+      "url": "https://registry.561.group/@red-cup-engineering/signcell/-/signcell-0.13.1-dev.198.tgz",
+      "integrity": "sha512-0ZhJJxrGa/hSMBTx64D+M1Qeo68oJMYy/Jiq3gA7k0pInXqYQs0ISCFzlY0Dkimi2GoGuETl1ghfJKmSPO9T1w==",
+      "archive_sha256": "3057fcc98f8283927ea09e1b8accc8c73c19e5f6a49bbe0b5e2bf2e8562f9212",
+      "archive_bytes": 104141,
+      "entries": 44,
+      "files": 44,
+      "archive_path": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/signcell-0.13.1-dev.198.tgz",
+      "package_path": "/workspace/scratch/455c183ed200/evidence/published-signcell-198/package",
+      "safe_paths_verified": true
+    }
+  },
+  "supplierReceiving": {
+    "receiptPath": "/workspace/scratch/455c183ed200/signcell/data/records/measurements/2026-10-26-signcell-198-published-receiving.json",
+    "receiptSha256": "368707fa8585876c8b843d6a683dd0bd9107a59802794ad2ebc3e03d2ea5d394",
+    "source": "Independent standards_contract qualification of actual published archive",
+    "tests": 116,
+    "pass": 116,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "archiveFilesUnchangedAfterTests": 44
+  },
+  "installation": {
+    "originalFrozenReceipt": "../2026-10-26-published-signcell-receiving/receipt.json",
+    "originalReceiptSha256": "f1a89ef5181b2af0240eec0e3c78821c1d2fa7f0d40e46bd275035fa23ebc78c",
+    "lockBlob": "784c1323a250fd329c46bcf9a203d27e5270cae9",
+    "lockSha256": "e19c9b1c1308fe21a5ed009fbee77ada7b5e9ec723970f4c7575dda2f60eb36b",
+    "sameAsCurrentMainAndPriorFrozenInstall": true,
+    "sourceOverrides": false,
+    "reinstalledForReconciliation": false,
+    "reason": "Current-main and combined manifest dependencies and lockfile are identical to the already-successful frozen registry installation; reconciliation changes no dependency selection."
+  },
+  "runtime": {
+    "node": "v24.22.1",
+    "pnpm": "11.25.0"
+  },
+  "nativeFull": {
+    "command": "node --test --test-reporter=tap test/*.test.mjs",
+    "workingDirectory": "/workspace/scratch/455c183ed200/seavt",
+    "authority": "approved native sandbox escalation for existing subprocess/concurrent-store fixtures",
+    "exitCode": 0,
+    "tests": 225,
+    "pass": 225,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "log": "native-full.tap"
+  },
+  "packagedReceiving": {
+    "command": "node --test --test-reporter=tap test/telemetry.test.mjs test/telemetry-trace-integrity.test.mjs test/telemetry-boundaries.test.mjs test/telemetry-cell-events.test.mjs",
+    "workingDirectory": "/workspace/scratch/455c183ed200/evidence/seavt-main209-cohort/package",
+    "authority": "approved native sandbox escalation for existing subprocess fixtures",
+    "exitCode": 0,
+    "tests": 49,
+    "pass": 49,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "log": "packed-receiving.tap",
+    "artifact": {
+      "kind": "local-SEAVT-package-receiving",
+      "reconciledMain": "20901d6291632d96cd034d6527e69c137d0faec4",
+      "publishedSEAVT": false,
+      "archivePath": "/workspace/scratch/455c183ed200/evidence/seavt-main209-cohort/red-cup-engineering-semiotic-eavt-services-section-0.3.2.tgz",
+      "packagePath": "/workspace/scratch/455c183ed200/evidence/seavt-main209-cohort/package",
+      "archiveSha256": "d9d28177018543186d466d325bf574737cb8bdcb551dc1f92747054a725155a4",
+      "archiveIntegrity": "sha512-QhvCOXDpyLnFJ3ou89SNOVl12Nu4e711kwkrVZ8KaarefdshW/wChxeTLp1ivnavgAaLfFEFOUSzCV0yUHF49w==",
+      "archiveBytes": 61094,
+      "sourceMatchedFiles": 33,
+      "receivingTests": [
+        "test/telemetry.test.mjs",
+        "test/telemetry-trace-integrity.test.mjs",
+        "test/telemetry-boundaries.test.mjs",
+        "test/telemetry-cell-events.test.mjs"
+      ],
+      "providerClosure": "/workspace/scratch/455c183ed200/seavt/node_modules",
+      "providerComposition": "Existing successful frozen installation from the byte-identical current-main lockfile; actual published SignCell198 and exact registry dependencies."
+    }
+  },
+  "historicalEvidence": "Earlier221/221 full and45/45 package results remain unchanged in their original receipt and logs. This receipt measures the separately reconciled225/49 candidate.",
+  "remainingEffects": {
+    "remoteWritesByThisAgent": false,
+    "SEAVTMerge": false,
+    "SEAVTPublication": false,
+    "runtimeActivation": false,
+    "next": "Root reviews the exact combined delta, preserves both source parents when integrating PR29, then uses the existing publisher and downstream immutable-package receiving route."
+  },
+  "artifacts": [
+    {
+      "path": "native-full.tap",
+      "bytes": 47144,
+      "sha256": "5a34da9a817f6189c48411e92fe61fa259ad1724203120c7755432668519ae4c"
+    },
+    {
+      "path": "pack.json",
+      "bytes": 3864,
+      "sha256": "fb8ec481345f974a51457e9093413486826604ee51b4252929fc2f0415d1b687"
+    },
+    {
+      "path": "pack.log",
+      "bytes": 99,
+      "sha256": "7125f194612fcff2f454c05d848e7cb71facc1967b4d5017e25b34fdee3ba74f"
+    },
+    {
+      "path": "packed-artifact.json",
+      "bytes": 1072,
+      "sha256": "a3c25acce2aeb56b3cfe0a41ee5214af69256e4d1375023dc8a8bd87efe46cbb"
+    },
+    {
+      "path": "packed-receiving.tap",
+      "bytes": 9081,
+      "sha256": "ecec24af0193c09bf86a4e9aee74a47387ddeb0ce8d52fe4fc28b375fad7a499"
+    },
+    {
+      "path": "reconciliation.json",
+      "bytes": 2226,
+      "sha256": "cf4cd85833e18878d2e34b6419bc5f69f71e99ebce9d18813d58eea3b2e6233a"
+    },
+    {
+      "path": "source-audit.json",
+      "bytes": 1752,
+      "sha256": "90475afdadc620dcc50930b48cbd890cb859196a7b3c4886940017f7a709e37e"
+    }
+  ]
+}

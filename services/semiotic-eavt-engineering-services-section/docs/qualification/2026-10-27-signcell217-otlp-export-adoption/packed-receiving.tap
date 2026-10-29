@@ -1,0 +1,316 @@
+TAP version 13
+# Subtest: sv11-positive: real stderr credential redaction reaches the receipt headline
+ok 1 - sv11-positive: real stderr credential redaction reaches the receipt headline
+  ---
+  duration_ms: 132.256842
+  type: 'test'
+  ...
+# Subtest: sv11-alternate: stdout fallback uses its bounded sanitized source tail
+ok 2 - sv11-alternate: stdout fallback uses its bounded sanitized source tail
+  ---
+  duration_ms: 80.880258
+  type: 'test'
+  ...
+# Subtest: sv11-refusal: absent tails and successful output do not manufacture headline detail
+ok 3 - sv11-refusal: absent tails and successful output do not manufacture headline detail
+  ---
+  duration_ms: 83.741658
+  type: 'test'
+  ...
+# Subtest: sv12-positive: nested spans and child environments retain admitted vendor state
+ok 4 - sv12-positive: nested spans and child environments retain admitted vendor state
+  ---
+  duration_ms: 13.235389
+  type: 'test'
+  ...
+# Subtest: sv12-level1-flags: received reserved bits remain evidence while new contexts emit sampled only
+ok 5 - sv12-level1-flags: received reserved bits remain evidence while new contexts emit sampled only
+  ---
+  duration_ms: 9.509145
+  type: 'test'
+  ...
+# Subtest: sv12-refusal: discarded or absent vendor state never returns from an injection base
+ok 6 - sv12-refusal: discarded or absent vendor state never returns from an injection base
+  ---
+  duration_ms: 7.259347
+  type: 'test'
+  ...
+# Subtest: sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+ok 7 - sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+  ---
+  duration_ms: 197.799822
+  type: 'test'
+  ...
+# Subtest: sv13-alternate: custody adds neither witness nor event time and owns the retained input
+ok 8 - sv13-alternate: custody adds neither witness nor event time and owns the retained input
+  ---
+  duration_ms: 19.137178
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+ok 9 - sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+  ---
+  duration_ms: 18.971259
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+ok 10 - sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+  ---
+  duration_ms: 56.397581
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: an unwritable original store propagates without a receipt
+ok 11 - sv13-refusal: an unwritable original store propagates without a receipt
+  ---
+  duration_ms: 5.926367
+  type: 'test'
+  ...
+# Subtest: sv5-wire-flags: retained uint32 evidence stays readable while reserved outbound bits refuse
+ok 12 - sv5-wire-flags: retained uint32 evidence stays readable while reserved outbound bits refuse
+  ---
+  duration_ms: 89.05231
+  type: 'test'
+  ...
+# Subtest: sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+ok 13 - sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+  ---
+  duration_ms: 42.155952
+  type: 'test'
+  ...
+# Subtest: sv8-alternate: multiple channels retain each channel's causal export order
+ok 14 - sv8-alternate: multiple channels retain each channel's causal export order
+  ---
+  duration_ms: 57.626456
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+ok 15 - sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+  ---
+  duration_ms: 11.115085
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+ok 16 - sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+  ---
+  duration_ms: 20.767194
+  type: 'test'
+  ...
+# Subtest: sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+ok 17 - sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+  ---
+  duration_ms: 31.000246
+  type: 'test'
+  ...
+# Subtest: sv9-alternate: an absent trace differs from an admitted empty frontier
+ok 18 - sv9-alternate: an absent trace differs from an admitted empty frontier
+  ---
+  duration_ms: 3.970902
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+ok 19 - sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+  ---
+  duration_ms: 12.420956
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: malformed causal reference and non-Message records remain explicit
+ok 20 - sv9-refusal: malformed causal reference and non-Message records remain explicit
+  ---
+  duration_ms: 8.350455
+  type: 'test'
+  ...
+# Subtest: sv10-positive: source readmission owns nested message and channel data
+ok 21 - sv10-positive: source readmission owns nested message and channel data
+  ---
+  duration_ms: 26.144436
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: missing or malformed channel is incomplete source custody
+ok 22 - sv10-refusal: missing or malformed channel is incomplete source custody
+  ---
+  duration_ms: 16.748301
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: foreign trace context and invalid source clock do not become observations
+ok 23 - sv10-refusal: foreign trace context and invalid source clock do not become observations
+  ---
+  duration_ms: 11.922868
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: invalid caller fields are rejected before advancing a trace
+ok 24 - sv10-refusal: invalid caller fields are rejected before advancing a trace
+  ---
+  duration_ms: 11.725572
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+ok 25 - sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+  ---
+  duration_ms: 3.162698
+  type: 'test'
+  ...
+# Subtest: sv1-positive
+ok 26 - sv1-positive
+  ---
+  duration_ms: 14.738435
+  type: 'test'
+  ...
+# Subtest: sv1-alternate
+ok 27 - sv1-alternate
+  ---
+  duration_ms: 4.386595
+  type: 'test'
+  ...
+# Subtest: sv1-refusal
+ok 28 - sv1-refusal
+  ---
+  duration_ms: 5.323071
+  type: 'test'
+  ...
+# Subtest: sv2-positive
+ok 29 - sv2-positive
+  ---
+  duration_ms: 57.718744
+  type: 'test'
+  ...
+# Subtest: sv2-alternate
+ok 30 - sv2-alternate
+  ---
+  duration_ms: 23.847328
+  type: 'test'
+  ...
+# Subtest: sv2-refusal
+ok 31 - sv2-refusal
+  ---
+  duration_ms: 9.574292
+  type: 'test'
+  ...
+# Subtest: sv3-positive
+ok 32 - sv3-positive
+  ---
+  duration_ms: 10.286142
+  type: 'test'
+  ...
+# Subtest: sv3-alternate
+ok 33 - sv3-alternate
+  ---
+  duration_ms: 5.944679
+  type: 'test'
+  ...
+# Subtest: sv3-refusal
+ok 34 - sv3-refusal
+  ---
+  duration_ms: 1.6122
+  type: 'test'
+  ...
+# Subtest: sv4-positive
+ok 35 - sv4-positive
+  ---
+  duration_ms: 32.456872
+  type: 'test'
+  ...
+# Subtest: sv4-alternate
+ok 36 - sv4-alternate
+  ---
+  duration_ms: 55.983955
+  type: 'test'
+  ...
+# Subtest: sv4-refusal
+ok 37 - sv4-refusal
+  ---
+  duration_ms: 7.758597
+  type: 'test'
+  ...
+# Subtest: sv5-positive
+ok 38 - sv5-positive
+  ---
+  duration_ms: 276.717503
+  type: 'test'
+  ...
+# Subtest: sv5-alternate
+ok 39 - sv5-alternate
+  ---
+  duration_ms: 234.288491
+  type: 'test'
+  ...
+# Subtest: sv5-refusal
+ok 40 - sv5-refusal
+  ---
+  duration_ms: 107.81397
+  type: 'test'
+  ...
+# Subtest: sv6-positive
+ok 41 - sv6-positive
+  ---
+  duration_ms: 36.956442
+  type: 'test'
+  ...
+# Subtest: sv6-alternate
+ok 42 - sv6-alternate
+  ---
+  duration_ms: 17.864217
+  type: 'test'
+  ...
+# Subtest: sv6-refusal
+ok 43 - sv6-refusal
+  ---
+  duration_ms: 14.927979
+  type: 'test'
+  ...
+# Subtest: sv6-completion: incomplete reports remain addressed, unreadable observations
+ok 44 - sv6-completion: incomplete reports remain addressed, unreadable observations
+  ---
+  duration_ms: 41.536141
+  type: 'test'
+  ...
+# Subtest: sv6-producer: explicit JUnit count projection survives the native message
+ok 45 - sv6-producer: explicit JUnit count projection survives the native message
+  ---
+  duration_ms: 24.392026
+  type: 'test'
+  ...
+# Subtest: sv6-byte-custody: invalid UTF-8 is retained exactly and cannot become a readable report
+ok 46 - sv6-byte-custody: invalid UTF-8 is retained exactly and cannot become a readable report
+  ---
+  duration_ms: 29.25127
+  type: 'test'
+  ...
+# Subtest: sv6-attribute-custody: caller context cannot manufacture or contradict report observations
+ok 47 - sv6-attribute-custody: caller context cannot manufacture or contradict report observations
+  ---
+  duration_ms: 26.637737
+  type: 'test'
+  ...
+# Subtest: sv7-positive: generic event retains body, caller clock, trace and actual receipt
+ok 48 - sv7-positive: generic event retains body, caller clock, trace and actual receipt
+  ---
+  duration_ms: 7.960079
+  type: 'test'
+  ...
+# Subtest: sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+ok 49 - sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+  ---
+  duration_ms: 8.930516
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+ok 50 - sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+  ---
+  duration_ms: 3.934927
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: an unwritable store propagates instead of returning a receipt
+ok 51 - sv7-refusal: an unwritable store propagates instead of returning a receipt
+  ---
+  duration_ms: 2.041094
+  type: 'test'
+  ...
+1..51
+# tests 51
+# suites 0
+# pass 51
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1319.786937

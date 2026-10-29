@@ -112,7 +112,7 @@ for(const kind of ["head","lock"])test("strict head "+kind+" leaf redirection re
  assert.throws(()=>writeHead(root,"fact","h",{frontier:[]},{durableRoot:root}));
  assert.equal(fs.readFileSync(target,"utf8"),'{"frontier":[]}');
 });
-for(const stage of ["partial-temp","temp-sync","rename","after-rename-sync"])test("strict head "+stage+" failure never claims a completed transaction",t=>{
+for(const strict of [false,true])for(const stage of ["partial-temp","temp-sync","rename","after-rename-sync"])test((strict?"strict":"ordinary")+" head "+stage+" failure never claims a completed transaction",t=>{
  const root=fixture(t),a=put(root,"fact",{x:1}),b=put(root,"fact",{x:2}),file=headFile(root,"fact","h");
  writeHead(root,"fact","h",{frontier:[a],at:"old"});
  const original=fs.readFileSync(file,"utf8");let renamed=false;
@@ -124,9 +124,35 @@ for(const stage of ["partial-temp","temp-sync","rename","after-rename-sync"])tes
    if((stage==="temp-sync"&&!directory)||(stage==="after-rename-sync"&&renamed&&directory))throw new Error("injected");
    return original(fd);
   }};
- },()=>assert.throws(()=>writeHead(root,"fact","h",{frontier:[b],at:"new"},{expect:[a],durableRoot:root})));
+ },()=>assert.throws(()=>writeHead(root,"fact","h",{frontier:[b],at:"new"},{expect:[a],...(strict?{durableRoot:root}:{})})));
  if(stage!=="after-rename-sync")assert.equal(fs.readFileSync(file,"utf8"),original);
  else assert.deepEqual(readHead(root,"fact","h").frontier,[b]);
+});
+test("ordinary large head never publishes a short write as an acknowledged frontier",t=>{
+ const root=fixture(t),a=put(root,"fact",{initial:true}),file=headFile(root,"fact","h");
+ writeHead(root,"fact","h",{frontier:[a],at:"old",closed:true});
+ const original=fs.readFileSync(file),frontier=Array.from({length:1650},(_,n)=>semanticId({n}));
+ assert.ok(Buffer.byteLength(JSON.stringify({frontier}))>65536);
+ let injected=false;
+ observe((paths)=>({
+  // The old one-write publisher would accept this positive short return.
+  writeSync:original=>(fd,data,...args)=>{
+   if(!String(paths.get(fd)).endsWith('.tmp'))return original(fd,data,...args);
+   injected=true;const bytes=Buffer.isBuffer(data)?data:Buffer.from(data);
+   return original(fd,bytes,0,Math.min(65536,bytes.length));
+  },
+  // File's complete-write boundary refuses capacity failure after a prefix.
+  writeFileSync:original=>(fd,data,...args)=>{
+   if(!String(paths.get(fd)).endsWith('.tmp'))return original(fd,data,...args);
+   injected=true;fs.writeSync(fd,Buffer.from(data).subarray(0,65536));
+   throw Object.assign(new Error('injected full-volume partial write'),{code:'ENOSPC'});
+  },
+ }),()=>assert.throws(()=>writeHead(root,"fact","h",{frontier,at:"new"},{expect:[a]})));
+ assert.equal(injected,true);assert.deepEqual(fs.readFileSync(file),original);
+ assert.deepEqual(readHead(root,"fact","h"),{name:"h",frontier:[a],at:"old",closed:true});
+ writeHead(root,"fact","h",{frontier,at:"new"},{expect:[a]});
+ assert.deepEqual(readHead(root,"fact","h"),{name:"h",frontier:frontier.sort(),at:"new"});
+ assert.equal(fs.readFileSync(file).at(-1),10);
 });
 test("uncertain terminal publication cannot clean claim until record and head barriers are repeated",t=>{
  const root=fixture(t),pending=put(root,"fact",{state:"pending"}),terminal={state:"returned",pending},done=put(root,"fact",terminal),file=headFile(root,"fact","h"),claim=join(root,"claim");

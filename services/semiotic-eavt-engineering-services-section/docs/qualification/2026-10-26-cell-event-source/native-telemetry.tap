@@ -1,0 +1,280 @@
+TAP version 13
+# Subtest: sv11-positive: real stderr credential redaction reaches the receipt headline
+ok 1 - sv11-positive: real stderr credential redaction reaches the receipt headline
+  ---
+  duration_ms: 87.468676
+  type: 'test'
+  ...
+# Subtest: sv11-alternate: stdout fallback uses its bounded sanitized source tail
+ok 2 - sv11-alternate: stdout fallback uses its bounded sanitized source tail
+  ---
+  duration_ms: 79.555144
+  type: 'test'
+  ...
+# Subtest: sv11-refusal: absent tails and successful output do not manufacture headline detail
+ok 3 - sv11-refusal: absent tails and successful output do not manufacture headline detail
+  ---
+  duration_ms: 50.818872
+  type: 'test'
+  ...
+# Subtest: sv12-positive: nested spans and child environments retain admitted vendor state
+ok 4 - sv12-positive: nested spans and child environments retain admitted vendor state
+  ---
+  duration_ms: 7.474765
+  type: 'test'
+  ...
+# Subtest: sv12-refusal: discarded or absent vendor state never returns from an injection base
+ok 5 - sv12-refusal: discarded or absent vendor state never returns from an injection base
+  ---
+  duration_ms: 6.181724
+  type: 'test'
+  ...
+# Subtest: sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+ok 6 - sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+  ---
+  duration_ms: 167.54813
+  type: 'test'
+  ...
+# Subtest: sv13-alternate: custody adds neither witness nor event time and owns the retained input
+ok 7 - sv13-alternate: custody adds neither witness nor event time and owns the retained input
+  ---
+  duration_ms: 22.077908
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+ok 8 - sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+  ---
+  duration_ms: 24.022638
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+ok 9 - sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+  ---
+  duration_ms: 33.605901
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: an unwritable original store propagates without a receipt
+ok 10 - sv13-refusal: an unwritable original store propagates without a receipt
+  ---
+  duration_ms: 5.50719
+  type: 'test'
+  ...
+# Subtest: sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+ok 11 - sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+  ---
+  duration_ms: 62.250124
+  type: 'test'
+  ...
+# Subtest: sv8-alternate: multiple channels retain each channel's causal export order
+ok 12 - sv8-alternate: multiple channels retain each channel's causal export order
+  ---
+  duration_ms: 44.1991
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+ok 13 - sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+  ---
+  duration_ms: 9.07829
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+ok 14 - sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+  ---
+  duration_ms: 16.393313
+  type: 'test'
+  ...
+# Subtest: sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+ok 15 - sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+  ---
+  duration_ms: 33.321068
+  type: 'test'
+  ...
+# Subtest: sv9-alternate: an absent trace differs from an admitted empty frontier
+ok 16 - sv9-alternate: an absent trace differs from an admitted empty frontier
+  ---
+  duration_ms: 3.205342
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+ok 17 - sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+  ---
+  duration_ms: 14.723437
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: malformed causal reference and non-Message records remain explicit
+ok 18 - sv9-refusal: malformed causal reference and non-Message records remain explicit
+  ---
+  duration_ms: 10.636425
+  type: 'test'
+  ...
+# Subtest: sv10-positive: source readmission owns nested message and channel data
+ok 19 - sv10-positive: source readmission owns nested message and channel data
+  ---
+  duration_ms: 10.132628
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: missing or malformed channel is incomplete source custody
+ok 20 - sv10-refusal: missing or malformed channel is incomplete source custody
+  ---
+  duration_ms: 27.578018
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: foreign trace context and invalid source clock do not become observations
+ok 21 - sv10-refusal: foreign trace context and invalid source clock do not become observations
+  ---
+  duration_ms: 18.955208
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: invalid caller fields are rejected before advancing a trace
+ok 22 - sv10-refusal: invalid caller fields are rejected before advancing a trace
+  ---
+  duration_ms: 9.477133
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+ok 23 - sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+  ---
+  duration_ms: 5.469234
+  type: 'test'
+  ...
+# Subtest: sv1-positive
+ok 24 - sv1-positive
+  ---
+  duration_ms: 6.201171
+  type: 'test'
+  ...
+# Subtest: sv1-alternate
+ok 25 - sv1-alternate
+  ---
+  duration_ms: 2.437399
+  type: 'test'
+  ...
+# Subtest: sv1-refusal
+ok 26 - sv1-refusal
+  ---
+  duration_ms: 2.900715
+  type: 'test'
+  ...
+# Subtest: sv2-positive
+ok 27 - sv2-positive
+  ---
+  duration_ms: 32.838154
+  type: 'test'
+  ...
+# Subtest: sv2-alternate
+ok 28 - sv2-alternate
+  ---
+  duration_ms: 23.74408
+  type: 'test'
+  ...
+# Subtest: sv2-refusal
+ok 29 - sv2-refusal
+  ---
+  duration_ms: 5.205825
+  type: 'test'
+  ...
+# Subtest: sv3-positive
+ok 30 - sv3-positive
+  ---
+  duration_ms: 6.960581
+  type: 'test'
+  ...
+# Subtest: sv3-alternate
+ok 31 - sv3-alternate
+  ---
+  duration_ms: 5.092005
+  type: 'test'
+  ...
+# Subtest: sv3-refusal
+ok 32 - sv3-refusal
+  ---
+  duration_ms: 0.968955
+  type: 'test'
+  ...
+# Subtest: sv4-positive
+ok 33 - sv4-positive
+  ---
+  duration_ms: 49.925799
+  type: 'test'
+  ...
+# Subtest: sv4-alternate
+ok 34 - sv4-alternate
+  ---
+  duration_ms: 44.011264
+  type: 'test'
+  ...
+# Subtest: sv4-refusal
+ok 35 - sv4-refusal
+  ---
+  duration_ms: 6.004278
+  type: 'test'
+  ...
+# Subtest: sv5-positive
+ok 36 - sv5-positive
+  ---
+  duration_ms: 239.996767
+  type: 'test'
+  ...
+# Subtest: sv5-alternate
+ok 37 - sv5-alternate
+  ---
+  duration_ms: 149.948078
+  type: 'test'
+  ...
+# Subtest: sv5-refusal
+ok 38 - sv5-refusal
+  ---
+  duration_ms: 114.37292
+  type: 'test'
+  ...
+# Subtest: sv6-positive
+ok 39 - sv6-positive
+  ---
+  duration_ms: 19.086164
+  type: 'test'
+  ...
+# Subtest: sv6-alternate
+ok 40 - sv6-alternate
+  ---
+  duration_ms: 14.330652
+  type: 'test'
+  ...
+# Subtest: sv6-refusal
+ok 41 - sv6-refusal
+  ---
+  duration_ms: 16.19328
+  type: 'test'
+  ...
+# Subtest: sv7-positive: generic event retains body, caller clock, trace and actual receipt
+ok 42 - sv7-positive: generic event retains body, caller clock, trace and actual receipt
+  ---
+  duration_ms: 9.273056
+  type: 'test'
+  ...
+# Subtest: sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+ok 43 - sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+  ---
+  duration_ms: 9.762492
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+ok 44 - sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+  ---
+  duration_ms: 2.998493
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: an unwritable store propagates instead of returning a receipt
+ok 45 - sv7-refusal: an unwritable store propagates instead of returning a receipt
+  ---
+  duration_ms: 1.873904
+  type: 'test'
+  ...
+1..45
+# tests 45
+# suites 0
+# pass 45
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 967.675806

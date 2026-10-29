@@ -10,7 +10,7 @@ import { semanticId } from "@red-cup-engineering/computer-content-address-engine
 import {
   HeadConflict, LegacyStoreRefused, StoreCorruption, StoreError, append, directoryRemote, each, extend, get, has, heads, logDates, pull, put, readHead, readLog, threadName, walk, writeHead,
 } from "../src/store.mjs";
-import { recordFile } from "../src/layout.mjs";
+import { checkDate, recordFile } from "../src/layout.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const roots = [];
@@ -23,6 +23,14 @@ function files(root) {
   visit(root);
   return found.sort();
 }
+
+test("store log date paths admit only actual calendar days", () => {
+  assert.equal(checkDate("2024-02-29"), "2024-02-29");
+  assert.equal(checkDate("2026-10-12"), "2026-10-12");
+  for (const invalid of ["2025-02-29", "2026-02-30", "2026-13-01", "2026-10-32", "2026-10-12T00:00:00Z"]) {
+    assert.throws(() => checkDate(invalid), StoreError);
+  }
+});
 
 test("ST-1: a record is filed where ni-path-v1 computes, over the conformance vectors", () => {
   const root = settlement();
@@ -105,6 +113,30 @@ test("ST-5: get returns only a line that hashes to its id, skipping bad lines", 
   assert.equal(put(root, "fact", { n: 1 }), address);
   assert.equal(readFileSync(file, "utf8").split("\n").length, 4);
   assert.deepEqual([...each(root, "fact")].map((entry) => entry.record), [{ n: 1 }]);
+});
+
+test("single-chunk line decoding preserves addressed verification, UTF-8 and split-chunk reads", () => {
+  const root = settlement();
+  const small = { message: "É 🌊 in one chunk" };
+  const address = semanticId(small);
+  const file = recordFile(root, "fact", address);
+  mkdirSync(dirname(file), { recursive: true });
+  // A prefix miss and an address-matching but hash-invalid record precede the valid line.
+  // A quicker reader must not accept either one, or skip the later verified record.
+  writeFileSync(file, `short prefix miss\n{"id":"${address}","record":{"message":"tampered"}}\n{"id":"${address}","record":${JSON.stringify(small)}}\n`);
+  assert.deepEqual(get(root, "fact", address), small);
+  assert.deepEqual([...each(root, "fact")], [{ address, record: small }]);
+  // Records spanning the 64 KiB chunk boundary must still join bytes before decoding;
+  // a multibyte UTF-8 character may straddle the boundary.
+  // Within the 65,536-byte record bound, yet its bucket line is longer than one 64 KiB read.
+  const large = { message: "é🌊".repeat(10_915) };
+  const largeAddress = put(root, "large", large);
+  assert.ok(readFileSync(recordFile(root, "large", largeAddress)).length > 65_536);
+  assert.deepEqual(get(root, "large", largeAddress), large);
+  assert.deepEqual([...each(root, "large")], [{ address: largeAddress, record: large }]);
+  const logLine = { at: "2026-10-21T01:02:03Z", message: "é🌊 from the log" };
+  append(root, "line", logLine);
+  assert.deepEqual([...readLog(root, "line", "2026-10-21")].map((entry) => entry.line), [logLine]);
 });
 
 test("ST-6: admission is the line; causes are not read", () => {
@@ -198,9 +230,9 @@ test("extend puts a record with its causes and advances the head", () => {
 
 test("ST-11: a log line is one write to the day of its at, never rewritten", () => {
   const root = settlement();
-  append(root, "schedule-run", { at: "2026-10-12T23:59:59.999Z", schedule: "heartbeat", outcome: "ok", ms: 38 });
-  append(root, "schedule-run", { at: "2026-10-13T00:00:00.000Z", schedule: "heartbeat", outcome: "ok", ms: 40 });
-  append(root, "schedule-run", { schedule: "heartbeat", ms: 41, at: "2026-10-12T23:59:59.999Z" });
+  append(root, "schedule-run", { at: "2026-10-12T23:59:59.999Z", schedule: "heartbeat", outcome: "ok", ms: 38 }, { seal: false });
+  append(root, "schedule-run", { at: "2026-10-13T00:00:00.000Z", schedule: "heartbeat", outcome: "ok", ms: 40 }, { seal: false });
+  append(root, "schedule-run", { schedule: "heartbeat", ms: 41, at: "2026-10-12T23:59:59.999Z" }, { seal: false });
   const day = join(root, "data/logs/schedule-run-logs/2026-10-12.jsonl");
   assert.equal(readFileSync(day, "utf8"), '{"at":"2026-10-12T23:59:59.999Z","schedule":"heartbeat","outcome":"ok","ms":38}\n{"at":"2026-10-12T23:59:59.999Z","schedule":"heartbeat","ms":41}\n');
   assert.deepEqual([...logDates(root, "schedule-run")], ["2026-10-12", "2026-10-13"]);
@@ -282,6 +314,75 @@ test("pull merges diverged threads into the maximal frontier", async () => {
   assert.deepEqual(readHead(behind, "move", "t").frontier, [z]);
 });
 
+test("one log: a channel's unchanged frontier still transports an explicit closure", async () => {
+  const remote = settlement(), local = settlement();
+  const message = put(remote, "channel-message", { text: "last message", causes: [] });
+  writeHead(remote, "channel-message", "dispatch", { frontier: [message] });
+  assert.equal((await pull(local, directoryRemote(remote), "channel-message")).records, 1);
+  assert.notEqual(readHead(local, "channel-message", "dispatch").closed, true);
+  writeHead(remote, "channel-message", "dispatch", { frontier: [message], closed: true });
+  const closed = await pull(local, directoryRemote(remote), "channel-message");
+  assert.deepEqual([closed.converged, closed.records, closed.truncated], [1, 0, false]);
+  assert.equal(readHead(local, "channel-message", "dispatch").closed, true);
+  assert.equal((await pull(local, directoryRemote(remote), "channel-message")).converged, 0);
+});
+
+test("one log: a channel message and its cross-type ledger consequence travel with causal custody", async () => {
+  const remote = settlement(), local = settlement();
+  const message = put(remote, "channel-message", { text: "accepted", causes: [] });
+  const entry = put(remote, "ledger-entry", { amount: "17", causes: [{ type: "channel-message", id: message }] });
+  writeHead(remote, "ledger-entry", "treasury", { frontier: [entry] });
+  const result = await pull(local, directoryRemote(remote), "ledger-entry");
+  assert.deepEqual([result.converged, result.records, result.truncated], [1, 2, false]);
+  assert.equal(has(local, "channel-message", message), true);
+  assert.deepEqual(readHead(local, "ledger-entry", "treasury").frontier, [entry]);
+});
+
+test("one log: a missing predecessor never becomes a converged channel head", async () => {
+  const remote = settlement(), local = settlement();
+  const missing = semanticId({ text: "preceding message", causes: [] });
+  const message = put(remote, "channel-message", { text: "reply", causes: [missing] });
+  writeHead(remote, "channel-message", "office", { frontier: [message] });
+  const refused = await pull(local, directoryRemote(remote), "channel-message");
+  assert.deepEqual([refused.converged, refused.records, refused.truncated], [0, 0, true]);
+  assert.equal(readHead(local, "channel-message", "office"), undefined);
+  assert.equal(has(local, "channel-message", message), false);
+  assert.equal(put(remote, "channel-message", { text: "preceding message", causes: [] }), missing);
+  const received = await pull(local, directoryRemote(remote), "channel-message");
+  assert.deepEqual([received.converged, received.records, received.truncated], [1, 2, false]);
+  assert.deepEqual(readHead(local, "channel-message", "office").frontier, [message]);
+});
+
+test("one log: forged peer payloads and changing parent reads cannot publish a ledger head", async () => {
+  const remote = settlement(), local = settlement();
+  const root = put(remote, "ledger-entry", { amount: "4", causes: [] });
+  const parent = put(remote, "ledger-entry", { amount: "9", causes: [root] });
+  writeHead(remote, "ledger-entry", "revenue", { frontier: [parent] });
+  let parentReads = 0;
+  const changing = directoryRemote(remote);
+  const originalGet = changing.get;
+  changing.get = (type, id) => {
+    if (id === parent && ++parentReads > 1) return { amount: "fraud", causes: [root] };
+    return originalGet(type, id);
+  };
+  const refused = await pull(local, changing, "ledger-entry");
+  assert.equal(refused.truncated, true);
+  assert.equal(refused.converged, 0);
+  assert.equal(has(local, "ledger-entry", root), true, "complete independent causes can be retained");
+  assert.equal(has(local, "ledger-entry", parent), false);
+  assert.equal(readHead(local, "ledger-entry", "revenue"), undefined);
+  const untrusted = {
+    async *heads() { yield { name: "forged", frontier: [parent] }; },
+    get() { return { amount: "counterfeit", causes: [root] }; },
+  };
+  const denied = await pull(local, untrusted, "ledger-entry");
+  assert.deepEqual([denied.converged, denied.records, denied.truncated], [0, 0, true]);
+  assert.equal(readHead(local, "ledger-entry", "forged"), undefined);
+  const accepted = await pull(local, directoryRemote(remote), "ledger-entry");
+  assert.equal(accepted.truncated, false);
+  assert.deepEqual(readHead(local, "ledger-entry", "revenue").frontier, [parent]);
+});
+
 test("ST-17: a root holding the earlier layout is refused on every operation", async () => {
   for (const legacy of ["data/state/log-state", "data/journals"]) {
     const root = settlement();
@@ -297,6 +398,15 @@ test("ST-17: a root holding the earlier layout is refused on every operation", a
     await assert.rejects(pull(root, directoryRemote(settlement()), "fact"), LegacyStoreRefused);
     assert.deepEqual(readdirSync(join(root, "data")).sort(), [legacy.split("/")[1]]);
   }
+});
+
+test("ST-17: a file named as the earlier layout is not the earlier layout", () => {
+  const root = settlement();
+  mkdirSync(join(root, "data"), { recursive: true });
+  writeFileSync(join(root, "data", "journals"), "This settlement's journal is filed by kind; a release that still writes here must be rebuilt.\n");
+  const address = put(root, "fact", { n: 1 });
+  assert.deepEqual(get(root, "fact", address), { n: 1 });
+  assert.equal(has(root, "fact", address), true);
 });
 
 test("ST-18: only the store's core writes files; layout and exchange do not", () => {

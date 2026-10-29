@@ -1,0 +1,52 @@
+{
+  "main": "20901d6291632d96cd034d6527e69c137d0faec4",
+  "mainParent": [
+    "1a615414a6b0db1ee993417e12e687e37b9a223d"
+  ],
+  "mainTree": "494612c59bfeead1a49cc47077ee9fd81b018d9b",
+  "changedMainPaths": [
+    {
+      "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+      "mainBlob": "57e379888600cb1982bfc3965bdb2c26692667a4",
+      "priorCandidateBlob": "0aec8f2eee92add1d457bd4c678197cc2a11e015",
+      "combinedBlob": "7556dba704c6d1f5eba28b72af33452cb75f7cee"
+    },
+    {
+      "path": "package.json",
+      "mainBlob": "e0d32940ad882097e06f874f40f74484c83ca59d",
+      "priorCandidateBlob": "ad88bc6d595b9940ab529309d00b1ba5522b9e79",
+      "combinedBlob": "01db502db87da9ef1dca1cd0f24059d7186cd426"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "mainBlob": "784c1323a250fd329c46bcf9a203d27e5270cae9",
+      "priorCandidateBlob": "784c1323a250fd329c46bcf9a203d27e5270cae9",
+      "combinedBlob": "784c1323a250fd329c46bcf9a203d27e5270cae9"
+    },
+    {
+      "path": "src/telemetry.mjs",
+      "mainBlob": "99ef4f626f4df3bbc3e9ba4bb5ca86113ad46314",
+      "priorCandidateBlob": "8134a1ff3680b3903aaedf74732e956f3b7aa99f",
+      "combinedBlob": "67a2c0e5878f6c02797f82fbd816bb3d01ffde97"
+    },
+    {
+      "path": "test/telemetry-trace-integrity.test.mjs",
+      "mainBlob": "a7e54fbaf8fd00cec8021c67fad149068ed0f783",
+      "priorCandidateBlob": "7e2a5daf228f81c73481db9de4be356dee50ce14",
+      "combinedBlob": "a7e54fbaf8fd00cec8021c67fad149068ed0f783"
+    },
+    {
+      "path": "test/telemetry.test.mjs",
+      "mainBlob": "de156cbd99eb72d0db8e118c133e084a8a0bdee0",
+      "priorCandidateBlob": "7e43d049927c9d8f7ffab267a7631d8aad2d5c4b",
+      "combinedBlob": "de156cbd99eb72d0db8e118c133e084a8a0bdee0"
+    }
+  ],
+  "decisions": [
+    "Clean three-way merge of telemetry implementation and specification from exact original base1a615.",
+    "Adopt current-main telemetry tests and stronger raw-store corruption fixture exactly.",
+    "Retain all four packaged receiving suites and adopt current-main Node>=24.2.0 engine.",
+    "Current-main lock equals the already-generated and frozen-installed candidate lock byte for byte."
+  ],
+  "historicalReceiptsPreserved": true
+}

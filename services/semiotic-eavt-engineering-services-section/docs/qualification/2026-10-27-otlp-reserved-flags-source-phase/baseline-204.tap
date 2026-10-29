@@ -1,0 +1,31 @@
+TAP version 13
+# Subtest: sv5-wire-flags: retained uint32 evidence stays readable while reserved outbound bits refuse
+not ok 1 - sv5-wire-flags: retained uint32 evidence stays readable while reserved outbound bits refuse
+  ---
+  duration_ms: 39.549006
+  type: 'test'
+  location: '/workspace/scratch/455c183ed200/evidence/seavt-otlp-reserved-flags/baseline/test/telemetry-trace-integrity.test.mjs:38:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception (TypeError).'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    name: 'TypeError'
+    message:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///workspace/scratch/455c183ed200/evidence/seavt-otlp-reserved-flags/baseline/test/telemetry-trace-integrity.test.mjs:51:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1402:25)
+    Test.start (node:internal/test_runner/test:1262:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 182.198228

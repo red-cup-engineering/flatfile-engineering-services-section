@@ -1,0 +1,1441 @@
+{
+  "kind": "seavt.signcell217-otlp-export-adoption/v1",
+  "status": "passed",
+  "recordedAt": "2026-10-27T01:05:52.944504+00:00",
+  "repository": "red-cup-engineering/semiotic-eavt-engineering-services-section",
+  "sourceCheckpoint": {
+    "commit": "a840aa6494009d225d5c3a34aac60a9a508a418e",
+    "tree": "bc7d13fd023da503dfe71e3f5ff60bbccae4596e",
+    "parent": "94424eb96e3201cd4c4d7669053ac5239f6d23f8",
+    "branch": "logging/otlp-reserved-flags-adoption-20261027",
+    "pullRequest": "https://github.com/red-cup-engineering/semiotic-eavt-engineering-services-section/pull/32",
+    "officialSource": {
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/expected-source.json",
+      "bytes": 46545,
+      "sha256": "3d875d11cbd3d8dae67967d1fb948e377b850a90482fcf48318054e6cb1a3d74",
+      "gitBlob": "e03aaa57ec885337705b1764c1f334c78d77e37e"
+    },
+    "all112LocalSourceBlobsMatch": true
+  },
+  "currentMainBasis": {
+    "commit": "94424eb96e3201cd4c4d7669053ac5239f6d23f8",
+    "tree": "c1475ff7bb74b83f684ba6805faeb0b4a32cdc37",
+    "deltaFrom51ced": {
+      "path": ".gitignore",
+      "gitBlob": "af8a21e7500f73cdd8ff8a09e644df31121f3605",
+      "description": "Only added data/logs/ and data/state/; no package, runtime, policy, test or requirement delta."
+    }
+  },
+  "source": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source",
+  "requirement": "SV5: preserve admitted incoming uint32 LogRecord flags in native custody, refuse reserved high24bits only at the shared owner's outbound OTLP projection, keep low-byte flags unchanged.",
+  "sourceDelta": [
+    {
+      "path": "package.json",
+      "base": {
+        "bytes": 2998,
+        "sha256": "728d504defa171903824fda17f7893fcb72432bc0c51597c704fb7c2f696f6e8",
+        "gitBlob": "a6f5fee06c15c32490452aac1c1b5efc6a4e3402",
+        "mode": "100644"
+      },
+      "candidate": {
+        "bytes": 2998,
+        "sha256": "7af038db7cf5a59167c74f681cdf3e084438673a758e374b717a214b507cdf45",
+        "gitBlob": "bd35f992becce5f0353a791be8078604e58a9f7f"
+      }
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "base": {
+        "bytes": 22339,
+        "sha256": "8afbda8836d4ba3743cf8898e57bc93e238c65fcd35bd3b34f45422ebfaca434",
+        "gitBlob": "f11d4488c9614f51290e1a7077035d5316dd7137",
+        "mode": "100644"
+      },
+      "candidate": {
+        "bytes": 22348,
+        "sha256": "c2307e618def8009454479fafa3349026aa07472821d386ffb69cb3e24836211",
+        "gitBlob": "c1202082c9705cb3f5219097a79eaa7f4cbb3c39"
+      }
+    }
+  ],
+  "runtimeImplementationChanged": false,
+  "sourceOverrides": false,
+  "testAndSpecAlreadyInCheckpoint": [
+    "test/telemetry-trace-integrity.test.mjs",
+    "content/text/documents/specifications/2026-10-19-observability-seavt.md"
+  ],
+  "historicalDistinguishingSourceProof": {
+    "path": "docs/qualification/2026-10-27-otlp-reserved-flags-source-phase/receipt.json",
+    "bytes": 16372,
+    "sha256": "6e0de69bbdfeb820721a28758e5552f923d3ae9db366deeb9794e523757c9958",
+    "gitBlob": "52eaa9ea9166081b06e81a9128744407ae0ea446",
+    "actual204With206": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "reason": "Missing expected exception (TypeError)."
+    },
+    "explicitCorrectedSourceComposition": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0
+    }
+  },
+  "actualSupplier": {
+    "kind": "verified-actual-signcell-supplier-selection/v1",
+    "selectedAt": "2026-10-27T00:59:11.174855+00:00",
+    "name": "@red-cup-engineering/signcell",
+    "version": "0.13.1-dev.217",
+    "gitHead": "cb878c7fcb77f93e68163768e9626646b88ceb5c",
+    "tree": "d962a2a2e30f495673cfd327f11560517702038f",
+    "archive": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/signcell-0.13.1-dev.217.tgz",
+    "package": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/package",
+    "bytes": 113479,
+    "sha256": "2427a2a12f3d205c41c04a9b1b872a7e23e14ad65f05d6520d4325a24789b102",
+    "sha1": "ddb544a7e8897e0fba724cd2fa8198277f8ea0f8",
+    "integrity": "sha512-8skWy6jfHIF8P+5YDx89G6Y0TZsuwWr0K5rqSAcLDGVli8ucVaUMqEkRpV+X2lCN5uRD6gFKIuyCodHGzK4cbg==",
+    "fileCount": 46,
+    "nonManifestSourceExact": 45,
+    "receivingReceipt": {
+      "path": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/receiving.json",
+      "bytes": 202651,
+      "sha256": "a501e42cd6377ee8c3a917dec646f96d99bd63119b84334bb20c6ac71d47ba27",
+      "gitBlob": "ac41e8ff96d790e5521d342447c4a0dc3705cbb3"
+    },
+    "receivingTotals": {
+      "tests": 139,
+      "pass": 139,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "sourceCheckpoint": "a840aa6494009d225d5c3a34aac60a9a508a418e",
+    "supplierReceivingCompletedBeforeSelection": true,
+    "finalReceivingReceipt": {
+      "path": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/receiving.json",
+      "bytes": 85461,
+      "sha256": "fed71f6b222227ce69567e8017af9edfc156f822881e9bffaef7acc7edb69c46",
+      "gitBlob": "defd5b9dd1d2092594b38e1433d5ddd59a542f4a"
+    },
+    "metadataRevisionRecord": {
+      "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/supplier-receipt-revision.json",
+      "bytes": 2236,
+      "sha256": "de1027204c650c0ddc8870eccf92bb0030a3366319d3112bf3d73803b23b66a9",
+      "gitBlob": "887383d29eef5b9b7d2966b55bcf7453a5fa66e8"
+    },
+    "initialReceiptReconstruction": {
+      "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/supplier-receiving-initial-reconstructed.json",
+      "bytes": 202651,
+      "sha256": "a501e42cd6377ee8c3a917dec646f96d99bd63119b84334bb20c6ac71d47ba27",
+      "gitBlob": "ac41e8ff96d790e5521d342447c4a0dc3705cbb3",
+      "matchesInitialObservedSha256": true
+    }
+  },
+  "nativeInstallation": {
+    "performed": true,
+    "pnpmVersion": "11.25.0",
+    "nodeVersion": "v24.22.1",
+    "startedWithoutNodeModules": true,
+    "method": "Original native lock generation then frozen scripts-disabled install in this isolated source, hardlinking the existing pnpm store.",
+    "packages": 47,
+    "reused": 46,
+    "downloaded": 1,
+    "store": "/root/.local/share/pnpm/store/v11",
+    "originalWorkspaceRegistryAgeAndIntegrityPoliciesUnchanged": true,
+    "dependencyLifecycleScriptsRun": false,
+    "lockDelta": {
+      "packages": {
+        "before": 47,
+        "after": 47,
+        "added": [
+          "@red-cup-engineering/metrologic@0.14.3-dev.1364",
+          "@red-cup-engineering/signcell@0.13.1-dev.217"
+        ],
+        "removed": [
+          "@red-cup-engineering/metrologic@0.14.3-dev.3",
+          "@red-cup-engineering/signcell@0.13.1-dev.206"
+        ],
+        "changedExisting": []
+      },
+      "snapshots": {
+        "before": 47,
+        "after": 47,
+        "added": [
+          "@red-cup-engineering/metrologic@0.14.3-dev.1364",
+          "@red-cup-engineering/signcell@0.13.1-dev.217"
+        ],
+        "removed": [
+          "@red-cup-engineering/metrologic@0.14.3-dev.3",
+          "@red-cup-engineering/signcell@0.13.1-dev.206"
+        ],
+        "changedExisting": []
+      }
+    },
+    "sourceAndInstalledLockStructurallyEqual": true
+  },
+  "operations": {
+    "lock-generation": {
+      "argv": [
+        "pnpm",
+        "install",
+        "--lockfile-only",
+        "--ignore-scripts",
+        "--frozen-lockfile=false",
+        "--reporter=append-only",
+        "--fetch-retries=0",
+        "--fetch-timeout=20000"
+      ],
+      "cwd": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source",
+      "startedAt": "2026-10-27T00:59:28.586743+00:00",
+      "finishedAt": "2026-10-27T00:59:29.353641+00:00",
+      "elapsedSeconds": 0.7669007319927914,
+      "exitCode": 0,
+      "log": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/lock-generation.log",
+      "logBytes": 210,
+      "logSha256": "3bc879a7895f52a2d86ae87c61e31ec8ab8539438ccb8f2ee91afcc97b5f5f24",
+      "rawOutput": {
+        "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/lock-generation.log",
+        "bytes": 210,
+        "sha256": "3bc879a7895f52a2d86ae87c61e31ec8ab8539438ccb8f2ee91afcc97b5f5f24",
+        "gitBlob": "f391fcc4c0d79c0f9ac8aa9fc9e62b41c920e066"
+      }
+    },
+    "frozen-install": {
+      "argv": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile",
+        "--ignore-scripts",
+        "--reporter=append-only",
+        "--fetch-retries=0",
+        "--fetch-timeout=20000"
+      ],
+      "cwd": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source",
+      "startedAt": "2026-10-27T00:59:44.601506+00:00",
+      "finishedAt": "2026-10-27T00:59:45.418768+00:00",
+      "elapsedSeconds": 0.8172669540072093,
+      "exitCode": 0,
+      "log": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/frozen-install.log",
+      "logBytes": 1031,
+      "logSha256": "95c23d125461ee3b31508191c7562c578c313d87b52ad10157ad882890a9b27b",
+      "rawOutput": {
+        "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/frozen-install.log",
+        "bytes": 1031,
+        "sha256": "95c23d125461ee3b31508191c7562c578c313d87b52ad10157ad882890a9b27b",
+        "gitBlob": "adaf1e5cc6d1485ecdffe364e3d1f652177bc6c9"
+      }
+    },
+    "native": {
+      "argv": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "test/absent-head-claim.test.mjs",
+        "test/artifact-allocation.test.mjs",
+        "test/causal-resource-head.test.mjs",
+        "test/check-current-state.test.mjs",
+        "test/checkpoint.test.mjs",
+        "test/clock.test.mjs",
+        "test/compact-carrier.test.mjs",
+        "test/deep-list-admission.test.mjs",
+        "test/head-complete-publication.test.mjs",
+        "test/sealed-log.test.mjs",
+        "test/seavt-carriers.test.mjs",
+        "test/signcell-seavt.test.mjs",
+        "test/store-appended.test.mjs",
+        "test/store-change-witness.test.mjs",
+        "test/store-memory.test.mjs",
+        "test/store-strict-descriptor.test.mjs",
+        "test/store-strict-discovery.test.mjs",
+        "test/store-verified-lines.test.mjs",
+        "test/store.test.mjs",
+        "test/strict-publication.test.mjs",
+        "test/telemetry-boundaries.test.mjs",
+        "test/telemetry-cell-events.test.mjs",
+        "test/telemetry-trace-integrity.test.mjs",
+        "test/telemetry.test.mjs"
+      ],
+      "cwd": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source",
+      "startedAt": "2026-10-27T01:00:21.043618+00:00",
+      "finishedAt": "2026-10-27T01:00:28.561631+00:00",
+      "elapsedSeconds": 7.518016857007751,
+      "exitCode": 0,
+      "counts": {
+        "tests": 234,
+        "suites": 0,
+        "pass": 234,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "tap": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/native.tap",
+      "tapBytes": 49125,
+      "tapSha256": "2f5352d0cda5fb94353e2a62d5a56890bbbba76b3f1d5399fba9edcdc1db5545",
+      "stderr": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/native.stderr",
+      "stderrBytes": 0,
+      "rawOutput": {
+        "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/native.tap",
+        "bytes": 49125,
+        "sha256": "2f5352d0cda5fb94353e2a62d5a56890bbbba76b3f1d5399fba9edcdc1db5545",
+        "gitBlob": "5a7ce7860ef86401a26203f08af30b5e61db52e2"
+      }
+    },
+    "pack-command": {
+      "argv": [
+        "npm",
+        "pack",
+        "--json",
+        "--pack-destination",
+        "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/pack"
+      ],
+      "cwd": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source",
+      "startedAt": "2026-10-27T01:00:45.160536+00:00",
+      "finishedAt": "2026-10-27T01:00:45.726816+00:00",
+      "elapsedSeconds": 0.5662774990050821,
+      "exitCode": 0,
+      "output": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/pack.json",
+      "outputBytes": 3864,
+      "outputSha256": "989a1e677e1bc0c317ce5a3d5b169483d1d5aa613b5c5b314a35531662d13abe",
+      "stderr": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/pack.stderr",
+      "stderrBytes": 99,
+      "rawOutput": {
+        "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/pack.json",
+        "bytes": 3864,
+        "sha256": "989a1e677e1bc0c317ce5a3d5b169483d1d5aa613b5c5b314a35531662d13abe",
+        "gitBlob": "a38a437db4b6e04dc67f5a9332689f8e97685b65"
+      },
+      "rawStderr": {
+        "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/pack.stderr",
+        "bytes": 99,
+        "sha256": "7125f194612fcff2f454c05d848e7cb71facc1967b4d5017e25b34fdee3ba74f",
+        "gitBlob": "83b5f9d4df0d01aa0059b4e2ce67617225986b34"
+      }
+    },
+    "packed-receiving": {
+      "argv": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "test/telemetry.test.mjs",
+        "test/telemetry-trace-integrity.test.mjs",
+        "test/telemetry-boundaries.test.mjs",
+        "test/telemetry-cell-events.test.mjs"
+      ],
+      "cwd": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/pack/package",
+      "startedAt": "2026-10-27T01:01:08.305442+00:00",
+      "finishedAt": "2026-10-27T01:01:09.729002+00:00",
+      "elapsedSeconds": 1.4235839609900722,
+      "exitCode": 0,
+      "counts": {
+        "tests": 51,
+        "suites": 0,
+        "pass": 51,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "declaredFiles": [
+        "test/telemetry.test.mjs",
+        "test/telemetry-trace-integrity.test.mjs",
+        "test/telemetry-boundaries.test.mjs",
+        "test/telemetry-cell-events.test.mjs"
+      ],
+      "tap": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/packed-receiving.tap",
+      "tapBytes": 9591,
+      "tapSha256": "067c81ddf6fde97a0dbc26e4cabf05179f6e061eed36c366cb9aa54c6bf28e90",
+      "stderr": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/packed-receiving.stderr",
+      "stderrBytes": 0,
+      "rawOutput": {
+        "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/packed-receiving.tap",
+        "bytes": 9591,
+        "sha256": "067c81ddf6fde97a0dbc26e4cabf05179f6e061eed36c366cb9aa54c6bf28e90",
+        "gitBlob": "ab0492b4d67b2605c0eb2ebe37584bf1229285d1"
+      }
+    }
+  },
+  "native": {
+    "argv": [
+      "node",
+      "--test",
+      "--test-reporter=tap",
+      "test/absent-head-claim.test.mjs",
+      "test/artifact-allocation.test.mjs",
+      "test/causal-resource-head.test.mjs",
+      "test/check-current-state.test.mjs",
+      "test/checkpoint.test.mjs",
+      "test/clock.test.mjs",
+      "test/compact-carrier.test.mjs",
+      "test/deep-list-admission.test.mjs",
+      "test/head-complete-publication.test.mjs",
+      "test/sealed-log.test.mjs",
+      "test/seavt-carriers.test.mjs",
+      "test/signcell-seavt.test.mjs",
+      "test/store-appended.test.mjs",
+      "test/store-change-witness.test.mjs",
+      "test/store-memory.test.mjs",
+      "test/store-strict-descriptor.test.mjs",
+      "test/store-strict-discovery.test.mjs",
+      "test/store-verified-lines.test.mjs",
+      "test/store.test.mjs",
+      "test/strict-publication.test.mjs",
+      "test/telemetry-boundaries.test.mjs",
+      "test/telemetry-cell-events.test.mjs",
+      "test/telemetry-trace-integrity.test.mjs",
+      "test/telemetry.test.mjs"
+    ],
+    "cwd": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source",
+    "startedAt": "2026-10-27T01:00:21.043618+00:00",
+    "finishedAt": "2026-10-27T01:00:28.561631+00:00",
+    "elapsedSeconds": 7.518016857007751,
+    "exitCode": 0,
+    "counts": {
+      "tests": 234,
+      "suites": 0,
+      "pass": 234,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "tap": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/native.tap",
+    "tapBytes": 49125,
+    "tapSha256": "2f5352d0cda5fb94353e2a62d5a56890bbbba76b3f1d5399fba9edcdc1db5545",
+    "stderr": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/native.stderr",
+    "stderrBytes": 0,
+    "rawOutput": {
+      "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/native.tap",
+      "bytes": 49125,
+      "sha256": "2f5352d0cda5fb94353e2a62d5a56890bbbba76b3f1d5399fba9edcdc1db5545",
+      "gitBlob": "5a7ce7860ef86401a26203f08af30b5e61db52e2"
+    }
+  },
+  "receiving": {
+    "argv": [
+      "node",
+      "--test",
+      "--test-reporter=tap",
+      "test/telemetry.test.mjs",
+      "test/telemetry-trace-integrity.test.mjs",
+      "test/telemetry-boundaries.test.mjs",
+      "test/telemetry-cell-events.test.mjs"
+    ],
+    "cwd": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/pack/package",
+    "startedAt": "2026-10-27T01:01:08.305442+00:00",
+    "finishedAt": "2026-10-27T01:01:09.729002+00:00",
+    "elapsedSeconds": 1.4235839609900722,
+    "exitCode": 0,
+    "counts": {
+      "tests": 51,
+      "suites": 0,
+      "pass": 51,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "declaredFiles": [
+      "test/telemetry.test.mjs",
+      "test/telemetry-trace-integrity.test.mjs",
+      "test/telemetry-boundaries.test.mjs",
+      "test/telemetry-cell-events.test.mjs"
+    ],
+    "tap": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/packed-receiving.tap",
+    "tapBytes": 9591,
+    "tapSha256": "067c81ddf6fde97a0dbc26e4cabf05179f6e061eed36c366cb9aa54c6bf28e90",
+    "stderr": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/packed-receiving.stderr",
+    "stderrBytes": 0,
+    "rawOutput": {
+      "path": "docs/qualification/2026-10-27-signcell217-otlp-export-adoption/packed-receiving.tap",
+      "bytes": 9591,
+      "sha256": "067c81ddf6fde97a0dbc26e4cabf05179f6e061eed36c366cb9aa54c6bf28e90",
+      "gitBlob": "ab0492b4d67b2605c0eb2ebe37584bf1229285d1"
+    }
+  },
+  "localPack": {
+    "archive": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/pack/red-cup-engineering-semiotic-eavt-services-section-0.3.2.tgz",
+    "package": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/pack/package",
+    "bytes": 61874,
+    "sha256": "d2f33bdf3b2f4fccb88c1410e09a5c3ef541f1d8cd228a5f3563eaee2a1d7a74",
+    "gitBlob": "9eeb95959a39a86014bd3c44bc05f79ef57d5e80",
+    "sha1": "0cef2906cce0f63f81b98be776141623d117f142",
+    "integrity": "sha512-ocObIAL+fd4JYz+BTpmgbGunOgbZSI9FAB3nucSlYEjpU4N9e/gWsbRwBils0duHvPgvgsQFi6xF5hMQu3i/nA==",
+    "members": {
+      "package.json": {
+        "bytes": 2998,
+        "sha256": "7af038db7cf5a59167c74f681cdf3e084438673a758e374b717a214b507cdf45",
+        "gitBlob": "bd35f992becce5f0353a791be8078604e58a9f7f",
+        "mode": "0o644"
+      },
+      "README.md": {
+        "bytes": 8382,
+        "sha256": "d08c8e8cf5a75a593b0ed80e2d5e6f67c51046d8667984cfe6b58135dc54b07b",
+        "gitBlob": "c4db89929c3b8fda9d46ef35ede0765c52da7473",
+        "mode": "0o644"
+      },
+      "src/admit-seavt-row.mjs": {
+        "bytes": 4182,
+        "sha256": "fa1c46c08ab2407cded951ed051e39ab2237ca7f6ed2940a80609e73ae0484cd",
+        "gitBlob": "a3709f241d6a8868b9898ea1c779e06a01595322",
+        "mode": "0o644"
+      },
+      "src/identity/artifact.mjs": {
+        "bytes": 2486,
+        "sha256": "44ae1f495f0eca46516a51efc4573bbb652a97a0ffa43023e39812c177c396da",
+        "gitBlob": "f83f53eec9cab5ef5a665a8103283241603f44da",
+        "mode": "0o644"
+      },
+      "src/bind-json-template.mjs": {
+        "bytes": 1321,
+        "sha256": "df9051d7d19aaa8b1547624ba38a6441d260f319e2c19c756a8a26fe02884794",
+        "gitBlob": "cd9a570946153fe023f52a5719ab0f4c4a830232",
+        "mode": "0o644"
+      },
+      "src/causal-resource-head.mjs": {
+        "bytes": 5722,
+        "sha256": "7c02eb45ece78595bbdd061f467c476581a5fa86117838292ee6fa52f64fbc53",
+        "gitBlob": "32d59e7373ff94402c3681974ee39ab0e5353e55",
+        "mode": "0o644"
+      },
+      "scripts/check-current-state.mjs": {
+        "bytes": 4585,
+        "sha256": "eb2b19e8138b1787f8135c19ca003ded81612251d299a56b02a062d63c0c087c",
+        "gitBlob": "e9c7e7b30195e040afa8ff4d007a0305e9ea6759",
+        "mode": "0o644"
+      },
+      "src/checkpoint.mjs": {
+        "bytes": 8584,
+        "sha256": "16952c707c8e6a15f355a7f7d31516036bbc2ccba2a3b77d29dc48a325af37fa",
+        "gitBlob": "db4f014749f68f41d125e7003ebac5a9749429c9",
+        "mode": "0o644"
+      },
+      "src/clock.mjs": {
+        "bytes": 3838,
+        "sha256": "169b766d85e010006ecbcc8b976b9d0a421f66c7463f3ca663e26bef63dc68ca",
+        "gitBlob": "4e8f7213725997780a1cda4a2153986b6f708a4d",
+        "mode": "0o644"
+      },
+      "src/compact-logs.mjs": {
+        "bytes": 7365,
+        "sha256": "9d905420d6b38fd8a18c49c8a152b5dea6d2b808f2d7e55b19b1009eb03fa962",
+        "gitBlob": "f8cad1a602faff552ddd127b26745f4a05fab009",
+        "mode": "0o644"
+      },
+      "scripts/compact-seavt-logs.mjs": {
+        "bytes": 1644,
+        "sha256": "d9999fef261d53c2506808efd3b726a0bacf8b5de7d028510ab996dbb35c100b",
+        "gitBlob": "36604df16c1565157d4b74b8da0ae2900846eefe",
+        "mode": "0o755"
+      },
+      "src/exchange.mjs": {
+        "bytes": 6677,
+        "sha256": "062b4d5eb9074cc9257234ea015c8427ef2fea982dbdd49d6e791bd27a9a122e",
+        "gitBlob": "23f215f821ed2ad43cc1d593bd1517be1ef70a14",
+        "mode": "0o644"
+      },
+      "scripts/export-otlp.mjs": {
+        "bytes": 1287,
+        "sha256": "74b37e54292e92079a1d7a728d0823dcd969a29d5c3b0cfaf2337e4ee3b0cbba",
+        "gitBlob": "793d31d944ba6c9c9321017f6466da5edb1269f3",
+        "mode": "0o755"
+      },
+      "src/identity/index.mjs": {
+        "bytes": 350,
+        "sha256": "eed654efba0a25dbaf396357a753152aa13b4fa4836491a4be56931aea620240",
+        "gitBlob": "d822d5639ef82d498ea76983fada33d44a25dc37",
+        "mode": "0o644"
+      },
+      "src/layout.mjs": {
+        "bytes": 5264,
+        "sha256": "ab9594a0ea1d97c8b4f794286580e2d25c23fa7b777dcf76b55cf6a01b6a7e78",
+        "gitBlob": "4ea6c226ecbc8a7f8d11533e08af06fd60e0442c",
+        "mode": "0o644"
+      },
+      "src/log-budget.mjs": {
+        "bytes": 4887,
+        "sha256": "3161a4395928aa1845bafa608701020fb586287f9ced32c47e5386e8536cc450",
+        "gitBlob": "1752be75c24a9643c847b78732b5e43fc6a052f0",
+        "mode": "0o644"
+      },
+      "src/normalize-seavt-row.mjs": {
+        "bytes": 1413,
+        "sha256": "bc8c6c35880119bb24304c0a482a60302bc0072fa9ad1a4c80e610cbda939cdd",
+        "gitBlob": "46dd7e9f0d5955c1cbc72f0ca049a114f272b2b6",
+        "mode": "0o644"
+      },
+      "src/profile.mjs": {
+        "bytes": 288,
+        "sha256": "8e78bd50934af13b3e3e56c00cd6ff07de1d5755335d581a03acb92a8713698b",
+        "gitBlob": "7aab5f012e9d24f7ccafec7af32644df3fdc0f29",
+        "mode": "0o644"
+      },
+      "scripts/seal-logs.mjs": {
+        "bytes": 1743,
+        "sha256": "4e85fc19f3db42ba62ff07887df29df3f806311b87f8ef61666ce1797405d458",
+        "gitBlob": "94de8497f85d2054bf8894c68644fcd68b7549f2",
+        "mode": "0o755"
+      },
+      "src/sealed-log.mjs": {
+        "bytes": 7480,
+        "sha256": "8e8acf5f36587ffe9e79304bec93048fdc5dbb3406291d0f2f010f58a5ffa03d",
+        "gitBlob": "9fcb3b4e6b1d970e2196cb51a1c63eec5ffc0bb7",
+        "mode": "0o644"
+      },
+      "src/seavt-carrier.mjs": {
+        "bytes": 5223,
+        "sha256": "7a5877125dee581a00ca0117d217dd8ac1a230b6009926071e6b1bc2652fffd1",
+        "gitBlob": "4f198938812cb3ef485614bcbf676c373b1cc77b",
+        "mode": "0o644"
+      },
+      "src/seavt-log.mjs": {
+        "bytes": 2316,
+        "sha256": "bdf7425f6a0c8771ce738407c2c96e8ae9f8f53a6f31c191c890cdd35e3e59b9",
+        "gitBlob": "965665dc824643bf119f57c36d519d8638b2bcff",
+        "mode": "0o644"
+      },
+      "scripts/seavt-volume.mjs": {
+        "bytes": 3480,
+        "sha256": "ae414da0ebb583060973ab2e725e355de32e892e885671976c816be9fed155ad",
+        "gitBlob": "d54328bd2708ed6231d5a20cc560b40442312cb2",
+        "mode": "0o755"
+      },
+      "src/store-core.mjs": {
+        "bytes": 33664,
+        "sha256": "1f2f502848a18171629f4713245689ba7846e8ddae46f1f5b51ccf6cc7e1cf4c",
+        "gitBlob": "09bd060f682e451e3b2334c18599e58dd78f3f7e",
+        "mode": "0o644"
+      },
+      "src/store.mjs": {
+        "bytes": 1111,
+        "sha256": "1a06de61357b90c5f44494a022e985f249a8264eb583ac0d940c9fb587e51f22",
+        "gitBlob": "0188329b3990189e107fc225c03b3694fe3bdbe1",
+        "mode": "0o644"
+      },
+      "test/telemetry-boundaries.test.mjs": {
+        "bytes": 7304,
+        "sha256": "a7469d66791de9bb445e2061037b9cc7d5fb17fa4a089b938fce3383eb9dedac",
+        "gitBlob": "5f65188f4bfd949448469f39c5c2e2081663e0eb",
+        "mode": "0o644"
+      },
+      "test/telemetry-cell-events.test.mjs": {
+        "bytes": 10025,
+        "sha256": "9c1ef2bfdb1f7ac55db20e0e47a14e68be7847d85cb027d720831c7c1f871027",
+        "gitBlob": "a4d5a7ea955be90f56998d235108e5a8f7731b8c",
+        "mode": "0o644"
+      },
+      "src/telemetry-store.mjs": {
+        "bytes": 13124,
+        "sha256": "c977e86d1b8a99116bcf4de76ee65fa67d6ce83419798045b5568595d854cf39",
+        "gitBlob": "727c721b4afa7393f4cdc5fa7a67455a7ce75f79",
+        "mode": "0o644"
+      },
+      "test/telemetry-trace-integrity.test.mjs": {
+        "bytes": 15937,
+        "sha256": "042310b531fb3aa8ce2b191187012b3a05deb651b2cb60ae34b3f76ce2cce1c9",
+        "gitBlob": "b2fc6193483e0517db178f665dfae7507ba44a79",
+        "mode": "0o644"
+      },
+      "src/telemetry.mjs": {
+        "bytes": 11782,
+        "sha256": "93c6e2769f9fac263e334ac6fb221a82961e5cf52de8ad0eb2615384499fe333",
+        "gitBlob": "67a2c0e5878f6c02797f82fbd816bb3d01ffde97",
+        "mode": "0o644"
+      },
+      "test/telemetry.test.mjs": {
+        "bytes": 20505,
+        "sha256": "88dd23226eb14e00a60c6e8a5e4fe6353a6ce55cdeb333342a2eae6c4019f3cb",
+        "gitBlob": "de156cbd99eb72d0db8e118c133e084a8a0bdee0",
+        "mode": "0o644"
+      },
+      "src/identity/text-document.mjs": {
+        "bytes": 2619,
+        "sha256": "151ba810b7ccdd9f2c0ae5bf2800392a81736b9ff8968bc57035e32920c7911a",
+        "gitBlob": "69b7cb86fbf656ef2ce7c750bf1dc8f78e695d39",
+        "mode": "0o644"
+      },
+      "src/volume.mjs": {
+        "bytes": 7338,
+        "sha256": "f8f8e21ba6c4b1c3c24dcf76c84bba9ab89643369ff3c5b47c61df7896cbf294",
+        "gitBlob": "f980b58cb718057fbde4a9cea19bb8b437c04105",
+        "mode": "0o644"
+      }
+    },
+    "all33MembersExactCandidateSource": true,
+    "receivingTests": [
+      "test/telemetry.test.mjs",
+      "test/telemetry-trace-integrity.test.mjs",
+      "test/telemetry-boundaries.test.mjs",
+      "test/telemetry-cell-events.test.mjs"
+    ],
+    "nodeModulesSelection": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules"
+  },
+  "providers": [
+    {
+      "name": "@red-cup-engineering/computer-content-address-engineering-services-section",
+      "declared": "0.2.0",
+      "version": "0.2.0",
+      "gitHead": null,
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+computer-content-address-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-content-address-engineering-services-section",
+      "manifest": {
+        "bytes": 1117,
+        "sha256": "cff45a5b99d892048b7e50ec4516e435f1c00cbe7d0e316e9307fe10fdc400c4",
+        "gitBlob": "2639de202f1b410a6b68bbd77a1c3bd1fe5171f1"
+      },
+      "originalDirectProviderManifestUnchanged": true
+    },
+    {
+      "name": "@red-cup-engineering/computer-data-engineering-services-section",
+      "declared": "0.2.0",
+      "version": "0.2.0",
+      "gitHead": null,
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+      "manifest": {
+        "bytes": 2641,
+        "sha256": "d054adc1d03cd518eff79b3e25e3cacaf2ec914e45dde17df80e9196c8063e3c",
+        "gitBlob": "81094bfc255b905332fefb3f47b039805b1f4814"
+      },
+      "originalDirectProviderManifestUnchanged": true
+    },
+    {
+      "name": "@red-cup-engineering/computer-file-engineering-services-section",
+      "declared": "0.5.0",
+      "version": "0.5.0",
+      "gitHead": null,
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+computer-file-engineering-services-section@0.5.0/node_modules/@red-cup-engineering/computer-file-engineering-services-section",
+      "manifest": {
+        "bytes": 3208,
+        "sha256": "7e5f6bf7264b7506c04ef7557057a977bac16c8e387548515506be3cad3968dd",
+        "gitBlob": "b4469491c73ee458ed40cf883588fa7c234f0bfe"
+      },
+      "originalDirectProviderManifestUnchanged": true
+    },
+    {
+      "name": "@red-cup-engineering/eavt-services-section",
+      "declared": "0.11.1",
+      "version": "0.11.1",
+      "gitHead": null,
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+eavt-services-section@0.11.1/node_modules/@red-cup-engineering/eavt-services-section",
+      "manifest": {
+        "bytes": 6461,
+        "sha256": "8755bc1d5dde952ab334073d43ba599de456b57a199e3e2554f03a999f9a6c65",
+        "gitBlob": "e2c9cecab3918521984dfbe8d23a45f8774bc6c4"
+      },
+      "originalDirectProviderManifestUnchanged": true
+    },
+    {
+      "name": "@red-cup-engineering/json-schema-services-section",
+      "declared": "0.5.0",
+      "version": "0.5.0",
+      "gitHead": null,
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section",
+      "manifest": {
+        "bytes": 6953,
+        "sha256": "e2e9018c1e2b1cf8bb90072932cae24d26f4f9748fad812627a09a8429d1c2e7",
+        "gitBlob": "eb67d873c2a8934e17a564502e91ae431f5f6083"
+      },
+      "originalDirectProviderManifestUnchanged": true
+    },
+    {
+      "name": "@red-cup-engineering/json-services-section",
+      "declared": "0.4.0",
+      "version": "0.4.0",
+      "gitHead": null,
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section",
+      "manifest": {
+        "bytes": 2734,
+        "sha256": "1b5945abba04ed87ad57a2a97586ee03b4742d8539fe43c2fabdec1161c181be",
+        "gitBlob": "2e1214eb36ebe14d11796b049620bf66ffa188d8"
+      },
+      "originalDirectProviderManifestUnchanged": true
+    },
+    {
+      "name": "@red-cup-engineering/signcell",
+      "declared": "0.13.1-dev.217",
+      "version": "0.13.1-dev.217",
+      "gitHead": "cb878c7fcb77f93e68163768e9626646b88ceb5c",
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.217/node_modules/@red-cup-engineering/signcell",
+      "manifest": {
+        "bytes": 3441,
+        "sha256": "a0263352863918be1ef10768b808a39c6a220679c6b0b3736db7d7b2e0010d07",
+        "gitBlob": "7d10d9dadce5ac5a7b5ec24140bdc0c478cbe0e9"
+      }
+    },
+    {
+      "name": "@red-cup-engineering/uri-services-section",
+      "declared": "0.1.1",
+      "version": "0.1.1",
+      "gitHead": null,
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+uri-services-section@0.1.1/node_modules/@red-cup-engineering/uri-services-section",
+      "manifest": {
+        "bytes": 987,
+        "sha256": "ad2294be4d435b8c12871d030a5976686259c15579818e1dd1eb84d0f96e1dc4",
+        "gitBlob": "7a89bc4a80fd0ce9d2e78db3b30722d1a0e0d524"
+      },
+      "originalDirectProviderManifestUnchanged": true
+    }
+  ],
+  "physicalReceivingClosure": {
+    "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules",
+    "entryCounts": {
+      "file": 2267,
+      "link": 181,
+      "directory": 595
+    },
+    "entries": 3043,
+    "beforeFingerprintSha256": "c9bb64ba9266847458fabd9daa83817088c50883525b0ce174a2902c71ecab0e",
+    "afterFingerprintSha256": "c9bb64ba9266847458fabd9daa83817088c50883525b0ce174a2902c71ecab0e",
+    "unchanged": true,
+    "localInventory": {
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/preflight.json",
+      "bytes": 963392,
+      "sha256": "6ec2f54ceb0137e5320fd12f67f6d578ddcdba7df809392ff85c305139fa81fa",
+      "gitBlob": "bfdaeec41dbe79de996828b090d7808e6b39f698"
+    },
+    "all46InstalledSigncellFilesMatchActualArchive": true,
+    "originalOtherSevenDirectProviderManifestsUnchanged": true
+  },
+  "qualifiedSourceFiles": {
+    "pnpm-workspace.yaml": {
+      "bytes": 415,
+      "sha256": "434a70f9efd25de49642f3de3e3d606be6e942e35f97c8cb45f2b6ea07d98ebc",
+      "gitBlob": "8cdacf87fb14da978a0b3121731ef89f7b4673b3"
+    },
+    "README.md": {
+      "bytes": 8382,
+      "sha256": "d08c8e8cf5a75a593b0ed80e2d5e6f67c51046d8667984cfe6b58135dc54b07b",
+      "gitBlob": "c4db89929c3b8fda9d46ef35ede0765c52da7473"
+    },
+    "SOURCE-PROVENANCE.md": {
+      "bytes": 4380,
+      "sha256": "5dff599d868d47d656368859c34c09c4f0cbeff21960d8971c2be8574d0415bd",
+      "gitBlob": "915a91a9750633bc89e75d1a090de5178bb94706"
+    },
+    ".gitignore": {
+      "bytes": 37,
+      "sha256": "95e8aabc685003bcd17762a8faaa78e63eff933151aa5ec285214824e72c0f06",
+      "gitBlob": "af8a21e7500f73cdd8ff8a09e644df31121f3605"
+    },
+    "pnpm-lock.yaml": {
+      "bytes": 22348,
+      "sha256": "c2307e618def8009454479fafa3349026aa07472821d386ffb69cb3e24836211",
+      "gitBlob": "c1202082c9705cb3f5219097a79eaa7f4cbb3c39"
+    },
+    "package.json": {
+      "bytes": 2998,
+      "sha256": "7af038db7cf5a59167c74f681cdf3e084438673a758e374b717a214b507cdf45",
+      "gitBlob": "bd35f992becce5f0353a791be8078604e58a9f7f"
+    },
+    ".npmrc": {
+      "bytes": 37,
+      "sha256": "8de08949bab508293e0d9aa76a511469ee2d306b1f6140a8f60c0d1de8b17fe2",
+      "gitBlob": "0a1f8151935f5a483c368cd930c26519cb3663cf"
+    },
+    "test/compact-carrier.test.mjs": {
+      "bytes": 18943,
+      "sha256": "dbac4bb9e9fb6b4347a715f4d67896acb5b9536fd6efdac737773e56970cc936",
+      "gitBlob": "2dfed09623a710b69b5942b2a0376715266872a9"
+    },
+    "test/seavt-carriers.test.mjs": {
+      "bytes": 2465,
+      "sha256": "31ea941261363c5b0945a66ebbd150b8a29281de06160cbd4b5485bed626683e",
+      "gitBlob": "1cda5761d22769f262eb7a12016a28d9fb36b7c4"
+    },
+    "test/artifact-allocation.test.mjs": {
+      "bytes": 2828,
+      "sha256": "990601594779795ad818631886b31fa1002d549271f8e2ac8b48e73638682179",
+      "gitBlob": "77b0b44e48410d5c0282f971fa630d7941421573"
+    },
+    "test/absent-head-claim.test.mjs": {
+      "bytes": 6604,
+      "sha256": "e2ed6288f9b5bac7ab91e79c00bd989f72536e78e394c9ecc3f650d3dcd1a0a2",
+      "gitBlob": "c2dfe3fbb2abff00ad874b0127151c2afb3757a9"
+    },
+    "test/store-strict-descriptor.test.mjs": {
+      "bytes": 1744,
+      "sha256": "dce79ace0a00632bdc02ee7e63c9f076069e55ac144ebc986c98ce0beda49f02",
+      "gitBlob": "42fc90be88b78d23e4b9fce9ef80d6ea9934c7e0"
+    },
+    "test/telemetry-trace-integrity.test.mjs": {
+      "bytes": 15937,
+      "sha256": "042310b531fb3aa8ce2b191187012b3a05deb651b2cb60ae34b3f76ce2cce1c9",
+      "gitBlob": "b2fc6193483e0517db178f665dfae7507ba44a79"
+    },
+    "test/strict-publication.test.mjs": {
+      "bytes": 15024,
+      "sha256": "b661aff071762c352ec76f040669650d50a65ede8514f7711173a4946bdc324e",
+      "gitBlob": "326f9144ec0fe51baa551a48c6da9f1494e3eb1a"
+    },
+    "test/telemetry.test.mjs": {
+      "bytes": 20505,
+      "sha256": "88dd23226eb14e00a60c6e8a5e4fe6353a6ce55cdeb333342a2eae6c4019f3cb",
+      "gitBlob": "de156cbd99eb72d0db8e118c133e084a8a0bdee0"
+    },
+    "test/causal-resource-head.test.mjs": {
+      "bytes": 5018,
+      "sha256": "5af572023130d3c8a2f22e2aaf6acb154ffa38034edf0e326a3dbbcc80eb46dd",
+      "gitBlob": "1ef7becc470405a9dd3281b6ec8d7edbf0b3dfe4"
+    },
+    "test/deep-list-admission.test.mjs": {
+      "bytes": 1229,
+      "sha256": "a6aedb801ac9974c85b32a963a6bcf999977de894b317a00b736b0d5fe60d818",
+      "gitBlob": "bfe4db29a4706e8d14a4caa5e181a93bd28e5df6"
+    },
+    "test/store.test.mjs": {
+      "bytes": 23108,
+      "sha256": "6d0f0fd55073ee9e1bdffb7a02c94f91d08cb491d89a8711c61cf88def8b7ca0",
+      "gitBlob": "cda3aeab889fa1f773a0a5b7a049893ea2779407"
+    },
+    "test/check-current-state.test.mjs": {
+      "bytes": 3006,
+      "sha256": "d73f70edbb3e1908ba2b416c0183c7b496210f1f0792ab14edc98c36cc8bdbd5",
+      "gitBlob": "7864022534866588e113aae37d726c501d615e5d"
+    },
+    "test/store-verified-lines.test.mjs": {
+      "bytes": 2333,
+      "sha256": "af6731f58c43e687e077fc03f5ee2c8f3770cf7c1f16f2ddb1df830d041193c8",
+      "gitBlob": "62222b4ea4fa1ca322f0b56dd323425071d9bf40"
+    },
+    "test/store-change-witness.test.mjs": {
+      "bytes": 1875,
+      "sha256": "77c1e0ffdea45f4bc3627e386ac53afc319e25977e47afc3097feb9ac639c34e",
+      "gitBlob": "477ee23d1b8a7188aec94e3ccf10621a82a83ed1"
+    },
+    "test/sealed-log.test.mjs": {
+      "bytes": 5885,
+      "sha256": "3067c2a5a8efb06333bf213799613e513c50894b4a0167ac4a1fc6b004714b02",
+      "gitBlob": "23e712096af29420c325b5a040ed3d0949e8e94e"
+    },
+    "test/head-complete-publication.test.mjs": {
+      "bytes": 7458,
+      "sha256": "4bfccb7df1c5cff1cdae636061b4944966247b132dee338af5df2c9c86a7dcf7",
+      "gitBlob": "9b1e1eceec36bebda610aeccc05cfcd673dc0ec3"
+    },
+    "test/telemetry-boundaries.test.mjs": {
+      "bytes": 7304,
+      "sha256": "a7469d66791de9bb445e2061037b9cc7d5fb17fa4a089b938fce3383eb9dedac",
+      "gitBlob": "5f65188f4bfd949448469f39c5c2e2081663e0eb"
+    },
+    "test/telemetry-cell-events.test.mjs": {
+      "bytes": 10025,
+      "sha256": "9c1ef2bfdb1f7ac55db20e0e47a14e68be7847d85cb027d720831c7c1f871027",
+      "gitBlob": "a4d5a7ea955be90f56998d235108e5a8f7731b8c"
+    },
+    "test/store-memory.test.mjs": {
+      "bytes": 4245,
+      "sha256": "2a6342b518340c951ccb2c02fd6cb8c9d73d23f017347d7a9d22ad18b427002f",
+      "gitBlob": "f4d71ac61be888ee31349f1fb647d635178cc2f8"
+    },
+    "test/store-strict-discovery.test.mjs": {
+      "bytes": 7935,
+      "sha256": "475c2236c822b4bb6fa872f0b1fc0dfe6e79f1c67cfa81cbef22ca2540bef8d2",
+      "gitBlob": "2de5211826e58170dd17b2d8c622712b9cd51a2d"
+    },
+    "test/signcell-seavt.test.mjs": {
+      "bytes": 5458,
+      "sha256": "2576065c47514152d975cf35ed9b71f8e4c477b5f5c7f30497b6bd9b9eba5576",
+      "gitBlob": "ef1bee84cec89e2dadefa4a6c2535ffafef916db"
+    },
+    "test/store-appended.test.mjs": {
+      "bytes": 3600,
+      "sha256": "24e045206886c1c242af899047305aa16caea22731f1278d5f9f80153ec35dbc",
+      "gitBlob": "7906796ef3455cfd6dd56c75b144a73ea5f995f2"
+    },
+    "test/clock.test.mjs": {
+      "bytes": 2408,
+      "sha256": "88ee90855bd963e0e83be3fdb9128b375096384bdd9c3d63f0856799f5d49138",
+      "gitBlob": "d711273713401d84b24e1744e82fb65e05cf83b3"
+    },
+    "test/checkpoint.test.mjs": {
+      "bytes": 9800,
+      "sha256": "e386ed554dfb98e3060e88b631587a0b84a41b55d266df1c30d3b5e95c03313a",
+      "gitBlob": "523f6e4a5e7666c067bd6931fb900ec7b6c18b37"
+    },
+    "docs/qualification/2026-10-26-signcell-206-level1-receiving/packed-receiving.tap": {
+      "bytes": 9330,
+      "sha256": "d874464951eef73219205bfe0d5f66d66ca9d326955922754295f53ccd189ba6",
+      "gitBlob": "0cd6a9dd965175b646a45ace1890062fb613b9c8"
+    },
+    "docs/qualification/2026-10-26-signcell-206-level1-receiving/receipt.json": {
+      "bytes": 21474,
+      "sha256": "e2d36772c2975ef562d0f661927d7170f483c4ba6549eb96813fc4ef6e09fe32",
+      "gitBlob": "0a1bc8e2c53e1b90d807941976782ffcac00d8f3"
+    },
+    "docs/qualification/2026-10-26-signcell-206-level1-receiving/native.tap": {
+      "bytes": 47367,
+      "sha256": "91f8203238639ac47b086035e317192be6f97c341a8716d5a53b372005ade291",
+      "gitBlob": "4eba41185046db13bf151baf8eb03c78bc6ec411"
+    },
+    "docs/qualification/2026-10-26-signcell-206-level1-receiving/frozen-install.log": {
+      "bytes": 1030,
+      "sha256": "6c9d397098aa35abedd0ad3beab83420e4b2f749314b444ef49733486ca10da3",
+      "gitBlob": "acb7c2c22b17696401f74888fd6615146d8fab18"
+    },
+    "docs/qualification/2026-10-26-signcell-206-level1-receiving/lock-generation.log": {
+      "bytes": 210,
+      "sha256": "2c0f8ef8d645a6b17e20c477ddf7bc2ebff2b7b0e7b729b8fcedd792ce5936c7",
+      "gitBlob": "e896deb10e4e57ec07c1aa92750db80a09451261"
+    },
+    "docs/qualification/2026-10-26-current-main-level1-reconciliation/packed-receiving.tap": {
+      "bytes": 9345,
+      "sha256": "01f727283765b22580e76c1f4f1b1a2244c263d60003806f7110a4b2af98c521",
+      "gitBlob": "03a80bc33f5c74ca100030a8ef51ad8e2070248f"
+    },
+    "docs/qualification/2026-10-26-current-main-level1-reconciliation/receipt.json": {
+      "bytes": 52805,
+      "sha256": "be004b54da6561ccdeb7b6d84fe0bb2beb6fb7ea7e1ac197d543e5f25af19cee",
+      "gitBlob": "dd57e2fee12c282bb5d40027d003f65a3ea7883c"
+    },
+    "docs/qualification/2026-10-26-current-main-level1-reconciliation/independent-probes.mjs": {
+      "bytes": 5327,
+      "sha256": "1b34cc7e9705f58e57d280a9b8f3c26843f43235e45df4af7edf3f8c77183484",
+      "gitBlob": "b0a4ed96c5dd23499f8cabe39551db516506cdfd"
+    },
+    "docs/qualification/2026-10-26-current-main-level1-reconciliation/native.tap": {
+      "bytes": 48854,
+      "sha256": "330abce1dfe809e4a59843faf70dbf943aa5143323491c35cacd8dac2b196800",
+      "gitBlob": "35d1b7682438486613030225c25980a44bb08e56"
+    },
+    "docs/qualification/2026-10-26-current-main-level1-reconciliation/prior-store-contracts-on-main.tap": {
+      "bytes": 9578,
+      "sha256": "b762f28a7bdf1457f87c9d775c59f5cc2fc005db8bbc6295f5f598f54a1c8a67",
+      "gitBlob": "6f4f41258f684530534e21888641364edb6f788a"
+    },
+    "docs/qualification/2026-10-26-current-main-level1-reconciliation/pack.log": {
+      "bytes": 981,
+      "sha256": "8278dd9bc1f30e3046ca920dcd5432b804abcb68e21c5b9b08a5800f8bef16d3",
+      "gitBlob": "c3dd615b6fee7a4dc4545f7d60dbd60dff60f0b1"
+    },
+    "docs/qualification/2026-10-26-current-main-level1-reconciliation/independent-review.json": {
+      "bytes": 12245,
+      "sha256": "b79f788817b9247b9b46ff541ec22048322438eda7f565de0c9a5831ee8a4456",
+      "gitBlob": "43dce1c95f133afe82b6d2e33522bd22a023bb13"
+    },
+    "docs/qualification/2026-10-26-current-main-level1-reconciliation/latest-main-native.tap": {
+      "bytes": 48489,
+      "sha256": "8309156b0c111a89982f7cec9c4ee987f007aa0b1f86f7848518ddf844463752",
+      "gitBlob": "cb1d10cd1c44dd3c61d9a4661d41310263a3e66e"
+    },
+    "docs/qualification/2026-10-26-current-main-level1-reconciliation/independent-probes.json": {
+      "bytes": 581,
+      "sha256": "b5b2ca2fb6f9580a5b1b69f617e81dc66cf0699e4f20c818a6d43b6d30f0cc1d",
+      "gitBlob": "0b20fbb13aecf0a5ca4c59424166cd0c1e68bfdc"
+    },
+    "docs/qualification/2026-10-27-otlp-reserved-flags-source-phase/receipt.json": {
+      "bytes": 16372,
+      "sha256": "6e0de69bbdfeb820721a28758e5552f923d3ae9db366deeb9794e523757c9958",
+      "gitBlob": "52eaa9ea9166081b06e81a9128744407ae0ea446"
+    },
+    "docs/qualification/2026-10-27-otlp-reserved-flags-source-phase/baseline-204.tap": {
+      "bytes": 1119,
+      "sha256": "0e64680da8ab8a26bf4f2366c262d29313c0269f007905fc9c619fe79863eab6",
+      "gitBlob": "2d0e6da4b4ec237e22fe13549a67266a53509cdc"
+    },
+    "docs/qualification/2026-10-27-otlp-reserved-flags-source-phase/source-composition.tap": {
+      "bytes": 373,
+      "sha256": "24a54285fab8220d1dc7ca87f62c592a65a84e2be437d559b608749dfc7c9e50",
+      "gitBlob": "fd5eb662ce2de1ddd7f05bbf3af92cbab2f03c05"
+    },
+    "docs/qualification/2026-10-26-cell-event-source/receipt.json": {
+      "bytes": 9977,
+      "sha256": "e7faa9171f7fd7e6c84079492fbc1f5ec2c23bc78fbd691e3d98d52d0cc26377",
+      "gitBlob": "8d543b93b757cf4e3d3073b30393ca3c19590606"
+    },
+    "docs/qualification/2026-10-26-cell-event-source/native-before-fixture-fix.tap": {
+      "bytes": 9160,
+      "sha256": "0e8bfd8d7ee98a7b8b190514a431d8d217cfc4bbad0d2d297d0aeb7bb9b98010",
+      "gitBlob": "0fd3360467bfc0afdef2e7e6121b0365cd183f31"
+    },
+    "docs/qualification/2026-10-26-cell-event-source/sandbox-telemetry.tap": {
+      "bytes": 1277,
+      "sha256": "c8fc13e38776ee2ee66ea55343451ba7ca43c900931cb53064660f5b60356df6",
+      "gitBlob": "f7a284f8d4c0458f57c0163b21aca393c020d608"
+    },
+    "docs/qualification/2026-10-26-cell-event-source/native-telemetry.tap": {
+      "bytes": 8123,
+      "sha256": "dced97d321e430cf35c0ae6e6dea42ebdd12ad98850d75208f45ca202899c66f",
+      "gitBlob": "3bc678b696a9e26af2ae39c141c31c00dcccc3a7"
+    },
+    "docs/qualification/2026-10-26-level1-flags-continuation/receipt.json": {
+      "bytes": 14501,
+      "sha256": "d73ece61ceec2ae48cb539ce37bcca3a39beec736e9fc54b6c184e46c86ea5f7",
+      "gitBlob": "c9ee9b6eaeed57daf4248a8f40f9b3dd77a56f07"
+    },
+    "docs/qualification/2026-10-26-level1-flags-continuation/baseline-200.tap": {
+      "bytes": 1149,
+      "sha256": "ceb2a59eb1dc7270fca6434f49e2a4092c77fb64e27e5ad2fdfc7ba9798965a0",
+      "gitBlob": "46a85753e800d9aa603d515de5e4fcd90869f622"
+    },
+    "docs/qualification/2026-10-26-level1-flags-continuation/source-composition.tap": {
+      "bytes": 379,
+      "sha256": "ffb81629b039a73a78fd36a111c2ef64a6cf3d378efe8eb35a1305c976813fee",
+      "gitBlob": "d71c093191988d87b367b51168db89c9f61a9793"
+    },
+    "docs/qualification/2026-10-26-seavt-0.3.3-dev.204-published-receiving/receipt.json": {
+      "bytes": 16950,
+      "sha256": "26b8301517ffb556f0e8365a2ef0cb62f406249f0bbdebd5b4efd7b62a9749c5",
+      "gitBlob": "8ad9f29891cbc413ba245030cdac9e8944716fd7"
+    },
+    "docs/qualification/2026-10-26-seavt-0.3.3-dev.204-published-receiving/receiving.tap": {
+      "bytes": 9336,
+      "sha256": "fa1e8d5b85c4301582fa44690386c2367f65eec25d94b3b6b990877d63d3b21e",
+      "gitBlob": "ee1d7962b76823cb7fd0dbd9efe4393ed10ab4b8"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/packed-receiving.tap": {
+      "bytes": 8135,
+      "sha256": "972af4053e094942b88f1c2a8a9cb95773e3a739f09fccab05f5b3fb25e57c9e",
+      "gitBlob": "7981ceabaadb3f4531d541892818ae47b037dd73"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/receipt.json": {
+      "bytes": 10211,
+      "sha256": "f1a89ef5181b2af0240eec0e3c78821c1d2fa7f0d40e46bd275035fa23ebc78c",
+      "gitBlob": "ca8b565652a9a40f21eb4d2277e60b728a234eff"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/frozen-install.log": {
+      "bytes": 1030,
+      "sha256": "49a48f043eaeb4cf8e33f29a6f3723c72664cb08e34e37ad0bee7a45afd45404",
+      "gitBlob": "422fd1e15f2a93b8ccf0e9bd314a9e61b14394c7"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/native-full.tap": {
+      "bytes": 46158,
+      "sha256": "91bb6b7d3329b2e371b7156a01f4f9048788085d41cca3860b3caaaf29e967f7",
+      "gitBlob": "3403b030d4092ac8d6f1ad3a1ad98cc09ec3fb7c"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/pack.log": {
+      "bytes": 99,
+      "sha256": "7125f194612fcff2f454c05d848e7cb71facc1967b4d5017e25b34fdee3ba74f",
+      "gitBlob": "83b5f9d4df0d01aa0059b4e2ce67617225986b34"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/packed-artifact.json": {
+      "bytes": 957,
+      "sha256": "e69e22709db0def8359ad66c25d3c444ebf51b11ab815672b83c1f415ba840cf",
+      "gitBlob": "edde77aeb6cb0df2096bb0d177d1a7b4867fa848"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/pnpm-lock-update.log": {
+      "bytes": 2510,
+      "sha256": "0e05b1e87b438897d89519f803b96d7b3dc9fce36ef7e76daa888de8eb89f4ab",
+      "gitBlob": "76da651cbe1aa4220ae18921f1bb94a9a0a91bb4"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/frozen-offline-attempt.log": {
+      "bytes": 726,
+      "sha256": "a27a543a2db3d9be700b5f0516d4634b9921bebddd3272b1c2b2a1f840b9135f",
+      "gitBlob": "c4264e98458fd5ce876bc747996e8fc76a237504"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/pack.json": {
+      "bytes": 3864,
+      "sha256": "0eb1a9f9a143d10ff07e8e7f7fee6cf5d00f8b5b502dfa360e4c84d6946552f7",
+      "gitBlob": "8fa507a4ce276e34dbd8200191e43b0e7cb17d81"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/lock-before.yaml": {
+      "bytes": 17621,
+      "sha256": "aa7d982ef8e8758f3665d9c402c66ec373fccb98cb9ce58dc417b62ac9e44d00",
+      "gitBlob": "9b59210c791529f4b6fb89f283179b7017e50e92"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/installed-signcell-identity.json": {
+      "bytes": 1042,
+      "sha256": "d36c5d0894764037c28a9d55deb8dacb097f267b109c21743b7b69f399ef4d39",
+      "gitBlob": "9f6d9a1df1ac2ca8845b02e7b439cd55110a90e8"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/dependency-audit.json": {
+      "bytes": 1282,
+      "sha256": "f00974f4ec465d3feb405e8231057aedb579069fe9871a077453121fcb8b79eb",
+      "gitBlob": "cf499a353c850e1c25f2e91aad65bd1ca2994b4c"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/pack-sandbox.json": {
+      "bytes": 247,
+      "sha256": "fe9cad16a55b49f8c8f127fd8dcc0f4fbade16a4715b287ffa77ce67fd8afa9c",
+      "gitBlob": "8557d483c36c21503e73f1831eaccfbf27f6cbfb"
+    },
+    "docs/qualification/2026-10-26-published-signcell-receiving/package-before.json": {
+      "bytes": 2988,
+      "sha256": "5bd3a697b0b47767e06dfc8362d168d0cbf4a7ab74b82a9c088b9230ce3ed740",
+      "gitBlob": "cb4161518c7c0c16222d76484502b6f16b2c27ea"
+    },
+    "docs/qualification/2026-10-26-reconciled-main209/packed-receiving.tap": {
+      "bytes": 9081,
+      "sha256": "ecec24af0193c09bf86a4e9aee74a47387ddeb0ce8d52fe4fc28b375fad7a499",
+      "gitBlob": "2e19c07e9f1c0cbfb12d23a1bb960fc011b7547b"
+    },
+    "docs/qualification/2026-10-26-reconciled-main209/receipt.json": {
+      "bytes": 11766,
+      "sha256": "566cf955ff90de5d7db076b2db99ba855d9fe9fc35b70c0b406578c7c2708ba0",
+      "gitBlob": "2ce96f9cfbdb3f95f086cfe8bf75ef0b55cc7c51"
+    },
+    "docs/qualification/2026-10-26-reconciled-main209/native-full.tap": {
+      "bytes": 47144,
+      "sha256": "5a34da9a817f6189c48411e92fe61fa259ad1724203120c7755432668519ae4c",
+      "gitBlob": "200e7b2e4a947b84a6f486c03892bfc38b1beec6"
+    },
+    "docs/qualification/2026-10-26-reconciled-main209/pack.log": {
+      "bytes": 99,
+      "sha256": "7125f194612fcff2f454c05d848e7cb71facc1967b4d5017e25b34fdee3ba74f",
+      "gitBlob": "83b5f9d4df0d01aa0059b4e2ce67617225986b34"
+    },
+    "docs/qualification/2026-10-26-reconciled-main209/source-audit.json": {
+      "bytes": 1752,
+      "sha256": "90475afdadc620dcc50930b48cbd890cb859196a7b3c4886940017f7a709e37e",
+      "gitBlob": "4ba42dceb38e2b37d84a899289af0ba1b898b858"
+    },
+    "docs/qualification/2026-10-26-reconciled-main209/packed-artifact.json": {
+      "bytes": 1072,
+      "sha256": "a3c25acce2aeb56b3cfe0a41ee5214af69256e4d1375023dc8a8bd87efe46cbb",
+      "gitBlob": "155bd8efc6d2701302aff12e8a6b45ca22f38a1a"
+    },
+    "docs/qualification/2026-10-26-reconciled-main209/pack.json": {
+      "bytes": 3864,
+      "sha256": "fb8ec481345f974a51457e9093413486826604ee51b4252929fc2f0415d1b687",
+      "gitBlob": "8aebf18f8ba7a47e884fbcb5434216938c6e5841"
+    },
+    "docs/qualification/2026-10-26-reconciled-main209/reconciliation.json": {
+      "bytes": 2226,
+      "sha256": "cf4cd85833e18878d2e34b6419bc5f69f71e99ebce9d18813d58eea3b2e6233a",
+      "gitBlob": "1f0304a8e2ba452c71cf2e30fb2003e12ccf5a9e"
+    },
+    "src/compact-logs.mjs": {
+      "bytes": 7365,
+      "sha256": "9d905420d6b38fd8a18c49c8a152b5dea6d2b808f2d7e55b19b1009eb03fa962",
+      "gitBlob": "f8cad1a602faff552ddd127b26745f4a05fab009"
+    },
+    "src/seavt-log.mjs": {
+      "bytes": 2316,
+      "sha256": "bdf7425f6a0c8771ce738407c2c96e8ae9f8f53a6f31c191c890cdd35e3e59b9",
+      "gitBlob": "965665dc824643bf119f57c36d519d8638b2bcff"
+    },
+    "src/layout.mjs": {
+      "bytes": 5264,
+      "sha256": "ab9594a0ea1d97c8b4f794286580e2d25c23fa7b777dcf76b55cf6a01b6a7e78",
+      "gitBlob": "4ea6c226ecbc8a7f8d11533e08af06fd60e0442c"
+    },
+    "src/clock.mjs": {
+      "bytes": 3838,
+      "sha256": "169b766d85e010006ecbcc8b976b9d0a421f66c7463f3ca663e26bef63dc68ca",
+      "gitBlob": "4e8f7213725997780a1cda4a2153986b6f708a4d"
+    },
+    "src/admit-seavt-row.mjs": {
+      "bytes": 4182,
+      "sha256": "fa1c46c08ab2407cded951ed051e39ab2237ca7f6ed2940a80609e73ae0484cd",
+      "gitBlob": "a3709f241d6a8868b9898ea1c779e06a01595322"
+    },
+    "src/bind-json-template.mjs": {
+      "bytes": 1321,
+      "sha256": "df9051d7d19aaa8b1547624ba38a6441d260f319e2c19c756a8a26fe02884794",
+      "gitBlob": "cd9a570946153fe023f52a5719ab0f4c4a830232"
+    },
+    "src/store.mjs": {
+      "bytes": 1111,
+      "sha256": "1a06de61357b90c5f44494a022e985f249a8264eb583ac0d940c9fb587e51f22",
+      "gitBlob": "0188329b3990189e107fc225c03b3694fe3bdbe1"
+    },
+    "src/telemetry.mjs": {
+      "bytes": 11782,
+      "sha256": "93c6e2769f9fac263e334ac6fb221a82961e5cf52de8ad0eb2615384499fe333",
+      "gitBlob": "67a2c0e5878f6c02797f82fbd816bb3d01ffde97"
+    },
+    "src/volume.mjs": {
+      "bytes": 7338,
+      "sha256": "f8f8e21ba6c4b1c3c24dcf76c84bba9ab89643369ff3c5b47c61df7896cbf294",
+      "gitBlob": "f980b58cb718057fbde4a9cea19bb8b437c04105"
+    },
+    "src/profile.mjs": {
+      "bytes": 288,
+      "sha256": "8e78bd50934af13b3e3e56c00cd6ff07de1d5755335d581a03acb92a8713698b",
+      "gitBlob": "7aab5f012e9d24f7ccafec7af32644df3fdc0f29"
+    },
+    "src/normalize-seavt-row.mjs": {
+      "bytes": 1413,
+      "sha256": "bc8c6c35880119bb24304c0a482a60302bc0072fa9ad1a4c80e610cbda939cdd",
+      "gitBlob": "46dd7e9f0d5955c1cbc72f0ca049a114f272b2b6"
+    },
+    "src/seavt-carrier.mjs": {
+      "bytes": 5223,
+      "sha256": "7a5877125dee581a00ca0117d217dd8ac1a230b6009926071e6b1bc2652fffd1",
+      "gitBlob": "4f198938812cb3ef485614bcbf676c373b1cc77b"
+    },
+    "src/exchange.mjs": {
+      "bytes": 6677,
+      "sha256": "062b4d5eb9074cc9257234ea015c8427ef2fea982dbdd49d6e791bd27a9a122e",
+      "gitBlob": "23f215f821ed2ad43cc1d593bd1517be1ef70a14"
+    },
+    "src/store-core.mjs": {
+      "bytes": 33664,
+      "sha256": "1f2f502848a18171629f4713245689ba7846e8ddae46f1f5b51ccf6cc7e1cf4c",
+      "gitBlob": "09bd060f682e451e3b2334c18599e58dd78f3f7e"
+    },
+    "src/sealed-log.mjs": {
+      "bytes": 7480,
+      "sha256": "8e8acf5f36587ffe9e79304bec93048fdc5dbb3406291d0f2f010f58a5ffa03d",
+      "gitBlob": "9fcb3b4e6b1d970e2196cb51a1c63eec5ffc0bb7"
+    },
+    "src/log-budget.mjs": {
+      "bytes": 4887,
+      "sha256": "3161a4395928aa1845bafa608701020fb586287f9ced32c47e5386e8536cc450",
+      "gitBlob": "1752be75c24a9643c847b78732b5e43fc6a052f0"
+    },
+    "src/causal-resource-head.mjs": {
+      "bytes": 5722,
+      "sha256": "7c02eb45ece78595bbdd061f467c476581a5fa86117838292ee6fa52f64fbc53",
+      "gitBlob": "32d59e7373ff94402c3681974ee39ab0e5353e55"
+    },
+    "src/telemetry-store.mjs": {
+      "bytes": 13124,
+      "sha256": "c977e86d1b8a99116bcf4de76ee65fa67d6ce83419798045b5568595d854cf39",
+      "gitBlob": "727c721b4afa7393f4cdc5fa7a67455a7ce75f79"
+    },
+    "src/checkpoint.mjs": {
+      "bytes": 8584,
+      "sha256": "16952c707c8e6a15f355a7f7d31516036bbc2ccba2a3b77d29dc48a325af37fa",
+      "gitBlob": "db4f014749f68f41d125e7003ebac5a9749429c9"
+    },
+    "src/identity/artifact.mjs": {
+      "bytes": 2486,
+      "sha256": "44ae1f495f0eca46516a51efc4573bbb652a97a0ffa43023e39812c177c396da",
+      "gitBlob": "f83f53eec9cab5ef5a665a8103283241603f44da"
+    },
+    "src/identity/text-document.mjs": {
+      "bytes": 2619,
+      "sha256": "151ba810b7ccdd9f2c0ae5bf2800392a81736b9ff8968bc57035e32920c7911a",
+      "gitBlob": "69b7cb86fbf656ef2ce7c750bf1dc8f78e695d39"
+    },
+    "src/identity/index.mjs": {
+      "bytes": 350,
+      "sha256": "eed654efba0a25dbaf396357a753152aa13b4fa4836491a4be56931aea620240",
+      "gitBlob": "d822d5639ef82d498ea76983fada33d44a25dc37"
+    },
+    "content/text/documents/specifications/store-migration-map.md": {
+      "bytes": 89627,
+      "sha256": "c6c58684db08b470c44e1f1ad25a60a1d16fb4ff03a07a07ef509de48d94d5d7",
+      "gitBlob": "599d97e5c4d8617c6e2d6700c0d739a54d8a3e44"
+    },
+    "content/text/documents/specifications/store-conversion.md": {
+      "bytes": 15678,
+      "sha256": "40727e609f1c84c69a0e6405868fbc10dfbc680024d1b2412b63e6ecf3712c40",
+      "gitBlob": "98793346c95d2c43823c658470752c6c2b167681"
+    },
+    "content/text/documents/specifications/store.md": {
+      "bytes": 45151,
+      "sha256": "8514b3d2d592efbe73022402d759102721c4e75f25f32f8cc6d0918e61c640e3",
+      "gitBlob": "c2a30ad1d7663cd219be31ce350ac2b489393e08"
+    },
+    "content/text/documents/specifications/seavt-log-carrier.md": {
+      "bytes": 5926,
+      "sha256": "f9ea5487cbea244dd2960375636a85af725d81aa57ba26cbc7fbb3b54e6a49c6",
+      "gitBlob": "f2ebb42739de3d71eb2bd66ecc5984cc61c5a8ff"
+    },
+    "content/text/documents/specifications/2026-10-19-observability-seavt.md": {
+      "bytes": 19537,
+      "sha256": "19a472ee8184469d8e485a4af03f80066c75dedd40b72c73b13d52008182d2ba",
+      "gitBlob": "773ca7ec2a49117f440164f7ddae1cd5c06a5802"
+    },
+    "content/text/documents/specifications/native-checkpoint.md": {
+      "bytes": 7946,
+      "sha256": "d75d391024d83fc99502bebe930566b839f4df58f954248ed9d73db9654d7e41",
+      "gitBlob": "54287c4efc2de281fee87a0fab1dde64d51a9697"
+    },
+    "scripts/seavt-volume.mjs": {
+      "bytes": 3480,
+      "sha256": "ae414da0ebb583060973ab2e725e355de32e892e885671976c816be9fed155ad",
+      "gitBlob": "d54328bd2708ed6231d5a20cc560b40442312cb2"
+    },
+    "scripts/check-current-state.mjs": {
+      "bytes": 4585,
+      "sha256": "eb2b19e8138b1787f8135c19ca003ded81612251d299a56b02a062d63c0c087c",
+      "gitBlob": "e9c7e7b30195e040afa8ff4d007a0305e9ea6759"
+    },
+    "scripts/compact-seavt-logs.mjs": {
+      "bytes": 1644,
+      "sha256": "d9999fef261d53c2506808efd3b726a0bacf8b5de7d028510ab996dbb35c100b",
+      "gitBlob": "36604df16c1565157d4b74b8da0ae2900846eefe"
+    },
+    "scripts/seal-logs.mjs": {
+      "bytes": 1743,
+      "sha256": "4e85fc19f3db42ba62ff07887df29df3f806311b87f8ef61666ce1797405d458",
+      "gitBlob": "94de8497f85d2054bf8894c68644fcd68b7549f2"
+    },
+    "scripts/export-otlp.mjs": {
+      "bytes": 1287,
+      "sha256": "74b37e54292e92079a1d7a728d0823dcd969a29d5c3b0cfaf2337e4ee3b0cbba",
+      "gitBlob": "793d31d944ba6c9c9321017f6466da5edb1269f3"
+    }
+  },
+  "postchecks": {
+    "all112CandidateSourceFilesUnchanged": true,
+    "full3043ProviderEntriesUnchanged": true,
+    "allEightDirectSelectionsAndManifestsUnchanged": true,
+    "sourceAndInstalledLockStructurallyEqual": true,
+    "originalWorkspaceAndRegistryPolicyUnchanged": true,
+    "all46SelectedSigncellArchiveMembersUnchanged": true,
+    "verifiedSupplierArchiveAndRecorded139OutcomeUnchanged": true,
+    "all33ExtractedLocalArchiveMembersUnchanged": true,
+    "localArchiveUnchanged": true,
+    "historical206And204ArchivePayloadsUnchanged": true
+  },
+  "historicalArchives": [
+    {
+      "directory": "/workspace/scratch/455c183ed200/evidence/published-seavt-0.3.3-dev.204",
+      "archiveSha256": "c7457527f987681035264f2870c15668b1232330205cd4c4f119a2237322aeda",
+      "unchangedOriginalFiles": 33
+    },
+    {
+      "directory": "/workspace/scratch/455c183ed200/evidence/published-signcell-206",
+      "archiveSha256": "29da33f30bf2017d765963f0bcadeae0c9fef7e3ff21417e0ac0ae77fd4a067c",
+      "unchangedOriginalFiles": 45
+    }
+  ],
+  "supplierSupportingReceiptRevision": {
+    "recordedAt": "2026-10-27T01:04:50.482206+00:00",
+    "initialObservedReceipt": {
+      "path": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/receiving.json",
+      "bytes": 202651,
+      "sha256": "a501e42cd6377ee8c3a917dec646f96d99bd63119b84334bb20c6ac71d47ba27",
+      "gitBlob": "ac41e8ff96d790e5521d342447c4a0dc3705cbb3"
+    },
+    "initialReceiptReconstruction": {
+      "path": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/supplier-receiving-initial-reconstructed.json",
+      "bytes": 202651,
+      "sha256": "a501e42cd6377ee8c3a917dec646f96d99bd63119b84334bb20c6ac71d47ba27",
+      "gitBlob": "ac41e8ff96d790e5521d342447c4a0dc3705cbb3",
+      "method": "Reverse only the supplier-confirmed four metadata amendments, restore providerClosure from preserved providers-before.json excluding files, and require the exact SHA256 observed before SEAVT installation.",
+      "originalObservedSha256Matched": true
+    },
+    "finalReceipt": {
+      "path": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/receiving.json",
+      "bytes": 85461,
+      "sha256": "fed71f6b222227ce69567e8017af9edfc156f822881e9bffaef7acc7edb69c46",
+      "gitBlob": "defd5b9dd1d2092594b38e1433d5ddd59a542f4a"
+    },
+    "amendments": [
+      "Expanded archivePath, packagePath and receiving.cwd from original evidence/... paths to absolute paths.",
+      "Added registryObservationHistory for the seven preserved registry observations.",
+      "Added receiverOrchestration explaining the index-only PosixPath shadowing correction and one actual receiving execution.",
+      "Replaced the inline providerClosure.edges array with selectionEdgeCount, fullBeforeAfterInventories bindings and selectionEdgesUnchanged; full edges remain in preserved before/after inventories."
+    ],
+    "receivingExecutionChanged": false,
+    "archivePackageProvidersAndRawTapChanged": false,
+    "sameReceivingStartedAt": "2026-10-27T00:57:46.989773+00:00",
+    "sameReceivingTotals": {
+      "tests": 139,
+      "pass": 139,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "scope": "Supporting receipt metadata revision only; the initial observation and finalized evidence are recorded separately, with no byte-stability claim for that JSON."
+  },
+  "independentReview": {
+    "reviewer": "/root/standards_contract",
+    "scope": "Read-only SV5 real-store custody/refusal/control and exportTrace all-channel completion; manifest, native source/installed lock, policy and measured raw-output receipt hashes.",
+    "result": "No blocking finding. The shared projection exception cannot return a successful partial trace because exportTrace returns only after all channels project.",
+    "testsRerun": false,
+    "filesEdited": false
+  },
+  "scope": [
+    "Actual issued SignCell217 was received139/139 and archive-verified before native SEAVT selection.",
+    "Native234/234 and local packaged51/51 are separate gates. The historical source-phase1/1 is preserved and not relabeled.",
+    "All33 local package members match the candidate; this local pack is not an issued SEAVT artifact or deployment.",
+    "Only the direct SignCell pin and its required Metrologic transitive supplier change; all other pins and original policies remain intact.",
+    "SignCell supporting receipt metadata was finalized while this qualification ran; initial and final identities are separately recorded, and no byte-stability claim is made for that JSON. Archive, provider payloads and the single139-case receiving execution remained unchanged.",
+    "Root owns final branch integration, main lease, merge and exact-head issued SEAVT receiving."
+  ]
+}

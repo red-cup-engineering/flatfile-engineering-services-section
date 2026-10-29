@@ -89,9 +89,12 @@ test('CP-8: interrupted write retains original and partial destination, fresh re
   assert.throws(() => verify(f), /paths or bytes differ/); assert.throws(() => prepareNativeCheckpoint(f), /destination must be empty/);
   const fresh = path.join(f.root, 'fresh'); fs.mkdirSync(fresh); assert.equal(prepareNativeCheckpoint({...f, destination: fresh}).captureIntegrity, true);
 });
-test('CP-8: uncertainty after head rename can be resolved by read-only verification', t => {
-  const f = fixture(t), original = fs.renameSync;
-  t.mock.method(fs, 'renameSync', (...args) => { original(...args); throw new Error('lost completion after rename'); }); syncBuiltinESMExports();
+test('CP-8: uncertainty after completed head publication can be resolved by read-only verification', t => {
+  const f = fixture(t), link = fs.linkSync, sync = fs.fsyncSync; let temporary;
+  t.mock.method(fs, 'linkSync', (...args) => { const result = link(...args); temporary = args[0]; return result; });
+  // Inject after final-link publication and temporary cleanup. An earlier failure
+  // can retain a second link and is correctly refused by checkpoint verification.
+  t.mock.method(fs, 'fsyncSync', (...args) => { const result = sync(...args); if (temporary && !fs.existsSync(temporary)) throw new Error('lost completion after publication'); return result; }); syncBuiltinESMExports();
   try { assert.throws(() => prepareNativeCheckpoint(f), /lost completion/); }
   finally { t.mock.restoreAll(); syncBuiltinESMExports(); }
   assert.equal(verify(f).captureIntegrity, true);

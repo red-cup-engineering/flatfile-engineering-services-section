@@ -1,0 +1,71 @@
+{
+  "tree": "81068eed3284f9899c8572b97db0bd0499693b6e",
+  "truncated": false,
+  "files": [
+    {
+      "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0e1e9fe606da74a2868e4f900b3f045dd7eab5c0",
+      "size": 21597,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-engineering-services-section/git/blobs/0e1e9fe606da74a2868e4f900b3f045dd7eab5c0"
+    },
+    {
+      "path": "content/text/documents/specifications/store.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c2a30ad1d7663cd219be31ce350ac2b489393e08",
+      "size": 45151,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-engineering-services-section/git/blobs/c2a30ad1d7663cd219be31ce350ac2b489393e08"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd35f992becce5f0353a791be8078604e58a9f7f",
+      "size": 2998,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-engineering-services-section/git/blobs/bd35f992becce5f0353a791be8078604e58a9f7f"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c1202082c9705cb3f5219097a79eaa7f4cbb3c39",
+      "size": 22348,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-engineering-services-section/git/blobs/c1202082c9705cb3f5219097a79eaa7f4cbb3c39"
+    },
+    {
+      "path": "src/store-core.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "09bd060f682e451e3b2334c18599e58dd78f3f7e",
+      "size": 33664,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-engineering-services-section/git/blobs/09bd060f682e451e3b2334c18599e58dd78f3f7e"
+    },
+    {
+      "path": "src/telemetry-store.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a14c00d733ad2b0f96c0519d15a16d468f7cfaa3",
+      "size": 14429,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-engineering-services-section/git/blobs/a14c00d733ad2b0f96c0519d15a16d468f7cfaa3"
+    },
+    {
+      "path": "src/telemetry.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "67a2c0e5878f6c02797f82fbd816bb3d01ffde97",
+      "size": 11782,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-engineering-services-section/git/blobs/67a2c0e5878f6c02797f82fbd816bb3d01ffde97"
+    },
+    {
+      "path": "test/telemetry-cell-events.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a4d5a7ea955be90f56998d235108e5a8f7731b8c",
+      "size": 10025,
+      "url": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-engineering-services-section/git/blobs/a4d5a7ea955be90f56998d235108e5a8f7731b8c"
+    }
+  ],
+  "nodeModulesInOriginalTree": false
+}

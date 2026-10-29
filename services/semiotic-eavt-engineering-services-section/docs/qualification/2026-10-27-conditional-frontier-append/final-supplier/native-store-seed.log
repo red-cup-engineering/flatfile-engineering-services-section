@@ -1,0 +1,2 @@
+[ERROR] Unknown options: 'ignore-scripts', 'network-concurrency', 'fetch-timeout', 'fetch-retries', 'cache-dir'
+For help, run: pnpm help store

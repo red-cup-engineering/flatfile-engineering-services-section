@@ -1,0 +1,201 @@
+{
+  "status": "source-qualified-awaiting-published-supplier",
+  "repository": "red-cup-engineering/semiotic-eavt-engineering-services-section",
+  "baseCommit": "1a615414a6b0db1ee993417e12e687e37b9a223d",
+  "baseTree": "ae180b664d65408716c209541909a852468bfc13",
+  "requirements": [
+    "SV11",
+    "SV12",
+    "SV13"
+  ],
+  "sourcePath": "/workspace/scratch/455c183ed200/seavt",
+  "origin": "Prepared SEAVT work in /workspace/scratch/29a7af2d4b6e/seavt; copied without its installation and without modifying the predecessor.",
+  "sourceChanges": [
+    {
+      "path": "README.md",
+      "bytes": 8382,
+      "blob": "c4db89929c3b8fda9d46ef35ede0765c52da7473",
+      "sha256": "d08c8e8cf5a75a593b0ed80e2d5e6f67c51046d8667984cfe6b58135dc54b07b",
+      "baseBlob": "7d198b05becc24cb99b66a5848557bb83c90e9dd"
+    },
+    {
+      "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+      "bytes": 17080,
+      "blob": "0aec8f2eee92add1d457bd4c678197cc2a11e015",
+      "sha256": "87b9dc25632cc8c32c67eefdfaed8dd6813d2a48a2eb8120617cd922243e4487",
+      "baseBlob": "4ae7830149a346b498273d6c88bcc87910887765"
+    },
+    {
+      "path": "package.json",
+      "bytes": 2988,
+      "blob": "cb4161518c7c0c16222d76484502b6f16b2c27ea",
+      "sha256": "5bd3a697b0b47767e06dfc8362d168d0cbf4a7ab74b82a9c088b9230ce3ed740",
+      "baseBlob": "4e1ef31e361cecfc7df59ce6eada2ee3dd0c0a84"
+    },
+    {
+      "path": "src/telemetry.mjs",
+      "bytes": 10896,
+      "blob": "8134a1ff3680b3903aaedf74732e956f3b7aa99f",
+      "sha256": "eaa48a97c40a72b0d0534ec373a260ca02b1ca274d7fd46f1302e944ad6abd44",
+      "baseBlob": "997271d339d214e6f0393e1235ae3054c9f8a16d"
+    },
+    {
+      "path": "test/telemetry-boundaries.test.mjs",
+      "bytes": 5675,
+      "blob": "2b4b311553955460efb33343a844e9260beb7a3a",
+      "sha256": "c957737c6cf760c197ca4c4ac38fc4a86e028e227ef8379da27c5616bff54574",
+      "baseBlob": null
+    },
+    {
+      "path": "test/telemetry-cell-events.test.mjs",
+      "bytes": 10025,
+      "blob": "a4d5a7ea955be90f56998d235108e5a8f7731b8c",
+      "sha256": "9c1ef2bfdb1f7ac55db20e0e47a14e68be7847d85cb027d720831c7c1f871027",
+      "baseBlob": null
+    },
+    {
+      "path": "test/telemetry-trace-integrity.test.mjs",
+      "bytes": 13888,
+      "blob": "7e2a5daf228f81c73481db9de4be356dee50ce14",
+      "sha256": "9b326d568e5585dc33684bda2c3ebb572373d92857af8a914f565563aed932b5",
+      "baseBlob": "5168a99190a238b226138b9b859a18d0c789ba10"
+    }
+  ],
+  "composition": {
+    "runtime": "Node.js v24.22.1",
+    "selectedSupplier": {
+      "repository": "red-cup-engineering/signcell",
+      "commit": "ce026a96e3c1ad20a3fa1f358af7d1eda4c56899",
+      "path": "/workspace/scratch/455c183ed200/signcell",
+      "binding": "All 30 remote package.json and src/ blobs match the selected local supplier. Local reconstructed git HEAD is not used as its source identity."
+    },
+    "directProviders": [
+      {
+        "name": "@red-cup-engineering/computer-content-address-engineering-services-section",
+        "version": "0.2.0",
+        "resolvedPath": "/workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+computer-content-address-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-content-address-engineering-services-section",
+        "manifestSha256": "cff45a5b99d892048b7e50ec4516e435f1c00cbe7d0e316e9307fe10fdc400c4"
+      },
+      {
+        "name": "@red-cup-engineering/computer-data-engineering-services-section",
+        "version": "0.2.0",
+        "resolvedPath": "/workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+        "manifestSha256": "d054adc1d03cd518eff79b3e25e3cacaf2ec914e45dde17df80e9196c8063e3c"
+      },
+      {
+        "name": "@red-cup-engineering/computer-file-engineering-services-section",
+        "version": "0.5.0",
+        "resolvedPath": "/workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+computer-file-engineering-services-section@0.5.0/node_modules/@red-cup-engineering/computer-file-engineering-services-section",
+        "manifestSha256": "7e5f6bf7264b7506c04ef7557057a977bac16c8e387548515506be3cad3968dd"
+      },
+      {
+        "name": "@red-cup-engineering/eavt-services-section",
+        "version": "0.11.1",
+        "resolvedPath": "/workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+eavt-services-section@0.11.1/node_modules/@red-cup-engineering/eavt-services-section",
+        "manifestSha256": "8755bc1d5dde952ab334073d43ba599de456b57a199e3e2554f03a999f9a6c65"
+      },
+      {
+        "name": "@red-cup-engineering/json-schema-services-section",
+        "version": "0.5.0",
+        "resolvedPath": "/workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section",
+        "manifestSha256": "e2e9018c1e2b1cf8bb90072932cae24d26f4f9748fad812627a09a8429d1c2e7"
+      },
+      {
+        "name": "@red-cup-engineering/json-services-section",
+        "version": "0.4.0",
+        "resolvedPath": "/workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section",
+        "manifestSha256": "1b5945abba04ed87ad57a2a97586ee03b4742d8539fe43c2fabdec1161c181be"
+      },
+      {
+        "name": "@red-cup-engineering/signcell",
+        "version": "0.13.1-dev.0",
+        "resolvedPath": "/workspace/scratch/455c183ed200/signcell",
+        "manifestSha256": "1be6b4aaee763a06d304740448b8db0d60d745750ba723da0cc86e78d38ed72d"
+      },
+      {
+        "name": "@red-cup-engineering/uri-services-section",
+        "version": "0.1.1",
+        "resolvedPath": "/workspace/scratch/29a7af2d4b6e/seavt/node_modules/.pnpm/@red-cup-engineering+uri-services-section@0.1.1/node_modules/@red-cup-engineering/uri-services-section",
+        "manifestSha256": "ad2294be4d435b8c12871d030a5976686259c15579818e1dd1eb84d0f96e1dc4"
+      }
+    ],
+    "installation": "Small explicit node_modules symlinks reuse the prior installed providers. Only the direct SignCell selection is overridden. No dependency installation or fabricated package version was used.",
+    "declaredSignCellVersion": "0.11.1",
+    "manifestVersion": "0.3.2",
+    "supplierManifestVersion": "0.13.1-dev.0",
+    "lockfileSha256": "aa7d982ef8e8758f3665d9c402c66ec373fccb98cb9ce58dc417b62ac9e44d00",
+    "workspaceFileSha256": "434a70f9efd25de49642f3de3e3d606be6e942e35f97c8cb45f2b6ea07d98ebc",
+    "supplierPins": "Dependencies, pnpm-lock.yaml and pnpm-workspace.yaml remain unchanged from the exact remote base."
+  },
+  "checks": {
+    "command": "node --test --test-reporter=tap test/telemetry-cell-events.test.mjs test/telemetry.test.mjs test/telemetry-boundaries.test.mjs test/telemetry-trace-integrity.test.mjs",
+    "authority": "Native command through approved sandbox escalation, required by the existing child-process fixtures.",
+    "final": {
+      "tests": 45,
+      "pass": 45,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "exitCode": 0,
+      "log": "native-telemetry.tap"
+    },
+    "groups": {
+      "claimEvents": 5,
+      "handleBoundaries": 5,
+      "traceIntegrity": 13,
+      "existingTelemetry": 22
+    },
+    "initialNative": {
+      "tests": 45,
+      "pass": 44,
+      "fail": 1,
+      "exitCode": 1,
+      "log": "native-before-fixture-fix.tap",
+      "finding": "The older invalid-clock receiving fixture called the stricter current SignCell constructor. Its error prevented testing the SEAVT receiver. The fixture now inserts the malformed raw record with existing store put, then asserts receiver refusal and incomplete export."
+    },
+    "sandbox": {
+      "fileResults": 4,
+      "pass": 1,
+      "fail": 3,
+      "exitCode": 1,
+      "log": "sandbox-telemetry.tap",
+      "limitation": "This restricted run emitted child-file failures without individual diagnostics for three existing suites. It is preserved and is not claimed as native qualification."
+    },
+    "scope": "These are all four packaged telemetry receiving suites. The changed handle behavior and its durable append/read/export boundary are covered; the rest of the package suite and independent Collector/runtime receiving were not rerun."
+  },
+  "review": {
+    "reviewer": "/root",
+    "disposition": "accepted for source branch",
+    "scope": "Reviewed actual src/telemetry.mjs and the changed SV10 fixture; recordCellEvent delegates admission then reuses existing append and returns custody-only receipt.",
+    "branch": "logging/shared-claim-event-journal-20261026",
+    "merge": "Draft only; no main merge."
+  },
+  "releaseGate": {
+    "qualified": "Exact source composition and the stated native telemetry behavior.",
+    "notQualified": [
+      "Registry installation under the unchanged declared supplier pin",
+      "Publication of this SEAVT candidate",
+      "Live runtime activation",
+      "Independent OTLP Collector receiving"
+    ],
+    "next": "The existing publisher must publish an immutable SignCell package mapping to ce026a96e3c1ad20a3fa1f358af7d1eda4c56899 or a later independently qualified source. Then select the real published version in this owner's manifest/lock and run packaged receiving before merge or downstream activation."
+  },
+  "logs": [
+    {
+      "path": "native-before-fixture-fix.tap",
+      "sha256": "0e8bfd8d7ee98a7b8b190514a431d8d217cfc4bbad0d2d297d0aeb7bb9b98010",
+      "bytes": 9160
+    },
+    {
+      "path": "native-telemetry.tap",
+      "sha256": "dced97d321e430cf35c0ae6e6dea42ebdd12ad98850d75208f45ca202899c66f",
+      "bytes": 8123
+    },
+    {
+      "path": "sandbox-telemetry.tap",
+      "sha256": "c8fc13e38776ee2ee66ea55343451ba7ca43c900931cb53064660f5b60356df6",
+      "bytes": 1277
+    }
+  ]
+}

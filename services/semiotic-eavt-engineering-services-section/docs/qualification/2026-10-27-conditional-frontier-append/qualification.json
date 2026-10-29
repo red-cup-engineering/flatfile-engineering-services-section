@@ -1,0 +1,199 @@
+{
+  "kind": "seavt-conditional-frontier-append-qualification/v1",
+  "observedAt": "2026-10-27T03:02:10.867201+00:00",
+  "repository": "red-cup-engineering/semiotic-eavt-engineering-services-section",
+  "baseMain": "67ae88de11740b4aa87e03f717f10b803604583c",
+  "baseTree": "81068eed3284f9899c8572b97db0bd0499693b6e",
+  "problem": "The existing store specification promises extend(...,{expect}), but the implementation ignored the option and appended repeated/stale successors.",
+  "change": "Reuse the existing expected-head assertion before record insertion and at head publication; preserve absent-only exclusive publication; forward optional expected frontier through native telemetry appendMessage and recordCellEvent.",
+  "changedFiles": {
+    "content/text/documents/specifications/2026-10-19-observability-seavt.md": {
+      "bytes": 23172,
+      "sha256": "78b264b3d778772b5b97950ec71d9397001d7607a0e6379d20e25c3a03e88eb1",
+      "gitBlob": "449805f8ef649934a07f6e2bae8815e4a7ba93df"
+    },
+    "content/text/documents/specifications/store.md": {
+      "bytes": 47080,
+      "sha256": "a821bb9b1e797bd1c59e66afa5e44968415272c8458d1774874c644e04d79d3c",
+      "gitBlob": "d2c5d013ed25fe3eb7a62e21c8c2fb1442c891e5"
+    },
+    "package.json": {
+      "bytes": 3090,
+      "sha256": "388b9b75df0083bac3a5c42491e6585c90ff32e9ba719c28a49633aead5f46b3",
+      "gitBlob": "035db0b75e7698ac38b71875c58f8bb198ac6a34"
+    },
+    "src/store-core.mjs": {
+      "bytes": 34433,
+      "sha256": "e9b7c60f34164eabc16df9eede6fd042c8e2f18687228581ed27a98ed37ee393",
+      "gitBlob": "92dbe1dbcf5a013ee296e1e7d939816c95a54b36"
+    },
+    "src/telemetry-store.mjs": {
+      "bytes": 14586,
+      "sha256": "a9717f82f75ee221648ebc8979ee3df0140ca301f0d6f70a1665b8cffebb4ff1",
+      "gitBlob": "29e899528a9770765165b36733cb45b47f2d7c4f"
+    },
+    "src/telemetry.mjs": {
+      "bytes": 12087,
+      "sha256": "6885bda580de6f1017e96ea0fa869ce22fc2d9fabf85b50bf62780fba36f8f9f",
+      "gitBlob": "0e6d84ba124acebf072bf221ed7741151867db91"
+    },
+    "test/telemetry-cell-events.test.mjs": {
+      "bytes": 11712,
+      "sha256": "8207d6efd4596b00cc8013227394f3b7e3bb70b231380a18cdd344fadacd9874",
+      "gitBlob": "1fba9dadc6b2d6ccc333b2b3d29d0ab71a32162b"
+    },
+    "test/store-conditional-extend.test.mjs": {
+      "bytes": 9502,
+      "sha256": "17fa0a22e3da23344a4ca917deca5847832d96adce8e5f1e577b88183dc4fa24",
+      "gitBlob": "ea0303bc2f5839d51a7c2a68920f70240c1ea135"
+    }
+  },
+  "sourceSelection": "Current canonical source/test/manifests were matched against owning Git blobs before editing. Historical qualification files not required for these runs were not all materialized; they remain unchanged in the remote base tree.",
+  "node": "v24.22.1",
+  "qualification": [
+    {
+      "stage": "native before correction",
+      "command": "node --test --test-reporter=tap test/store-conditional-extend.test.mjs",
+      "tests": 9,
+      "pass": 1,
+      "fail": 8,
+      "exit": 1,
+      "output": "before-correction.tap"
+    },
+    {
+      "stage": "native conditional cases after correction",
+      "command": "node --test --test-reporter=tap test/store-conditional-extend.test.mjs",
+      "tests": 9,
+      "pass": 9,
+      "fail": 0,
+      "exit": 0,
+      "output": "conditional-native.tap"
+    },
+    {
+      "stage": "full source suite",
+      "command": "node --test --test-reporter=tap test/*.test.mjs",
+      "tests": 252,
+      "pass": 252,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "exit": 0,
+      "output": "native.tap"
+    },
+    {
+      "stage": "actual local archive",
+      "command": "node --test --test-reporter=tap <all five package.receivingTests>",
+      "tests": 69,
+      "pass": 69,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "exit": 0,
+      "output": "packed.tap"
+    }
+  ],
+  "acceptance": [
+    "absent-only initial append",
+    "stale frontier refusal before record write",
+    "typed frontier set equality and no caller mutation",
+    "empty-frontier versus absent-head distinction",
+    "invalid guard refusal",
+    "fresh-process replay",
+    "two simultaneous cooperative processes produce one successor",
+    "ordinary and strict post-publication failure followed by stale retry refusal",
+    "actual opposing-witness SignCell claim through existing telemetry handle without extra evidence"
+  ],
+  "directProviders": {
+    "@red-cup-engineering/computer-content-address-engineering-services-section": {
+      "version": "0.2.0",
+      "package": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+computer-content-address-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-content-address-engineering-services-section",
+      "manifest": {
+        "bytes": 1117,
+        "sha256": "cff45a5b99d892048b7e50ec4516e435f1c00cbe7d0e316e9307fe10fdc400c4",
+        "gitBlob": "2639de202f1b410a6b68bbd77a1c3bd1fe5171f1"
+      }
+    },
+    "@red-cup-engineering/computer-data-engineering-services-section": {
+      "version": "0.2.0",
+      "package": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+      "manifest": {
+        "bytes": 2641,
+        "sha256": "d054adc1d03cd518eff79b3e25e3cacaf2ec914e45dde17df80e9196c8063e3c",
+        "gitBlob": "81094bfc255b905332fefb3f47b039805b1f4814"
+      }
+    },
+    "@red-cup-engineering/computer-file-engineering-services-section": {
+      "version": "0.5.0",
+      "package": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+computer-file-engineering-services-section@0.5.0/node_modules/@red-cup-engineering/computer-file-engineering-services-section",
+      "manifest": {
+        "bytes": 3208,
+        "sha256": "7e5f6bf7264b7506c04ef7557057a977bac16c8e387548515506be3cad3968dd",
+        "gitBlob": "b4469491c73ee458ed40cf883588fa7c234f0bfe"
+      }
+    },
+    "@red-cup-engineering/eavt-services-section": {
+      "version": "0.11.1",
+      "package": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+eavt-services-section@0.11.1/node_modules/@red-cup-engineering/eavt-services-section",
+      "manifest": {
+        "bytes": 6461,
+        "sha256": "8755bc1d5dde952ab334073d43ba599de456b57a199e3e2554f03a999f9a6c65",
+        "gitBlob": "e2c9cecab3918521984dfbe8d23a45f8774bc6c4"
+      }
+    },
+    "@red-cup-engineering/json-schema-services-section": {
+      "version": "0.5.0",
+      "package": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section",
+      "manifest": {
+        "bytes": 6953,
+        "sha256": "e2e9018c1e2b1cf8bb90072932cae24d26f4f9748fad812627a09a8429d1c2e7",
+        "gitBlob": "eb67d873c2a8934e17a564502e91ae431f5f6083"
+      }
+    },
+    "@red-cup-engineering/json-services-section": {
+      "version": "0.4.0",
+      "package": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section",
+      "manifest": {
+        "bytes": 2734,
+        "sha256": "1b5945abba04ed87ad57a2a97586ee03b4742d8539fe43c2fabdec1161c181be",
+        "gitBlob": "2e1214eb36ebe14d11796b049620bf66ffa188d8"
+      }
+    },
+    "@red-cup-engineering/signcell": {
+      "version": "0.13.1-dev.217",
+      "package": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.217/node_modules/@red-cup-engineering/signcell",
+      "manifest": {
+        "bytes": 3441,
+        "sha256": "a0263352863918be1ef10768b808a39c6a220679c6b0b3736db7d7b2e0010d07",
+        "gitBlob": "7d10d9dadce5ac5a7b5ec24140bdc0c478cbe0e9"
+      }
+    },
+    "@red-cup-engineering/uri-services-section": {
+      "version": "0.1.1",
+      "package": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+uri-services-section@0.1.1/node_modules/@red-cup-engineering/uri-services-section",
+      "manifest": {
+        "bytes": 987,
+        "sha256": "ad2294be4d435b8c12871d030a5976686259c15579818e1dd1eb84d0f96e1dc4",
+        "gitBlob": "7a89bc4a80fd0ce9d2e78db3b30722d1a0e0d524"
+      }
+    }
+  },
+  "closureReceiving": {
+    "beforeAndAfterPackedReceivingEqual": true,
+    "fileAndLinkEntries": 2448,
+    "inventory": "providers.json.gz",
+    "sourceAndPackedMembersUnchanged": true,
+    "archiveMembers": 34,
+    "archiveSha256": "3ed96f3ed8cfcc633fed99802d90364400a154aa55d642fd5210c0eec1480cec"
+  },
+  "scientificLineage": {
+    "source": "https://github.com/lenticule-science/obsmetrologia-science-services-section/blob/a8515044eb632f4fc3b639e3b3d8d106e64b90ff/Obsmetrologia/Closure/Modal.lean",
+    "observation": "The cited source explicitly requires a finite S5 modal frame for its knowledge-order closure laws. This patch supplies no new frame or valuation theorem. It preserves the existing causal custody cut used by witness-sensitive readers. Read-only source review, not a Lean kernel execution."
+  },
+  "limitations": [
+    "The existing age-reclaiming lock is not a fence against an indefinitely paused writer.",
+    "Record and head publication are separate; late failure may retain a record or a visible head.",
+    "The guard does not establish exactly-once external effects, claim truth, or additional witnesses.",
+    "Qualification currently selects issued SignCell 0.13.1-dev.217; a later supplier adoption requires new native and packed receiving.",
+    "Registry issuance, installed consumer uptake and live host activation are not established by this local source/archive receipt."
+  ]
+}

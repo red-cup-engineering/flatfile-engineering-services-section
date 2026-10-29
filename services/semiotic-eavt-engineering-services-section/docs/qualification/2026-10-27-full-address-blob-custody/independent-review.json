@@ -1,0 +1,18 @@
+{
+  "kind": "seavt.blob-custody-independent-review/v1",
+  "reviewer": "Independent collaboration agent /root/ledger_review",
+  "candidateBase": "f3bc5b2daab91de3543f53107a7e8495733e4486",
+  "result": "passed after revision",
+  "originalCounterexample": "A canonical prefix that is an ordinary file yields ENOTDIR. hasBlob initially masked it using verified legacy bytes; all four read/put operations now propagate that error and permit legacy fallback only on ENOENT.",
+  "verification": {
+    "reproducedFinalEnotdirHoldout": true,
+    "receivingCases": 59,
+    "receivingTapSha256": "36f98863ff708dc4d64669ce1955ce061cc7e70f67d7aa57e3abdecf83a32e80",
+    "providerEntriesUnchanged": 2448
+  },
+  "source": {
+    "telemetry": "a14c00d733ad2b0f96c0519d15a16d468f7cfaa3",
+    "test": "d7a65a9f40a9808aa34d5ca0d5032674d317010c"
+  },
+  "scope": "Full-address blob custody, verified duplicate/EEXIST receiving and verified legacy fallback. Reuses the actual File owner's completed temporary-file/exclusive-link operation. Does not establish additional ancestor crash-durability or runtime activation guarantees."
+}

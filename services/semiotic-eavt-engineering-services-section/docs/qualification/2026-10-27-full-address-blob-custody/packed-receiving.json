@@ -1,0 +1,34 @@
+{
+  "kind": "seavt.packed-blob-custody-receiving/v1",
+  "packageRoot": "/dev/shm/logging-538c/packages/seavt-blob-candidate/unpacked/package",
+  "command": [
+    "node",
+    "--test",
+    "--test-concurrency=1",
+    "--test-reporter=tap",
+    "test/telemetry.test.mjs",
+    "test/telemetry-trace-integrity.test.mjs",
+    "test/telemetry-boundaries.test.mjs",
+    "test/telemetry-cell-events.test.mjs"
+  ],
+  "tmpdir": "/dev/shm/logging-538c/blob-tests/packed-native",
+  "exitCode": 0,
+  "counts": {
+    "tests": 59,
+    "suites": 0,
+    "pass": 59,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "tapSha256": "6266e8c15afbc5b55f8c222b99a0475b963c80c9d3e637a91a163d978f5f1d81",
+  "archiveSha256": "c218b662c584c7a07c3387f4a7e54c95403751fda01b3c4ae3ffb0f0d6d70225",
+  "archiveUnchanged": true,
+  "membersVerified": 33,
+  "memberChanges": [],
+  "sourceExact": true,
+  "signcell": "0.13.1-dev.217",
+  "dependencyLink": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules",
+  "publication": false
+}

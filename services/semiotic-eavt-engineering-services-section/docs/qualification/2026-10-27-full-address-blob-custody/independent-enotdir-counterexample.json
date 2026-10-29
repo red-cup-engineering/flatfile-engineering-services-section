@@ -1,0 +1,17 @@
+{
+  "case": "ENOTDIR canonical path must not permit legacy fallback",
+  "address": "ni:///sha-256;tvUFhRyh0fiqXgGqsTLVgSciw_Wmr9Beg6muqQf9fSc",
+  "outcomes": {
+    "getBlob": {
+      "error": "ENOTDIR",
+      "message": "ENOTDIR: not a directory, open '/tmp/logging-538c-review/fallback-AbT9Ks/data/blobs/telemetry/sha-256/tv/UFhRyh0fiqXgGqsTLVgSciw_Wmr9Beg6muqQf9fSc'"
+    },
+    "hasBlob": {
+      "returned": true
+    },
+    "blobSize": {
+      "error": "ENOTDIR",
+      "message": "ENOTDIR: not a directory, open '/tmp/logging-538c-review/fallback-AbT9Ks/data/blobs/telemetry/sha-256/tv/UFhRyh0fiqXgGqsTLVgSciw_Wmr9Beg6muqQf9fSc'"
+    }
+  }
+}

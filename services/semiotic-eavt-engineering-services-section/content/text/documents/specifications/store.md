@@ -35,7 +35,7 @@ provenance:
 put(root, type, record, { durableRoot }), writeHead(..., { expect, durableRoot })
 and extend(..., { causes, closed, durableRoot }) opt into the computer-file
 owner's strict durability contract. Calls omitting durableRoot keep their
-existing behavior. The caller supplies a pre-existing, already-durable anchor;
+existing durability guarantees. The caller supplies a pre-existing, already-durable anchor;
 it may be a durable ancestor when the settlement root has not yet been created.
 The anchor is a trusted precondition, not a fact inferred from its pathname.
 
@@ -46,11 +46,22 @@ directory chain even when all directories already existed. put's matching-record
 fast path reestablishes these barriers without appending. A new bucket line is
 still one O_APPEND write: a short write refuses and retains its fragment.
 
-Strict writeHead uses the existing complete atomic file writer, preserves
+All writeHead publication uses the existing complete atomic file writer, preserves
 expected-frontier admission, supplied at and closed semantics, and uses the
 original 0644 head creation mode masked by the process umask. extend persists
 the record before publishing the head. No API promises a combined transaction:
 orphan records and uncertain post-rename results remain possible.
+
+Ordinary replacement also delegates to the file owner. A single successful
+low-level write can return fewer bytes than requested, including after a
+filesystem fills partway through the write. Such a prefix must never become a
+head. The file owner completes the temporary write before rename; write or
+file-sync failure before publication preserves the existing head. Cleanup of its
+private temporary is attempted, and ordinary replacement uses the file owner's
+directory-sync behavior. A failure after rename remains uncertain and can
+leave the complete new head visible. This change does not reconstruct an
+already-corrupt head, tolerate partial JSON, enlarge an admission limit, or
+replay any operation represented by retained records.
 
 A post-publication failure does not prove the head stayed old. A domain that
 destroys another custody after seeing a terminal head must, under its actual
@@ -58,7 +69,18 @@ writer fence, reestablish strict put barriers for the required records and
 republish the exact intended head with its observed at/closed fields and
 expected frontier, then independently read both. Reading an already-visible
 head alone is not sufficient. The current expiring lock is unchanged and does
-not fence a paused old writer.
+not fence a paused old writer for replacement or extension. Absent-only creation
+(`expect: null`) additionally uses the file owner's exclusive final link in both
+ordinary and strict modes: a paused initial writer cannot replace a head created
+by a competing initial writer. This is not a repair of general CAS or lease fencing.
+
+An absent-only claim permits an external effect only when its initial strict
+write returns successfully. An existing or uncertain claim permits observation
+only; it must not be deleted, replaced, or retried as a new authorization merely
+because an external observation is absent. A post-link durability failure can
+leave the claim visible and still refuses authorization. EEXIST is translated
+to HeadConflict only after strict readback admits the named destination head;
+a temporary-file collision without that head remains the original error.
 
 readHead(root, object, name, { strict, maxBytes }) supports an optional positive
 safe integer maxBytes below Number.MAX_SAFE_INTEGER. Supplying maxBytes implies
@@ -108,13 +130,13 @@ The module is `@red-cup-engineering/semiotic-eavt-services-section/store`. Every
 | `get(root, type, address) -> record or undefined` | Returns the record the address names. |
 | `has(root, type, address) -> boolean` | Whether a verified line for the address exists. |
 | `each(root, type) -> generator of {address, record}` | Streams every record of a type from its existing NI buckets, in bucket order. |
-| `walk(root, type, from, {limit}) -> generator` | Reads a thread: starts at the addresses `from` (a head's frontier) and follows causes. |
+| `walk(root, type, from, {limit, verifyOnly}) -> generator` | Reads a thread: starts at the addresses `from` (a head's frontier) and follows causes. |
 | `append(root, type, line) -> void` | Appends one line to the day's log of the type. |
 | `readLog(root, type, date, {from}) -> generator of {line, next}` | Streams a day's lines from a byte position; `next` is the position after the line. |
 | `logDates(root, type) -> generator of date` | The dates that have a log, in order, from the directory listing. |
 | `readHead(root, object, name) -> head or undefined` | Reads one head. |
 | `writeHead(root, object, name, head, {expect}) -> void` | Replaces one head atomically. |
-| `extend(root, object, name, record, {causes}) -> address` | The one write path for a thread: puts the record and advances the head. |
+| `extend(root, object, name, record, {causes, expect}) -> address` | The one write path for a thread: optionally checks the observed frontier, puts the record and advances the head. |
 | `heads(root, object) -> generator of {name, head}` | Streams the heads of a type of thread from the directory listing. |
 | `pull(root, remote, object, {limit}) -> summary` | Converges with a peer by heads (section 8). |
 
@@ -126,19 +148,30 @@ The module is `@red-cup-engineering/semiotic-eavt-services-section/store`. Every
 
 **each.** Opens the bucket files of the type in name order, and yields the records in each in file order. It lists existing bucket names once into a 512-byte presence bitmap, opens only those buckets, and holds one chunk and one record. The bitmap is discarded when discovery ends. It is the only way to read every record of a type, it costs the size of the type, and it is not an index. A reader that wants the latest records, or the records of a period, reads a log or a head; it does not `each` a type and sort.
 
+**appended.** `appended(root, type, cursor)` returns the records of a type appended since `cursor`, and the cursor to pass next time; without a cursor it returns every record, as `each` does. Bucket files only grow, so the cursor is, per existing bucket, the byte position after the last complete line read and the file's inode: a call stats each bucket and reads only the bytes after its position, and a line not yet terminated waits for the next call. If a bucket the cursor names has shrunk, been replaced or is gone, the call returns `{reset: true}` and the consumer folds again from a call without a cursor. The cursor is the consumer's, held between its calls as a log cursor is (`readLog`); the store holds nothing between calls. It is how a reader that keeps a fold of a type (the World's tellings, a work board) learns what is new without reading the whole type: its cost is a stat per bucket plus the new bytes, where `each` costs the type.
+
 **Strict discovery.** `each(root, type, {strict: true})` and `heads(root, object, {strict: true})` retain their streaming bounds but refuse malformed, unverifiable or unavailable evidence instead of silently omitting it. Record discovery also refuses incomplete and overlong lines; head discovery validates every frontier. Strict record/head leaf entries must be regular files. They are opened with no-follow and nonblocking flags and checked on that same descriptor before reading; symbolic leaf links, FIFOs and directories are refused. A platform without those flags refuses strict discovery. This does not change the separately supported log-directory placement. Genuine missing files/directories remain absent, while `ENOTDIR` and other filesystem failures propagate. Structural corruption messages name the path, not the record contents. Existing calls without `strict` retain their permissive behavior.
 
 A strict iterator is complete only after successful exhaustion. A yielded prefix followed by an error is not a complete reading. Discovery is not an atomic snapshot across writers or heads: an authority consumer must name its scope, fully validate referenced records, refuse missing/truncated walks, and perform its own final current-source check. Unchanged head contents do not certify unchanged availability of their referenced bytes.
 
 **walk.** `from` is a list of addresses. `walk` reads each, then the records named by each record's `causes`, and so on, visiting every address once, and yields `{address, record}` in effects-first order (a record before the causes it names). The walk stops after `limit` records (default 256) and yields `{truncated: true}`. An address whose line is absent, including one that disappears between traversal and emission, is yielded as `{address, type, missing: true}` and the walk continues with the rest. A reader that needs causes first collects the walk, bounded by the limit, and reverses it. `walk` visits at most `limit` addresses, and that set is the only memory it holds beyond a chunk and a record.
 
+`verifyOnly: true` requests identity verification without returning record bodies. It yields `{address, type, verified: true}` for present admitted nodes, with the same missing markers, effects-first order, cross-type references and traversal limit. The option must be boolean and defaults to false. This mode keeps only per-call bucket version metadata (device, inode, byte size, nanosecond mtime and ctime), not record bodies or a persistent index. It reuses a traversal admission only when the exact bucket was stable across that read and remains unchanged at emission. A changed, replaced or disappeared bucket uses the original current lookup, so disappearance or corruption between yields still reports missing. Default record-producing walks retain their current reread.
+
+The native current-state checker exhausts strict record discovery once: that producer already verifies canonical identities and bucket placement. It then uses proof-only head traversal and requires the explicit `verified` marker; an older supplier that ignores the option refuses instead of appearing successful. All root, legacy-layout, malformed-row, missing-history and 100000-address head bounds remain. The checker neither copies records nor retains a cache between calls.
+
+
 **append.** The line is one JSON object, at most 4,096 bytes serialized, with an `at` member that is an ISO 8601 UTC timestamp. `append` serializes `at` first, takes the date from its first ten characters, and appends the line and a newline to `data/logs/<type>-logs/<date>.jsonl` in a single write on an `O_APPEND` descriptor. It does not flush to disk. A log is never rewritten, truncated or compacted by the store.
 
 **readLog and logDates.** `readLog` reads a day's file from byte `from` (0 for the start) and yields complete lines only; the consumer keeps `next` as its cursor, a pair of (date, byte position) that it holds itself. `logDates` lists the type's directory.
 
-**readHead, writeHead, heads.** A head is the file `data/state/<object>-state/<name>.json`. `name` is the thread's name as the world names it; characters unsafe in a file name (`/`, `#`, `%`) are percent-encoded, and a thread known by an address is named by that address's 43-character digest. `writeHead` takes a lock file `<name>.json.lock` (created exclusively; a lock older than 30 seconds is taken over), reads the current head, checks `expect` (absent: no check; `null`: the head must not exist; a list: the current frontier must equal it), writes `<name>.json.tmp` and renames it over the head, and releases the lock. If `expect` does not hold it throws `HeadConflict` and changes nothing. `heads` lists the directory and reads each file, so it costs the number of live threads of the type, not their history.
+**readHead, writeHead, heads.** A head is the file `data/state/<object>-state/<name>.json`. `name` is the thread's name as the world names it; characters unsafe in a file name (`/`, `#`, `%`) are percent-encoded, and a thread known by an address is named by that address's 43-character digest. `writeHead` takes a lock file `<name>.json.lock` (created exclusively; a lock older than 30 seconds is taken over), reads the current head, checks `expect` (absent: no check; `null`: the head must not exist; a list: the current frontier must equal it), publishes the complete head, and releases the lock. For `expect: null`, publication uses the file owner's atomic exclusive final link, which cannot overwrite an occupied destination even after lock takeover. Other replacements use the file owner's complete temporary-file write and atomic rename; strict writes additionally establish its declared durable-root barriers. If `expect` does not hold it throws `HeadConflict` and changes nothing. `heads` lists the directory and reads each file, so it costs the number of live threads of the type, not their history.
 
-**extend.** `extend(root, object, name, record, {causes})` is how a thread grows. Under the head's lock it reads the head's frontier, puts the record with `causes` set to the given causes (default: the whole frontier, so the record follows everything the writer saw), and writes the head with the frontier `(old frontier minus the record's causes) plus the new address`. It returns the address. The type of the thread's records is `object`.
+**extend.** `extend(root, object, name, record, {causes, expect})` is how a thread grows. Under the head's lock it reads the head's frontier, checks the optional `expect` guard before putting any record, puts the record with `causes` set to the given causes (default: the whole frontier, so the record follows everything the writer saw), and writes the head with the frontier `(old frontier minus the record's causes) plus the new address`. It returns the address. The type of the thread's records is `object`.
+
+The guard has the same meaning and normalized reference-set equality as `writeHead`: omitted/`undefined` means no condition, `null` requires an absent head, and an array requires that frontier. An empty array admits either an absent head or an existing empty frontier; `null` does not admit an existing empty head. Equivalent own-type string and typed references, ordering and repetitions have the existing set meaning. The caller's expected frontier is retained as a normalized guard without mutating it. Invalid references refuse. A preexisting mismatch throws `HeadConflict` before any record is put and preserves record and head bytes. Publication rechecks the same guard; `expect: null` retains the File owner's exclusive final publication.
+
+This supplies the already specified one-successor operation for competing cooperative writers or a retry from a stale source cut. It does not make the age-reclaiming lock a fence against a paused writer, prevent an external actor replacing a head, or establish exactly-once external effects. A failure after the record write can leave that record held; a failure after head publication can leave the new head visible. The receiver reads the persisted head and original records to reconcile that uncertainty. Retrying with the old expected frontier then refuses instead of adding another successor. These publication limits and strict `durableRoot` barriers remain as defined above. A causal custody edge still supplies no new claim witness, authorization or truth judgment.
 
 ## 4. Layout
 
@@ -193,7 +226,7 @@ A thread is a set of records that follow one another by causes: a work intent's 
 
 **Writing.** `extend` puts the next record with its causes and advances the head. Two writers that extend the same head at once, one after the other under the lock, make a chain; two nodes that extend the same thread without having seen each other make two maximal records, and the frontier holds both. Nothing coordinates them: the records are monotone facts.
 
-**Reading.** `readHead(root, type, name)` gives the frontier; `walk(root, type, frontier)` reads the thread, newest causes first, as far as the reader needs. A reader that wants the standing of a thread folds the walk. A reader that wants whether the thread changed compares frontiers: equal frontiers are equal readings, since every address is the content of its record and its causes. This replaces the revision strings of `revisionOfSubject` and `revisionThroughDate`.
+**Reading.** `readHead(root, type, name)` gives the frontier; `walk(root, type, frontier)` reads the thread, newest causes first, as far as the reader needs. A reader that wants the standing of a thread folds the walk. Equal frontiers key equal extensional readings only for the same root/type, complete content-address-verified cause closure, fold/schema, parameters and required availability. Missing/truncated walks are not complete readings; unchanged heads do not certify that their referenced bytes remain available. Under those conditions the frontier replaces the scoped revision strings of `revisionOfSubject` and `revisionThroughDate`, not source-occurrence or archive-resolution identity. See [migration map section 2.1](store-migration-map.md#21-source-sensitive-receiving-s1-s2-and-s5) for source-sensitive consumers.
 
 **Listing.** A board of threads is `heads(root, type)` with each head's walk read to the depth the board needs. The cost is the number of open threads, and a thread whose head says `closed` is skipped without a walk.
 
@@ -250,6 +283,10 @@ eavt-services-section's `data-artifact-address` changes its stem law with it: a 
 
 **What the store holds in memory.** Nothing between calls: no map, set, table, cache, buffer pool, open descriptor, watcher or timer survives a call. A call holds at most one 64 KiB read chunk, one record (at most 65,536 bytes) with its canonical bytes (about the same), and, for `walk`, the addresses it has visited (at most `limit` of them, 52 bytes each, with `limit` 256 by default). A call in flight is therefore bounded by about 0.3 MiB, and the node bounds store calls in flight to 8 (the host, feltos-node item 4), so the store's contribution is at most about 2.5 MiB while any number of records, lines, heads, days and types are on disk. It is below the 32 MB budget by that fixed amount, and it does not move as history grows. `process.memoryUsage()` of a node whose store holds ten million records differs from the same node with an empty store by the calls in flight and nothing more.
 
+**The formula's constants.** The one structure that outlives a call is the image of the formula itself: the 4096 bucket paths of `ni-path-v1`, computed by the NI owner the first time any type is discovered and held frozen for the life of the process (about 162 KiB of V8 heap, measured). It is a function of the formula version alone. It names no address, depends on nothing stored, and does not grow with records, types or days, so ST-2 and ST-14 hold. Deriving it per call cost more than reading: before it was held, a no-change `appended` over 1,528 records in 1,278 buckets took 22–44 ms, two-thirds of it spent re-parsing a placeholder NI per directory name. Held, the call takes 9–11 ms.
+
+**What discovery costs a consumer that folds a type.** `ni-path-v1` makes a point read cost one bucket. It spreads a type over its buckets just as evenly: 1,528 `character-mask` records already occupy 1,273 of the 4096 files. `appended` therefore costs one `stat` per occupied bucket whether or not anything was appended (9–11 ms at that size). A consumer that refolds a type to answer each message, or each poll of a wait, pays that per message. On Bare Cedar Fog on 2026-10-26, MetroPlat's actor mesh refolded `character-mask` on every 50 ms reply poll, and that fold was 38 % of the FeltOS main thread. The store's answer is not a hot index. The consumer derives *when* to fold from the events it already has: a new message, a turn, a backed-off poll (MetroPlat #186). It never folds on a fixed fast clock.
+
 **What a call costs in bytes read.** `get`, `has` and `put`: one bucket file, `N / 4096` lines of a type of `N` records, 1 KB per line is 250 KB at one million records; streamed. `walk`: one bucket per step. `readLog`: the bytes of the day from the cursor. `heads`: the open threads. `each`: the type. Time grows with a type's size; memory does not.
 
 **Outgrowing the formula.** When a type's bucket file passes 1 MiB (about four million records of 1 KB), the type moves to the next version of the formula, which names wider digest spans, by rewriting its buckets; a version never changes and a directory never mixes two. `ni-path-v1` is the only version now.
@@ -264,16 +301,18 @@ eavt-services-section's `data-artifact-address` changes its stem law with it: a 
 - **ST-6 (ubiquitous).** The store shall admit a record by writing its line, and shall not read the record's causes when it does.
 - **ST-7 (unwanted behaviour).** If a cause named by a record read in a walk has no verified line, then the store shall yield that address as missing and continue the walk.
 - **ST-8 (state-driven).** While a walk has yielded `limit` records, the store shall stop it and say it was truncated.
-- **ST-9 (event-driven).** When a head is written, the store shall hold the head's lock, check `expect`, write a temporary file and rename it over the head.
-- **ST-10 (unwanted behaviour).** If the head's current frontier does not satisfy `expect`, then the store shall change nothing and throw `HeadConflict`.
-- **ST-11 (ubiquitous).** The store shall append a log line as one write, to the file of the date of the line's `at`, and shall never rewrite, truncate or delete a log.
-- **ST-12 (unwanted behaviour).** If a record exceeds 65,536 bytes or a log line exceeds 4,096 bytes, then the store shall refuse it.
+- **ST-9 (event-driven).** When a head is written, the store shall hold the head's lock, check `expect`, and publish a complete temporary file. With `expect: null`, it shall use the file owner's exclusive final link and shall not overwrite an occupied head. Other writes retain atomic replacement. Only a successfully returned strict initial write can authorize an external effect guarded by that initial claim; uncertain outcomes shall remain observation-only.
+- **ST-10 (unwanted behaviour).** If the head's current frontier does not satisfy `expect`, then the store shall change nothing and throw `HeadConflict`. Conditional `extend` shall check this under the head lock before putting the proposed record, and shall preserve the same guard through head publication. A failure after a successful initial guard remains subject to the separate record/head publication and uncertain-outcome rules above.
+- **ST-11 (ubiquitous).** The store shall append a log line as one write, to the file of the date of the line's `at`, and shall never rewrite, truncate or delete a log; the one change to a closed day is sealing it into compressed segments that read as the same bytes (seavt-log-carrier.md).
+- **ST-12 (unwanted behaviour).** If a record exceeds 65,536 bytes or a log line exceeds 4,096 bytes, then the store shall refuse it; a caller that writes SEAVT rows raises the log bound to 1 MiB (seavt-log-carrier.md, CAR-4).
 - **ST-13 (unwanted behaviour).** If a type or object name is not plain lowercase words joined by hyphens within the length limits, then the store shall refuse it.
 - **ST-14 (ubiquitous).** The JavaScript memory the store holds shall not depend on the number of records, lines, heads, threads, days or types, and shall not exceed its fixed bound (section 10) per call in flight.
 - **ST-15 (ubiquitous).** The store shall start no watcher and no timer, and shall read no file at import.
 - **ST-16 (event-driven).** When `pull` meets an address the local store has, the store shall stop walking that branch.
-- **ST-17 (unwanted behaviour).** If a root holds `data/state/log-state` or `data/journals`, then the store shall refuse every operation on it and name the conversion.
+- **ST-17 (unwanted behaviour).** If a root holds a directory `data/state/log-state` or `data/journals` (a file of that name is not the earlier layout), then the store shall refuse every operation on it and name the conversion.
 - **ST-18 (ubiquitous).** The only code that writes under `data/records`, `data/state` and `data/logs` of a settlement shall be the store; no package shall write a side file there by hand.
+- **ST-19 (event-driven).** When `appended` is given a cursor it returned, the store shall return exactly the verified records whose complete lines were written after that cursor's positions, and shall hold nothing between calls.
+- **ST-20 (unwanted behaviour).** If a bucket named by an `appended` cursor has shrunk, been replaced or is gone, then the store shall return `{reset: true}` and no records.
 
 Each is judged by a test in `test/` that runs the operation on a temporary root. ST-14 is judged by `process.memoryUsage()` of a process that has `put` and `walk`ed over a root holding one million records, against the same process over an empty root: the difference stays below the bound of section 10. The node's receiving test, `check-memory-budget.mjs`, runs the same measurement at the host.
 
@@ -303,7 +342,8 @@ The store is built as `store` (re-exports), `store-core` (the operations), `layo
 4. **Type names are letters only.** `^[a-z]+(-[a-z]+)*$`, words of at most 24 characters, whole at most 64: a digit is an identifier or a date and is refused (ST-13). `dataKindDirectoryName` still slugifies; the store checks the name first, and the stem-law change of section 9 belongs to the wave that deletes the old store.
 5. **Head names.** `/`, `\`, `#`, `%`, control characters and a leading dot are percent-encoded; a name is 1 to 200 characters. The head file holds `name` (the unencoded name), `frontier` (sorted, one entry per address), `at`, and `closed` only when true. `extend` takes `{causes, closed}`; omitting `closed` reopens the thread.
 6. **`walk` order and memory.** The walk is a depth-first pass whose reverse finishing order is effects first for every edge among the visited addresses (also when truncated). It holds the visited addresses (at most `limit`) and a stack of frames; a frame holds its record's causes only when there are at most 8 and otherwise re-reads the record, so no frame holds a record. Records are read again when yielded. Yielded items carry `type` as well as `address`. A bucket line that names the address but does not hash to it is treated as absent by `walk` and `pull` (`get` and `has` throw `StoreCorruption` as section 3 says).
-7. **Discovery is bounded and stateless.** `each` observes existing names into a 512-byte presence bitmap and visits only those paths, built through `niBucketPath`, in name order; `logDates` makes one pass of the directory per date, keeping the smallest date greater than the last yielded. `heads` streams the directory without sorting.
+7. **Discovery is bounded and stateless.** `each` observes existing names into a 512-byte presence bitmap and visits only those paths, built through `niBucketPath`, in name order (the formula's 4096 paths are computed once per process, decision 11); `logDates` makes one pass of the directory per date, keeping the smallest date greater than the last yielded. `heads` streams the directory without sorting.
 8. **`readLog` yields parsed lines**; a line that does not parse as a JSON object is skipped. A line longer than 65,536 bytes plus 1,024 is passed over unread into memory.
 9. **The head lock** is a file created exclusively inside `store-core`, older than 30 seconds taken over, waited on up to 15 seconds; `directory-lock` (a lock directory) stays until the wave that deletes the old store, which then retires it.
 10. **ST-14 is judged at 30,000 records, not one million.** Writing a million hashed lines would load the machine for minutes; the test fixture writes 30,000 bucket lines and 30,000 log lines, runs the operations, and asserts that what the process retains after collection differs from the same operations over an empty root by under 2 MiB. The one-million measurement remains the node's `check-memory-budget.mjs`.
+11. **The formula's bucket paths are held, not re-derived (2026-10-26).** `bucketsOfFormula()` has the NI owner compute the 4096 paths of `ni-path-v1` once per process, and discovery validates and yields directory names against that frozen array. It is a constant of the formula, not of the store, so section 10's "nothing between calls" still holds of everything derived from records. Measured on a live FeltOS 30 s CPU sample (2026-10-26, Bare Cedar Fog): 3.5 s of 18.5 s busy was `niPathSegments`/`isNiUri`/`fromBase64url` under `appended`. Recorded by the chief-information-officer office (bare-cedar-fog-claude session), not the Leader.

@@ -1,0 +1,32 @@
+{
+  "kind": "verified-actual-signcell-supplier-selection/v1",
+  "selectedAt": "2026-10-27T00:59:11.174855+00:00",
+  "name": "@red-cup-engineering/signcell",
+  "version": "0.13.1-dev.217",
+  "gitHead": "cb878c7fcb77f93e68163768e9626646b88ceb5c",
+  "tree": "d962a2a2e30f495673cfd327f11560517702038f",
+  "archive": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/signcell-0.13.1-dev.217.tgz",
+  "package": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/package",
+  "bytes": 113479,
+  "sha256": "2427a2a12f3d205c41c04a9b1b872a7e23e14ad65f05d6520d4325a24789b102",
+  "sha1": "ddb544a7e8897e0fba724cd2fa8198277f8ea0f8",
+  "integrity": "sha512-8skWy6jfHIF8P+5YDx89G6Y0TZsuwWr0K5rqSAcLDGVli8ucVaUMqEkRpV+X2lCN5uRD6gFKIuyCodHGzK4cbg==",
+  "fileCount": 46,
+  "nonManifestSourceExact": 45,
+  "receivingReceipt": {
+    "path": "/workspace/scratch/455c183ed200/evidence/published-signcell-217/receiving.json",
+    "bytes": 202651,
+    "sha256": "a501e42cd6377ee8c3a917dec646f96d99bd63119b84334bb20c6ac71d47ba27",
+    "gitBlob": "ac41e8ff96d790e5521d342447c4a0dc3705cbb3"
+  },
+  "receivingTotals": {
+    "tests": 139,
+    "pass": 139,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "sourceCheckpoint": "a840aa6494009d225d5c3a34aac60a9a508a418e",
+  "supplierReceivingCompletedBeforeSelection": true
+}

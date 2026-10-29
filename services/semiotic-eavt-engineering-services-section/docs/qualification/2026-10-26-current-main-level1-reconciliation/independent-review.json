@@ -1,0 +1,281 @@
+{
+  "profile": "seavt-current-main-reconciliation-independent-review/1",
+  "observedAt": "2026-10-26T23:37:41.864873+00:00",
+  "reviewer": "cell_lineage_tab",
+  "status": "accepted-source-composition",
+  "scope": "Independent read-only implementation review and six bounded temporary-root probes. No implementation/provider edits or remote operations by this reviewer.",
+  "source": {
+    "repository": "red-cup-engineering/semiotic-eavt-engineering-services-section",
+    "priorQualifiedMain": "389951f15e0ffb57ee29f8d71ef1a16a4904ce3d",
+    "concurrentMain": "e1e81b84e2e2ee312bbc197e0b47b34dfe12fae2",
+    "concurrentTree": "e842450e2862f42eda1e3a65dc25c49733036a65",
+    "candidateDirectory": "/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/combined",
+    "compareUrl": "https://github.com/red-cup-engineering/semiotic-eavt-engineering-services-section/compare/389951f15e0ffb57ee29f8d71ef1a16a4904ce3d...e1e81b84e2e2ee312bbc197e0b47b34dfe12fae2",
+    "changedPathsInConcurrentMerge": 11,
+    "concurrentAdditions": 128,
+    "concurrentDeletions": 370,
+    "candidateChangedPaths": [
+      {
+        "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+        "bytes": 19011,
+        "sha256": "b43f311ca85d97fd1144a9bd84ec17333f326d4846b7680d426e32c1c7966897",
+        "gitBlob": "68396a1d9fc4d3e8914720b669c72e7bf09a53c1"
+      },
+      {
+        "path": "content/text/documents/specifications/seavt-log-carrier.md",
+        "bytes": 5926,
+        "sha256": "f9ea5487cbea244dd2960375636a85af725d81aa57ba26cbc7fbb3b54e6a49c6",
+        "gitBlob": "f2ebb42739de3d71eb2bd66ecc5984cc61c5a8ff"
+      },
+      {
+        "path": "content/text/documents/specifications/store.md",
+        "bytes": 45151,
+        "sha256": "8514b3d2d592efbe73022402d759102721c4e75f25f32f8cc6d0918e61c640e3",
+        "gitBlob": "c2a30ad1d7663cd219be31ce350ac2b489393e08"
+      },
+      {
+        "path": "package.json",
+        "bytes": 2998,
+        "sha256": "728d504defa171903824fda17f7893fcb72432bc0c51597c704fb7c2f696f6e8",
+        "gitBlob": "a6f5fee06c15c32490452aac1c1b5efc6a4e3402"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "bytes": 22339,
+        "sha256": "8afbda8836d4ba3743cf8898e57bc93e238c65fcd35bd3b34f45422ebfaca434",
+        "gitBlob": "f11d4488c9614f51290e1a7077035d5316dd7137"
+      },
+      {
+        "path": "src/clock.mjs",
+        "bytes": 3838,
+        "sha256": "169b766d85e010006ecbcc8b976b9d0a421f66c7463f3ca663e26bef63dc68ca",
+        "gitBlob": "4e8f7213725997780a1cda4a2153986b6f708a4d"
+      },
+      {
+        "path": "src/exchange.mjs",
+        "bytes": 6677,
+        "sha256": "062b4d5eb9074cc9257234ea015c8427ef2fea982dbdd49d6e791bd27a9a122e",
+        "gitBlob": "23f215f821ed2ad43cc1d593bd1517be1ef70a14"
+      },
+      {
+        "path": "src/identity/artifact.mjs",
+        "bytes": 2486,
+        "sha256": "44ae1f495f0eca46516a51efc4573bbb652a97a0ffa43023e39812c177c396da",
+        "gitBlob": "f83f53eec9cab5ef5a665a8103283241603f44da"
+      },
+      {
+        "path": "src/layout.mjs",
+        "bytes": 5264,
+        "sha256": "ab9594a0ea1d97c8b4f794286580e2d25c23fa7b777dcf76b55cf6a01b6a7e78",
+        "gitBlob": "4ea6c226ecbc8a7f8d11533e08af06fd60e0442c"
+      },
+      {
+        "path": "src/sealed-log.mjs",
+        "bytes": 7480,
+        "sha256": "8e8acf5f36587ffe9e79304bec93048fdc5dbb3406291d0f2f010f58a5ffa03d",
+        "gitBlob": "9fcb3b4e6b1d970e2196cb51a1c63eec5ffc0bb7"
+      },
+      {
+        "path": "src/store-core.mjs",
+        "bytes": 33664,
+        "sha256": "1f2f502848a18171629f4713245689ba7846e8ddae46f1f5b51ccf6cc7e1cf4c",
+        "gitBlob": "09bd060f682e451e3b2334c18599e58dd78f3f7e"
+      },
+      {
+        "path": "src/store.mjs",
+        "bytes": 1111,
+        "sha256": "1a06de61357b90c5f44494a022e985f249a8264eb583ac0d940c9fb587e51f22",
+        "gitBlob": "0188329b3990189e107fc225c03b3694fe3bdbe1"
+      },
+      {
+        "path": "test/sealed-log.test.mjs",
+        "bytes": 5885,
+        "sha256": "3067c2a5a8efb06333bf213799613e513c50894b4a0167ac4a1fc6b004714b02",
+        "gitBlob": "23e712096af29420c325b5a040ed3d0949e8e94e"
+      },
+      {
+        "path": "test/store.test.mjs",
+        "bytes": 23108,
+        "sha256": "6d0f0fd55073ee9e1bdffb7a02c94f91d08cb491d89a8711c61cf88def8b7ca0",
+        "gitBlob": "cda3aeab889fa1f773a0a5b7a049893ea2779407"
+      },
+      {
+        "path": "test/telemetry-boundaries.test.mjs",
+        "bytes": 7304,
+        "sha256": "a7469d66791de9bb445e2061037b9cc7d5fb17fa4a089b938fce3383eb9dedac",
+        "gitBlob": "5f65188f4bfd949448469f39c5c2e2081663e0eb"
+      }
+    ]
+  },
+  "preservedPositiveChanges": [
+    {
+      "finding": "A compressed segment short write now refuses before publishing a segment or retiring the original sealing file.",
+      "source": "https://github.com/red-cup-engineering/semiotic-eavt-engineering-services-section/blob/e1e81b84e2e2ee312bbc197e0b47b34dfe12fae2/src/sealed-log.mjs#L63-L89",
+      "composition": "Prior multi-block row writer and reader retained; imported StoreError and exact compressed.length return check composed into the writer."
+    },
+    {
+      "finding": "Seven new durability cases are retained: zero-byte and one-byte compressed segment writes; four ordinary-head failure stages alongside strict cases; one large ordinary-head prefix/ENOSPC failure.",
+      "sources": [
+        "https://github.com/red-cup-engineering/semiotic-eavt-engineering-services-section/blob/e1e81b84e2e2ee312bbc197e0b47b34dfe12fae2/test/sealed-log.test.mjs#L24-L45",
+        "https://github.com/red-cup-engineering/semiotic-eavt-engineering-services-section/blob/e1e81b84e2e2ee312bbc197e0b47b34dfe12fae2/test/strict-publication.test.mjs#L115-L157"
+      ],
+      "composition": "Strict-publication tests are byte-exact concurrent main. Sealed-log tests differ only by explicit seal:false in the helper, necessary under preserved automatic sealing."
+    },
+    {
+      "finding": "Ordinary head runtime already used the same file-owner complete atomic writer at both source heads; the added tests improve coverage.",
+      "composition": "Retained concurrent-main head explanation and its precise store-spec replacement sentence."
+    }
+  ],
+  "removedContractsRestored": [
+    {
+      "contract": "Incremental record reading and change notification",
+      "details": "appended with per-bucket position/inode and reset on shrink/replacement/disappearance; recordsChangeWitness and new-put directory mtime; original public exports."
+    },
+    {
+      "contract": "SEAVT carrier admission and bounded append",
+      "details": "SEAVT row/budget exports; 1 MiB row allowance; maxBytes, guard, seal and boolean append return; raw and sealed multi-block line reading; automatic sealing. Unchanged row/compaction modules still import the removed constants."
+    },
+    {
+      "contract": "Source dates and filing clocks",
+      "details": "Real Gregorian calendar dates and exact-fraction utcFilingInstant remain required by unchanged seavt-carrier. Exact time comparison itself was not redesigned."
+    },
+    {
+      "contract": "Peer causal custody and head convergence",
+      "details": "Identity verification before retention, missing/malformed cause refusal, second-read revalidation and actual cause presence, plus closure-only transitions on an unchanged frontier. Valid ordinary cross-type traversal succeeds on both old and regressed sources; its completeness and identity protections were removed."
+    },
+    {
+      "contract": "Caller-selected artifact byte allocation",
+      "details": "Validated positive safe integer maxBytes forwarded to strict JSON admission; both source/canonical limits and all other original guards retained."
+    },
+    {
+      "contract": "Existing bounded discovery/verification policies",
+      "details": "Formula-constant bucket paths and bounded exact-line digest verdict cache restored; no new index or runtime authority added. No performance benchmark was run in this review."
+    },
+    {
+      "contract": "Earlier-layout refusal distinguishes a directory from a note",
+      "details": "Original directory check restored; a regular data/journals note is not treated as a legacy store."
+    },
+    {
+      "contract": "Prior explicit regression coverage",
+      "details": "All six removed store cases restored alongside all seven concurrent durability additions."
+    }
+  ],
+  "regressionsIndependentlyObservedBeforeComposition": {
+    "missingCause": {
+      "prior": {
+        "converged": 0,
+        "records": 0,
+        "truncated": true,
+        "head": null
+      },
+      "concurrent": {
+        "converged": 1,
+        "records": 1,
+        "truncated": false,
+        "headPublished": true,
+        "causePresent": false
+      }
+    },
+    "forgedPayload": {
+      "prior": "refuses without head",
+      "concurrent": "reports convergence and publishes a head while has(claimedAddress) is false"
+    },
+    "unchangedFrontierClosure": {
+      "prior": "closed:true transported with zero new records",
+      "concurrent": "ignored"
+    },
+    "zeroCap": {
+      "prior": {
+        "returned": false,
+        "capReads": 1,
+        "refusals": 1,
+        "retainedLines": 0
+      },
+      "concurrent": {
+        "returned": "undefined",
+        "capReads": 0,
+        "refusals": 0,
+        "retainedLines": 1
+      }
+    },
+    "calendarRollover": {
+      "inputs": [
+        "2025-02-29",
+        "2026-02-30"
+      ],
+      "prior": "refused log-date",
+      "concurrent": "accepted"
+    },
+    "legacyNote": {
+      "prior": "regular data/journals note accepted",
+      "concurrent": "legacy-store refusal"
+    },
+    "baselineNativeEvidence": {
+      "path": "evidence/seavt-e1-reconciliation/latest-main-native.tap",
+      "tests": 201,
+      "pass": 194,
+      "fail": 7,
+      "skipped": 0,
+      "role": "Read from separately executed native baseline, not counted as independent probes."
+    }
+  },
+  "independentProbes": {
+    "command": "node docs/qualification/2026-10-26-current-main-level1-reconciliation/independent-probes.mjs <exact-source-directory>",
+    "result": {
+      "candidate": "/workspace/scratch/455c183ed200/evidence/seavt-e1-reconciliation/combined",
+      "probes": 6,
+      "passed": 6,
+      "cases": [
+        {
+          "name": "second-block-0-byte-short-write",
+          "passed": true,
+          "originalBytes": 200040,
+          "readableRows": 1,
+          "retryExact": true
+        },
+        {
+          "name": "second-block-1-byte-short-write",
+          "passed": true,
+          "originalBytes": 200040,
+          "readableRows": 1,
+          "retryExact": true
+        },
+        {
+          "name": "cross-type-missing-refusal-retry-and-closure",
+          "passed": true
+        },
+        {
+          "name": "forged-peer-refused",
+          "passed": true
+        },
+        {
+          "name": "zero-cap-no-record-retained",
+          "passed": true
+        },
+        {
+          "name": "calendar-valid-and-rollover-refusal",
+          "passed": true
+        }
+      ]
+    },
+    "reproducer": {
+      "path": "docs/qualification/2026-10-26-current-main-level1-reconciliation/independent-probes.mjs",
+      "bytes": 5327,
+      "sha256": "1b34cc7e9705f58e57d280a9b8f3c26843f43235e45df4af7edf3f8c77183484",
+      "gitBlob": "b0a4ed96c5dd23499f8cabe39551db516506cdfd"
+    },
+    "rawOutput": {
+      "path": "docs/qualification/2026-10-26-current-main-level1-reconciliation/independent-probes.json",
+      "bytes": 581,
+      "sha256": "b5b2ca2fb6f9580a5b1b69f617e81dc66cf0699e4f20c818a6d43b6d30f0cc1d",
+      "gitBlob": "0b20fbb13aecf0a5ca4c59424166cd0c1e68bfdc"
+    },
+    "nativeOrPackedTestCounts": false
+  },
+  "decision": "The combined source retains the established logging contracts and the useful concurrent short-write fix. Accepted for the separate full-native and packed owner qualification gates.",
+  "limits": [
+    "This is source-composition evidence, not registry issuance or live host adoption.",
+    "Independent probes are separate from the owner native and packaged suites.",
+    "Atomic head replacement and uncertain post-publication results retain their original contract; no combined transaction is claimed."
+  ]
+}

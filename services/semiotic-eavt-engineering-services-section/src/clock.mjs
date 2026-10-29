@@ -1,3 +1,14 @@
+/** A real Gregorian day, refusing rollover dates rather than normalizing them. */
+export function isSeavtCalendarDate(value) {
+  const match = typeof value === "string"
+    ? /^(\d{4})-(\d{2})-(\d{2})$/u.exec(value) : null;
+  if (!match) return false;
+  const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+  if (month < 1 || month > 12 || day < 1) return false;
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  return day <= [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+}
+
 /** Admit a real absolute observation instant. Date.parse alone can silently
  * normalize impossible calendar dates such as February 30. */
 export const isAbsoluteSeavtClock = value => {
@@ -9,9 +20,7 @@ export const isAbsoluteSeavtClock = value => {
   if (Number(hour) > 23 || Number(minute) > 59 || Number(second) > 59 ||
       (offsetHour !== undefined && (Number(offsetHour) > 23 || Number(offsetMinute) > 59)) ||
       !Number.isFinite(Date.parse(value))) return false;
-  const day = value.slice(0, 10);
-  const midnight = new Date(day + "T00:00:00Z");
-  return Number.isFinite(midnight.getTime()) && midnight.toISOString().slice(0, 10) === day;
+  return isSeavtCalendarDate(value.slice(0, 10));
 };
 
 /** Exact order of SEAVT instants, including all fractional-second digits.
@@ -42,4 +51,18 @@ export function sourceClocksVisibleAt({ publishedAt, receivedAt, observedAt } = 
     throw new TypeError("SEAVT source clock cutoff must be an absolute instant");
   return [publishedAt, receivedAt, observedAt].every(stamp =>
     isAbsoluteSeavtClock(stamp) && compareAbsoluteSeavtClocks(stamp, cutoff) <= 0);
+}
+
+/** Canonical UTC filing time, retaining fractional digits exactly.
+ * A UTC Z source spelling stays verbatim. Offset sources acquire a .000
+ * fractional spelling when none was supplied, matching the existing day-log
+ * carrier and preserving the independent original source-time in row.t. */
+export function utcFilingInstant(value) {
+  if (!isAbsoluteSeavtClock(value))
+    throw new TypeError("SEAVT filing requires an absolute observation instant");
+  if (value.endsWith("Z")) return value;
+  const whole = value.replace(/\.\d+(?=[+-]\d{2}:\d{2}$)/u, "");
+  const utc = new Date(Date.parse(whole)).toISOString().slice(0, 19);
+  const fractional = value.match(/\.(\d+)(?=[+-]\d{2}:\d{2}$)/u)?.[1] ?? "000";
+  return utc + "." + fractional + "Z";
 }

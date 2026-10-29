@@ -1,0 +1,424 @@
+TAP version 13
+# Subtest: conditional extend: absent-only creation rejects a repeated attempt before another record is put
+ok 1 - conditional extend: absent-only creation rejects a repeated attempt before another record is put
+  ---
+  duration_ms: 58.42984
+  type: 'test'
+  ...
+# Subtest: conditional extend: stale frontier rejects before persisting a second successor
+ok 2 - conditional extend: stale frontier rejects before persisting a second successor
+  ---
+  duration_ms: 10.235555
+  type: 'test'
+  ...
+# Subtest: conditional extend: expected frontiers use the existing typed-reference set equivalence
+ok 3 - conditional extend: expected frontiers use the existing typed-reference set equivalence
+  ---
+  duration_ms: 8.690976
+  type: 'test'
+  ...
+# Subtest: conditional extend: empty-frontier and omitted guards preserve their existing meanings
+ok 4 - conditional extend: empty-frontier and omitted guards preserve their existing meanings
+  ---
+  duration_ms: 11.316883
+  type: 'test'
+  ...
+# Subtest: conditional extend: invalid expected references cannot be ignored and publish a record
+ok 5 - conditional extend: invalid expected references cannot be ignored and publish a record
+  ---
+  duration_ms: 8.373079
+  type: 'test'
+  ...
+# Subtest: conditional extend: a fresh process resumes the persisted cut and refuses its stale replay
+ok 6 - conditional extend: a fresh process resumes the persisted cut and refuses its stale replay
+  ---
+  duration_ms: 433.401486
+  type: 'test'
+  ...
+# Subtest: conditional extend: two actual processes using one cut admit at most one successor
+ok 7 - conditional extend: two actual processes using one cut admit at most one successor
+  ---
+  duration_ms: 132.105878
+  type: 'test'
+  ...
+# Subtest: conditional extend: ordinary uncertain publication remains read-only on stale retry
+ok 8 - conditional extend: ordinary uncertain publication remains read-only on stale retry
+  ---
+  duration_ms: 339.585747
+  type: 'test'
+  ...
+# Subtest: conditional extend: strict uncertain publication remains read-only on stale retry
+ok 9 - conditional extend: strict uncertain publication remains read-only on stale retry
+  ---
+  duration_ms: 336.78006
+  type: 'test'
+  ...
+# Subtest: sv11-positive: real stderr credential redaction reaches the receipt headline
+ok 10 - sv11-positive: real stderr credential redaction reaches the receipt headline
+  ---
+  duration_ms: 109.130078
+  type: 'test'
+  ...
+# Subtest: sv11-alternate: stdout fallback uses its bounded sanitized source tail
+ok 11 - sv11-alternate: stdout fallback uses its bounded sanitized source tail
+  ---
+  duration_ms: 60.39432
+  type: 'test'
+  ...
+# Subtest: sv11-refusal: absent tails and successful output do not manufacture headline detail
+ok 12 - sv11-refusal: absent tails and successful output do not manufacture headline detail
+  ---
+  duration_ms: 32.001909
+  type: 'test'
+  ...
+# Subtest: sv12-positive: nested spans and child environments retain admitted vendor state
+ok 13 - sv12-positive: nested spans and child environments retain admitted vendor state
+  ---
+  duration_ms: 7.548411
+  type: 'test'
+  ...
+# Subtest: sv12-level1-flags: received reserved bits remain evidence while new contexts emit sampled only
+ok 14 - sv12-level1-flags: received reserved bits remain evidence while new contexts emit sampled only
+  ---
+  duration_ms: 8.35979
+  type: 'test'
+  ...
+# Subtest: sv12-refusal: discarded or absent vendor state never returns from an injection base
+ok 15 - sv12-refusal: discarded or absent vendor state never returns from an injection base
+  ---
+  duration_ms: 6.258244
+  type: 'test'
+  ...
+# Subtest: sv14: an explicit journal frontier refuses a stale claim observation without adding evidence
+ok 16 - sv14: an explicit journal frontier refuses a stale claim observation without adding evidence
+  ---
+  duration_ms: 87.994572
+  type: 'test'
+  ...
+# Subtest: sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+ok 17 - sv13-positive: repeated and forwarded claim events retain evidence through the actual journal and export
+  ---
+  duration_ms: 108.61483
+  type: 'test'
+  ...
+# Subtest: sv13-alternate: custody adds neither witness nor event time and owns the retained input
+ok 18 - sv13-alternate: custody adds neither witness nor event time and owns the retained input
+  ---
+  duration_ms: 13.681337
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+ok 19 - sv13-refusal: malformed claim envelopes and accessors leave the existing head unchanged
+  ---
+  duration_ms: 13.634197
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+ok 20 - sv13-refusal: over-bound claim events preserve the head and are not retried or shortened
+  ---
+  duration_ms: 28.030533
+  type: 'test'
+  ...
+# Subtest: sv13-refusal: an unwritable original store propagates without a receipt
+ok 21 - sv13-refusal: an unwritable original store propagates without a receipt
+  ---
+  duration_ms: 4.351993
+  type: 'test'
+  ...
+# Subtest: sv5-wire-flags: retained uint32 evidence stays readable while reserved outbound bits refuse
+ok 22 - sv5-wire-flags: retained uint32 evidence stays readable while reserved outbound bits refuse
+  ---
+  duration_ms: 38.773205
+  type: 'test'
+  ...
+# Subtest: sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+ok 23 - sv8-positive: shared ancestors and fan-in retain causal order despite backward clocks
+  ---
+  duration_ms: 24.020729
+  type: 'test'
+  ...
+# Subtest: sv8-alternate: multiple channels retain each channel's causal export order
+ok 24 - sv8-alternate: multiple channels retain each channel's causal export order
+  ---
+  duration_ms: 31.245754
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+ok 25 - sv8-refusal: an unresolved cause is explicit and cannot become a complete export
+  ---
+  duration_ms: 14.106366
+  type: 'test'
+  ...
+# Subtest: sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+ok 26 - sv8-refusal: a hash-invalid cause is unavailable evidence, not an omitted success
+  ---
+  duration_ms: 14.919506
+  type: 'test'
+  ...
+# Subtest: sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+ok 27 - sv9-positive: a bounded read reports its cut and never exports a silently truncated trace
+  ---
+  duration_ms: 19.19863
+  type: 'test'
+  ...
+# Subtest: sv9-alternate: an absent trace differs from an admitted empty frontier
+ok 28 - sv9-alternate: an absent trace differs from an admitted empty frontier
+  ---
+  duration_ms: 2.867535
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+ok 29 - sv9-refusal: foreign typed heads and causes cannot impersonate telemetry messages
+  ---
+  duration_ms: 9.521524
+  type: 'test'
+  ...
+# Subtest: sv9-refusal: malformed causal reference and non-Message records remain explicit
+ok 30 - sv9-refusal: malformed causal reference and non-Message records remain explicit
+  ---
+  duration_ms: 8.659449
+  type: 'test'
+  ...
+# Subtest: sv10-positive: source readmission owns nested message and channel data
+ok 31 - sv10-positive: source readmission owns nested message and channel data
+  ---
+  duration_ms: 7.825687
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: missing or malformed channel is incomplete source custody
+ok 32 - sv10-refusal: missing or malformed channel is incomplete source custody
+  ---
+  duration_ms: 10.542596
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: foreign trace context and invalid source clock do not become observations
+ok 33 - sv10-refusal: foreign trace context and invalid source clock do not become observations
+  ---
+  duration_ms: 8.629815
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: invalid caller fields are rejected before advancing a trace
+ok 34 - sv10-refusal: invalid caller fields are rejected before advancing a trace
+  ---
+  duration_ms: 8.043704
+  type: 'test'
+  ...
+# Subtest: sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+ok 35 - sv10-refusal: unreadable heads and genuine filesystem errors remain errors
+  ---
+  duration_ms: 2.411159
+  type: 'test'
+  ...
+# Subtest: sv1-positive
+ok 36 - sv1-positive
+  ---
+  duration_ms: 6.018625
+  type: 'test'
+  ...
+# Subtest: sv1-alternate
+ok 37 - sv1-alternate
+  ---
+  duration_ms: 3.089999
+  type: 'test'
+  ...
+# Subtest: sv1-refusal
+ok 38 - sv1-refusal
+  ---
+  duration_ms: 2.543558
+  type: 'test'
+  ...
+# Subtest: sv1-full-address: distinct blobs in one record bucket retain both byte strings
+ok 39 - sv1-full-address: distinct blobs in one record bucket retain both byte strings
+  ---
+  duration_ms: 4.393094
+  type: 'test'
+  ...
+# Subtest: sv1-existing-custody: duplicate put refuses corrupt addressed bytes without replacing them
+ok 40 - sv1-existing-custody: duplicate put refuses corrupt addressed bytes without replacing them
+  ---
+  duration_ms: 2.913944
+  type: 'test'
+  ...
+# Subtest: sv1-raced-publication: EEXIST is received only when the winning bytes verify
+ok 41 - sv1-raced-publication: EEXIST is received only when the winning bytes verify
+  ---
+  duration_ms: 6.830864
+  type: 'test'
+  ...
+# Subtest: sv1-legacy-custody: reads admit original bucket bytes and preserve them during a new write
+ok 42 - sv1-legacy-custody: reads admit original bucket bytes and preserve them during a new write
+  ---
+  duration_ms: 3.093593
+  type: 'test'
+  ...
+# Subtest: sv1-legacy-collision: an unrelated occupied bucket is not reported as the requested blob
+ok 43 - sv1-legacy-collision: an unrelated occupied bucket is not reported as the requested blob
+  ---
+  duration_ms: 2.903438
+  type: 'test'
+  ...
+# Subtest: sv1-current-corruption: a valid historical copy cannot hide a corrupt current addressed file
+ok 44 - sv1-current-corruption: a valid historical copy cannot hide a corrupt current addressed file
+  ---
+  duration_ms: 1.09249
+  type: 'test'
+  ...
+# Subtest: sv1-current-io-refusal: historical bytes cannot mask ENOTDIR at the current address
+ok 45 - sv1-current-io-refusal: historical bytes cannot mask ENOTDIR at the current address
+  ---
+  duration_ms: 2.015395
+  type: 'test'
+  ...
+# Subtest: sv4-and-sv6-custody: corrupt command and report blobs refuse before a successful journal append
+ok 46 - sv4-and-sv6-custody: corrupt command and report blobs refuse before a successful journal append
+  ---
+  duration_ms: 15.995266
+  type: 'test'
+  ...
+# Subtest: sv2-positive
+ok 47 - sv2-positive
+  ---
+  duration_ms: 19.479853
+  type: 'test'
+  ...
+# Subtest: sv2-alternate
+ok 48 - sv2-alternate
+  ---
+  duration_ms: 15.222912
+  type: 'test'
+  ...
+# Subtest: sv2-refusal
+ok 49 - sv2-refusal
+  ---
+  duration_ms: 4.162629
+  type: 'test'
+  ...
+# Subtest: sv3-positive
+ok 50 - sv3-positive
+  ---
+  duration_ms: 5.563481
+  type: 'test'
+  ...
+# Subtest: sv3-alternate
+ok 51 - sv3-alternate
+  ---
+  duration_ms: 4.278623
+  type: 'test'
+  ...
+# Subtest: sv3-refusal
+ok 52 - sv3-refusal
+  ---
+  duration_ms: 0.807131
+  type: 'test'
+  ...
+# Subtest: sv4-positive
+ok 53 - sv4-positive
+  ---
+  duration_ms: 24.849062
+  type: 'test'
+  ...
+# Subtest: sv4-alternate
+ok 54 - sv4-alternate
+  ---
+  duration_ms: 23.244663
+  type: 'test'
+  ...
+# Subtest: sv4-refusal
+ok 55 - sv4-refusal
+  ---
+  duration_ms: 5.432875
+  type: 'test'
+  ...
+# Subtest: sv5-positive
+ok 56 - sv5-positive
+  ---
+  duration_ms: 251.947444
+  type: 'test'
+  ...
+# Subtest: sv5-alternate
+ok 57 - sv5-alternate
+  ---
+  duration_ms: 139.225137
+  type: 'test'
+  ...
+# Subtest: sv5-refusal
+ok 58 - sv5-refusal
+  ---
+  duration_ms: 101.160807
+  type: 'test'
+  ...
+# Subtest: sv6-positive
+ok 59 - sv6-positive
+  ---
+  duration_ms: 24.071074
+  type: 'test'
+  ...
+# Subtest: sv6-alternate
+ok 60 - sv6-alternate
+  ---
+  duration_ms: 17.360711
+  type: 'test'
+  ...
+# Subtest: sv6-refusal
+ok 61 - sv6-refusal
+  ---
+  duration_ms: 16.169804
+  type: 'test'
+  ...
+# Subtest: sv6-completion: incomplete reports remain addressed, unreadable observations
+ok 62 - sv6-completion: incomplete reports remain addressed, unreadable observations
+  ---
+  duration_ms: 49.820633
+  type: 'test'
+  ...
+# Subtest: sv6-producer: explicit JUnit count projection survives the native message
+ok 63 - sv6-producer: explicit JUnit count projection survives the native message
+  ---
+  duration_ms: 34.358311
+  type: 'test'
+  ...
+# Subtest: sv6-byte-custody: invalid UTF-8 is retained exactly and cannot become a readable report
+ok 64 - sv6-byte-custody: invalid UTF-8 is retained exactly and cannot become a readable report
+  ---
+  duration_ms: 35.131713
+  type: 'test'
+  ...
+# Subtest: sv6-attribute-custody: caller context cannot manufacture or contradict report observations
+ok 65 - sv6-attribute-custody: caller context cannot manufacture or contradict report observations
+  ---
+  duration_ms: 33.600058
+  type: 'test'
+  ...
+# Subtest: sv7-positive: generic event retains body, caller clock, trace and actual receipt
+ok 66 - sv7-positive: generic event retains body, caller clock, trace and actual receipt
+  ---
+  duration_ms: 14.058579
+  type: 'test'
+  ...
+# Subtest: sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+ok 67 - sv7-alternate: equal clocks retain causal order and JSON text can preserve null
+  ---
+  duration_ms: 9.346831
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+ok 68 - sv7-refusal: invalid event, unsupported body and over-bound publication refuse once
+  ---
+  duration_ms: 3.337601
+  type: 'test'
+  ...
+# Subtest: sv7-refusal: an unwritable store propagates instead of returning a receipt
+ok 69 - sv7-refusal: an unwritable store propagates instead of returning a receipt
+  ---
+  duration_ms: 3.080805
+  type: 'test'
+  ...
+1..69
+# tests 69
+# suites 0
+# pass 69
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3594.600367

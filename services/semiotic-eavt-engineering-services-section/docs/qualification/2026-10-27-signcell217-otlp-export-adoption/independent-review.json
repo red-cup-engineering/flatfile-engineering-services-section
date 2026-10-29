@@ -1,0 +1,56 @@
+{
+  "kind": "seavt.signcell217-independent-receiving/v1",
+  "recordedAt": "2026-10-27 01:10:52 UTC",
+  "reviewer": "Independent collaboration agent /root/ledger_review",
+  "basis": {
+    "pr": 32,
+    "head": "a840aa6494009d225d5c3a34aac60a9a508a418e",
+    "main": "94424eb96e3201cd4c4d7669053ac5239f6d23f8"
+  },
+  "result": "passed",
+  "method": "Read-only independent verification of original remote source, local source, native lock, actual installed providers, archive and complete raw TAP. No test rerun.",
+  "verified": {
+    "baselineSourceFiles": 112,
+    "changedFiles": [
+      "package.json",
+      "pnpm-lock.yaml"
+    ],
+    "newQualificationFiles": 10,
+    "deliveryEntries": 12,
+    "physicalProviderEntries": 3043,
+    "directProviders": 8,
+    "signcellArchiveMembers": 46,
+    "seavtLocalPackMembers": 33,
+    "native": {
+      "files": 24,
+      "pass": 234,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    "packed": {
+      "files": 4,
+      "pass": 51,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    }
+  },
+  "dependencyDelta": {
+    "signcell": [
+      "0.13.1-dev.206",
+      "0.13.1-dev.217"
+    ],
+    "metrologic": [
+      "0.14.3-dev.3",
+      "0.14.3-dev.1364"
+    ],
+    "otherExistingSnapshotEntriesChanged": 0
+  },
+  "semanticReceiving": "Existing regression retains original high-bit log and trace head, rejects outbound export without a returned subset, and confirms low-byte flags remain exportable.",
+  "limitations": [
+    "Publication and actual newly issued SEAVT archive receiving remain separate.",
+    "Historical qualification is not relabeled as a new run.",
+    "No installed FeltOS or live host adoption is asserted."
+  ]
+}

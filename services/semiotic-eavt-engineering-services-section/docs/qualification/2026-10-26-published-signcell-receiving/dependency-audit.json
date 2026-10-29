@@ -1,0 +1,42 @@
+{
+  "manifestDependencyChanges": {
+    "@red-cup-engineering/signcell": {
+      "before": "0.11.1",
+      "after": "0.13.1-dev.198"
+    }
+  },
+  "lockImporterChanges": {
+    "@red-cup-engineering/signcell": {
+      "before": {
+        "specifier": "0.11.1",
+        "version": "0.11.1"
+      },
+      "after": {
+        "specifier": "0.13.1-dev.198",
+        "version": "0.13.1-dev.198"
+      }
+    }
+  },
+  "lockAddedPackages": [
+    "@red-cup-engineering/computer-data-engineering-services-section@0.7.1",
+    "@red-cup-engineering/computer-serialized-content-engineering-services-section@0.1.0",
+    "@red-cup-engineering/metrologic@0.14.3-dev.3",
+    "@red-cup-engineering/semiotic-eavt-services-section@0.3.2",
+    "@red-cup-engineering/signcell@0.13.1-dev.198",
+    "@rgrove/parse-xml@5.0.0",
+    "@scure/base@2.4.0",
+    "http-structured-fields@1.0.0",
+    "whatwg-mimetype@5.0.0"
+  ],
+  "removed": {
+    "packages": [],
+    "snapshots": []
+  },
+  "changedExisting": {
+    "packages": [],
+    "snapshots": []
+  },
+  "workspaceSha256": "434a70f9efd25de49642f3de3e3d606be6e942e35f97c8cb45f2b6ea07d98ebc",
+  "lockSha256": "e19c9b1c1308fe21a5ed009fbee77ada7b5e9ec723970f4c7575dda2f60eb36b",
+  "packageSha256": "d0eb39a69750ca314fdc7e24206bcfec5ed257345b387890e938220c1a7585b8"
+}

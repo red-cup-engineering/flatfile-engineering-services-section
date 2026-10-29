@@ -1,0 +1,237 @@
+{
+  "kind": "native-seavt-supplier-reconciliation",
+  "source": "/workspace/scratch/2909a2a1d403/ledger-work/seavt",
+  "requiredSourceBase": "67ae88de11740b4aa87e03f717f10b803604583c",
+  "mainRefreshedBeforeIntegration": "67ae88de11740b4aa87e03f717f10b803604583c",
+  "supplier": {
+    "name": "@red-cup-engineering/signcell",
+    "version": "0.13.3-dev.225",
+    "gitHead": "e34a8c9d8f44cd5ff61ab2234a170f4295ce2dd2",
+    "archive": "/workspace/scratch/2909a2a1d403/evidence/signcell-uri/issued/signcell.tgz",
+    "bytes": 117186,
+    "sha256": "9fdc401dd973ca473f977a2afa67c3752ce41ae61d8e16a6e6814db245a89600"
+  },
+  "beforeSource": {
+    "package.json": {
+      "sha256": "388b9b75df0083bac3a5c42491e6585c90ff32e9ba719c28a49633aead5f46b3",
+      "bytes": 3090
+    },
+    "pnpm-lock.yaml": {
+      "sha256": "c2307e618def8009454479fafa3349026aa07472821d386ffb69cb3e24836211",
+      "bytes": 22348
+    },
+    "pnpm-workspace.yaml": {
+      "sha256": "434a70f9efd25de49642f3de3e3d606be6e942e35f97c8cb45f2b6ea07d98ebc",
+      "bytes": 415
+    },
+    ".npmrc": {
+      "sha256": "8de08949bab508293e0d9aa76a511469ee2d306b1f6140a8f60c0d1de8b17fe2",
+      "bytes": 37
+    }
+  },
+  "beforeProviderSource": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules",
+  "providerInventoryEntries": 3043,
+  "freeBytesBefore": 42496000,
+  "reserveBytes": 8388608,
+  "boundedPeakBytes": 3145728,
+  "nativePnpm": {
+    "path": "/workspace/scratch/6274801a90c9/fabrication-suppliers/qualification/tools/pnpm@11.28.5/package/bin/pnpm.cjs",
+    "version": "11.28.5"
+  },
+  "environmentDelta": {
+    "NODE_DISABLE_COMPILE_CACHE": "1"
+  },
+  "history": [
+    {
+      "stage": "native-store-seed",
+      "command": [
+        "node",
+        "/workspace/scratch/6274801a90c9/fabrication-suppliers/qualification/tools/pnpm@11.28.5/package/bin/pnpm.cjs",
+        "store",
+        "add",
+        "/workspace/scratch/2909a2a1d403/evidence/signcell-uri/issued/signcell.tgz",
+        "--ignore-scripts",
+        "--registry=https://registry.npmjs.org/",
+        "--config.@561-group:registry=https://registry.561.group/",
+        "--config.@causeway-services:registry=https://registry.561.group/",
+        "--config.@coesite-operations:registry=https://registry.561.group/",
+        "--config.@emsenn:registry=https://registry.561.group/",
+        "--config.@emsweb:registry=https://registry.561.group/",
+        "--config.@harmonious-union:registry=https://registry.561.group/",
+        "--config.@koios-news:registry=https://registry.561.group/",
+        "--config.@lenticule-science:registry=https://registry.561.group/",
+        "--config.@red-cup-engineering:registry=https://registry.561.group/",
+        "--config.@red-cup-science:registry=https://registry.561.group/",
+        "--config.@rsc-quiescent:registry=https://registry.561.group/",
+        "--network-concurrency=4",
+        "--fetch-timeout=20000",
+        "--fetch-retries=0",
+        "--cache-dir=/workspace/scratch/2909a2a1d403/native-pnpm-cache",
+        "--store-dir=/root/.local/share/pnpm/store/v11"
+      ],
+      "cwd": "/workspace/scratch/2909a2a1d403/ledger-work/seavt",
+      "observedAt": "2026-10-27T03:23:41.991236+00:00",
+      "exitCode": 1,
+      "elapsedSeconds": 0.6169924040004844,
+      "rawOutput": "native-store-seed.log",
+      "rawOutputIdentity": {
+        "bytes": 143,
+        "sha256": "ebba102487a92acf2f98714c7d504d80f51164f745913e503c6fd807635031e6"
+      }
+    },
+    {
+      "stage": "native-store-seed-attempt-2",
+      "command": [
+        "node",
+        "/workspace/scratch/6274801a90c9/fabrication-suppliers/qualification/tools/pnpm@11.28.5/package/bin/pnpm.cjs",
+        "store",
+        "add",
+        "/workspace/scratch/2909a2a1d403/evidence/signcell-uri/issued/signcell.tgz",
+        "--config.cache-dir=/workspace/scratch/2909a2a1d403/native-pnpm-cache",
+        "--store-dir=/root/.local/share/pnpm/store/v11"
+      ],
+      "cwd": "/workspace/scratch/2909a2a1d403/ledger-work/seavt",
+      "observedAt": "2026-10-27T03:24:54.454401+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 0.7669257200032007,
+      "rawOutput": "native-store-seed-attempt-2.log",
+      "rawOutputIdentity": {
+        "bytes": 55,
+        "sha256": "97f1211dfffce573d2dabc3a6279a57d0b3e8e74010f5538da9d01f177563611"
+      }
+    },
+    {
+      "stage": "native-relock",
+      "command": [
+        "node",
+        "/workspace/scratch/6274801a90c9/fabrication-suppliers/qualification/tools/pnpm@11.28.5/package/bin/pnpm.cjs",
+        "install",
+        "--lockfile-only",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--registry=https://registry.npmjs.org/",
+        "--config.@561-group:registry=https://registry.561.group/",
+        "--config.@causeway-services:registry=https://registry.561.group/",
+        "--config.@coesite-operations:registry=https://registry.561.group/",
+        "--config.@emsenn:registry=https://registry.561.group/",
+        "--config.@emsweb:registry=https://registry.561.group/",
+        "--config.@harmonious-union:registry=https://registry.561.group/",
+        "--config.@koios-news:registry=https://registry.561.group/",
+        "--config.@lenticule-science:registry=https://registry.561.group/",
+        "--config.@red-cup-engineering:registry=https://registry.561.group/",
+        "--config.@red-cup-science:registry=https://registry.561.group/",
+        "--config.@rsc-quiescent:registry=https://registry.561.group/",
+        "--network-concurrency=4",
+        "--fetch-timeout=20000",
+        "--fetch-retries=0",
+        "--cache-dir=/workspace/scratch/2909a2a1d403/native-pnpm-cache",
+        "--store-dir=/root/.local/share/pnpm/store/v11"
+      ],
+      "cwd": "/workspace/scratch/2909a2a1d403/ledger-work/seavt",
+      "observedAt": "2026-10-27T03:24:55.221863+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 2.975339370997972,
+      "rawOutput": "native-relock.log",
+      "rawOutputIdentity": {
+        "bytes": 280,
+        "sha256": "74e33cbf349ca876948267f3cc155a1aae2b74f4f04942360d14cac7d9403f8d"
+      }
+    },
+    {
+      "stage": "native-frozen-install",
+      "command": [
+        "node",
+        "/workspace/scratch/6274801a90c9/fabrication-suppliers/qualification/tools/pnpm@11.28.5/package/bin/pnpm.cjs",
+        "install",
+        "--frozen-lockfile",
+        "--ignore-scripts",
+        "--prefer-offline",
+        "--package-import-method=hardlink",
+        "--registry=https://registry.npmjs.org/",
+        "--config.@561-group:registry=https://registry.561.group/",
+        "--config.@causeway-services:registry=https://registry.561.group/",
+        "--config.@coesite-operations:registry=https://registry.561.group/",
+        "--config.@emsenn:registry=https://registry.561.group/",
+        "--config.@emsweb:registry=https://registry.561.group/",
+        "--config.@harmonious-union:registry=https://registry.561.group/",
+        "--config.@koios-news:registry=https://registry.561.group/",
+        "--config.@lenticule-science:registry=https://registry.561.group/",
+        "--config.@red-cup-engineering:registry=https://registry.561.group/",
+        "--config.@red-cup-science:registry=https://registry.561.group/",
+        "--config.@rsc-quiescent:registry=https://registry.561.group/",
+        "--network-concurrency=4",
+        "--fetch-timeout=20000",
+        "--fetch-retries=0",
+        "--cache-dir=/workspace/scratch/2909a2a1d403/native-pnpm-cache",
+        "--store-dir=/root/.local/share/pnpm/store/v11"
+      ],
+      "cwd": "/workspace/scratch/2909a2a1d403/ledger-work/seavt",
+      "observedAt": "2026-10-27T03:24:58.197875+00:00",
+      "exitCode": 0,
+      "elapsedSeconds": 1.418682044997695,
+      "rawOutput": "native-frozen-install.log",
+      "rawOutputIdentity": {
+        "bytes": 390,
+        "sha256": "3429a8f01d0229f534c263023c0f0099d791cfa249e69e5af61c4078a9da6bad"
+      }
+    }
+  ],
+  "scope": "Native manifest/lock reconciliation in an owned pnpm linking layout. Unchanged real package leaves and their original dependency contexts are reused read-only. This is not an empty-directory fresh install or an issued SEAVT artifact.",
+  "providerLayout": {
+    "source": "/workspace/scratch/455c183ed200/evidence/seavt-otlp-issued-qualification/source/node_modules",
+    "target": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/node_modules",
+    "ownedDirectories": 148,
+    "copiedMetadataFiles": 41,
+    "copiedLinks": 181,
+    "immutableProviderLeaves": 47
+  },
+  "sparseLayoutBytes": 1654784,
+  "originalProviderFilesLinksModesUnchanged": false,
+  "freeBytesAfter": 41623552,
+  "lockDelta": {
+    "packages": {
+      "added": [
+        "@red-cup-engineering/signcell@0.13.3-dev.225"
+      ],
+      "removed": [
+        "@red-cup-engineering/signcell@0.13.1-dev.217"
+      ],
+      "changedExisting": []
+    },
+    "snapshots": {
+      "added": [
+        "@red-cup-engineering/signcell@0.13.3-dev.225"
+      ],
+      "removed": [
+        "@red-cup-engineering/signcell@0.13.1-dev.217"
+      ],
+      "changedExisting": []
+    }
+  },
+  "installedSupplier": {
+    "path": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.3-dev.225/node_modules/@red-cup-engineering/signcell",
+    "archiveFilesCompared": 46,
+    "allArchiveFilesByteEqual": true
+  },
+  "originalPolicyUnchanged": true,
+  "sourceAndInstalledLocksStructurallyEqual": true,
+  "afterSource": {
+    "package.json": {
+      "bytes": 3090,
+      "sha256": "d7372a277e8df06a236ac64ab8cb175542d78116f671d470b4f20b5d77f9bb91"
+    },
+    "pnpm-lock.yaml": {
+      "bytes": 22348,
+      "sha256": "eec3e167cba5e1e6a300cf1a291c9027db999a4f281f6bb73b4db0ab6939d65f"
+    },
+    "pnpm-workspace.yaml": {
+      "bytes": 415,
+      "sha256": "434a70f9efd25de49642f3de3e3d606be6e942e35f97c8cb45f2b6ea07d98ebc"
+    },
+    ".npmrc": {
+      "bytes": 37,
+      "sha256": "8de08949bab508293e0d9aa76a511469ee2d306b1f6140a8f60c0d1de8b17fe2"
+    }
+  },
+  "providerLayoutBytesAfterNativeInstall": 2658304
+}

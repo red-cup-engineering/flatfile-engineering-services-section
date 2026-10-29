@@ -1,0 +1,19 @@
+{
+  "kind": "local-SEAVT-package-receiving",
+  "reconciledMain": "20901d6291632d96cd034d6527e69c137d0faec4",
+  "publishedSEAVT": false,
+  "archivePath": "/workspace/scratch/455c183ed200/evidence/seavt-main209-cohort/red-cup-engineering-semiotic-eavt-services-section-0.3.2.tgz",
+  "packagePath": "/workspace/scratch/455c183ed200/evidence/seavt-main209-cohort/package",
+  "archiveSha256": "d9d28177018543186d466d325bf574737cb8bdcb551dc1f92747054a725155a4",
+  "archiveIntegrity": "sha512-QhvCOXDpyLnFJ3ou89SNOVl12Nu4e711kwkrVZ8KaarefdshW/wChxeTLp1ivnavgAaLfFEFOUSzCV0yUHF49w==",
+  "archiveBytes": 61094,
+  "sourceMatchedFiles": 33,
+  "receivingTests": [
+    "test/telemetry.test.mjs",
+    "test/telemetry-trace-integrity.test.mjs",
+    "test/telemetry-boundaries.test.mjs",
+    "test/telemetry-cell-events.test.mjs"
+  ],
+  "providerClosure": "/workspace/scratch/455c183ed200/seavt/node_modules",
+  "providerComposition": "Existing successful frozen installation from the byte-identical current-main lockfile; actual published SignCell198 and exact registry dependencies."
+}

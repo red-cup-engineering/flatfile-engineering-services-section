@@ -1,0 +1,189 @@
+{
+  "kind": "final-seavt-conditional-frontier-qualification",
+  "observedAt": "2026-10-27T03:40:40.885028+00:00",
+  "repository": "red-cup-engineering/semiotic-eavt-engineering-services-section",
+  "requiredSourceBase": "67ae88de11740b4aa87e03f717f10b803604583c",
+  "sourceBaseTree": "81068eed3284f9899c8572b97db0bd0499693b6e",
+  "mainRefreshedAfterNativeAndPackedTests": "67ae88de11740b4aa87e03f717f10b803604583c",
+  "scope": "Reviewed source candidate; publication and actual issued SEAVT receiving follow the repository workflow.",
+  "changes": [
+    {
+      "path": "src/store-core.mjs",
+      "absolutePath": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/src/store-core.mjs",
+      "baseBlob": "09bd060f682e451e3b2334c18599e58dd78f3f7e",
+      "bytes": 34433,
+      "sha256": "e9b7c60f34164eabc16df9eede6fd042c8e2f18687228581ed27a98ed37ee393",
+      "gitBlobSha1": "92dbe1dbcf5a013ee296e1e7d939816c95a54b36"
+    },
+    {
+      "path": "src/telemetry-store.mjs",
+      "absolutePath": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/src/telemetry-store.mjs",
+      "baseBlob": "a14c00d733ad2b0f96c0519d15a16d468f7cfaa3",
+      "bytes": 14586,
+      "sha256": "a9717f82f75ee221648ebc8979ee3df0140ca301f0d6f70a1665b8cffebb4ff1",
+      "gitBlobSha1": "29e899528a9770765165b36733cb45b47f2d7c4f"
+    },
+    {
+      "path": "src/telemetry.mjs",
+      "absolutePath": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/src/telemetry.mjs",
+      "baseBlob": "67a2c0e5878f6c02797f82fbd816bb3d01ffde97",
+      "bytes": 12087,
+      "sha256": "6885bda580de6f1017e96ea0fa869ce22fc2d9fabf85b50bf62780fba36f8f9f",
+      "gitBlobSha1": "0e6d84ba124acebf072bf221ed7741151867db91"
+    },
+    {
+      "path": "test/store-conditional-extend.test.mjs",
+      "absolutePath": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/test/store-conditional-extend.test.mjs",
+      "baseBlob": null,
+      "bytes": 9502,
+      "sha256": "17fa0a22e3da23344a4ca917deca5847832d96adce8e5f1e577b88183dc4fa24",
+      "gitBlobSha1": "ea0303bc2f5839d51a7c2a68920f70240c1ea135"
+    },
+    {
+      "path": "test/telemetry-cell-events.test.mjs",
+      "absolutePath": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/test/telemetry-cell-events.test.mjs",
+      "baseBlob": "a4d5a7ea955be90f56998d235108e5a8f7731b8c",
+      "bytes": 11931,
+      "sha256": "225623a60fb58f656cf867767e31d2fd62f271825beb58acbfad076a158e3a2f",
+      "gitBlobSha1": "d0dd18bda74eba37c437f2d4ea801b82fd7ba0cd"
+    },
+    {
+      "path": "content/text/documents/specifications/store.md",
+      "absolutePath": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/content/text/documents/specifications/store.md",
+      "baseBlob": "c2a30ad1d7663cd219be31ce350ac2b489393e08",
+      "bytes": 47080,
+      "sha256": "a821bb9b1e797bd1c59e66afa5e44968415272c8458d1774874c644e04d79d3c",
+      "gitBlobSha1": "d2c5d013ed25fe3eb7a62e21c8c2fb1442c891e5"
+    },
+    {
+      "path": "content/text/documents/specifications/2026-10-19-observability-seavt.md",
+      "absolutePath": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/content/text/documents/specifications/2026-10-19-observability-seavt.md",
+      "baseBlob": "0e1e9fe606da74a2868e4f900b3f045dd7eab5c0",
+      "bytes": 23378,
+      "sha256": "ed315520cd587e064541f68ab5f4b19be39bc0956d3dfdf6e579d8976e95f811",
+      "gitBlobSha1": "6afd5a8fed41a10e715c1cdea3e8d5716d70db04"
+    },
+    {
+      "path": "package.json",
+      "absolutePath": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/package.json",
+      "baseBlob": "bd35f992becce5f0353a791be8078604e58a9f7f",
+      "bytes": 3090,
+      "sha256": "d7372a277e8df06a236ac64ab8cb175542d78116f671d470b4f20b5d77f9bb91",
+      "gitBlobSha1": "90161b5e34d1f70f3ed4fad6bdfb1fcf16ddc652"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "absolutePath": "/workspace/scratch/2909a2a1d403/ledger-work/seavt/pnpm-lock.yaml",
+      "baseBlob": "c1202082c9705cb3f5219097a79eaa7f4cbb3c39",
+      "bytes": 22348,
+      "sha256": "eec3e167cba5e1e6a300cf1a291c9027db999a4f281f6bb73b4db0ab6939d65f",
+      "gitBlobSha1": "14a1e75b0510ecaffd2e9910a88ccc9259689229"
+    }
+  ],
+  "selectedSupplier": {
+    "name": "@red-cup-engineering/signcell",
+    "version": "0.13.3-dev.225",
+    "gitHead": "e34a8c9d8f44cd5ff61ab2234a170f4295ce2dd2",
+    "archive": "/workspace/scratch/2909a2a1d403/evidence/signcell-uri/issued/signcell.tgz",
+    "bytes": 117186,
+    "sha256": "9fdc401dd973ca473f977a2afa67c3752ce41ae61d8e16a6e6814db245a89600"
+  },
+  "nativeDependencyReconciliation": "installation.json",
+  "nativeSuite": {
+    "command": "node --test --test-reporter=tap --test-concurrency=1 test/*.test.mjs",
+    "resolvedTestFiles": [
+      "test/absent-head-claim.test.mjs",
+      "test/artifact-allocation.test.mjs",
+      "test/causal-resource-head.test.mjs",
+      "test/check-current-state.test.mjs",
+      "test/checkpoint.test.mjs",
+      "test/clock.test.mjs",
+      "test/compact-carrier.test.mjs",
+      "test/deep-list-admission.test.mjs",
+      "test/head-complete-publication.test.mjs",
+      "test/sealed-log.test.mjs",
+      "test/seavt-carriers.test.mjs",
+      "test/signcell-seavt.test.mjs",
+      "test/store-appended.test.mjs",
+      "test/store-change-witness.test.mjs",
+      "test/store-conditional-extend.test.mjs",
+      "test/store-memory.test.mjs",
+      "test/store-strict-descriptor.test.mjs",
+      "test/store-strict-discovery.test.mjs",
+      "test/store-verified-lines.test.mjs",
+      "test/store.test.mjs",
+      "test/strict-publication.test.mjs",
+      "test/telemetry-boundaries.test.mjs",
+      "test/telemetry-cell-events.test.mjs",
+      "test/telemetry-trace-integrity.test.mjs",
+      "test/telemetry.test.mjs"
+    ],
+    "rawOutput": "final-native.tap",
+    "tests": 252,
+    "pass": 252,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "archiveSuite": {
+    "archive": "/workspace/scratch/2909a2a1d403/ledger-work/pack-final/red-cup-engineering-semiotic-eavt-services-section-0.3.2.tgz",
+    "sha256": "83b6a1a9ba722fe8830180794647bda169009044882820ef550541a7d4537ddb",
+    "archiveFilesCompared": 34,
+    "allArchiveFilesEqualSource": true,
+    "command": [
+      "node",
+      "--test",
+      "--test-reporter=tap",
+      "--test-concurrency=1",
+      "test/telemetry.test.mjs",
+      "test/telemetry-trace-integrity.test.mjs",
+      "test/telemetry-boundaries.test.mjs",
+      "test/telemetry-cell-events.test.mjs",
+      "test/store-conditional-extend.test.mjs"
+    ],
+    "receivingTests": [
+      "test/telemetry.test.mjs",
+      "test/telemetry-trace-integrity.test.mjs",
+      "test/telemetry-boundaries.test.mjs",
+      "test/telemetry-cell-events.test.mjs",
+      "test/store-conditional-extend.test.mjs"
+    ],
+    "rawOutput": "final-packed.tap",
+    "tests": 69,
+    "pass": 69,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "postflight": {
+    "originalProviderEntries": 3043,
+    "allOriginalFileBytesLinksAndModesEqualAfterBothSuites": true,
+    "selectedSigncellArchiveFilesComparedAfterBothSuites": 46,
+    "allSelectedSigncellArchiveFilesByteEqualAfterBothSuites": true
+  },
+  "isolationRecovery": {
+    "failedObservation": "installation-failed-isolation.json",
+    "changedGeneratedShims": 210,
+    "changedImplementationPayloads": 0,
+    "exactRestorationProof": "shim-restoration.json",
+    "verifiedOriginalAndMutatedBytes": "verified-shim-restoration.json.gz",
+    "correctedLayout": "owned-provider-layout.json",
+    "independentMutableShimsAndMetadata": 283,
+    "finalNativeReconciliationPassedWithOriginalProvidersUnchanged": true
+  },
+  "sourceLineage": {
+    "readOnlySource": "https://github.com/lenticule-science/obsmetrologia-science-services-section/blob/a8515044eb632f4fc3b639e3b3d8d106e64b90ff/Obsmetrologia/Closure/Modal.lean",
+    "use": "Distinguish causal custody cuts from knowledge/closure claims that require their explicit frame assumptions. No Lean kernel run or new truth certificate is claimed."
+  },
+  "limits": [
+    "An expected frontier is an explicit compare-and-append condition under the existing head lock; it does not establish arbitrary exactly-once business effects.",
+    "Ordinary repeated and forwarded observations remain permitted without expect and preserve the original event and witness lanes.",
+    "Record and head publication remain separate existing operations; late failure can leave publication uncertain. Tests retain and inspect that uncertainty rather than issuing a success receipt.",
+    "The first sparse provider-leaf setup failed isolation by rewriting generated shims. Every affected original byte was exactly restored before final native reconciliation in an owned directory/shim layout.",
+    "Dependency qualification reuses original immutable payloads. It is not an empty-directory fresh install.",
+    "Native results and any hosted workflow outcome must be reported separately."
+  ],
+  "scratchOnlyExcludedChange": "node_modules is absent from the canonical GitHub tree; its tracked symlink in the local bootstrap repository is not a delivery change."
+}

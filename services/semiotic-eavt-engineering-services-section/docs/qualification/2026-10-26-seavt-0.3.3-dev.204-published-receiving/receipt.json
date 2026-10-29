@@ -1,0 +1,395 @@
+{
+  "kind": "published-package-receiving",
+  "recordedAt": "2026-10-26T23:49:12.935189+00:00",
+  "repository": "red-cup-engineering/semiotic-eavt-engineering-services-section",
+  "version": "0.3.3-dev.204",
+  "gitHead": "ea12f5614cca4c663491af1594cbfe05e77c7a3f",
+  "tree": "6952cd1d519dbf12875eea5703804c574924d63e",
+  "status": "received",
+  "registry": {
+    "observedAt": "2026-10-26T23:49:09.972118+00:00",
+    "url": "https://registry.561.group/@red-cup-engineering%2fsemiotic-eavt-services-section",
+    "observations": 1,
+    "expectedGitHead": "ea12f5614cca4c663491af1594cbfe05e77c7a3f",
+    "metadataSha256": "ddf488b3ae39caeef5b0e34ffe33eee6987f53bf747eec04f416cb5056a25a5c",
+    "distTags": {
+      "latest": "0.3.2",
+      "candidate": "0.1.6-dev.0",
+      "maintenance": "0.1.6",
+      "dev": "0.3.3-dev.204"
+    },
+    "matchingVersions": [
+      "0.3.3-dev.204"
+    ],
+    "state": "exact-issue-observed",
+    "selectedVersion": "0.3.3-dev.204"
+  },
+  "archive": {
+    "url": "https://registry.561.group/@red-cup-engineering/semiotic-eavt-services-section/-/semiotic-eavt-services-section-0.3.3-dev.204.tgz",
+    "path": "/workspace/scratch/455c183ed200/evidence/published-seavt-0.3.3-dev.204/seavt-0.3.3-dev.204.tgz",
+    "integrity": "sha512-BbzGahqkLezQuZz37EUyEvCDfpLbZUMcnItCkYVI5A463myI56p8NI161IxjKGvKQ72EoHAHbIhzSHEMvPwM3Q==",
+    "sha1": "aab1cf7b3e60dd065851e327e8d865084df5e3dd",
+    "bytes": 61390,
+    "sha256": "c7457527f987681035264f2870c15668b1232330205cd4c4f119a2237322aeda",
+    "gitBlob": "f4d6318bedf92f23bea830bf382315f2e5ae99eb"
+  },
+  "sourceVerification": {
+    "officialTreeUrl": "https://api.github.com/repos/red-cup-engineering/semiotic-eavt-engineering-services-section/git/trees/6952cd1d519dbf12875eea5703804c574924d63e?recursive=1",
+    "repositoryBlobsVerifiedBeforeAndAfterReceiving": 107,
+    "archiveMembers": 33,
+    "nonManifestMembersExactOfficialGitBlobs": 32,
+    "manifestChanges": [
+      "version",
+      "gitHead"
+    ],
+    "allPayloadMembersUnchangedAfterReceiving": true,
+    "members": [
+      {
+        "path": "package.json",
+        "bytes": 3063,
+        "sha256": "6927ca82593e96261794a9e956615338aaa95e4aaaef4fee223e90e866303957",
+        "gitBlob": "ec5232267554898d28aedc36fc6ca58fcc269d51"
+      },
+      {
+        "path": "README.md",
+        "bytes": 8382,
+        "sha256": "d08c8e8cf5a75a593b0ed80e2d5e6f67c51046d8667984cfe6b58135dc54b07b",
+        "gitBlob": "c4db89929c3b8fda9d46ef35ede0765c52da7473"
+      },
+      {
+        "path": "src/admit-seavt-row.mjs",
+        "bytes": 4182,
+        "sha256": "fa1c46c08ab2407cded951ed051e39ab2237ca7f6ed2940a80609e73ae0484cd",
+        "gitBlob": "a3709f241d6a8868b9898ea1c779e06a01595322"
+      },
+      {
+        "path": "src/identity/artifact.mjs",
+        "bytes": 2486,
+        "sha256": "44ae1f495f0eca46516a51efc4573bbb652a97a0ffa43023e39812c177c396da",
+        "gitBlob": "f83f53eec9cab5ef5a665a8103283241603f44da"
+      },
+      {
+        "path": "src/bind-json-template.mjs",
+        "bytes": 1321,
+        "sha256": "df9051d7d19aaa8b1547624ba38a6441d260f319e2c19c756a8a26fe02884794",
+        "gitBlob": "cd9a570946153fe023f52a5719ab0f4c4a830232"
+      },
+      {
+        "path": "src/causal-resource-head.mjs",
+        "bytes": 5722,
+        "sha256": "7c02eb45ece78595bbdd061f467c476581a5fa86117838292ee6fa52f64fbc53",
+        "gitBlob": "32d59e7373ff94402c3681974ee39ab0e5353e55"
+      },
+      {
+        "path": "scripts/check-current-state.mjs",
+        "bytes": 4585,
+        "sha256": "eb2b19e8138b1787f8135c19ca003ded81612251d299a56b02a062d63c0c087c",
+        "gitBlob": "e9c7e7b30195e040afa8ff4d007a0305e9ea6759"
+      },
+      {
+        "path": "src/checkpoint.mjs",
+        "bytes": 8584,
+        "sha256": "16952c707c8e6a15f355a7f7d31516036bbc2ccba2a3b77d29dc48a325af37fa",
+        "gitBlob": "db4f014749f68f41d125e7003ebac5a9749429c9"
+      },
+      {
+        "path": "src/clock.mjs",
+        "bytes": 3838,
+        "sha256": "169b766d85e010006ecbcc8b976b9d0a421f66c7463f3ca663e26bef63dc68ca",
+        "gitBlob": "4e8f7213725997780a1cda4a2153986b6f708a4d"
+      },
+      {
+        "path": "src/compact-logs.mjs",
+        "bytes": 7365,
+        "sha256": "9d905420d6b38fd8a18c49c8a152b5dea6d2b808f2d7e55b19b1009eb03fa962",
+        "gitBlob": "f8cad1a602faff552ddd127b26745f4a05fab009"
+      },
+      {
+        "path": "scripts/compact-seavt-logs.mjs",
+        "bytes": 1644,
+        "sha256": "d9999fef261d53c2506808efd3b726a0bacf8b5de7d028510ab996dbb35c100b",
+        "gitBlob": "36604df16c1565157d4b74b8da0ae2900846eefe"
+      },
+      {
+        "path": "src/exchange.mjs",
+        "bytes": 6677,
+        "sha256": "062b4d5eb9074cc9257234ea015c8427ef2fea982dbdd49d6e791bd27a9a122e",
+        "gitBlob": "23f215f821ed2ad43cc1d593bd1517be1ef70a14"
+      },
+      {
+        "path": "scripts/export-otlp.mjs",
+        "bytes": 1287,
+        "sha256": "74b37e54292e92079a1d7a728d0823dcd969a29d5c3b0cfaf2337e4ee3b0cbba",
+        "gitBlob": "793d31d944ba6c9c9321017f6466da5edb1269f3"
+      },
+      {
+        "path": "src/identity/index.mjs",
+        "bytes": 350,
+        "sha256": "eed654efba0a25dbaf396357a753152aa13b4fa4836491a4be56931aea620240",
+        "gitBlob": "d822d5639ef82d498ea76983fada33d44a25dc37"
+      },
+      {
+        "path": "src/layout.mjs",
+        "bytes": 5264,
+        "sha256": "ab9594a0ea1d97c8b4f794286580e2d25c23fa7b777dcf76b55cf6a01b6a7e78",
+        "gitBlob": "4ea6c226ecbc8a7f8d11533e08af06fd60e0442c"
+      },
+      {
+        "path": "src/log-budget.mjs",
+        "bytes": 4887,
+        "sha256": "3161a4395928aa1845bafa608701020fb586287f9ced32c47e5386e8536cc450",
+        "gitBlob": "1752be75c24a9643c847b78732b5e43fc6a052f0"
+      },
+      {
+        "path": "src/normalize-seavt-row.mjs",
+        "bytes": 1413,
+        "sha256": "bc8c6c35880119bb24304c0a482a60302bc0072fa9ad1a4c80e610cbda939cdd",
+        "gitBlob": "46dd7e9f0d5955c1cbc72f0ca049a114f272b2b6"
+      },
+      {
+        "path": "src/profile.mjs",
+        "bytes": 288,
+        "sha256": "8e78bd50934af13b3e3e56c00cd6ff07de1d5755335d581a03acb92a8713698b",
+        "gitBlob": "7aab5f012e9d24f7ccafec7af32644df3fdc0f29"
+      },
+      {
+        "path": "scripts/seal-logs.mjs",
+        "bytes": 1743,
+        "sha256": "4e85fc19f3db42ba62ff07887df29df3f806311b87f8ef61666ce1797405d458",
+        "gitBlob": "94de8497f85d2054bf8894c68644fcd68b7549f2"
+      },
+      {
+        "path": "src/sealed-log.mjs",
+        "bytes": 7480,
+        "sha256": "8e8acf5f36587ffe9e79304bec93048fdc5dbb3406291d0f2f010f58a5ffa03d",
+        "gitBlob": "9fcb3b4e6b1d970e2196cb51a1c63eec5ffc0bb7"
+      },
+      {
+        "path": "src/seavt-carrier.mjs",
+        "bytes": 5223,
+        "sha256": "7a5877125dee581a00ca0117d217dd8ac1a230b6009926071e6b1bc2652fffd1",
+        "gitBlob": "4f198938812cb3ef485614bcbf676c373b1cc77b"
+      },
+      {
+        "path": "src/seavt-log.mjs",
+        "bytes": 2316,
+        "sha256": "bdf7425f6a0c8771ce738407c2c96e8ae9f8f53a6f31c191c890cdd35e3e59b9",
+        "gitBlob": "965665dc824643bf119f57c36d519d8638b2bcff"
+      },
+      {
+        "path": "scripts/seavt-volume.mjs",
+        "bytes": 3480,
+        "sha256": "ae414da0ebb583060973ab2e725e355de32e892e885671976c816be9fed155ad",
+        "gitBlob": "d54328bd2708ed6231d5a20cc560b40442312cb2"
+      },
+      {
+        "path": "src/store-core.mjs",
+        "bytes": 33664,
+        "sha256": "1f2f502848a18171629f4713245689ba7846e8ddae46f1f5b51ccf6cc7e1cf4c",
+        "gitBlob": "09bd060f682e451e3b2334c18599e58dd78f3f7e"
+      },
+      {
+        "path": "src/store.mjs",
+        "bytes": 1111,
+        "sha256": "1a06de61357b90c5f44494a022e985f249a8264eb583ac0d940c9fb587e51f22",
+        "gitBlob": "0188329b3990189e107fc225c03b3694fe3bdbe1"
+      },
+      {
+        "path": "test/telemetry-boundaries.test.mjs",
+        "bytes": 7304,
+        "sha256": "a7469d66791de9bb445e2061037b9cc7d5fb17fa4a089b938fce3383eb9dedac",
+        "gitBlob": "5f65188f4bfd949448469f39c5c2e2081663e0eb"
+      },
+      {
+        "path": "test/telemetry-cell-events.test.mjs",
+        "bytes": 10025,
+        "sha256": "9c1ef2bfdb1f7ac55db20e0e47a14e68be7847d85cb027d720831c7c1f871027",
+        "gitBlob": "a4d5a7ea955be90f56998d235108e5a8f7731b8c"
+      },
+      {
+        "path": "src/telemetry-store.mjs",
+        "bytes": 13124,
+        "sha256": "c977e86d1b8a99116bcf4de76ee65fa67d6ce83419798045b5568595d854cf39",
+        "gitBlob": "727c721b4afa7393f4cdc5fa7a67455a7ce75f79"
+      },
+      {
+        "path": "test/telemetry-trace-integrity.test.mjs",
+        "bytes": 14116,
+        "sha256": "f6a833cd10a658fc437c0d9c006c59d045e84b5e2eb013e8deec591dab3a3d6c",
+        "gitBlob": "a7e54fbaf8fd00cec8021c67fad149068ed0f783"
+      },
+      {
+        "path": "src/telemetry.mjs",
+        "bytes": 11782,
+        "sha256": "93c6e2769f9fac263e334ac6fb221a82961e5cf52de8ad0eb2615384499fe333",
+        "gitBlob": "67a2c0e5878f6c02797f82fbd816bb3d01ffde97"
+      },
+      {
+        "path": "test/telemetry.test.mjs",
+        "bytes": 20505,
+        "sha256": "88dd23226eb14e00a60c6e8a5e4fe6353a6ce55cdeb333342a2eae6c4019f3cb",
+        "gitBlob": "de156cbd99eb72d0db8e118c133e084a8a0bdee0"
+      },
+      {
+        "path": "src/identity/text-document.mjs",
+        "bytes": 2619,
+        "sha256": "151ba810b7ccdd9f2c0ae5bf2800392a81736b9ff8968bc57035e32920c7911a",
+        "gitBlob": "69b7cb86fbf656ef2ce7c750bf1dc8f78e695d39"
+      },
+      {
+        "path": "src/volume.mjs",
+        "bytes": 7338,
+        "sha256": "f8f8e21ba6c4b1c3c24dcf76c84bba9ab89643369ff3c5b47c61df7896cbf294",
+        "gitBlob": "f980b58cb718057fbde4a9cea19bb8b437c04105"
+      }
+    ]
+  },
+  "receiving": {
+    "cwd": "/workspace/scratch/455c183ed200/evidence/published-seavt-0.3.3-dev.204/package",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "--test",
+      "--test-reporter=tap",
+      "--test-concurrency=1",
+      "test/telemetry.test.mjs",
+      "test/telemetry-trace-integrity.test.mjs",
+      "test/telemetry-boundaries.test.mjs",
+      "test/telemetry-cell-events.test.mjs"
+    ],
+    "nodeVersion": "v24.22.1",
+    "startedAt": "2026-10-26T23:49:10.169583+00:00",
+    "finishedAt": "2026-10-26T23:49:12.634774+00:00",
+    "exitCode": 0,
+    "counts": {
+      "tests": 50,
+      "suites": 0,
+      "pass": 50,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 2417.024632
+    },
+    "tap": {
+      "path": "receiving.tap",
+      "bytes": 9336,
+      "sha256": "fa1e8d5b85c4301582fa44690386c2367f65eec25d94b3b6b990877d63d3b21e",
+      "gitBlob": "ee1d7962b76823cb7fd0dbd9efe4393ed10ab4b8"
+    },
+    "stderrBytes": 0,
+    "stderr": ""
+  },
+  "providers": {
+    "mode": "reuse the isolated native-qualified frozen registry closure",
+    "closure": "/workspace/scratch/455c183ed200/evidence/seavt-level1-issued-qualification/source/node_modules",
+    "freshInstallDuringArchiveReceiving": false,
+    "allProviderFilesAndLinksUnchangedAfterReceiving": true,
+    "fullClosureSnapshot": {
+      "sha256": "5a7cdeff43d675318904e66e7960cec81b0db4eace8ca0b1f45513ec680235a6",
+      "entries": 3029,
+      "files": 2254,
+      "links": 181,
+      "directories": 594
+    },
+    "directProviders": {
+      "@red-cup-engineering/computer-content-address-engineering-services-section": {
+        "version": "0.2.0",
+        "realpath": "/workspace/scratch/455c183ed200/evidence/seavt-level1-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+computer-content-address-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-content-address-engineering-services-section",
+        "gitHead": null,
+        "manifest": {
+          "bytes": 1117,
+          "sha256": "cff45a5b99d892048b7e50ec4516e435f1c00cbe7d0e316e9307fe10fdc400c4",
+          "gitBlob": "2639de202f1b410a6b68bbd77a1c3bd1fe5171f1"
+        }
+      },
+      "@red-cup-engineering/computer-data-engineering-services-section": {
+        "version": "0.2.0",
+        "realpath": "/workspace/scratch/455c183ed200/evidence/seavt-level1-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+computer-data-engineering-services-section@0.2.0/node_modules/@red-cup-engineering/computer-data-engineering-services-section",
+        "gitHead": null,
+        "manifest": {
+          "bytes": 2641,
+          "sha256": "d054adc1d03cd518eff79b3e25e3cacaf2ec914e45dde17df80e9196c8063e3c",
+          "gitBlob": "81094bfc255b905332fefb3f47b039805b1f4814"
+        }
+      },
+      "@red-cup-engineering/computer-file-engineering-services-section": {
+        "version": "0.5.0",
+        "realpath": "/workspace/scratch/455c183ed200/evidence/seavt-level1-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+computer-file-engineering-services-section@0.5.0/node_modules/@red-cup-engineering/computer-file-engineering-services-section",
+        "gitHead": null,
+        "manifest": {
+          "bytes": 3208,
+          "sha256": "7e5f6bf7264b7506c04ef7557057a977bac16c8e387548515506be3cad3968dd",
+          "gitBlob": "b4469491c73ee458ed40cf883588fa7c234f0bfe"
+        }
+      },
+      "@red-cup-engineering/eavt-services-section": {
+        "version": "0.11.1",
+        "realpath": "/workspace/scratch/455c183ed200/evidence/seavt-level1-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+eavt-services-section@0.11.1/node_modules/@red-cup-engineering/eavt-services-section",
+        "gitHead": null,
+        "manifest": {
+          "bytes": 6461,
+          "sha256": "8755bc1d5dde952ab334073d43ba599de456b57a199e3e2554f03a999f9a6c65",
+          "gitBlob": "e2c9cecab3918521984dfbe8d23a45f8774bc6c4"
+        }
+      },
+      "@red-cup-engineering/json-schema-services-section": {
+        "version": "0.5.0",
+        "realpath": "/workspace/scratch/455c183ed200/evidence/seavt-level1-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+json-schema-services-section@0.5.0/node_modules/@red-cup-engineering/json-schema-services-section",
+        "gitHead": null,
+        "manifest": {
+          "bytes": 6953,
+          "sha256": "e2e9018c1e2b1cf8bb90072932cae24d26f4f9748fad812627a09a8429d1c2e7",
+          "gitBlob": "eb67d873c2a8934e17a564502e91ae431f5f6083"
+        }
+      },
+      "@red-cup-engineering/json-services-section": {
+        "version": "0.4.0",
+        "realpath": "/workspace/scratch/455c183ed200/evidence/seavt-level1-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+json-services-section@0.4.0/node_modules/@red-cup-engineering/json-services-section",
+        "gitHead": null,
+        "manifest": {
+          "bytes": 2734,
+          "sha256": "1b5945abba04ed87ad57a2a97586ee03b4742d8539fe43c2fabdec1161c181be",
+          "gitBlob": "2e1214eb36ebe14d11796b049620bf66ffa188d8"
+        }
+      },
+      "@red-cup-engineering/signcell": {
+        "version": "0.13.1-dev.206",
+        "realpath": "/workspace/scratch/455c183ed200/evidence/seavt-level1-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+signcell@0.13.1-dev.206/node_modules/@red-cup-engineering/signcell",
+        "gitHead": "db194e835880bec7f3df5861cf5fbdb631550501",
+        "manifest": {
+          "bytes": 3438,
+          "sha256": "c3c4a22f6a8528cdbbebcc43c5cca144ee3e1d5a5c7f9bdb8de0dd49e31fb9f2",
+          "gitBlob": "3142fd2ccc4def48e38b9783603fed14fc443480"
+        }
+      },
+      "@red-cup-engineering/uri-services-section": {
+        "version": "0.1.1",
+        "realpath": "/workspace/scratch/455c183ed200/evidence/seavt-level1-issued-qualification/source/node_modules/.pnpm/@red-cup-engineering+uri-services-section@0.1.1/node_modules/@red-cup-engineering/uri-services-section",
+        "gitHead": null,
+        "manifest": {
+          "bytes": 987,
+          "sha256": "ad2294be4d435b8c12871d030a5976686259c15579818e1dd1eb84d0f96e1dc4",
+          "gitBlob": "7a89bc4a80fd0ce9d2e78db3b30722d1a0e0d524"
+        }
+      }
+    },
+    "nativeQualification": {
+      "status": "passed",
+      "frozenInstall": true,
+      "frozenInstallScope": "Same exact manifest/lock/policy and native-frozen actual206 closure from prior qualification; reused for current-main source composition without reinstall.",
+      "nativeTests": 233,
+      "packedReceivingTests": 50,
+      "receiptPath": "/workspace/scratch/455c183ed200/seavt/docs/qualification/2026-10-26-current-main-level1-reconciliation/receipt.json",
+      "receiptSha256": "be004b54da6561ccdeb7b6d84fe0bb2beb6fb7ea7e1ac197d543e5f25af19cee"
+    }
+  },
+  "historicalBaseline": {
+    "version": "0.3.3-dev.200",
+    "originalArtifactAndProvidersModified": false
+  },
+  "limits": [
+    "Receives the actual issued artifact; this is not deployment or fleet-wide receiving.",
+    "Runs the four declared receiving suites; the separately recorded native gate is not rerun.",
+    "No fresh install, policy change, historical fixture/provider edit, FeltOS edit or remote write."
+  ]
+}
