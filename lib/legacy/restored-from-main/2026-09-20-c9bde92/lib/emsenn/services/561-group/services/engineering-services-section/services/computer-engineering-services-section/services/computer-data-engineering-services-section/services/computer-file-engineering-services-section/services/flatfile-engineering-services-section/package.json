@@ -1,0 +1,39 @@
+{
+  "name": "@red-cup-engineering/flatfile",
+  "version": "0.2.0",
+  "type": "module",
+  "description": "Plain flatfile: whole-file atomic text write (temp + fsync + rename), UTF-8 whole-file text read, a binarity sniff over a regular file's leading bytes, and a plain classifier for the file -> regular-file -> flatfile spine. A flatfile is a NUL-free regular file -- the base byte-touch every text codec (json/jsonl/eavt, text/markdown) composes.",
+  "keywords": [
+    "flatfile",
+    "computer-data",
+    "561-group"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emsenn/bare-cedar-fog.git",
+    "directory": "lib/emsenn/services/561-group/services/engineering-services-section/services/computer-engineering-services-section/services/computer-data-engineering-services-section/services/computer-file-engineering-services-section/services/flatfile-engineering-services-section"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./src/flatfile.mjs",
+    "./cli": "./apps/flatfile-cli.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "scripts",
+    "apps",
+    "data/records/schema",
+    "content",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@lenticule-science/metrologic": "file:../../../../../computer-systems-engineering-services-section/services/computer-math-system-services-section/apps/metrologic"
+  }
+}
