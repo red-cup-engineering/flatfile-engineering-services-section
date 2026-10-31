@@ -36,7 +36,7 @@ Several scripts import `dist/`, so build before running them from a checkout;
   `validate-schema-instance` is the bounded process judge; it refuses a known
   keyword it does not implement and checks calendar dates, not date shapes.
 - `src/validation.mjs` (`./validation`), `src/contracts.mjs` (`./contracts`),
-  `src/profile-admission.mjs`: the house-wide evaluator, the contract registry
+  `src/profile-admission.mjs`: the Group-wide evaluator, the contract registry
   and the profile-assertion helpers.
 - `src/schema-evaluation.mjs` (`check-json-schema`, `evaluate-json-schema`): the
   native Hyperjump engine for Draft 4 through 2020-12 over a caller-supplied
