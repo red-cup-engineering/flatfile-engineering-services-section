@@ -18,12 +18,15 @@
   "exports": {
     ".": "./src/flatfile.mjs",
     "./read-flatfile-text": "./scripts/read-flatfile-text.mjs",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./file-receipt-store": "./src/file-receipt-store.mjs"
   },
   "files": [
     "src",
     "scripts",
-    "README.md"
+    "README.md",
+    "test",
+    "specifications"
   ],
   "sideEffects": false,
   "scripts": {
@@ -33,5 +36,11 @@
   "funding": {
     "type": "individual",
     "url": "https://github.com/561-group/.github/blob/main/TIPS.md"
-  }
+  },
+  "receivingTests": [
+    "test/flatfile.test.mjs",
+    "test/publication.test.mjs",
+    "test/receipt-store-lock.test.mjs",
+    "test/receipt-store-claims.test.mjs"
+  ]
 }

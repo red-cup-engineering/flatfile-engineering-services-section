@@ -19,3 +19,11 @@ This section is also the package `@red-cup-engineering/flatfile-engineering-serv
 `readFlatfileText`, `sniffFileBinarity` and `classifyFlatfile`. The asynchronous
 `readFileText` of `computer-file-engineering-services-section` remains for async callers;
 `readFlatfileText` is for callers whose own contract is synchronous.
+
+
+## File receipt store
+
+`@red-cup-engineering/flatfile-engineering-services-section/file-receipt-store`
+exports the existing `FileReceiptStore` for explicit caller-owned JSON receipt paths.
+It preserves process/restart claims and write-lock fencing, not power-loss durability.
+See `specifications/file-receipt-store.md` for source lineage and migration.
