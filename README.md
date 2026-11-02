@@ -1,4 +1,4 @@
-# Flatfile services section
+# @red-cup-engineering/flatfile-engineering-services-section
 
 <!-- 561-group-standards:badges:start -->
 [![Red Cup Engineering](https://img.shields.io/badge/561%20Group-Red%20Cup%20Engineering-c0392b)](https://github.com/red-cup-engineering)
@@ -6,6 +6,8 @@
 [![Indigenous data: CARE](https://img.shields.io/badge/Indigenous%20data-CARE-4b6f44)](https://github.com/red-cup-engineering/.github/blob/main/GOVERNANCE.md)
 [![Tips welcome](https://img.shields.io/badge/tips-welcome-d4a017)](https://github.com/561-group/.github/blob/main/TIPS.md)
 <!-- 561-group-standards:badges:end -->
+
+Plain flatfile: whole-file atomic text write (temp + fsync + rename), synchronous UTF-8 whole-file text read (readFlatfileText), a binarity sniff over a regular file's leading bytes, and a plain classifier for the file -> regular-file -> flatfile spine. A flatfile is a NUL-free regular file -- the base byte-touch every text codec composes.
 
 This section owns file data whose admitted carrier is a finite byte sequence in
 one file. Its children prove progressively narrower representation families;
