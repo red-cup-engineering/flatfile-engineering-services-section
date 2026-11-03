@@ -6,7 +6,7 @@
 // Ported (moved, adapted to stand alone) from @red-cup-engineering/computer's
 // posix-holography/src/flatfile.mjs, posix-holography/src/read-text.mjs, and
 // posix-holography/src/sniff.mjs (source directory:
-// computer-operating-system-services-section/services/561-group-computer/posix-holography/).
+// computer-operating-systems-engineering-services-section/services/561-group-computer/posix-holography/).
 //
 // EXCLUDED, deliberately, and why:
 //   - Upstream flatfile.mjs's readFile(path) = stat(path) and readRegularFile/readFlatfile's
