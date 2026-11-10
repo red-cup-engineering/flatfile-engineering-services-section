@@ -29,3 +29,7 @@ This section is also the package `@red-cup-engineering/flatfile-engineering-serv
 exports the existing `FileReceiptStore` for explicit caller-owned JSON receipt paths.
 It preserves process/restart claims and write-lock fencing, not power-loss durability.
 See `specifications/file-receipt-store.md` for source lineage and migration.
+
+## Acceptance
+
+Run `npm test` for the source suite. The [API reference](docs/API.md) links the source refusal and [runnable consumer example](examples/quickstart.test.mjs).

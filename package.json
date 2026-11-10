@@ -26,11 +26,14 @@
     "scripts",
     "README.md",
     "test",
-    "specifications"
+    "specifications",
+    "docs/API.md",
+    "examples/quickstart.test.mjs"
   ],
   "sideEffects": false,
   "scripts": {
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "test:consumer": "node --test examples/quickstart.test.mjs"
   },
   "license": "MIT",
   "funding": {
