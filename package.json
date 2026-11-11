@@ -1,6 +1,6 @@
 {
   "name": "@red-cup-engineering/flatfile-engineering-services-section",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "description": "Plain flatfile: whole-file atomic text write (temp + fsync + rename), synchronous UTF-8 whole-file text read (readFlatfileText), a binarity sniff over a regular file's leading bytes, and a plain classifier for the file -> regular-file -> flatfile spine. A flatfile is a NUL-free regular file -- the base byte-touch every text codec composes.",
   "keywords": [
