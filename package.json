@@ -27,7 +27,6 @@
     "README.md",
     "test",
     "specifications",
-    "docs/API.md",
     "examples/quickstart.test.mjs"
   ],
   "sideEffects": false,

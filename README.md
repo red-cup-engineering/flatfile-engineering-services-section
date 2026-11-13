@@ -32,4 +32,4 @@ See `specifications/file-receipt-store.md` for source lineage and migration.
 
 ## Acceptance
 
-Run `npm test` for the source suite. The [API reference](docs/API.md) links the source refusal and [runnable consumer example](examples/quickstart.test.mjs).
+Run `npm test` for the source suite. See the [runnable consumer example](examples/quickstart.test.mjs).
