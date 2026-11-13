@@ -1,9 +1,9 @@
-[submodule "services/text-file-services-section"]
-	path = services/text-file-services-section
+[submodule "services/text-file-engineering-services-section"]
+	path = services/text-file-engineering-services-section
 	url = https://github.com/red-cup-engineering/text-file-engineering-services-section.git
 	branch = main
-[submodule "services/serialization-services-section"]
-	path = services/serialization-services-section
+[submodule "services/serialization-engineering-services-section"]
+	path = services/serialization-engineering-services-section
 	url = https://github.com/red-cup-engineering/serialization-engineering-services-section.git
 	branch = main
 [submodule "services/data-custody-directory-service"]
