@@ -101,7 +101,7 @@ function claimName(eventKey) {
   return `${createHash("sha256").update(eventKey, "utf8").digest("hex")}.json`;
 }
 
-export class FileRecordStore {
+export class FileReceiptStore {
   constructor(path) {
     if (typeof path !== "string" || path.trim() === "") {
       throw new TypeError("receipt store path is required");
@@ -116,11 +116,11 @@ export class FileRecordStore {
     return readStore(this.path)[eventKey] ?? null;
   }
 
-  put(eventKey, record) {
+  put(eventKey, receipt) {
     if (typeof eventKey !== "string" || eventKey === "") {
       throw new TypeError("eventKey is required");
     }
-    if (record === null || typeof record !== "object" || Array.isArray(record)) {
+    if (receipt === null || typeof receipt !== "object" || Array.isArray(receipt)) {
       throw new TypeError("receipt must be an object");
     }
 
@@ -130,7 +130,7 @@ export class FileRecordStore {
       if (Object.hasOwn(current, eventKey)) {
         throw new Error("receipt already exists for eventKey");
       }
-      const next = { ...current, [eventKey]: record };
+      const next = { ...current, [eventKey]: receipt };
       const temporary = `${this.path}.${process.pid}.${randomUUID()}.tmp`;
       writeFileSync(temporary, `${JSON.stringify(next, null, 2)}\n`, {
         encoding: "utf8",
@@ -140,7 +140,7 @@ export class FileRecordStore {
         assertOwned();
         renameSync(temporary, this.path);
         assertOwned();
-        return record;
+        return receipt;
       } finally {
         rmSync(temporary, { force: true });
       }
