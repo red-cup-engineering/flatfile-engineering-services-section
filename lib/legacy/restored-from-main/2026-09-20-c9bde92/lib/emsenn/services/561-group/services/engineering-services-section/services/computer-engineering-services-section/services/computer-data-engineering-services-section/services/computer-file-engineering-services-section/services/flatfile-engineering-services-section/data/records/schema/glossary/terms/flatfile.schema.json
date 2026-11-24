@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "glossary/terms/flatfile",
+  "title": "flatfile",
+  "description": "The result of classifying a filesystem path along the file -> regular-file -> flatfile spine (classifyFlatfile). A flatfile is exactly a NUL-free regular file: isRegularFile is true and binarity is \"flat\". binarity and kind are null when the path is not a regular file (a directory, symlink, device, etc.) -- binarity sniffing and flatfile-vs-binary-file classification presuppose a regular file and are never attempted otherwise. This schema describes the plain classification value itself, never a charged/holographic reading of the path -- that composition belongs to the stat/observation row of the decomposition.",
+  "type": "object",
+  "required": ["path", "isRegularFile", "binarity", "kind"],
+  "additionalProperties": false,
+  "properties": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The filesystem path classified."
+    },
+    "isRegularFile": {
+      "type": "boolean",
+      "description": "Whether the path names a regular file (node:fs statSync(path).isFile())."
+    },
+    "binarity": {
+      "description": "The sniffed binarity of the file's leading bytes (first 8192), or null when the path is not a regular file.",
+      "anyOf": [
+        { "type": "string", "enum": ["flat", "binary"] },
+        { "type": "null" }
+      ]
+    },
+    "kind": {
+      "description": "\"flatfile\" when the path is a regular file whose binarity is \"flat\"; \"binary-file\" when it is a regular file whose binarity is \"binary\"; null when the path is not a regular file.",
+      "anyOf": [
+        { "type": "string", "enum": ["flatfile", "binary-file"] },
+        { "type": "null" }
+      ]
+    }
+  }
+}
