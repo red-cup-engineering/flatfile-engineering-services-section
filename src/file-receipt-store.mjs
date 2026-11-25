@@ -1,4 +1,5 @@
-import { createHash, randomUUID } from "node:crypto";
+import { sha256Hex } from "@red-cup-engineering/semiotic-content-address-system";
+import { randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
@@ -98,7 +99,7 @@ function withLock(lockPath, action) {
 }
 
 function claimName(eventKey) {
-  return `${createHash("sha256").update(eventKey, "utf8").digest("hex")}.json`;
+  return `${sha256Hex(eventKey)}.json`;
 }
 
 export class FileReceiptStore {
